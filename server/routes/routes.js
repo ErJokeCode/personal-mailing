@@ -27,10 +27,49 @@ const router = app => {
         }
     })
     
-    app.put("/api/courses/update", async(req, res)=> {
+    app.get("/api/courses", async(req, res)=> {
         try{
-            await parse_inf_urfu_to_db(req)
-            res.sendStatus(200)
+            console.log(req.body)
+            const university = req.body.university;
+            const name_course = req.body.name_course;
+            const collection = req.app.locals.collection("courses");
+            await parse_inf_urfu_to_db(collection).then(async function() {
+                let results = []
+                if(name_course != undefined && university != undefined){
+                    results = await collection.find({"name": name_course, "university": university}).toArray();
+                }
+                else if(name_course != undefined){
+                    results = await collection.find({"name": name_course}).toArray();
+                }
+                else if(university != undefined){
+                    results = await collection.find({"university": university}).toArray();
+                }
+                else{
+                    results = await collection.find().toArray();
+                }
+                
+                res.json(results) 
+            })  
+        }
+        catch(err){
+            console.log(err)
+            res.sendStatus(500)
+        }
+    });
+
+    app.get("/api/courses/universitys", async(req, res)=> {
+        try{
+            const collection = req.app.locals.collection("courses");
+            await parse_inf_urfu_to_db(collection).then(async function() {
+                const results = await collection.find().toArray();
+                let universitys = []
+                results.forEach(course => {
+                    if (universitys.indexOf(course.university) == -1){
+                        universitys.push(course.university)
+                    }
+                })
+                res.json(universitys) 
+            })  
         }
         catch(err){
             console.log(err)
@@ -104,33 +143,9 @@ const router = app => {
             res.sendStatus(500)
         }
     })
-
-    // app.get("/api/services", async(req, res) => {
-    //     try{
-    //         const YouGielNameAdminColumn = process.env.YOUGILE__ADMIN__NAME__COLUMN;
-    //         const YouGileAdminService = process.env.YOUGILE__ADMIN__SERVICE;
-
-
-    //         const reqTask = await axios.get("https://yougile.com/api-v2/tasks", 
-    //             { params : {title : YouGileAdminService} , headers: {"Authorization" : `Bearer ${process.env.YOUGILE__TOKEN}`} })
-
-    //         const descrTask = reqTask.data.content[0].description;
-    //         let start = descrTask.indexOf("<table");
-    //         let end = descrTask.indexOf("</table>")+8;
-    //         const table = descrTask.slice(start, end);
-    //         const json = toObject(table)
-
-    //         res.json(json)
-    //     }
-    //     catch{
-    //         console.log(err);
-    //         res.sendStatus(500);
-    //     }
-    // })
 }
 
-
-async function parse_inf_urfu_to_db(req) {
+async function parse_inf_urfu_to_db(collection) {
     try{
         const {data} = await axios.get("https://inf-online.urfu.ru/ru/onlain-kursy/");
 
@@ -138,15 +153,9 @@ async function parse_inf_urfu_to_db(req) {
         const table = $('.ce-bodytext table tbody');
         const courses = table_courses_to_json($, table)
 
-        const collection = req.app.locals.collection("courses");
         await collection.drop().then(async function() {
             await collection.insertMany(courses);
         });
-        
-        // await axios.post(`https://api.telegram.org/bot5340189185:AAHP6C_90kJPUvVZTmbzu4QGzQveGOLyBV4/sendMessage`, {
-        //     "chat_id" : 1362536052, 
-        //     "text" : "test"
-        // })
     }
     catch(err){
         console.log(err);
