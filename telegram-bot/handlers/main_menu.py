@@ -6,8 +6,11 @@ import aiohttp
 from config import URL_SERVER
 import keyboards.main_menu as keyboard
 from states import LKStates
+from texts.error import Registration, Input
+from texts.main_menu import ToCurator
 
 router = Router()
+
 
 async def show_main_menu(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
@@ -15,19 +18,26 @@ async def show_main_menu(message: types.Message, state: FSMContext):
         await message.answer("Главное меню:", reply_markup=keyboard.Menu())
     else:
         await message.delete()
-        await message.answer("Вы не зарегистрированы. Пожалуйста, введите вашу почту и номер студенческого билета. Для повторного входа используйте команду /start")
+        await message.answer(Registration.no())
+
+
 
 @router.callback_query(LKStates.MAIN_MENU, F.data == 'chat_curator')
 async def process_chat_curator(callback_query: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
+
     if user_data.get('email') and user_data.get('personal_number'):
         await callback_query.message.delete()
         await state.set_state(LKStates.WAITING_CHAT_WITH_CURATOR)
-        await callback_query.message.answer("Введите ваш вопрос:", reply_markup=keyboard.Back_to_main())
+        await callback_query.message.answer(ToCurator.preface(), 
+                                            reply_markup=keyboard.Back_to_main())
     else:
         await callback_query.message.delete()
-        await callback_query.message.answer("Вы не зарегистрированы. Пожалуйста, введите вашу почту и номер студенческого билета. Для повторного входа используйте команду /start")
+        await callback_query.message.answer(Registration.no())
 
+@router.message(LKStates.WAITING_CHAT_WITH_CURATOR)
+async def message_to_curator(message: types.Message, state: FSMContext):
+    print(message.text)
 
 # @router.callback_query(LKStates.MAIN_MENU, lambda c: c.data == "chat_curator")
 # async def process_chat_curator(callback_query: types.CallbackQuery, state: FSMContext):
@@ -57,7 +67,7 @@ async def process_online_courses(callback_query: types.CallbackQuery, state: FSM
         await callback_query.message.answer("Выберите онлайн курс:", reply_markup=keyboard.Courses(courses_data=courses_data))
     else:
         await callback_query.message.delete()
-        await callback_query.message.answer("Вы не зарегистрированы. Пожалуйста, введите вашу почту и номер студенческого билета. Для повторного входа используйте команду /start")
+        await callback_query.message.answer(Registration.no())
 
 @router.callback_query(lambda c: c.data.startswith("course_"))
 async def process_course_info(callback_query: types.CallbackQuery, state: FSMContext):
@@ -76,7 +86,7 @@ async def process_course_info(callback_query: types.CallbackQuery, state: FSMCon
         await callback_query.message.answer(f"Информация о курсе {course_data['name']}\n{course_data['info']}\n{course_data['date']}\n{course_data['university']}\n\n Баллы: {courses_data[course_id]['score']}", reply_markup=keyboard.Back_to_courses())
     else:
         await callback_query.message.delete()
-        await callback_query.message.answer("Вы не зарегистрированы. Пожалуйста, введите вашу почту и номер студенческого билета. Для повторного входа используйте команду /start")
+        await callback_query.message.answer(Registration.no())
 
 @router.callback_query(lambda c: c.data == "faq")
 async def process_faq(callback_query: types.CallbackQuery, state: FSMContext):
@@ -87,7 +97,7 @@ async def process_faq(callback_query: types.CallbackQuery, state: FSMContext):
         await callback_query.message.answer(faq_text, reply_markup=keyboard.Back_to_main())
     else:
         await callback_query.message.delete()
-        await callback_query.message.answer("Вы не зарегистрированы. Пожалуйста, введите вашу почту и номер студенческого билета. Для повторного входа используйте команду /start")
+        await callback_query.message.answer(Registration.no())
 
 @router.callback_query(lambda c: c.data == "main_menu")
 async def process_main_menu(callback_query: types.CallbackQuery, state: FSMContext): 
@@ -98,7 +108,7 @@ async def process_main_menu(callback_query: types.CallbackQuery, state: FSMConte
         await show_main_menu(callback_query.message, state)
     else:
         await callback_query.message.delete()
-        await callback_query.message.answer("Вы не зарегистрированы. Пожалуйста, введите вашу почту и номер студенческого билета. Для повторного входа используйте команду /start")
+        await callback_query.message.answer(Registration.no())
 
 # @router.callback_query(lambda c: c.data == "logout")
 # async def process_logout(callback_query: types.CallbackQuery, state: FSMContext):
@@ -116,10 +126,6 @@ async def process_main_menu(callback_query: types.CallbackQuery, state: FSMConte
 
 
 
-@router.message(LKStates.WAITING_CHAT_WITH_CURATOR)
-async def chat(message: types.Message, state: FSMContext):
-    await message.answer("Спасибо! Мы сохранили вопрос или что-то ещё")
-
 @router.message(LKStates.MAIN_MENU)
 async def chat(message: types.Message, state: FSMContext):
-    await message.answer("Мне непонятен текст))")
+    await message.answer(Input.incorrect())
