@@ -20,9 +20,7 @@ public static class Program
             {
                 options.AddDefaultPolicy(
                     policy =>
-                    {
-                        policy.WithOrigins(new string[] { "http://localhost:5010" }).AllowAnyMethod().AllowAnyHeader();
-                    });
+                    { policy.WithOrigins("http://client:5010").AllowAnyMethod().AllowAnyHeader(); });
             });
 
         var app = builder.Build();

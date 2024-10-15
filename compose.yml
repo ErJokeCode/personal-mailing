@@ -1,18 +1,25 @@
 services:
+  client:
+    build: ./client
+    command: npm run dev
+    ports:
+      - 5010:5010
+    volumes:
+      - ./client:/opt/client
+
   parserdb:
     image: mongo
     restart: always
     ports:
       - 27071:27017
     healthcheck:
-      # test: echo 'db.runCommand("ping").ok' | mongo mongo:27017/test --quiet
       test: echo "healthy"
       interval: 10s
       timeout: 10s
       retries: 5
       start_period: 30s
     volumes:
-      - pgdata:/var/lib/postgresql/data
+      - parserdata:/var/lib/parser/data
 
   parser:
     build: ./servers/parser
@@ -40,4 +47,4 @@ services:
       - ./servers/core:/opt/core
 
 volumes:
-  pgdata:
+  parserdata:
