@@ -1,0 +1,43 @@
+services:
+  parserdb:
+    image: mongo
+    restart: always
+    ports:
+      - 27071:27017
+    healthcheck:
+      # test: echo 'db.runCommand("ping").ok' | mongo mongo:27017/test --quiet
+      test: echo "healthy"
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  parser:
+    build: ./servers/parser
+    command: python main.py
+    depends_on:
+      parserdb:
+        condition: service_healthy
+    ports:
+      - 8000:8000
+    volumes:
+      - ./servers/parser:/opt/parser
+
+  bot:
+    build: ./telegram-bot
+    command: python main.py
+    volumes:
+      - ./telegram-bot:/opt/bot
+
+  core:
+    build: ./servers/core
+    command: dotnet run
+    ports:
+      - 5000:5000
+    volumes:
+      - ./servers/core:/opt/core
+
+volumes:
+  pgdata:
