@@ -1,0 +1,19 @@
+meta {
+  name: upload-courses
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_api}}/upload/report_ok
+  body: multipartForm
+  auth: none
+}
+
+body:form-urlencoded {
+  file: 
+}
+
+body:multipart-form {
+  file: @file(/home/nick/Documents/Svodnaya_vedomost.xlsx)
+}
