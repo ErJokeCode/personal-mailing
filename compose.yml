@@ -7,31 +7,6 @@ services:
     volumes:
       - ./client:/opt/client
 
-  parserdb:
-    image: mongo
-    restart: always
-    ports:
-      - 27071:27017
-    healthcheck:
-      test: echo "healthy"
-      interval: 10s
-      timeout: 10s
-      retries: 5
-      start_period: 30s
-    volumes:
-      - parserdata:/var/lib/parser/data
-
-  parser:
-    build: ./servers/parser
-    command: python main.py
-    depends_on:
-      parserdb:
-        condition: service_healthy
-    ports:
-      - 8000:8000
-    volumes:
-      - ./servers/parser:/opt/parser
-
   bot:
     build: ./telegram-bot
     command: python main.py
@@ -46,5 +21,46 @@ services:
     volumes:
       - ./servers/core:/opt/core
 
+  userdb:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: userdb
+    ports:
+      - 5423:5432
+    volumes:
+      - userdata:/var/lib/user/data
+
+  user:
+    build: ./servers/user
+    command: dotnet run
+    depends_on:
+      userdb:
+        condition: service_started
+    volumes:
+      - ./servers/user:/opt/user
+
+  parserdb:
+    image: mongo
+    restart: always
+    ports:
+      - 27071:27017
+    volumes:
+      - parserdata:/var/lib/parser/data
+
+  parser:
+    build: ./servers/parser
+    command: python main.py
+    depends_on:
+      parserdb:
+        condition: service_started
+    ports:
+      - 8000:8000
+    volumes:
+      - ./servers/parser:/opt/parser
+
 volumes:
   parserdata:
+  userdata:
