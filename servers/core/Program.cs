@@ -1,8 +1,5 @@
 using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Ocelot.DependencyInjection;
-using Ocelot.Middleware;
 
 namespace Core;
 
@@ -12,8 +9,7 @@ public static class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
-        builder.Configuration.AddJsonFile("ocelot.json", optional: false, reloadOnChange: true);
-        builder.Services.AddOcelot(builder.Configuration);
+        builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
         builder.Services.AddCors(
             options =>
@@ -26,7 +22,7 @@ public static class Program
         var app = builder.Build();
 
         app.UseCors();
-        app.UseOcelot();
+        app.MapReverseProxy();
 
         app.Run();
     }
