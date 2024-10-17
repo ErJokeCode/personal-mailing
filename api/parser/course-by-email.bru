@@ -1,0 +1,29 @@
+meta {
+  name: course-by-email
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{base_api}}/parser/course/by_email?email=nikita.shishkov@urfu.me
+  body: none
+  auth: none
+}
+
+params:query {
+  email: nikita.shishkov@urfu.me
+}
+
+body:json {
+  {
+    "email": "nick.shishkov@urfu.me"
+  }
+}
+
+body:form-urlencoded {
+  email: nick.shishkov@urfu.me
+}
+
+body:multipart-form {
+  email: nick.shishkov@urfu.me
+}

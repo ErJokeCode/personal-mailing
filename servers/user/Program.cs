@@ -28,7 +28,8 @@ public static class Program
             }
         }
 
-        app.MapGet("/", (UserDb db) => db.Students);
+        app.MapPost("/auth", (string email, string personalNumber, string chatId, UserDb db) =>
+                             { return db.Students; });
 
         app.Run();
     }
@@ -45,5 +46,10 @@ public static class Program
     public class Student
     {
         public int Id { get; set; }
+        public int PersonalNumber { get; set; }
+        public int ChatId { get; set; }
+
+        public string UserId { get; set; }
+        public string UserCourseId { get; set; }
     }
 }
