@@ -41,7 +41,7 @@ async def auth_user(user: Annotated[GetUserAuth, Body()]):
         raise HTTPException(status_code=404, detail="User not found")
 
     new_auth_user = UserAuth(email=user.email, personal_number=user.personal_number, chat_id=user.chat_id, id_user=get_user.id, id_user_course=user_course.id)
-    if collection_auth.find_one({"email" : new_auth_user.email}) != None:
+    if collection_auth.find_one({"email" : new_auth_user.email}) == None:
         collection_auth.insert_one(new_auth_user.model_dump(by_alias=True, exclude=["id"]))
         new_auth_user = UserAuth(**collection_auth.find_one(new_auth_user.model_dump()))
         return new_auth_user

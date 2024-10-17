@@ -5,6 +5,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from contextlib import asynccontextmanager
 from aiogram.types import Update
+from aiogram.fsm.storage.redis import RedisStorage
 
 import aiohttp
 import asyncio
@@ -13,14 +14,14 @@ import json
 from fastapi import FastAPI, Request
 import uvicorn
 
-from config import URL_SERVER
-from config import TOKEN
+from config import URL_REDIS, URL_SERVER, TOKEN
 from handlers import start, main_menu, information_teaching
 
 
+storage = RedisStorage.from_url(URL_REDIS)
 
 bot = Bot(token=TOKEN)
-dp = Dispatcher()
+dp = Dispatcher(storage = storage)
 dp.include_routers(start.router, main_menu.router)
 
 async def main():
