@@ -7,6 +7,7 @@ class RegistrationStates(StatesGroup):
 class LKStates(StatesGroup):
     MAIN_MENU = State()
     WAITING_CHAT_WITH_CURATOR = State()
+    COURSES = State()
 
 class Info_teaching(StatesGroup):
     INFO = State()
