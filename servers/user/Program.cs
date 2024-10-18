@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using System.Web;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
@@ -42,13 +41,6 @@ public static class Program
         app.Run();
     }
 
-    private class AuthDetails
-    {
-        public string email { get; set; }
-        public string personal_number { get; set; }
-        public string chat_id { get; set; }
-    }
-
     private static async Task<IResult> HandleCourses(Guid id, Models.UserDb db)
     {
         HttpClient httpClient = new()
@@ -76,13 +68,15 @@ public static class Program
             return Results.NotFound();
         }
 
-        var result = await response.Content.ReadAsStringAsync();
-        var userCourse = JsonSerializer.Deserialize<Models.UserCourse>(result);
+        var serializerSettings = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower };
 
-        return Results.Ok(userCourse.courses);
+        var result = await response.Content.ReadAsStringAsync();
+        var userCourse = JsonSerializer.Deserialize<Models.UserCourse>(result, serializerSettings);
+
+        return Results.Ok(userCourse.Courses);
     }
 
-    private static async Task<IResult> HandleAuth(AuthDetails details, Models.UserDb db)
+    private static async Task<IResult> HandleAuth(Models.AuthDetails details, Models.UserDb db)
     {
         HttpClient httpClient = new()
         {
@@ -90,7 +84,7 @@ public static class Program
         };
         var query = new Dictionary<string, string>
         {
-            ["email"] = details.email,
+            ["email"] = details.Email,
         };
         var response = await httpClient.GetAsync(QueryHelpers.AddQueryString("/course/by_email/", query));
 
@@ -99,14 +93,16 @@ public static class Program
             return Results.NotFound();
         }
 
+        var serializerSettings = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower };
+
         var result = await response.Content.ReadAsStringAsync();
-        var userCourse = JsonSerializer.Deserialize<Models.UserCourse>(result);
+        var userCourse = JsonSerializer.Deserialize<Models.UserCourse>(result, serializerSettings);
 
         query = new Dictionary<string, string>
         {
-            ["name"] = userCourse.name,
-            ["sername"] = userCourse.sername,
-            ["patronymic"] = userCourse.patronymic,
+            ["name"] = userCourse.Name,
+            ["sername"] = userCourse.Sername,
+            ["patronymic"] = userCourse.Patronymic,
         };
         response = await httpClient.GetAsync(QueryHelpers.AddQueryString("/user_info/by_name/", query));
 
@@ -116,9 +112,9 @@ public static class Program
         }
 
         result = await response.Content.ReadAsStringAsync();
-        var user = JsonSerializer.Deserialize<Models.User>(result);
+        var user = JsonSerializer.Deserialize<Models.User>(result, serializerSettings);
 
-        if (details.personal_number != user.personal_number)
+        if (details.PersonalNumber != user.PersonalNumber)
         {
             return Results.NotFound();
         }
@@ -126,12 +122,12 @@ public static class Program
         var student =
             new Models.Student()
             {
-                Email = details.email,
-                PersonalNumber = details.personal_number,
-                ChatId = details.chat_id,
+                Email = details.Email,
+                PersonalNumber = details.PersonalNumber,
+                ChatId = details.ChatId,
                 UserId = user._id,
                 UserCourseId = userCourse._id
-            }; 
+            };
 
         db.Students.Add(student);
         await db.SaveChangesAsync();
