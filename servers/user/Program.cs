@@ -41,13 +41,22 @@ public static class Program
         app.Run();
     }
 
-    private static async Task<IResult> HandleAuth(string email, string personalNumber, string ChatId, Models.UserDb db)
+    private class AuthDetails
     {
-        HttpClient httpClient = new() {
+        public string email { get; set; }
+        public string personal_number { get; set; }
+        public string chat_id { get; set; }
+    }
+
+    private static async Task<IResult> HandleAuth(AuthDetails details, Models.UserDb db)
+    {
+        HttpClient httpClient = new()
+        {
             BaseAddress = new Uri("http://parser:8000"),
         };
-        var query = new Dictionary<string, string> {
-            ["email"] = email,
+        var query = new Dictionary<string, string>
+        {
+            ["email"] = details.email,
         };
         var response = await httpClient.GetAsync(QueryHelpers.AddQueryString("/course/by_email/", query));
 
@@ -59,7 +68,8 @@ public static class Program
         var result = await response.Content.ReadAsStringAsync();
         var userCourse = JsonSerializer.Deserialize<Models.UserCourse>(result);
 
-        query = new Dictionary<string, string> {
+        query = new Dictionary<string, string>
+        {
             ["name"] = userCourse.name,
             ["sername"] = userCourse.sername,
             ["patronymic"] = userCourse.patronymic,
@@ -74,13 +84,19 @@ public static class Program
         result = await response.Content.ReadAsStringAsync();
         var user = JsonSerializer.Deserialize<Models.User>(result);
 
-        if (personalNumber != user.personal_number)
+        if (details.personal_number != user.personal_number)
         {
             return Results.NotFound();
         }
 
-        var student = new Models.Student() { Email = email, PersonalNumber = personalNumber, ChatId = ChatId,
-                                             UserId = user._id, UserCourseId = userCourse._id };
+        var student = new Models.Student()
+        {
+            Email = details.email,
+            PersonalNumber = details.personal_number,
+            ChatId = details.chat_id,
+            UserId = user._id,
+            UserCourseId = userCourse._id
+        };
 
         db.Students.Add(student);
         await db.SaveChangesAsync();

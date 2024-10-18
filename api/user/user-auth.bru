@@ -5,13 +5,15 @@ meta {
 }
 
 post {
-  url: http://localhost:5000/user/auth?email=nikita.shishkov@urfu.me&personalNumber=0&ChatId=0
-  body: none
+  url: http://localhost:5000/user/auth
+  body: json
   auth: none
 }
 
-params:query {
-  email: nikita.shishkov@urfu.me
-  personalNumber: 0
-  ChatId: 0
+body:json {
+  {
+    "email": "nikita.shishkov@urfu.me",
+    "personal_number": "0",
+    "chat_id": "0"
+  }
 }
