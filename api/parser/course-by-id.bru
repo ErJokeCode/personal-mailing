@@ -1,0 +1,29 @@
+meta {
+  name: course-by-id
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{base_api}}/parser/course/by_id?id
+  body: none
+  auth: none
+}
+
+params:query {
+  id: 
+}
+
+body:json {
+  {
+    "email": "nick.shishkov@urfu.me"
+  }
+}
+
+body:form-urlencoded {
+  email: nick.shishkov@urfu.me
+}
+
+body:multipart-form {
+  email: nick.shishkov@urfu.me
+}

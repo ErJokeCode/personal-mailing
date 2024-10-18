@@ -76,7 +76,7 @@ async def process_course_info(callback_query: types.CallbackQuery, state: FSMCon
         courses_data = user_data.get('courses_data')
         course_id = int(callback_query.data.split("_")[1])
         async with aiohttp.ClientSession() as session:
-            async with session.get(f"{URL_SERVER}/course/search", params={"name": courses_data[course_id]["name"], "university": courses_data[course_id]["university"]}) as response:
+            async with session.get(f"{URL_SERVER}/parser/course/search", params={"name": courses_data[course_id]["name"], "university": courses_data[course_id]["university"]}) as response:
                 if response.status == 200:
                     course_data = await response.json()
                 else:

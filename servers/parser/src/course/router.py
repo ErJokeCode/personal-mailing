@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 
 from config import DB
 from src.schemas import Course, Course_info, User_course
+from bson import ObjectId
 
 
 router_course = APIRouter(
@@ -10,8 +11,9 @@ router_course = APIRouter(
 )
 
 
+# Извиняюсь за вторжение
 @router_course.get("/by_email")
-async def auth_user(email: str):
+async def get_by_email(email: str):
     try:
         collection_user_course = DB.get_user_course_collection()
     except Exception as e:
@@ -19,6 +21,23 @@ async def auth_user(email: str):
         raise HTTPException(status_code=500, detail="Error DB")
 
     user_course = collection_user_course.find_one({"email": email})
+    if user_course is None:
+        print("User not found")
+        raise HTTPException(status_code=404, detail="User not found")
+    user_course = User_course(**user_course)
+
+    return user_course
+
+
+@router_course.get("/by_id")
+async def get_by_id(id: str):
+    try:
+        collection_user_course = DB.get_user_course_collection()
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail="Error DB")
+
+    user_course = collection_user_course.find_one({"_id": ObjectId(id)})
     if user_course is None:
         print("User not found")
         raise HTTPException(status_code=404, detail="User not found")

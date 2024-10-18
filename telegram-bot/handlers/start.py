@@ -51,7 +51,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
             async with session.post(f"{URL_SERVER}/user/auth", json=body) as response:
                 if response.status < 400:
                     response_data = await response.json()
-                    await state.update_data(user_id=response_data.get("_id"))
+                    await state.update_data(user_id=response_data.get("id"))
                     await show_main_menu(message, state)
                 else:
                     await message.answer(
@@ -89,7 +89,7 @@ async def process_student_id(message: types.Message, state: FSMContext):
         async with session.post(f"{URL_SERVER}/user/auth", json=body) as response:
             if response.status < 400:
                 response_data = await response.json()
-                await state.update_data(user_id=response_data.get("_id"))
+                await state.update_data(user_id=response_data.get("id"))
                 # Delete all registration messages
                 for msg_id in [
                     user_data.get("welcome_msg_id"),

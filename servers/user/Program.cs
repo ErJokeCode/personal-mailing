@@ -37,6 +37,7 @@ public static class Program
         }
 
         app.MapPost("/auth", HandleAuth);
+        app.MapGet("/{id}/courses", HandleCourses);
 
         app.Run();
     }
@@ -46,6 +47,39 @@ public static class Program
         public string email { get; set; }
         public string personal_number { get; set; }
         public string chat_id { get; set; }
+    }
+
+    private static async Task<IResult> HandleCourses(Guid id, Models.UserDb db)
+    {
+        HttpClient httpClient = new()
+        {
+            BaseAddress = new Uri("http://parser:8000"),
+        };
+
+        var user = db.Students.Find(id);
+
+        if (user == null)
+        {
+            Console.WriteLine("Didnt find user");
+            return Results.NotFound();
+        }
+
+        var query = new Dictionary<string, string>
+        {
+            ["id"] = user.UserCourseId,
+        };
+        var response = await httpClient.GetAsync(QueryHelpers.AddQueryString("/course/by_id/", query));
+
+        if (!response.IsSuccessStatusCode)
+        {
+            Console.WriteLine("Didnt find user's courses");
+            return Results.NotFound();
+        }
+
+        var result = await response.Content.ReadAsStringAsync();
+        var userCourse = JsonSerializer.Deserialize<Models.UserCourse>(result);
+
+        return Results.Ok(userCourse.courses);
     }
 
     private static async Task<IResult> HandleAuth(AuthDetails details, Models.UserDb db)
@@ -89,14 +123,15 @@ public static class Program
             return Results.NotFound();
         }
 
-        var student = new Models.Student()
-        {
-            Email = details.email,
-            PersonalNumber = details.personal_number,
-            ChatId = details.chat_id,
-            UserId = user._id,
-            UserCourseId = userCourse._id
-        };
+        var student =
+            new Models.Student()
+            {
+                Email = details.email,
+                PersonalNumber = details.personal_number,
+                ChatId = details.chat_id,
+                UserId = user._id,
+                UserCourseId = userCourse._id
+            }; 
 
         db.Students.Add(student);
         await db.SaveChangesAsync();
