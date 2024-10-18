@@ -1,0 +1,17 @@
+meta {
+  name: user-by-name
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{base_api}}/parser/user_info/by_name/?name=Никита&sername=Шишков&patronymic=Евгеньевич
+  body: none
+  auth: none
+}
+
+params:query {
+  name: Никита
+  sername: Шишков
+  patronymic: Евгеньевич
+}

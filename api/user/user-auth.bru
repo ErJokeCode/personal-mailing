@@ -1,0 +1,17 @@
+meta {
+  name: user-auth
+  type: http
+  seq: 1
+}
+
+post {
+  url: http://localhost:5000/user/auth?email=nikita.shishkov@urfu.me&personalNumber=0&ChatId=0
+  body: none
+  auth: none
+}
+
+params:query {
+  email: nikita.shishkov@urfu.me
+  personalNumber: 0
+  ChatId: 0
+}

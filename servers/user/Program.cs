@@ -1,5 +1,13 @@
+using System;
+using System.Text.Json;
+using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
+using System.Web;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +21,7 @@ public static class Program
         var builder = WebApplication.CreateBuilder(args);
 
         var connection = builder.Configuration.GetConnectionString("Database");
-        builder.Services.AddDbContext<UserDb>(options => options.UseNpgsql(connection));
+        builder.Services.AddDbContext<Models.UserDb>(options => options.UseNpgsql(connection));
 
         var app = builder.Build();
 
@@ -21,35 +29,62 @@ public static class Program
         {
             var services = scope.ServiceProvider;
 
-            var context = services.GetRequiredService<UserDb>();
+            var context = services.GetRequiredService<Models.UserDb>();
             if (context.Database.GetPendingMigrations().Any())
             {
                 context.Database.Migrate();
             }
         }
 
-        app.MapPost("/auth", (string email, string personalNumber, string chatId, UserDb db) =>
-                             { return db.Students; });
+        app.MapPost("/auth", HandleAuth);
 
         app.Run();
     }
 
-    public class UserDb : DbContext
+    private static async Task<IResult> HandleAuth(string email, string personalNumber, string ChatId, Models.UserDb db)
     {
-        public DbSet<Student> Students => Set<Student>();
+        HttpClient httpClient = new() {
+            BaseAddress = new Uri("http://parser:8000"),
+        };
+        var query = new Dictionary<string, string> {
+            ["email"] = email,
+        };
+        var response = await httpClient.GetAsync(QueryHelpers.AddQueryString("/course/by_email/", query));
 
-        public UserDb(DbContextOptions<UserDb> options) : base(options)
+        if (!response.IsSuccessStatusCode)
         {
+            return Results.NotFound();
         }
-    }
 
-    public class Student
-    {
-        public int Id { get; set; }
-        public int PersonalNumber { get; set; }
-        public int ChatId { get; set; }
+        var result = await response.Content.ReadAsStringAsync();
+        var userCourse = JsonSerializer.Deserialize<Models.UserCourse>(result);
 
-        public string UserId { get; set; }
-        public string UserCourseId { get; set; }
+        query = new Dictionary<string, string> {
+            ["name"] = userCourse.name,
+            ["sername"] = userCourse.sername,
+            ["patronymic"] = userCourse.patronymic,
+        };
+        response = await httpClient.GetAsync(QueryHelpers.AddQueryString("/user_info/by_name/", query));
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return Results.NotFound();
+        }
+
+        result = await response.Content.ReadAsStringAsync();
+        var user = JsonSerializer.Deserialize<Models.User>(result);
+
+        if (personalNumber != user.personal_number)
+        {
+            return Results.NotFound();
+        }
+
+        var student = new Models.Student() { Email = email, PersonalNumber = personalNumber, ChatId = ChatId,
+                                             UserId = user._id, UserCourseId = userCourse._id };
+
+        db.Students.Add(student);
+        await db.SaveChangesAsync();
+
+        return Results.Created<Models.Student>("", student);
     }
 }
