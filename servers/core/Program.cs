@@ -10,25 +10,45 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Core.Models;
+using Shared.Core;
+using Shared.Messages;
+using NServiceBus;
 
 namespace Core;
 
 public static class Program
 {
-    public static void Main(string[] args)
+    public static IEndpointInstance _endpoint = null;
+
+    public static async Task Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
 
         var connection = builder.Configuration.GetConnectionString("Database");
-        builder.Services.AddDbContext<Models.CoreDb>(options => options.UseNpgsql(connection));
+        builder.Services.AddDbContext<CoreDb>(options => options.UseNpgsql(connection));
 
         var app = builder.Build();
+
+        var endpointConfiguration = new EndpointConfiguration("Core");
+        endpointConfiguration.EnableInstallers();
+        endpointConfiguration.UseSerialization<SystemJsonSerializer>();
+
+        var transport = endpointConfiguration.UseTransport<RabbitMQTransport>();
+        transport.UseConventionalRoutingTopology(QueueType.Quorum);
+        transport.ConnectionString("host=rabbitmq");
+
+        var routing = transport.Routing();
+        routing.RouteToEndpoint(typeof(NewStudentAuth), "Notify");
+
+        var endpointInstance = await NServiceBus.Endpoint.Start(endpointConfiguration);
+        _endpoint = endpointInstance;
 
         using (var scope = app.Services.CreateScope())
         {
             var services = scope.ServiceProvider;
 
-            var context = services.GetRequiredService<Models.CoreDb>();
+            var context = services.GetRequiredService<CoreDb>();
             if (context.Database.GetPendingMigrations().Any())
             {
                 context.Database.Migrate();
@@ -39,9 +59,11 @@ public static class Program
         app.MapGet("/{id}/courses", HandleCourses);
 
         app.Run();
+
+        await endpointInstance.Stop();
     }
 
-    private static async Task<IResult> HandleCourses(Guid id, Models.CoreDb db)
+    private static async Task<IResult> HandleCourses(Guid id, CoreDb db)
     {
         HttpClient httpClient = new()
         {
@@ -71,14 +93,14 @@ public static class Program
         var serializerSettings = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower };
 
         var result = await response.Content.ReadAsStringAsync();
-        var userCourse = JsonSerializer.Deserialize<Models.UserCourse>(result, serializerSettings);
+        var userCourse = JsonSerializer.Deserialize<UserCourse>(result, serializerSettings);
 
         return Results.Ok(userCourse.Courses);
     }
 
-    private static async Task<IResult> HandleAuth(Models.AuthDetails details, Models.CoreDb db)
+    private static async Task<IResult> HandleAuth(AuthDetails details, CoreDb db)
     {
-        var student = db.Students.Single(s => s.Email == details.Email);
+        var student = db.Students.SingleOrDefault(s => s.Email == details.Email);
 
         if (student != null)
         {
@@ -103,7 +125,7 @@ public static class Program
         var serializerSettings = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower };
 
         var result = await response.Content.ReadAsStringAsync();
-        var userCourse = JsonSerializer.Deserialize<Models.UserCourse>(result, serializerSettings);
+        var userCourse = JsonSerializer.Deserialize<UserCourse>(result, serializerSettings);
 
         query = new Dictionary<string, string>
         {
@@ -119,14 +141,14 @@ public static class Program
         }
 
         result = await response.Content.ReadAsStringAsync();
-        var user = JsonSerializer.Deserialize<Models.User>(result, serializerSettings);
+        var user = JsonSerializer.Deserialize<User>(result, serializerSettings);
 
         if (details.PersonalNumber != user.PersonalNumber)
         {
             return Results.NotFound();
         }
 
-        student = new Models.Student()
+        student = new Student()
         {
             Email = details.Email,
             PersonalNumber = details.PersonalNumber,
@@ -138,6 +160,8 @@ public static class Program
         db.Students.Add(student);
         await db.SaveChangesAsync();
 
-        return Results.Created<Models.Student>("", student);
+        await _endpoint.Send(new NewStudentAuth() { Student = student });
+
+        return Results.Created<Student>("", student);
     }
 }
