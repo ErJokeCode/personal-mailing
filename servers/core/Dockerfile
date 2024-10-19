@@ -8,6 +8,4 @@ ADD . /opt/core
 WORKDIR /opt/core
 RUN dotnet restore
 
-EXPOSE 5000
-
 CMD ["dotnet", "run"]

@@ -13,34 +13,34 @@ services:
     volumes:
       - ./telegram-bot:/opt/bot
 
-  core:
-    build: ./servers/core
+  gateway:
+    build: ./servers/gateway
     command: dotnet run
     ports:
       - 5000:5000
     volumes:
-      - ./servers/core:/opt/core
+      - ./servers/gateway:/opt/gateway
 
-  userdb:
+  coredb:
     image: postgres
     restart: always
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: userdb
+      POSTGRES_DB: coredb
     ports:
       - 5423:5432
     volumes:
-      - userdata:/var/lib/user/data
+      - coredata:/var/lib/core/data
 
-  user:
-    build: ./servers/user
+  core:
+    build: ./servers/core
     command: dotnet run
     depends_on:
-      userdb:
+      coredb:
         condition: service_started
     volumes:
-      - ./servers/user:/opt/user
+      - ./servers/core:/opt/core
 
   parserdb:
     image: mongo
@@ -63,4 +63,4 @@ services:
 
 volumes:
   parserdata:
-  userdata:
+  coredata:

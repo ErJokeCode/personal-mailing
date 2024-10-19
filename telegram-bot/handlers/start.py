@@ -48,7 +48,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
             "chat_id": str(message.chat.id),
         }
         async with aiohttp.ClientSession() as session:
-            async with session.post(f"{URL_SERVER}/user/auth", json=body) as response:
+            async with session.post(f"{URL_SERVER}/core/auth", json=body) as response:
                 if response.status < 400:
                     response_data = await response.json()
                     await state.update_data(user_id=response_data.get("id"))
@@ -86,7 +86,7 @@ async def process_student_id(message: types.Message, state: FSMContext):
         "chat_id": str(message.chat.id),
     }
     async with aiohttp.ClientSession() as session:
-        async with session.post(f"{URL_SERVER}/user/auth", json=body) as response:
+        async with session.post(f"{URL_SERVER}/core/auth", json=body) as response:
             if response.status < 400:
                 response_data = await response.json()
                 await state.update_data(user_id=response_data.get("id"))

@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
-namespace User.Models;
+namespace Core.Models;
 
-public class UserDb : DbContext
+public class CoreDb : DbContext
 {
     public DbSet<Student> Students => Set<Student>();
 
-    public UserDb(DbContextOptions<UserDb> options) : base(options)
+    public CoreDb(DbContextOptions<CoreDb> options) : base(options)
     {
     }
 }
