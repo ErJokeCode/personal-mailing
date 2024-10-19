@@ -78,6 +78,13 @@ public static class Program
 
     private static async Task<IResult> HandleAuth(Models.AuthDetails details, Models.CoreDb db)
     {
+        var student = db.Students.Single(s => s.Email == details.Email);
+
+        if (student != null)
+        {
+            return Results.Ok(student);
+        }
+
         HttpClient httpClient = new()
         {
             BaseAddress = new Uri("http://parser:8000"),
@@ -119,15 +126,14 @@ public static class Program
             return Results.NotFound();
         }
 
-        var student =
-            new Models.Student()
-            {
-                Email = details.Email,
-                PersonalNumber = details.PersonalNumber,
-                ChatId = details.ChatId,
-                UserId = user._id,
-                UserCourseId = userCourse._id
-            };
+        student = new Models.Student()
+        {
+            Email = details.Email,
+            PersonalNumber = details.PersonalNumber,
+            ChatId = details.ChatId,
+            UserId = user._id,
+            UserCourseId = userCourse._id
+        };
 
         db.Students.Add(student);
         await db.SaveChangesAsync();
