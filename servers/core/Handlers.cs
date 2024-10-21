@@ -8,9 +8,9 @@ using System.Threading.Tasks;
 using Core.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
-using NServiceBus;
 using Shared.Core;
 using Shared.Messages;
+using MassTransit;
 
 namespace Core;
 
@@ -72,7 +72,7 @@ public static class Handlers
         public string ChatId { get; set; }
     }
 
-    public static async Task<IResult> HandleAuth(AuthDetails details, IEndpointInstance endpoint, CoreDb db)
+    public static async Task<IResult> HandleAuth(AuthDetails details, IPublishEndpoint endpoint, CoreDb db)
     {
         var student = db.Students.SingleOrDefault(s => s.Email == details.Email);
 
@@ -119,7 +119,10 @@ public static class Handlers
         db.Students.Add(student);
         await db.SaveChangesAsync();
 
-        await endpoint.Send(new NewStudentAuth() { Student = student });
+        await endpoint.Publish<NewStudentAuthed>(new()
+        {
+            Student = student,
+        });
 
         return Results.Created<Student>("", student);
     }

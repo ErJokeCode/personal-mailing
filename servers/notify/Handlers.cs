@@ -1,7 +1,8 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Notify.Models;
-using NServiceBus;
+using MassTransit;
+
 using Shared.Messages;
 
 namespace Notify;
@@ -10,11 +11,11 @@ public static class Handlers
 {
     public static IHubContext<SignalHub> Hub = null;
 
-    public class NewStudentAuthHandler : IHandleMessages<NewStudentAuth>
+    public class NewStudentAuthedConsumer : IConsumer<NewStudentAuthed>
     {
-        public async Task Handle(NewStudentAuth message, IMessageHandlerContext context)
+        public async Task Consume(ConsumeContext<NewStudentAuthed> context)
         {
-            await Hub.Clients.All.SendAsync("NewStudentAuth", message.Student);
+            await Hub.Clients.All.SendAsync("NewStudentAuthed", context.Message);
         }
     }
 }

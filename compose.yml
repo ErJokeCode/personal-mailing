@@ -33,7 +33,7 @@ services:
       - ./servers/gateway:/opt/gateway
 
   rabbitmq:
-    image: rabbitmq
+    image: rabbitmq:management
     ports:
       - 5627:5672
       - 15627:15672

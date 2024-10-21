@@ -3,8 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 using Notify.Models;
-using NServiceBus;
-using Shared.Messages;
+using MassTransit;
 
 namespace Notify;
 
@@ -23,19 +22,6 @@ public static class Program
         app.Run();
     }
 
-    public static async Task ConfigureRabbitMQ()
-    {
-        var endpointConfiguration = new EndpointConfiguration("Notify");
-        endpointConfiguration.EnableInstallers();
-        endpointConfiguration.UseSerialization<SystemJsonSerializer>();
-
-        var transport = endpointConfiguration.UseTransport<RabbitMQTransport>();
-        transport.UseConventionalRoutingTopology(QueueType.Quorum);
-        transport.ConnectionString("host=rabbitmq");
-
-        var endpointInstance = await NServiceBus.Endpoint.Start(endpointConfiguration);
-    }
-
     public static async Task ConfigureServices(this WebApplicationBuilder builder)
     {
         builder.Services.AddCors(
@@ -47,9 +33,25 @@ public static class Program
                         policy.WithOrigins(new string[] { "http://localhost:5010" }).AllowAnyHeader().AllowAnyMethod();
                     });
             });
+
         builder.Services.AddSignalR();
 
-        await ConfigureRabbitMQ();
+        builder.Services.AddMassTransit(o =>
+                                        {
+                                            o.AddConsumer<Handlers.NewStudentAuthedConsumer>();
+
+                                            o.UsingRabbitMq((context, cfg) =>
+                                                            {
+                                                                cfg.Host("rabbitmq", "/",
+                                                                         h =>
+                                                                         {
+                                                                             h.Username("guest");
+                                                                             h.Password("guest");
+                                                                         });
+
+                                                                cfg.ConfigureEndpoints(context);
+                                                            });
+                                        });
     }
 
     public static async Task InitialzieServices(this WebApplication app)

@@ -1,9 +1,8 @@
-using NServiceBus;
 using Shared.Core;
 
 namespace Shared.Messages;
 
-public class NewStudentAuth : ICommand
+public class NewStudentAuthed
 {
     public Student Student { get; set; }
 }

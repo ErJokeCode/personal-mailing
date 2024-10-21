@@ -16,7 +16,7 @@
             })
             .build();
 
-        connection.on("NewStudentAuth", function (_) {
+        connection.on("NewStudentAuthed", function (_) {
             auth_students += 1;
         });
 
