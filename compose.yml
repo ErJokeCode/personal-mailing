@@ -24,14 +24,6 @@ services:
     volumes:
       - ./telegram-bot:/opt/bot
 
-  gateway:
-    build: ./servers/gateway
-    command: dotnet run
-    ports:
-      - 5000:5000
-    volumes:
-      - ./servers/gateway:/opt/gateway
-
   rabbitmq:
     image: rabbitmq:management
     ports:
@@ -46,7 +38,7 @@ services:
       retries: 10
 
   notify:
-    build: 
+    build:
       context: ./servers
       dockerfile: ./notify/Dockerfile
     command: dotnet run
@@ -69,10 +61,12 @@ services:
       - coredata:/var/lib/core/data
 
   core:
-    build: 
+    build:
       context: ./servers
       dockerfile: ./core/Dockerfile
     command: dotnet run
+    ports:
+      - 5000:5000
     depends_on:
       coredb:
         condition: service_started

@@ -1,0 +1,22 @@
+meta {
+  name: admin-login
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{base_api}}/login?useCookies=true
+  body: json
+  auth: none
+}
+
+params:query {
+  useCookies: true
+}
+
+body:json {
+  {
+    "email": "admin@admin",
+    "password": "Admin_1"
+  }
+}

@@ -1,0 +1,18 @@
+meta {
+  name: admin-register
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{base_api}}/core/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "admin@admin",
+    "password": "Admin_1"
+  }
+}
