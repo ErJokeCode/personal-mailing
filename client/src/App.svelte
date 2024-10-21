@@ -10,7 +10,7 @@
 
     onMount(async () => {
         var connection = new signalR.HubConnectionBuilder()
-            .withUrl("http://localhost:5002/signal", {
+            .withUrl("http://localhost:5000/signal", {
                 transport: signalR.HttpTransportType.ServerSentEvents,
                 withCredentials: false,
             })

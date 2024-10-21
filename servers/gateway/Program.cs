@@ -27,15 +27,15 @@ public static class Program
                                             o.ResponseBodyLogLimit = 4096;
                                         });
 
-        builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
-
         builder.Services.AddCors(
             options =>
             {
                 options.AddDefaultPolicy(
                     policy =>
-                    { policy.WithOrigins("http://client:5010").AllowAnyMethod().AllowAnyHeader(); });
+                    { policy.WithOrigins("http://localhost:5010").AllowAnyMethod().AllowAnyHeader(); });
             });
+
+        builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
     }
 
     public static async Task InitialzieServices(this WebApplication app)

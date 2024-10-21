@@ -28,6 +28,16 @@ public static class Program
 
     public static async Task ConfigureServices(this WebApplicationBuilder builder)
     {
+        builder.Services.AddCors(
+            options =>
+            {
+                options.AddDefaultPolicy(
+                    policy =>
+                    {
+                        policy.WithOrigins(new string[] { "http://localhost:5000" }).AllowAnyHeader().AllowAnyMethod();
+                    });
+            });
+
         var connection = builder.Configuration.GetConnectionString("Database");
         builder.Services.AddDbContext<CoreDb>(options => options.UseNpgsql(connection));
 
@@ -49,6 +59,8 @@ public static class Program
 
     public static async Task InitialzieServices(this WebApplication app)
     {
+        app.UseCors();
+
         using (var scope = app.Services.CreateScope())
         {
             var services = scope.ServiceProvider;

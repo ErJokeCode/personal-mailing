@@ -30,7 +30,7 @@ public static class Program
                 options.AddDefaultPolicy(
                     policy =>
                     {
-                        policy.WithOrigins(new string[] { "http://localhost:5010" }).AllowAnyHeader().AllowAnyMethod();
+                        policy.WithOrigins(new string[] { "http://localhost:5000" }).AllowAnyHeader().AllowAnyMethod();
                     });
             });
 
