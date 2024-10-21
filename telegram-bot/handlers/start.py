@@ -1,3 +1,4 @@
+import asyncio
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
 from aiogram.filters.command import Command
@@ -53,6 +54,12 @@ async def cmd_start(message: types.Message, state: FSMContext):
                     response_data = await response.json()
                     await state.update_data(user_id=response_data.get("id"))
                     await show_main_menu(message, state)
+                elif response.status == 423:
+                    msg_login = await message.answer("Пользователь уже вошел в аккаунт")
+                    await asyncio.sleep(5)
+                    await message.bot.delete_messages(
+                        message.chat.id, [msg_login.message_id, message.message_id]
+                    )
                 else:
                     await message.answer(
                         "Произошла ошибка при регистрации. Пожалуйста, введите вашу почту."
@@ -89,19 +96,25 @@ async def process_student_id(message: types.Message, state: FSMContext):
         async with session.post(f"{URL_SERVER}/core/auth", json=body) as response:
             if response.status < 400:
                 response_data = await response.json()
-                await state.update_data(user_id=response_data.get("id"))
                 # Delete all registration messages
-                for msg_id in [
-                    user_data.get("welcome_msg_id"),
-                    user_data.get("email_msg_id"),
-                    user_data.get("student_id_msg_id"),
-                    user_data.get("student_id_response_msg_id"),
+                for msg in [
+                    "welcome_msg_id",
+                    "email_msg_id",
+                    "student_id_msg_id",
+                    "student_id_response_msg_id",
                 ]:
+                    msg_id = user_data.get(msg)
                     if msg_id:
                         await message.bot.delete_message(
                             chat_id=message.chat.id, message_id=msg_id
                         )
                 await state.set_state(LKStates.MAIN_MENU)
+                await state.clear()
+                await state.update_data(
+                    email=body["email"],
+                    personal_number=body["personal_number"],
+                    user_id=response_data.get("id"),
+                )
                 await show_main_menu(message, state)
             else:
                 await message.answer(

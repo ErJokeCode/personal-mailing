@@ -60,3 +60,12 @@ class Course_info(BaseModel):
     date: str
     university: str
     info: str
+
+
+class StudentMoseus(BaseModel):
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    fio: str
+    flow: str
+    code: str
+    speciality: str
+    subjects: list[str]

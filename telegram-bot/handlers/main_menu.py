@@ -5,9 +5,10 @@ import aiohttp
 
 from config import URL_SERVER
 import keyboards.main_menu as keyboard
-from states import LKStates
+from states import Info_teaching, LKStates
 from texts.error import Registration, Input
 from texts.main_menu import ToCurator
+from handlers.information_teaching import show_info_teaching
 
 router = Router()
 
@@ -29,14 +30,21 @@ async def process_chat_curator(callback_query: types.CallbackQuery, state: FSMCo
     if user_data.get('email') and user_data.get('personal_number'):
         await callback_query.message.delete()
         await state.set_state(LKStates.WAITING_CHAT_WITH_CURATOR)
-        await callback_query.message.answer(ToCurator.preface(), 
+        msg = await callback_query.message.answer(ToCurator.preface(), 
                                             reply_markup=keyboard.Back_to_main())
+        await state.update_data(msg_in_chat_with_curator = [msg.message_id])
     else:
         await callback_query.message.delete()
         await callback_query.message.answer(Registration.no())
 
+
+
 @router.message(LKStates.WAITING_CHAT_WITH_CURATOR)
 async def message_to_curator(message: types.Message, state: FSMContext):
+    user_data = await state.get_data()
+    msg_in_chat_with_curator = user_data.get("msg_in_chat_with_curator")
+    msg_in_chat_with_curator.append(message.message_id)
+    await state.update_data(msg_in_chat_with_curator = msg_in_chat_with_curator)
     print(message.text)
 
 # @router.callback_query(LKStates.MAIN_MENU, lambda c: c.data == "chat_curator")
@@ -49,6 +57,8 @@ async def message_to_curator(message: types.Message, state: FSMContext):
 #     else:
 #         await callback_query.message.delete()
 #         await callback_query.message.answer("Вы не зарегистрированы. Пожалуйста, введите вашу почту и номер студенческого билета. Для повторного входа используйте команду /start")
+
+
 
 @router.callback_query(lambda c: c.data == "online_courses")
 async def process_online_courses(callback_query: types.CallbackQuery, state: FSMContext):
@@ -69,6 +79,8 @@ async def process_online_courses(callback_query: types.CallbackQuery, state: FSM
         await callback_query.message.delete()
         await callback_query.message.answer(Registration.no())
 
+
+
 @router.callback_query(lambda c: c.data.startswith("course_"))
 async def process_course_info(callback_query: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
@@ -88,6 +100,8 @@ async def process_course_info(callback_query: types.CallbackQuery, state: FSMCon
         await callback_query.message.delete()
         await callback_query.message.answer(Registration.no())
 
+
+
 @router.callback_query(lambda c: c.data == "faq")
 async def process_faq(callback_query: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
@@ -99,6 +113,39 @@ async def process_faq(callback_query: types.CallbackQuery, state: FSMContext):
         await callback_query.message.delete()
         await callback_query.message.answer(Registration.no())
 
+
+
+@router.callback_query(LKStates.WAITING_CHAT_WITH_CURATOR, lambda c: c.data == "main_menu")
+async def process_main_menu(callback_query: types.CallbackQuery, state: FSMContext): 
+    await state.set_state(LKStates.MAIN_MENU)   
+    user_data = await state.get_data()
+    if user_data.get('email') and user_data.get('personal_number'):
+        del_msg = user_data.get('msg_in_chat_with_curator')
+        if del_msg:
+            await callback_query.message.bot.delete_messages(chat_id=callback_query.message.chat.id, message_ids=del_msg)
+        user_data.pop("msg_in_chat_with_curator")
+        await state.clear()
+        await state.update_data(**user_data)
+        await show_main_menu(callback_query.message, state)
+    else:
+        await callback_query.message.delete()
+        await callback_query.message.answer(Registration.no())
+
+
+
+@router.callback_query(Info_teaching.INFO, lambda c: c.data == "main_menu")
+async def process_main_menu(callback_query: types.CallbackQuery, state: FSMContext): 
+    await state.set_state(LKStates.MAIN_MENU)   
+    user_data = await state.get_data()
+    if user_data.get('email') and user_data.get('personal_number'):
+        await callback_query.message.delete()
+        await show_main_menu(callback_query.message, state)
+    else:
+        await callback_query.message.delete()
+        await callback_query.message.answer(Registration.no())
+
+
+
 @router.callback_query(lambda c: c.data == "main_menu")
 async def process_main_menu(callback_query: types.CallbackQuery, state: FSMContext): 
     await state.set_state(LKStates.MAIN_MENU)   
@@ -109,6 +156,21 @@ async def process_main_menu(callback_query: types.CallbackQuery, state: FSMConte
     else:
         await callback_query.message.delete()
         await callback_query.message.answer(Registration.no())
+
+
+
+@router.callback_query(lambda c: c.data == "info_teaching")
+async def process_main_menu(callback_query: types.CallbackQuery, state: FSMContext): 
+    user_data = await state.get_data()
+    if user_data.get('email') and user_data.get('personal_number'):
+        await state.set_state(Info_teaching.INFO)   
+        await callback_query.message.delete()
+        await show_info_teaching(callback_query.message, state)
+    else:
+        await callback_query.message.delete()
+        await callback_query.message.answer(Registration.no())
+
+
 
 # @router.callback_query(lambda c: c.data == "logout")
 # async def process_logout(callback_query: types.CallbackQuery, state: FSMContext):
@@ -126,6 +188,6 @@ async def process_main_menu(callback_query: types.CallbackQuery, state: FSMConte
 
 
 
-@router.message(LKStates.MAIN_MENU)
+@router.message()
 async def chat(message: types.Message, state: FSMContext):
-    await message.answer(Input.incorrect())
+    await message.delete()
