@@ -10,6 +10,7 @@ using MassTransit;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Threading;
 
 namespace Core;
 
@@ -23,8 +24,8 @@ public static class Program
         var app = builder.Build();
         await app.InitialzieServices();
 
-        app.MapPost("/auth", Handlers.HandleAuth);
-        app.MapGet("/{id}/courses", Handlers.HandleCourses);
+        app.MapPost("/core/auth", Handlers.HandleAuth);
+        app.MapGet("/core/{id}/courses", Handlers.HandleCourses);
 
         app.Run();
     }
@@ -65,7 +66,17 @@ public static class Program
             options =>
             { options.AddPolicy("CustomPolicy", policy => policy.RequireAuthenticatedUser()); });
 
-        builder.Services.AddIdentityApiEndpoints<ApplicationUser>().AddEntityFrameworkStores<CoreDb>();
+        builder.Services
+            .AddIdentityApiEndpoints<ApplicationUser>(o =>
+                                                      {
+                                                          o.Password.RequireDigit = false;
+                                                          o.Password.RequireNonAlphanumeric = false;
+                                                          o.Password.RequireLowercase = false;
+                                                          o.Password.RequireUppercase = false;
+                                                          o.Password.RequiredUniqueChars = 0;
+                                                          o.Password.RequiredLength = 1;
+                                                      })
+            .AddEntityFrameworkStores<CoreDb>();
     }
 
     public static async Task InitialzieServices(this WebApplication app)
@@ -79,10 +90,22 @@ public static class Program
             {
                 context.Database.Migrate();
             }
+
+            var userManager = services.GetRequiredService<UserManager<ApplicationUser>>();
+            var userStore = services.GetRequiredService<IUserStore<ApplicationUser>>();
+            var emailStore = (IUserEmailStore<ApplicationUser>)userStore;
+
+            var email = "admin";
+            var password = "admin";
+            var user = new ApplicationUser();
+
+            await userStore.SetUserNameAsync(user, email, CancellationToken.None);
+            await emailStore.SetEmailAsync(user, email, CancellationToken.None);
+            var result = await userManager.CreateAsync(user, password);
         }
 
         app.UseCors();
-        app.MapIdentityApi<ApplicationUser>();
+        app.MapCustomIdentityApi<ApplicationUser>();
         app.MapReverseProxy();
     }
 }

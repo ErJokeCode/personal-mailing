@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
-namespace Shared.Core;
+namespace Shared.Models;
 
 public class Course
 {

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Core.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
-using Shared.Core;
+using Shared.Models;
 using Shared.Messages;
 using MassTransit;
 

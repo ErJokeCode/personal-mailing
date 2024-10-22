@@ -5,18 +5,14 @@ meta {
 }
 
 post {
-  url: {{base_api}}/login?useCookies=true
+  url: {{base_api}}/login
   body: json
   auth: none
 }
 
-params:query {
-  useCookies: true
-}
-
 body:json {
   {
-    "email": "admin@admin",
-    "password": "Admin_1"
+    "email": "admin",
+    "password": "admin"
   }
 }

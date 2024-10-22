@@ -1,4 +1,4 @@
-using Shared.Core;
+using Shared.Models;
 
 namespace Shared.Messages;
 
