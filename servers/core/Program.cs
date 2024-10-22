@@ -33,15 +33,17 @@ public static class Program
 
     public static async Task ConfigureServices(this WebApplicationBuilder builder)
     {
-        builder.Services.AddCors(
-            options =>
-            {
-                options.AddDefaultPolicy(
-                    policy =>
-                    {
-                        policy.WithOrigins(new string[] { "http://localhost:5010" }).AllowAnyHeader().AllowAnyMethod();
-                    });
-            });
+        builder.Services.AddCors(options =>
+                                 {
+                                     options.AddDefaultPolicy(
+                                         policy =>
+                                         {
+                                             policy.WithOrigins(new string[] { "http://localhost:5010" })
+                                                 .AllowAnyHeader()
+                                                 .AllowAnyMethod()
+                                                 .AllowCredentials();
+                                         });
+                                 });
 
         builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
