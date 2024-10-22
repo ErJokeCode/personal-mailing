@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Threading;
+using System.Security.Claims;
 
 namespace Core;
 
@@ -64,7 +65,7 @@ public static class Program
 
         builder.Services.AddAuthorization(
             options =>
-            { options.AddPolicy("CustomPolicy", policy => policy.RequireAuthenticatedUser()); });
+            { options.AddPolicy("CustomPolicy", policy => policy.RequireClaim("Admin")); });
 
         builder.Services
             .AddIdentityApiEndpoints<ApplicationUser>(o =>
@@ -102,6 +103,8 @@ public static class Program
             await userStore.SetUserNameAsync(user, email, CancellationToken.None);
             await emailStore.SetEmailAsync(user, email, CancellationToken.None);
             var result = await userManager.CreateAsync(user, password);
+
+            await userManager.AddClaimAsync(user, new Claim("Admin", ""));
         }
 
         app.UseCors();
