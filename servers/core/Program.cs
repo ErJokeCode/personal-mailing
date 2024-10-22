@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Threading;
 using System.Security.Claims;
+using Microsoft.AspNetCore.HttpLogging;
 
 namespace Core;
 
@@ -25,14 +26,22 @@ public static class Program
         var app = builder.Build();
         await app.InitialzieServices();
 
-        app.MapPost("/core/auth", Handlers.HandleAuth);
-        app.MapGet("/core/{id}/courses", Handlers.HandleCourses);
+        app.MapPost("/core/auth", Handlers.HandleAuth).RequireAuthorization("AdminPolicy");
+        app.MapGet("/core/{id}/courses", Handlers.HandleCourses).RequireAuthorization("AdminPolicy");
+        app.MapGet("/core/students", Handlers.HandleStudents).RequireAuthorization("AdminPolicy");
 
         app.Run();
     }
 
     public static async Task ConfigureServices(this WebApplicationBuilder builder)
     {
+        builder.Services.AddHttpLogging(o =>
+                                        {
+                                            o.LoggingFields = HttpLoggingFields.All;
+                                            o.RequestBodyLogLimit = 4096;
+                                            o.ResponseBodyLogLimit = 4096;
+                                        });
+
         builder.Services.AddCors(options =>
                                  {
                                      options.AddDefaultPolicy(
@@ -67,7 +76,7 @@ public static class Program
 
         builder.Services.AddAuthorization(
             options =>
-            { options.AddPolicy("CustomPolicy", policy => policy.RequireClaim("Admin")); });
+            { options.AddPolicy("AdminPolicy", policy => policy.RequireClaim("Admin")); });
 
         builder.Services
             .AddIdentityApiEndpoints<ApplicationUser>(o =>
@@ -109,6 +118,7 @@ public static class Program
             await userManager.AddClaimAsync(user, new Claim("Admin", ""));
         }
 
+        app.UseHttpLogging();
         app.UseCors();
         app.MapCustomIdentityApi<ApplicationUser>();
         app.MapReverseProxy();

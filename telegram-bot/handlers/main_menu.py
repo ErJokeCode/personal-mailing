@@ -3,7 +3,7 @@ from aiogram.fsm.context import FSMContext
 
 import aiohttp
 
-from config import URL_SERVER
+from config import URL_SERVER, get_cookie
 import keyboards.main_menu as keyboard
 from states import Info_teaching, LKStates
 from texts.error import Registration, Input
@@ -65,7 +65,8 @@ async def process_online_courses(callback_query: types.CallbackQuery, state: FSM
     user_data = await state.get_data()
     # Отправляем запрос на сервер для получения списка онлайн курсов
     async with aiohttp.ClientSession() as session:
-        async with session.get(f"{URL_SERVER}/core/{user_data.get('user_id')}/courses") as response:
+        headers = {"cookie": f"{get_cookie()}"}
+        async with session.get(f"{URL_SERVER}/core/{user_data.get('user_id')}/courses", headers=headers) as response:
             if response.status == 200:
                 courses_data = await response.json()
             else:
@@ -88,7 +89,8 @@ async def process_course_info(callback_query: types.CallbackQuery, state: FSMCon
         courses_data = user_data.get('courses_data')
         course_id = int(callback_query.data.split("_")[1])
         async with aiohttp.ClientSession() as session:
-            async with session.get(f"{URL_SERVER}/parser/course/search", params={"name": courses_data[course_id]["name"], "university": courses_data[course_id]["university"]}) as response:
+            headers = {"cookie": f"{get_cookie()}"}
+            async with session.get(f"{URL_SERVER}/parser/course/search", headers=headers, params={"name": courses_data[course_id]["name"], "university": courses_data[course_id]["university"]}) as response:
                 if response.status == 200:
                     course_data = await response.json()
                 else:

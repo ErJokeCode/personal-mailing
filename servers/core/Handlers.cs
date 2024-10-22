@@ -18,8 +18,7 @@ public static class Handlers
 {
     private static async Task<T> GetFromParser<T>(string path, Dictionary<string, string> query)
     {
-        HttpClient httpClient = new()
-        {
+        HttpClient httpClient = new() {
             BaseAddress = new Uri("http://parser:8000"),
         };
 
@@ -47,8 +46,7 @@ public static class Handlers
             return Results.NotFound();
         }
 
-        var query = new Dictionary<string, string>
-        {
+        var query = new Dictionary<string, string> {
             ["id"] = user.UserCourseId,
         };
 
@@ -81,8 +79,7 @@ public static class Handlers
             return Results.Ok(student);
         }
 
-        var query = new Dictionary<string, string>
-        {
+        var query = new Dictionary<string, string> {
             ["email"] = details.Email,
         };
 
@@ -93,8 +90,7 @@ public static class Handlers
             return Results.NotFound();
         }
 
-        query = new Dictionary<string, string>
-        {
+        query = new Dictionary<string, string> {
             ["name"] = userCourse.Name,
             ["sername"] = userCourse.Sername,
             ["patronymic"] = userCourse.Patronymic,
@@ -107,23 +103,21 @@ public static class Handlers
             return Results.NotFound();
         }
 
-        student = new Student()
-        {
-            Email = details.Email,
-            PersonalNumber = details.PersonalNumber,
-            ChatId = details.ChatId,
-            UserId = user._id,
-            UserCourseId = userCourse._id
-        };
+        student = new Student() { Email = details.Email, PersonalNumber = details.PersonalNumber,
+                                  ChatId = details.ChatId, UserId = user._id, UserCourseId = userCourse._id };
 
         db.Students.Add(student);
         await db.SaveChangesAsync();
 
-        await endpoint.Publish<NewStudentAuthed>(new()
-        {
+        await endpoint.Publish<NewStudentAuthed>(new() {
             Student = student,
         });
 
         return Results.Created<Student>("", student);
+    }
+
+    public static IResult HandleStudents(CoreDb db)
+    {
+        return Results.Ok(db.Students);
     }
 }

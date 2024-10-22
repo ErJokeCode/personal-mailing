@@ -8,19 +8,42 @@
     let student_success = "";
     let courses_files;
     let courses_success = "";
-    let auth_students = 0;
+    let auth_students = [];
+
+    async function getStudents() {
+        let response;
+
+        try {
+            response = await fetch(`${server_url}/core/students`, {
+                credentials: "include",
+            });
+        } catch (err) {
+            auth_students = [];
+        }
+
+        if (response?.ok) {
+            let json = await response.json();
+            auth_students = json;
+        }
+    }
 
     onMount(async () => {
-        login_status = "Not Logged In";
+        getStudents();
 
-        let response = await fetch(
-            `${server_url}/parser/course/by_email?email=nikita.shishkov@urfu.me`,
-            {
-                credentials: "include",
-            },
-        );
+        let response;
 
-        if (response.ok) {
+        try {
+            response = await fetch(
+                `${server_url}/parser/course/by_email?email=nikita.shishkov@urfu.me`,
+                {
+                    credentials: "include",
+                },
+            );
+        } catch (err) {
+            login_status = "Not Logged In";
+        }
+
+        if (response?.ok) {
             login_status = "Logged In";
         }
 
@@ -32,7 +55,7 @@
             .build();
 
         connection.on("NewStudentAuthed", function (_) {
-            auth_students += 1;
+            getStudents();
         });
 
         connection.start();
@@ -81,7 +104,6 @@
 
 <main>
     <h2>{login_status}</h2>
-    <h2>Authed Students: {auth_students}</h2>
 
     <label>
         Students File
@@ -98,6 +120,18 @@
     </label>
     <button on:click={send_courses}>Send Courses</button>
     <span>{courses_success}</span>
+
+    <h2>Authed Students</h2>
+    <table>
+        <tr>
+            <th>Email</th>
+        </tr>
+        {#each auth_students as student}
+            <tr>
+                <th>{student.email}</th>
+            </tr>
+        {/each}
+    </table>
 </main>
 
 <style>

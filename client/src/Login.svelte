@@ -6,22 +6,26 @@
     let message = "";
 
     async function login() {
-        let response = await fetch(`${server_url}/login`, {
-            method: "Post",
-            body: JSON.stringify({
-                email: email,
-                password: password,
-            }),
-            credentials: "include",
-            headers: {
-                Accept: "application/json",
-                "Content-Type": "application/json",
-            },
-        });
+        let response;
 
-        if (!response.ok) {
+        try {
+            response = await fetch(`${server_url}/login`, {
+                method: "Post",
+                body: JSON.stringify({
+                    email: email,
+                    password: password,
+                }),
+                credentials: "include",
+                headers: {
+                    Accept: "application/json",
+                    "Content-Type": "application/json",
+                },
+            });
+        } catch(err) {
             message = "Something went wrong! " + response.statusText;
-        } else {
+        }
+
+        if (response?.ok) {
             message = "You successfully logged in!";
         }
     }

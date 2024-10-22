@@ -2,13 +2,14 @@ import asyncio
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
 from aiogram.filters.command import Command
+import requests
 
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 import aiohttp
 import re
 
-from config import URL_SERVER
+from config import URL_SERVER, get_cookie
 from handlers.main_menu import show_main_menu
 from states import RegistrationStates, LKStates
 
@@ -49,7 +50,10 @@ async def cmd_start(message: types.Message, state: FSMContext):
             "chat_id": str(message.chat.id),
         }
         async with aiohttp.ClientSession() as session:
-            async with session.post(f"{URL_SERVER}/core/auth", json=body) as response:
+            headers = {"cookie": f"{get_cookie()}"}
+            async with session.post(
+                f"{URL_SERVER}/core/auth", json=body, headers=headers
+            ) as response:
                 if response.status < 400:
                     response_data = await response.json()
                     await state.update_data(user_id=response_data.get("id"))
@@ -93,7 +97,10 @@ async def process_student_id(message: types.Message, state: FSMContext):
         "chat_id": str(message.chat.id),
     }
     async with aiohttp.ClientSession() as session:
-        async with session.post(f"{URL_SERVER}/core/auth", json=body) as response:
+        headers = {"cookie": f"{get_cookie()}"}
+        async with session.post(
+            f"{URL_SERVER}/core/auth", json=body, headers=headers
+        ) as response:
             if response.status < 400:
                 response_data = await response.json()
                 # Delete all registration messages
