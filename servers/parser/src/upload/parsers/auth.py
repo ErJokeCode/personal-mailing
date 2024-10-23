@@ -3,19 +3,21 @@ from fastapi import HTTPException, UploadFile
 import pandas as pd
 
 from config import DB
-from src.schemas import User
+from src.schemas import Student
 
 
-def update_auth(file: UploadFile):
+def upload_student(file: UploadFile):
     try:
         excel = pd.ExcelFile(BytesIO(file.file.read()))
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="File read error")
     
-    collection = DB.get_user_collection()
-    collection_auth = DB.get_user_auth_collection()
+    collection = DB.get_student()
     collection.delete_many({})
+
+    collection_auth = DB.get_user_auth_collection()
+    
 
     sheet_name = excel.sheet_names[0]
 
@@ -33,18 +35,23 @@ def update_auth(file: UploadFile):
 
 def get_user_auth(item):
     FIO = item["Фамилия, имя, отчество"].split()
-    return User(
-        sername=FIO[0] if len(FIO) > 0 else "",
+    return Student(
+        surname=FIO[0] if len(FIO) > 0 else "",
         name=FIO[1] if len(FIO) > 1 else "",
         patronymic=FIO[2] if len(FIO) > 2 else "",
         faculty = item["Форм. факультет"],
         city = item["Территориальное подразделение"],
         department = item["Кафедра"],
-        number_course = item["Курс"],
-        group = item["Группа"],
+        group = {
+            "number" : item["Группа"],
+            "number_course" : item["Курс"],
+            "direction_code" : None, 
+            "name_speciality" : None
+            },
         status = True if item["Состояние"] == "Активный" else False,
         type_of_cost = item["Вид возм. затрат"],
         type_of_education = item["Форма освоения"],
         date_of_birth = item["Дата рождения"],
-        personal_number = str(item["Личный №"])
+        personal_number = str(item["Личный №"]), 
+        subjects=[]
     )

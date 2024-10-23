@@ -4,7 +4,7 @@ from fastapi import APIRouter, Body, HTTPException, UploadFile
 from fastapi import Depends
 
 from config import DB
-from src.schemas import Course, GetUserAuth, User_course, User, UserAuth
+from src.schemas import Course, GetUserAuth, User_course, Student, UserAuth
 
 
 
@@ -17,7 +17,7 @@ router_user = APIRouter(
 @router_user.post("/auth")
 async def auth_user(user: Annotated[GetUserAuth, Body()]):
     try:
-        collection_user = DB.get_user_collection()
+        collection_user = DB.get_student()
         collection_auth = DB.get_user_auth_collection()
         collection_user_course = DB.get_user_course_collection()
     except Exception as e:
@@ -34,7 +34,7 @@ async def auth_user(user: Annotated[GetUserAuth, Body()]):
     if get_user is None:
         print("User not found")
         raise HTTPException(status_code=404, detail="User not found")
-    get_user = User(**get_user)
+    get_user = Student(**get_user)
 
     if get_user.personal_number != user.personal_number:
         print("User not found")

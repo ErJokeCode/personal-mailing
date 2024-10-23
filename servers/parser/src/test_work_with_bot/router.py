@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import APIRouter, Body, HTTPException
 import requests
 
-from src.schemas import User
+from src.schemas import Student
 from config import TOKEN_BOT
 
 

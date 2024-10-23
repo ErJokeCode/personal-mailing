@@ -2,7 +2,7 @@ from fastapi import UploadFile
 import pandas as pd
 
 from config import DB
-from schemas import Course, User
+from schemas import Course, Student
 
 
 
@@ -54,10 +54,10 @@ def get_email(item):
 def get_group(item):
     return item["Группа"]
 
-def create_user(item, email, group) -> User:
+def create_user(item, email, group) -> Student:
     course = get_course(item)
-    return User(
-        sername=item["Фамилия"],
+    return Student(
+        surname=item["Фамилия"],
         name=item["Имя"],
         patronymic=None if str(item["Отчество"]) == "nan" else item["Отчество"],
         email=email,

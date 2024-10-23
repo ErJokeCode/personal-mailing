@@ -13,20 +13,21 @@ def update_report(file: UploadFile):
         print(e)
         raise HTTPException(status_code=500, detail="File read error")
     
-    collection = DB.get_user_course_collection()
-    collection_auth = DB.get_user_auth_collection()
-    collection.delete_many({})
+    collection = DB.get_student()
 
+    dfs = []
     for sheet_name in excel.sheet_names[1:]:
         df = excel.parse(sheet_name)
-        data = df.to_dict('records')
-
-        for item in data:
-            parse_data(item, collection, collection_auth)
+        dfs.append(df)
+    data_dfs = pd.concat(dfs)
+    data = data_dfs.groupby(["Фамилия", "Имя", "Отчество", "Группа"]).nunique()
+    print(data)
+        # for item in data:
+        #     student = get_student(item, collection)
     return {"status" : "success"}
 
 
-def parse_data(item, collection, collection_auth):
+def get_student(item, collection):
     try:
         email = get_email(item)
         
@@ -37,10 +38,7 @@ def parse_data(item, collection, collection_auth):
             group = get_group(item)
             if(group[:2] == "РИ"):
                 user = create_user(item, email, group)
-                user = collection.insert_one(user.model_dump(by_alias=True, exclude=["id"]))
-                user_id = user.inserted_id
-                if(collection_auth.find_one({"email" : email})):
-                    collection_auth.update_one({"email" : email}, {"$set" : {"id_user_course" : str(user_id)}})
+                return user.model_dump(by_alias=True, exclude=["id"])
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Parse student error")
