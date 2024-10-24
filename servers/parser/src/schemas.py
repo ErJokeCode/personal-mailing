@@ -6,6 +6,46 @@ from bson import ObjectId
 
 PyObjectId = Annotated[str, BeforeValidator(str)]
 
+class OnlineCourse(BaseModel):
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    name: str 
+    university: str | None = None
+    date_start: str | None = None
+    deadline: list[str] | None = None
+    info: str | None = None
+
+class Subject(BaseModel):
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    full_name: str
+    name: str 
+    form_education: str
+    info: str | None = None
+
+class Student(BaseModel):
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    personal_number: str 
+    name: str 
+    surname: str 
+    patronymic: str | None = None
+    email: str | None = None
+    date_of_birth: str
+    group: dict
+    status: bool | None = False
+    type_of_cost: str | None = None
+    type_of_education: str | None = None
+    subjects: list[object]
+    online_course: list[object]
+
+class OnlineCourseStudent(BaseModel):
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    name: str 
+    university: str | None = None
+    date_start: str | None = None
+    deadline: list[str] | None = None
+    info: str | None = None
+    score: str | None = None
+
+
 
 
 class Course(BaseModel):
@@ -13,31 +53,16 @@ class Course(BaseModel):
     university: str | None = None
     score: str | None = None
 
-class User_course(BaseModel):
+class StudentCourse(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
-    sername: str | None = None
+    surname: str | None = None
     name: str | None = None
     patronymic: str | None = None
     email: str
     group: str | None = None
-    courses: list[Course]
+    courses: list[dict]
 
-class User(BaseModel):
-    id: Optional[PyObjectId] = Field(alias="_id", default=None)
-    personal_number: str 
-    name: str 
-    sername: str 
-    patronymic: str | None = None
-    email: str | None = None
-    date_of_birth: str
-    group: str
-    faculty: str | None = None
-    city: str | None = "Екатеринбург"
-    department: str | None = None
-    number_course: int | None = None
-    status: bool | None = False
-    type_of_cost: str | None = None
-    type_of_education: str | None = None
+
 
 
 class UserAuth(BaseModel):

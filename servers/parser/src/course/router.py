@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 
 from config import DB
-from src.schemas import Course, Course_info, User_course
+from src.schemas import Course, Course_info, StudentCourse
 from bson import ObjectId
 
 
@@ -24,7 +24,7 @@ async def get_by_email(email: str):
     if user_course is None:
         print("User not found")
         raise HTTPException(status_code=404, detail="User not found")
-    user_course = User_course(**user_course)
+    user_course = StudentCourse(**user_course)
 
     return user_course
 
@@ -41,7 +41,7 @@ async def get_by_id(id: str):
     if user_course is None:
         print("User not found")
         raise HTTPException(status_code=404, detail="User not found")
-    user_course = User_course(**user_course)
+    user_course = StudentCourse(**user_course)
 
     return user_course
 

@@ -3,7 +3,7 @@ from fastapi import APIRouter, Body, HTTPException
 from bson import ObjectId
 
 from config import DB
-from src.schemas import User
+from src.schemas import Student
 
 
 router_user_info = APIRouter(
@@ -13,12 +13,12 @@ router_user_info = APIRouter(
 
 
 @router_user_info.post("/")
-async def add_user(user: Annotated[User, Body()]):
+async def add_user(user: Annotated[Student, Body()]):
     try:
-        collection = DB.get_user_collection()
+        collection = DB.get_student()
         new_user = collection.insert_one(user.model_dump(by_alias=True, exclude=["id"]))
         created_user = collection.find_one({"_id": new_user.inserted_id})
-        return User(**created_user)
+        return Student(**created_user)
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Error DB")
@@ -27,7 +27,7 @@ async def add_user(user: Annotated[User, Body()]):
 @router_user_info.get("/by_name")
 async def get_user_by_name(name: str, sername: str, patronymic: str):
     try:
-        collection_user = DB.get_user_collection()
+        collection_user = DB.get_student()
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Error DB")
@@ -42,7 +42,7 @@ async def get_user_by_name(name: str, sername: str, patronymic: str):
     if get_user is None:
         print("User not found")
         raise HTTPException(status_code=404, detail="User not found")
-    get_user = User(**get_user)
+    get_user = Student(**get_user)
 
     return get_user
 
@@ -56,7 +56,7 @@ async def get_user(id: str):
         raise HTTPException(status_code=400, detail="Invalid ID")
 
     try:
-        collection = DB.get_user_collection()
+        collection = DB.get_student()
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Error DB")
@@ -65,4 +65,4 @@ async def get_user(id: str):
     if user is None:
         print("User not found")
         raise HTTPException(status_code=404, detail="User not found")
-    return User(**user)
+    return Student(**user)
