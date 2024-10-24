@@ -16,9 +16,6 @@ def upload_student(file: UploadFile):
     collection = DB.get_student()
     collection.delete_many({})
 
-    collection_auth = DB.get_user_auth_collection()
-    
-
     sheet_name = excel.sheet_names[0]
 
     df = pd.read_excel(excel, sheet_name=sheet_name)
@@ -28,8 +25,6 @@ def upload_student(file: UploadFile):
         user_auth = get_user_auth(item)
         if(collection.find_one({"personal_number" : user_auth.personal_number}) == None):
             user = collection.insert_one(user_auth.model_dump(by_alias=True, exclude=["id"]))
-            if(collection_auth.find_one({"personal_number" : user_auth.personal_number})):
-                collection_auth.update_one({"personal_number" : user_auth.personal_number}, {"$set" : {"id_user" : str(user.inserted_id)}})
 
     return {"status" : "success"}
 
@@ -53,5 +48,6 @@ def get_user_auth(item):
         type_of_education = item["Форма освоения"],
         date_of_birth = item["Дата рождения"],
         personal_number = str(item["Личный №"]), 
-        subjects=[]
+        subjects=[],
+        online_course=[]
     )

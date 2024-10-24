@@ -31,6 +31,8 @@ def choice_in_modeus(file: UploadFile):
 
         fill_students(df, collection_subject, collection_student, collection_not_found)
 
+        return {"status" : "seccess"}
+
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Parse student error")
@@ -86,14 +88,15 @@ def fill_students(df : DataFrame, collection_subject, collection_student, collec
         name=FIO[1] if len(FIO) > 1 else ""
         patronymic=FIO[2] if len(FIO) > 2 else ""
 
-        if collection_student.find_one({"name" : name, "surname" : surname, "patronymic" : patronymic}):
-            group = info_student[1]
-            speciality = info_student[2]
-            info_subjects = []
+        info_subjects = []
             
-            for choice in choice_subjects:
-                info_subjects.append(collection_subject.find_one({"full_name" : choice}))      
+        for choice in choice_subjects:
+            info_subjects.append(collection_subject.find_one({"full_name" : choice})) 
 
+        group = info_student[1]
+        speciality = info_student[2] 
+
+        if collection_student.find_one({"name" : name, "surname" : surname, "patronymic" : patronymic}):
             collection_student.update_one(
                     {"name" : name, "surname" : surname, "patronymic" : patronymic}, 
                     {"$set" : {"subjects" : info_subjects, "group.direction_code" : group, "group.name_speciality" : speciality}})
