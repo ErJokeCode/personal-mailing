@@ -100,6 +100,21 @@
             student_success = "Error";
         }
     }
+
+    async function send_test_notif(studnetId) {
+        await fetch(`${server_url}/core/send`, {
+            method: "Post",
+            body: JSON.stringify({
+                studentId: studnetId,
+                content: "test message",
+            }),
+            credentials: "include",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json",
+            },
+        });
+    }
 </script>
 
 <main>
@@ -130,6 +145,9 @@
             <tr>
                 <th>{student.email}</th>
             </tr>
+            <button on:click={() => send_test_notif(student.id)}
+                >Send Test Notification</button
+            >
         {/each}
     </table>
 </main>

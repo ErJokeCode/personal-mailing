@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json.Serialization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Shared.Models;
 
@@ -29,6 +31,10 @@ public class User
     public string PersonalNumber { get; set; }
 }
 
+public class AdminUser : IdentityUser
+{
+}
+
 public class Student
 {
     public Guid Id { get; set; }
@@ -39,4 +45,16 @@ public class Student
 
     public string UserId { get; set; }
     public string UserCourseId { get; set; }
+
+    public ICollection<Notification> Notifications { get; set; }
+}
+
+public class Notification
+{
+    public int Id { get; set; }
+
+    public Guid StudentId { get; set; }
+    public Student Student { get; set; }
+
+    public string Content { get; set; }
 }

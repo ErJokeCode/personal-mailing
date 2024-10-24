@@ -5,15 +5,22 @@ using Shared.Models;
 
 namespace Core.Models;
 
-public class CoreDb : IdentityDbContext<ApplicationUser>
+public class CoreDb : IdentityDbContext<AdminUser>
 {
     public DbSet<Student> Students => Set<Student>();
+    public DbSet<Notification> Notifications => Set<Notification>();
 
     public CoreDb(DbContextOptions<CoreDb> options) : base(options)
     {
     }
-}
 
-public class ApplicationUser : IdentityUser
-{
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<Student>()
+            .HasMany(e => e.Notifications)
+            .WithOne(e => e.Student)
+            .HasForeignKey(e => e.StudentId);
+    }
 }

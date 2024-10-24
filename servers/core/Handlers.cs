@@ -11,6 +11,9 @@ using Microsoft.AspNetCore.WebUtilities;
 using Shared.Models;
 using Shared.Messages;
 using MassTransit;
+using System.Net.Http.Json;
+using System.Text;
+using Microsoft.EntityFrameworkCore;
 
 namespace Core;
 
@@ -119,5 +122,59 @@ public static class Handlers
     public static IResult HandleStudents(CoreDb db)
     {
         return Results.Ok(db.Students);
+    }
+
+    public class MessageDetails
+    {
+        public Guid StudentId { get; set; }
+        public string Content { get; set; }
+    }
+
+    public class Data
+    {
+        public string chat_id { get; set; }
+        public string text { get; set; }
+    }
+
+    public static async Task<bool> SendToBot(string chatId, string content)
+    {
+        HttpClient httpClient = new() { BaseAddress = new Uri("https://api.telegram.org") };
+
+        var data = new Data() {
+            chat_id = chatId,
+            text = content,
+        };
+
+        var bot_token = Environment.GetEnvironmentVariable("TOKEN_BOT");
+
+        Console.WriteLine(bot_token);
+
+        var response = await httpClient.PostAsJsonAsync($"/bot{bot_token}/sendMessage", data);
+
+        return response.IsSuccessStatusCode;
+    }
+
+    public static async Task<IResult> SendNotification(MessageDetails details, CoreDb db)
+    {
+        var student = await db.Students.FindAsync(details.StudentId);
+
+        if (student == null)
+        {
+            return Results.NotFound();
+        }
+
+        var sent = await SendToBot(student.ChatId, details.Content);
+
+        if (!sent)
+        {
+            return Results.BadRequest();
+        }
+
+        var notification = new Notification() { StudentId = details.StudentId, Content = details.Content };
+        db.Notifications.Add(notification);
+
+        await db.SaveChangesAsync();
+
+        return Results.Ok();
     }
 }
