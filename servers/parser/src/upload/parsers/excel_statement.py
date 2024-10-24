@@ -14,6 +14,7 @@ def update_report(file: UploadFile):
         raise HTTPException(status_code=500, detail="File read error")
     
     collection = DB.get_student()
+    collection_course = DB.get_course_info_collection()
     all_students = {}
     
     for sheet_name in excel.sheet_names[1:]:
@@ -22,15 +23,17 @@ def update_report(file: UploadFile):
         data = df[df["Группа"].apply(lambda x: "РИ-" in x)].to_dict('records')
         for student in data:
             email = get_email(student)
+            course = get_course(student).model_dump()
+            course_db = collection_course.find_one({"name" : course["name"], "university" : {"$regex": course["university"]}})
+            course_db["score"] = course["score"]
             if email not in all_students.keys():
-                all_students[email] = create_student_course(student, get_email(student), get_group(student)).model_dump()
+                all_students[email] = create_student_course(student, course_db, get_email(student), get_group(student)).model_dump()
             else:
-                course = get_course(student).model_dump()
-                all_students[email]["courses"].append(course)
+                all_students[email]["courses"].append(course_db)
 
     for student in all_students.values():
         collection.update_one({"name": student["name"], "surname": student["surname"], "patronymic" : student["patronymic"], "group.number" : student["group"]}, 
-                              {"$set" : {"email" : student["email"], "courses" : student["courses"]}})
+                              {"$set" : {"email" : student["email"], "online_course" : student["courses"]}})
     
     return {"status" : "success"}
 
@@ -67,13 +70,12 @@ def get_email(item):
 def get_group(item):
     return item["Группа"]
 
-def create_student_course(item, email, group) -> StudentCourse:
-    course = get_course(item)
+def create_student_course(item, course, email, group) -> StudentCourse:
     return StudentCourse(
         surname=item["Фамилия"],
         name=item["Имя"],
         patronymic=None if str(item["Отчество"]) == "nan" else item["Отчество"],
         email=email,
         group=group,
-        courses=[course.model_dump()]
+        courses=[course]
     )

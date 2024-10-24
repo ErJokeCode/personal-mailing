@@ -1,5 +1,6 @@
+from fastapi.responses import HTMLResponse
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 
 from src.upload.router import router_data
 from src.user.router import router_user
@@ -12,7 +13,7 @@ app = FastAPI()
 
 app.include_router(router=router_data)
 app.include_router(router=router_user)
-app.include_router(router=router_user_info)
+#app.include_router(router=router_user_info)
 app.include_router(router=router_course)
 app.include_router(router=router_bot)
 

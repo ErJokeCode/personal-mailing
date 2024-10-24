@@ -36,7 +36,14 @@ class Student(BaseModel):
     subjects: list[object]
     online_course: list[object]
 
-
+class OnlineCourseStudent(BaseModel):
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    name: str 
+    university: str | None = None
+    date_start: str | None = None
+    deadline: list[str] | None = None
+    info: str | None = None
+    score: str | None = None
 
 
 
