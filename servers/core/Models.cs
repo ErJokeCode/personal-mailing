@@ -7,7 +7,7 @@ namespace Core.Models;
 
 public class CoreDb : IdentityDbContext<AdminUser>
 {
-    public DbSet<Student> Students => Set<Student>();
+    public DbSet<ActiveStudent> Students => Set<ActiveStudent>();
     public DbSet<Notification> Notifications => Set<Notification>();
 
     public CoreDb(DbContextOptions<CoreDb> options) : base(options)
@@ -18,7 +18,7 @@ public class CoreDb : IdentityDbContext<AdminUser>
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<Student>()
+        modelBuilder.Entity<ActiveStudent>()
             .HasMany(e => e.Notifications)
             .WithOne(e => e.Student)
             .HasForeignKey(e => e.StudentId);

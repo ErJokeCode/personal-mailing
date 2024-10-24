@@ -18,10 +18,10 @@ public static class Program
 
         var group = app.MapGroup("/core").RequireAuthorization("AdminPolicy");
 
-        group.MapPost("/auth", Handlers.HandleAuth);
-        group.MapGet("/{id}/courses", Handlers.HandleCourses);
-        group.MapGet("/students", Handlers.HandleStudents);
-        group.MapPost("/send", Handlers.SendNotification);
+        // group.MapPost("/auth", Handlers.HandleAuth);
+        // group.MapGet("/{id}/courses", Handlers.HandleCourses);
+        // group.MapGet("/students", Handlers.HandleStudents);
+        // group.MapPost("/send", Handlers.SendNotification);
 
         app.Run();
     }

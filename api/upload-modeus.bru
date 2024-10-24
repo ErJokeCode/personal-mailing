@@ -1,0 +1,15 @@
+meta {
+  name: upload-modeus
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{base_api}}/parser/upload/choice_in_modeus
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  file: @file(/home/nick/Documents/Students_in_RMUP2024-10-17-09-56-34.xlsx)
+}
