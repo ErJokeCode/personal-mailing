@@ -25,9 +25,11 @@ async def post_choice_in_modeus(file: UploadFile):
 
 @router_data.post("/report_online_course")
 async def post_online_course_report(file: UploadFile):
-    return parse_courses()
-    #Доделываю, пока не работет(
-    return update_report(file)
+    res = parse_courses()
+    if res["status"] == "success":
+        return update_report(file)
+    else:
+        return res
 
 
 

@@ -3,7 +3,7 @@ from fastapi import HTTPException, UploadFile
 import pandas as pd
 
 from config import DB
-from src.schemas import Course, User_course
+from src.schemas import Course, StudentCourse
 
 
 def update_report(file: UploadFile):
@@ -14,16 +14,24 @@ def update_report(file: UploadFile):
         raise HTTPException(status_code=500, detail="File read error")
     
     collection = DB.get_student()
-
-    dfs = []
+    all_students = {}
+    
     for sheet_name in excel.sheet_names[1:]:
         df = excel.parse(sheet_name)
-        dfs.append(df)
-    data_dfs = pd.concat(dfs)
-    data = data_dfs.groupby(["Фамилия", "Имя", "Отчество", "Группа"]).nunique()
-    print(data)
-        # for item in data:
-        #     student = get_student(item, collection)
+
+        data = df[df["Группа"].apply(lambda x: "РИ-" in x)].to_dict('records')
+        for student in data:
+            email = get_email(student)
+            if email not in all_students.keys():
+                all_students[email] = create_student_course(student, get_email(student), get_group(student)).model_dump()
+            else:
+                course = get_course(student).model_dump()
+                all_students[email]["courses"].append(course)
+
+    for student in all_students.values():
+        collection.update_one({"name": student["name"], "surname": student["surname"], "patronymic" : student["patronymic"], "group.number" : student["group"]}, 
+                              {"$set" : {"email" : student["email"], "courses" : student["courses"]}})
+    
     return {"status" : "success"}
 
 
@@ -37,7 +45,7 @@ def get_student(item, collection):
         else:
             group = get_group(item)
             if(group[:2] == "РИ"):
-                user = create_user(item, email, group)
+                user = create_student_course(item, email, group)
                 return user.model_dump(by_alias=True, exclude=["id"])
     except Exception as e:
         print(e)
@@ -59,10 +67,10 @@ def get_email(item):
 def get_group(item):
     return item["Группа"]
 
-def create_user(item, email, group) -> User_course:
+def create_student_course(item, email, group) -> StudentCourse:
     course = get_course(item)
-    return User_course(
-        sername=item["Фамилия"],
+    return StudentCourse(
+        surname=item["Фамилия"],
         name=item["Имя"],
         patronymic=None if str(item["Отчество"]) == "nan" else item["Отчество"],
         email=email,

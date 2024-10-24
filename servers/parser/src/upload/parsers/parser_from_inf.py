@@ -14,10 +14,13 @@ def parse_courses():
     url = "https://inf-online.urfu.ru/ru/onlain-kursy/#urfu"
 
     # Получаем содержимое страницы
-    response = requests.get(url)
-
-    if response.status_code != 200:
+    try:
+        response = requests.get(url)
+    except:
         return {"status" : "Not connect to urfu"}
+    
+    if response.status_code != 200:
+        raise {"status" : "Error connect to urfu"}
     else:
         soup = BeautifulSoup(response.content, 'html.parser')
 

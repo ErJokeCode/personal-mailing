@@ -46,14 +46,14 @@ class Course(BaseModel):
     university: str | None = None
     score: str | None = None
 
-class User_course(BaseModel):
+class StudentCourse(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
-    sername: str | None = None
+    surname: str | None = None
     name: str | None = None
     patronymic: str | None = None
     email: str
     group: str | None = None
-    courses: list[Course]
+    courses: list[dict]
 
 
 

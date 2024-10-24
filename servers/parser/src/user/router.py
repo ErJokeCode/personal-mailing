@@ -4,7 +4,7 @@ from fastapi import APIRouter, Body, HTTPException, UploadFile
 from fastapi import Depends
 
 from config import DB
-from src.schemas import Course, GetUserAuth, User_course, Student, UserAuth
+from src.schemas import Course, GetUserAuth, StudentCourse, Student, UserAuth
 
 
 
@@ -28,9 +28,9 @@ async def auth_user(user: Annotated[GetUserAuth, Body()]):
     if user_course is None:
         print("User not found")
         raise HTTPException(status_code=404, detail="User not found")
-    user_course = User_course(**user_course)
+    user_course = StudentCourse(**user_course)
 
-    get_user = collection_user.find_one({"name" : user_course.name, "sername" : user_course.sername, "patronymic" : user_course.patronymic})
+    get_user = collection_user.find_one({"name" : user_course.name, "sername" : user_course.surname, "patronymic" : user_course.patronymic})
     if get_user is None:
         print("User not found")
         raise HTTPException(status_code=404, detail="User not found")
@@ -75,7 +75,7 @@ async def get_courses(id : str) -> list[Course]:
 
     try:
         user_auth = UserAuth(**collection_auth.find_one({"_id" : ObjectId(id)}))
-        user_course = User_course(**collection_user_course.find_one({"_id" : ObjectId(user_auth.id_user_course)}))
+        user_course = StudentCourse(**collection_user_course.find_one({"_id" : ObjectId(user_auth.id_user_course)}))
         return user_course.courses
     except Exception as e:
         print(e)
