@@ -31,31 +31,7 @@ namespace Core.Migrations
                     b.Property<string>("ChatId")
                         .HasColumnType("text");
 
-                    b.Property<string>("DateOfBirth")
-                        .HasColumnType("text");
-
                     b.Property<string>("Email")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Patronymic")
-                        .HasColumnType("text");
-
-                    b.Property<string>("PersonalNumber")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("Status")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Surname")
-                        .HasColumnType("text");
-
-                    b.Property<string>("TypeOfCost")
-                        .HasColumnType("text");
-
-                    b.Property<string>("TypeOfEducation")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
@@ -125,127 +101,6 @@ namespace Core.Migrations
                         .HasDatabaseName("UserNameIndex");
 
                     b.ToTable("AspNetUsers", (string)null);
-                });
-
-            modelBuilder.Entity("Core.Models.CourseInfo", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<Guid>("ActiveStudentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("DateStart")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Deadline")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Info")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Score")
-                        .HasColumnType("text");
-
-                    b.Property<string>("University")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ActiveStudentId");
-
-                    b.ToTable("CourseInfo");
-                });
-
-            modelBuilder.Entity("Core.Models.Group", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<Guid>("ActiveStudentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("DirectionCode")
-                        .HasColumnType("text");
-
-                    b.Property<string>("NameSpeciality")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Number")
-                        .HasColumnType("text");
-
-                    b.Property<int>("NumberCourse")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ActiveStudentId")
-                        .IsUnique();
-
-                    b.ToTable("Group");
-                });
-
-            modelBuilder.Entity("Core.Models.Notification", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<Guid>("ActiveStudentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Content")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Date")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ActiveStudentId");
-
-                    b.ToTable("Notifications");
-                });
-
-            modelBuilder.Entity("Core.Models.Subject", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<Guid>("ActiveStudentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("FormEducation")
-                        .HasColumnType("text");
-
-                    b.Property<string>("FullName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Info")
-                        .HasColumnType("text");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ActiveStudentId");
-
-                    b.ToTable("Subject");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -380,44 +235,6 @@ namespace Core.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Core.Models.CourseInfo", b =>
-                {
-                    b.HasOne("Core.Models.ActiveStudent", null)
-                        .WithMany("OnlineCourse")
-                        .HasForeignKey("ActiveStudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Core.Models.Group", b =>
-                {
-                    b.HasOne("Core.Models.ActiveStudent", null)
-                        .WithOne("Group")
-                        .HasForeignKey("Core.Models.Group", "ActiveStudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Core.Models.Notification", b =>
-                {
-                    b.HasOne("Core.Models.ActiveStudent", "ActiveStudent")
-                        .WithMany("Notifications")
-                        .HasForeignKey("ActiveStudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ActiveStudent");
-                });
-
-            modelBuilder.Entity("Core.Models.Subject", b =>
-                {
-                    b.HasOne("Core.Models.ActiveStudent", null)
-                        .WithMany("Subjects")
-                        .HasForeignKey("ActiveStudentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -467,17 +284,6 @@ namespace Core.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Core.Models.ActiveStudent", b =>
-                {
-                    b.Navigation("Group");
-
-                    b.Navigation("Notifications");
-
-                    b.Navigation("OnlineCourse");
-
-                    b.Navigation("Subjects");
                 });
 #pragma warning restore 612, 618
         }
