@@ -1,13 +1,12 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
-using Notify.Models;
 using MassTransit;
+using Core.Messages;
+using Core.Models;
 
-using Shared.Messages;
+namespace Core;
 
-namespace Notify;
-
-public static class Handlers
+public static class MessageHandlers
 {
     public static IHubContext<SignalHub> Hub = null;
 

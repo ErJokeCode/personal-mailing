@@ -14,7 +14,6 @@ using System.Linq;
 using System;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
-using Shared.Models;
 using System.IO;
 
 namespace Core;
@@ -69,6 +68,8 @@ public static class Startup
 
         Action<IBusRegistrationConfigurator> busOptions = options =>
         {
+            options.AddConsumer<MessageHandlers.NewStudentAuthedConsumer>();
+
             Action<IBusRegistrationContext, IRabbitMqBusFactoryConfigurator> busContext = (context, cfg) =>
             {
                 Action<IRabbitMqHostConfigurator> rabbitOptions = rabbit =>
@@ -85,6 +86,7 @@ public static class Startup
         builder.Services.AddMassTransit(busOptions);
 
         builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+        builder.Services.AddSignalR();
 
         var connection = builder.Configuration.GetConnectionString("Database");
         builder.Services.AddDbContext<CoreDb>(options => options.UseNpgsql(connection));
@@ -119,6 +121,8 @@ public static class Startup
         app.UseCors();
         app.MapCustomIdentityApi<AdminUser>();
         app.MapReverseProxy();
+
+        app.MapHub<SignalHub>("/signal");
     }
 
     public static void MigrateDatabase(IServiceProvider services)

@@ -2,6 +2,8 @@ from typing import Annotated
 from bson import ObjectId
 from fastapi import APIRouter, Body, HTTPException, UploadFile
 from fastapi import Depends
+from bson import json_util
+import json
 
 from config import DB
 from src.schemas import (
@@ -35,22 +37,18 @@ async def get_courses(id: str) -> list[OnlineCourseStudent]:
         raise HTTPException(status_code=404, detail="User not found")
 
 
-@router_user.get("/{id}")
-async def get_courses(id: str):
-    try:
-        object_id = ObjectId(id)
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=400, detail="Invalid ID")
-
+@router_user.get("/")
+async def get_student(email: str):
     try:
         collection = DB.get_student()
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Error DB")
 
-    user = collection.find_one({"_id": ObjectId(id)})
+    user = collection.find_one({"email": email})
+
     if user is None:
         print("User not found")
         raise HTTPException(status_code=404, detail="User not found")
-    return Student(**user)
+
+    return json.loads(json_util.dumps(user))

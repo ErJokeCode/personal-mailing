@@ -1,6 +1,6 @@
-using Shared.Models;
+using Core.Models;
 
-namespace Shared.Messages;
+namespace Core.Messages;
 
 public class NewStudentAuthed
 {

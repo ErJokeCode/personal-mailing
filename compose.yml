@@ -37,17 +37,6 @@ services:
       timeout: 30s
       retries: 10
 
-  notify:
-    build:
-      context: ./servers
-      dockerfile: ./notify/Dockerfile
-    command: dotnet run
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-    volumes:
-      - ./servers/notify:/opt/notify
-
   coredb:
     image: postgres
     restart: always
