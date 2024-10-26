@@ -35,17 +35,11 @@ public class CoreDb : IdentityDbContext<AdminUser>
     }
 }
 
-public class ObjectId
-{
-    [JsonPropertyName("$oid")]
-    public string Value { get; set; }
-}
-
 [Keyless]
 public class Subject
 {
     [JsonPropertyName("_id")]
-    public ObjectId _id { get; set; }
+    public string _id { get; set; }
     public string FullName { get; set; }
     public string Name { get; set; }
     public string FormEducation { get; set; }
@@ -56,7 +50,7 @@ public class Subject
 public class CourseInfo
 {
     [JsonPropertyName("_id")]
-    public ObjectId _id { get; set; }
+    public string _id { get; set; }
     public string Name { get; set; }
     public string University { get; set; }
     public string DateStart { get; set; }
@@ -77,7 +71,7 @@ public class Group
 public class Student
 {
     [JsonPropertyName("_id")]
-    public ObjectId _id { get; set; }
+    public string _id { get; set; }
     public string PersonalNumber { get; set; }
     public string Name { get; set; }
     public string Surname { get; set; }

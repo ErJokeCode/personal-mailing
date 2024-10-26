@@ -3,6 +3,7 @@ from bson import ObjectId
 from fastapi import APIRouter, Body, HTTPException, UploadFile
 from fastapi import Depends
 from bson import json_util
+import bson
 import json
 import datetime
 
@@ -38,6 +39,15 @@ async def get_courses(id: str) -> list[OnlineCourseStudent]:
         raise HTTPException(status_code=404, detail="User not found")
 
 
+def my_handler(x):
+    if isinstance(x, datetime.datetime):
+        return x.isoformat()
+    elif isinstance(x, bson.ObjectId):
+        return str(x)
+    else:
+        raise TypeError(x)
+
+
 @router_user.get("/")
 async def get_student(email: str):
     try:
@@ -52,4 +62,4 @@ async def get_student(email: str):
         print("User not found")
         raise HTTPException(status_code=404, detail="User not found")
 
-    return json.loads(json_util.dumps(user))
+    return json.loads(json.dumps(user, default=my_handler))
