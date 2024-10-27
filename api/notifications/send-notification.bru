@@ -20,7 +20,7 @@ body:json {
 }
 
 body:multipart-form {
-  json: '''
+  body: '''
     {
       "content": "Важное сообщение!",
       "studentIds": [
@@ -28,5 +28,5 @@ body:multipart-form {
       ]
     }
   '''
-  ~file: @file(/home/nick/Documents/StudentSamples (12).xls)
+  documents: @file(/home/nick/Documents/StudentSamples (12).xls|/home/nick/Documents/Students_in_RMUP2024-10-17-09-56-34.xlsx)
 }

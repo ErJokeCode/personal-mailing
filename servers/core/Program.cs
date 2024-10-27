@@ -12,6 +12,7 @@ public static class Program
     public static async Task Main(string[] args)
     {
         Startup.LoadEnv(".env");
+        Startup.CreateFolder("Documents");
 
         var builder = WebApplication.CreateBuilder(args);
         builder.ConfigureServices();

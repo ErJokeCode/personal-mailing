@@ -16,6 +16,7 @@ using Core.Messages;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
+using System.IO;
 
 namespace Core;
 
@@ -114,10 +115,15 @@ public static class Handlers
 
         var response = await httpClient.PostAsJsonAsync($"/bot{botToken}/sendMessage", message);
 
+        if (!response.IsSuccessStatusCode)
+        {
+            Console.WriteLine(await response.Content.ReadAsStringAsync());
+        }
+
         return response.IsSuccessStatusCode;
     }
 
-    public static async Task<bool> SendDocumentToBot(string chatId, IFormFile file, string caption)
+    public static async Task<bool> SendDocumentToBot(string chatId, IFormFileCollection documents, string caption)
     {
         HttpClient httpClient = new() { BaseAddress = new Uri("https://api.telegram.org") };
 
@@ -125,13 +131,37 @@ public static class Handlers
 
         content.Add(new StringContent(chatId), "chat_id");
         content.Add(new StringContent(caption), "caption");
-        content.Add(new StreamContent(file.OpenReadStream()), "document", file.FileName);
+
+        foreach (var document in documents)
+        {
+            content.Add(new StreamContent(document.OpenReadStream()), "document", document.FileName);
+        }
 
         var botToken = Environment.GetEnvironmentVariable("TOKEN_BOT");
 
         var response = await httpClient.PostAsync($"/bot{botToken}/sendDocument", content);
 
         return response.IsSuccessStatusCode;
+    }
+
+    public static async Task<List<string>> StoreDocuments(IFormFileCollection documents)
+    {
+        var now = DateTime.Now.ToString();
+        var fileNames = new List<string>();
+
+        foreach (var document in documents)
+        {
+            var fileName = (now + " " + document.FileName).Replace("/", "-");
+            fileNames.Add(fileName);
+
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "Documents", fileName);
+            var writeFile = File.Create(path);
+            var stream = document.OpenReadStream();
+            stream.Position = 0;
+            await stream.CopyToAsync(writeFile);
+        }
+
+        return fileNames;
     }
 
     public class NotificationDetails
@@ -141,11 +171,12 @@ public static class Handlers
         public string Content { get; set; }
     }
 
-    public static async Task<IResult> SendNotification([FromForm] IFormFile file, [FromForm] string json, CoreDb db,
-                                                       HttpContext context, UserManager<AdminUser> userManager)
+    public static async Task<IResult> SendNotification([FromForm] IFormFileCollection documents, [FromForm] string body,
+                                                       CoreDb db, HttpContext context,
+                                                       UserManager<AdminUser> userManager)
     {
         var details = JsonSerializer.Deserialize<NotificationDetails>(
-            json, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+            body, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
         var adminId = userManager.GetUserId(context.User);
 
@@ -172,9 +203,9 @@ public static class Handlers
 
             bool sent;
 
-            if (file != null)
+            if (documents != null)
             {
-                sent = await SendDocumentToBot(activeStudent.ChatId, file, notification.Content);
+                sent = await SendDocumentToBot(activeStudent.ChatId, documents, notification.Content);
             }
             else
             {
@@ -189,6 +220,9 @@ public static class Handlers
             notification.ActiveStudents.Add(activeStudent);
         }
 
+        var fileNames = await StoreDocuments(documents);
+        notification.FileNames = fileNames;
+
         db.Notifications.Add(notification);
 
         var dto = new NotificationDto()
@@ -197,6 +231,7 @@ public static class Handlers
             Content = notification.Content,
             Date = notification.Date,
             AdminId = adminId,
+            FileNames = notification.FileNames,
         };
 
         foreach (var active in notification.ActiveStudents)
@@ -227,6 +262,7 @@ public static class Handlers
                 Content = notif.Content,
                 Date = notif.Date,
                 AdminId = notif.AdminId,
+                FileNames = notif.FileNames,
             };
             notifications.Add(dto);
         }
@@ -257,6 +293,7 @@ public static class Handlers
                 Content = notif.Content,
                 Date = notif.Date,
                 AdminId = notif.AdminId,
+                FileNames = notif.FileNames,
             };
 
             foreach (var student in notif.ActiveStudents)

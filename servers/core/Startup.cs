@@ -18,6 +18,9 @@ using System.IO;
 
 namespace Core;
 
+// TODO Create Documents folder in root, if it's not there
+// Otherwise gonna break when pushing git changes
+
 public static class Startup
 {
     public static void LoadEnv(string filePath)
@@ -41,6 +44,12 @@ public static class Startup
             var value = parts[1].Trim();
             Environment.SetEnvironmentVariable(key, value);
         }
+    }
+
+    public static void CreateFolder(string name)
+    {
+        var path = Path.Combine(Directory.GetCurrentDirectory(), name);
+        Directory.CreateDirectory(path);
     }
 
     public static void ConfigureServices(this WebApplicationBuilder builder)
