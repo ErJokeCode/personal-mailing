@@ -17,11 +17,7 @@ public class SignalHub : Hub
 public class CoreDb : IdentityDbContext<AdminUser>
 {
     public DbSet<ActiveStudent> ActiveStudents => Set<ActiveStudent>();
-    // public DbSet<Group> Group => Set<Group>();
-
     // public DbSet<Notification> Notifications => Set<Notification>();
-    // public DbSet<CourseInfo> CourseInfo => Set<CourseInfo>();
-    // public DbSet<Subject> Subject => Set<Subject>();
 
     public CoreDb(DbContextOptions<CoreDb> options) : base(options)
     {
@@ -96,6 +92,10 @@ public class AdminUser : IdentityUser
 public class ActiveStudent
 {
     public Guid Id { get; set; }
+
+    [NotMapped]
+    public Student Student { get; set; }
+
     public string Email { get; set; }
     public string ChatId { get; set; }
     // public ICollection<Notification> Notifications { get; set; }

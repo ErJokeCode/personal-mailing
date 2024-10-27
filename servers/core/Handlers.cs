@@ -18,25 +18,48 @@ namespace Core;
 
 public static class Handlers
 {
-    private static async Task<T> GetFromParser<T>(string path, Dictionary<string, string> query)
+    public class AuthDetails
     {
-        HttpClient httpClient = new() {
-            BaseAddress = new Uri("http://parser:8000"),
-        };
+        [JsonPropertyName("email")]
+        public string Email { get; set; }
+        [JsonPropertyName("personal_number")]
+        public string PersonalNumber { get; set; }
+        [JsonPropertyName("chat_id")]
+        public string ChatId { get; set; }
+    }
 
-        var response = await httpClient.GetAsync(QueryHelpers.AddQueryString(path, query));
+    public static async Task<IResult> HandleAuth(AuthDetails details, IPublishEndpoint endpoint, CoreDb db)
+    {
+        var activeStudent = db.ActiveStudents.SingleOrDefault(a => a.Email == details.Email);
 
-        if (!response.IsSuccessStatusCode)
+        if (activeStudent != null)
         {
-            return default(T);
+            await activeStudent.IncludeStudent();
+            return Results.Ok(activeStudent);
         }
 
-        var serializerSettings = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower };
+        activeStudent = new ActiveStudent()
+        {
+            Email = details.Email,
+            ChatId = details.ChatId,
+        };
 
-        var result = await response.Content.ReadAsStringAsync();
-        var obj = JsonSerializer.Deserialize<T>(result, serializerSettings);
+        var found = await activeStudent.IncludeStudent();
 
-        return obj;
+        if (!found || activeStudent.Student.PersonalNumber != details.PersonalNumber)
+        {
+            return Results.NotFound();
+        }
+
+        db.ActiveStudents.Add(activeStudent);
+        await db.SaveChangesAsync();
+
+        await endpoint.Publish<NewStudentAuthed>(new()
+        {
+            ActiveStudent = activeStudent,
+        });
+
+        return Results.Created<ActiveStudent>("", activeStudent);
     }
 
     public static async Task<IResult> HandleCourses(Guid id, CoreDb db)
@@ -48,62 +71,9 @@ public static class Handlers
             return Results.NotFound();
         }
 
-        var query = new Dictionary<string, string> {
-            ["email"] = activeStudent.Email,
-        };
+        await activeStudent.IncludeStudent();
 
-        var student = await GetFromParser<Student>("/student", query);
-
-        if (student == null)
-        {
-            return Results.NotFound();
-        }
-
-        return Results.Ok(student.OnlineCourse);
-    }
-
-    public class AuthDetails
-    {
-        [JsonPropertyName("email")]
-        public string Email { get; set; }
-        [JsonPropertyName("personal_number")]
-        public string PersonalNumber { get; set; }
-        [JsonPropertyName("chat_id")]
-        public string ChatId { get; set; }
-    }
-    public static async Task<IResult> HandleAuth(AuthDetails details, IPublishEndpoint endpoint, CoreDb db)
-    {
-        var activeStudent = db.ActiveStudents.SingleOrDefault(a => a.Email == details.Email);
-
-        if (activeStudent != null)
-        {
-            return Results.Ok(activeStudent);
-        }
-
-        var query = new Dictionary<string, string> {
-            ["email"] = details.Email,
-        };
-
-        var student = await GetFromParser<Student>("/student", query);
-
-        if (student == null || student.PersonalNumber != details.PersonalNumber)
-        {
-            return Results.NotFound();
-        }
-
-        activeStudent = new ActiveStudent() {
-            Email = student.Email,
-            ChatId = details.ChatId,
-        };
-
-        db.ActiveStudents.Add(activeStudent);
-        await db.SaveChangesAsync();
-
-        await endpoint.Publish<NewStudentAuthed>(new() {
-            Student = activeStudent,
-        });
-
-        return Results.Created<ActiveStudent>("", activeStudent);
+        return Results.Ok(activeStudent.Student.OnlineCourse);
     }
 
     // public static IResult HandleStudents(CoreDb db)
@@ -164,4 +134,47 @@ public static class Handlers
     //
     //     return Results.Ok();
     // }
+
+    public static async Task<T> GetFromParser<T>(string path, Dictionary<string, string> query)
+    {
+        HttpClient httpClient = new()
+        {
+            BaseAddress = new Uri("http://parser:8000"),
+        };
+
+        var response = await httpClient.GetAsync(QueryHelpers.AddQueryString(path, query));
+
+        if (!response.IsSuccessStatusCode)
+        {
+            return default(T);
+        }
+
+        var serializerSettings = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower };
+
+        var result = await response.Content.ReadAsStringAsync();
+        var obj = JsonSerializer.Deserialize<T>(result, serializerSettings);
+
+        return obj;
+    }
+}
+
+public static class ActiveStudentExtensions
+{
+    public static async Task<bool> IncludeStudent(this ActiveStudent active)
+    {
+        var query = new Dictionary<string, string>
+        {
+            ["email"] = active.Email,
+        };
+
+        var student = await Handlers.GetFromParser<Student>("/student", query);
+
+        if (student == null)
+        {
+            return false;
+        }
+
+        active.Student = student;
+        return true;
+    }
 }
