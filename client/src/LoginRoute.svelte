@@ -31,8 +31,6 @@
     }
 </script>
 
-<br />
-
 <label>
     Email
     <input type="text" bind:value={email} />
