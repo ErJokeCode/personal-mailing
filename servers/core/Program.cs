@@ -25,8 +25,8 @@ public static class Program
 
         group.MapPost("/auth", Handlers.HandleAuth);
         group.MapGet("/{id}/courses", Handlers.HandleCourses);
-        // group.MapGet("/students", Handlers.HandleStudents);
-        // group.MapPost("/send", Handlers.SendNotification);
+        group.MapGet("/students", Handlers.HandleStudents);
+        group.MapPost("/send_notification", Handlers.SendNotification);
 
         app.Run();
     }

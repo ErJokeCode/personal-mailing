@@ -76,64 +76,87 @@ public static class Handlers
         return Results.Ok(activeStudent.Student.OnlineCourse);
     }
 
-    // public static IResult HandleStudents(CoreDb db)
-    // {
-    //     return Results.Ok(db.Students);
-    // }
+    public static async Task<IResult> HandleStudents(CoreDb db)
+    {
+        var activeStudents = db.ActiveStudents.ToArray();
+        await activeStudents.IncludeStudents();
 
-    // public class MessageDetails
-    // {
-    //     public Guid StudentId { get; set; }
-    //     public string Content { get; set; }
-    // }
+        return Results.Ok(activeStudents);
+    }
 
-    // public class Data
-    // {
-    //     public string chat_id { get; set; }
-    //     public string text { get; set; }
-    // }
+    public class Message
+    {
+        public string chat_id { get; set; }
+        public string text { get; set; }
+    }
 
-    // public static async Task<bool> SendToBot(string chatId, string content)
-    // {
-    //     HttpClient httpClient = new() { BaseAddress = new Uri("https://api.telegram.org") };
-    //
-    //     var data = new Data() {
-    //         chat_id = chatId,
-    //         text = content,
-    //     };
-    //
-    //     var bot_token = Environment.GetEnvironmentVariable("TOKEN_BOT");
-    //
-    //     Console.WriteLine(bot_token);
-    //
-    //     var response = await httpClient.PostAsJsonAsync($"/bot{bot_token}/sendMessage", data);
-    //
-    //     return response.IsSuccessStatusCode;
-    // }
+    public static async Task<bool> SendToBot(string chatId, string content)
+    {
+        HttpClient httpClient = new() { BaseAddress = new Uri("https://api.telegram.org") };
 
-    // public static async Task<IResult> SendNotification(MessageDetails details, CoreDb db)
-    // {
-    //     var student = await db.Students.FindAsync(details.StudentId);
-    //
-    //     if (student == null)
-    //     {
-    //         return Results.NotFound();
-    //     }
-    //
-    //     var sent = await SendToBot(student.ChatId, details.Content);
-    //
-    //     if (!sent)
-    //     {
-    //         return Results.BadRequest();
-    //     }
-    //
-    //     var notification = new Notification() { StudentId = details.StudentId, Content = details.Content };
-    //     db.Notifications.Add(notification);
-    //
-    //     await db.SaveChangesAsync();
-    //
-    //     return Results.Ok();
-    // }
+        var message = new Message()
+        {
+            chat_id = chatId,
+            text = content,
+        };
+
+        var bot_token = Environment.GetEnvironmentVariable("TOKEN_BOT");
+
+        var response = await httpClient.PostAsJsonAsync($"/bot{bot_token}/sendMessage", message);
+
+        return response.IsSuccessStatusCode;
+    }
+
+    public class NotificationDetails
+    {
+        public List<Guid> StudentIds { get; set; }
+
+        public string Content { get; set; }
+    }
+
+    public static async Task<IResult> SendNotification(NotificationDetails details, CoreDb db)
+    {
+        var notification = new Notification()
+        {
+            Content = details.Content,
+            Date = DateTime.Now.ToString(),
+        };
+
+        foreach (var guid in details.StudentIds)
+        {
+            var activeStudent = db.ActiveStudents.Find(guid);
+
+            if (activeStudent == null)
+            {
+                continue;
+            }
+
+            var sent = await SendToBot(activeStudent.ChatId, notification.Content);
+
+            if (!sent)
+            {
+                continue;
+            }
+
+            notification.ActiveStudents.Add(activeStudent);
+        }
+
+        db.Notifications.Add(notification);
+
+        var dto = new NotificationDto()
+        {
+            Content = notification.Content,
+            Date = notification.Date,
+        };
+
+        foreach (var active in notification.ActiveStudents)
+        {
+            dto.StudentIds.Add(active.Id);
+        }
+
+        await db.SaveChangesAsync();
+        return Results.Ok(dto);
+    }
 
     public static async Task<T> GetFromParser<T>(string path, Dictionary<string, string> query)
     {
@@ -176,5 +199,13 @@ public static class ActiveStudentExtensions
 
         active.Student = student;
         return true;
+    }
+
+    public static async Task IncludeStudents(this ICollection<ActiveStudent> actives)
+    {
+        foreach (var active in actives)
+        {
+            await active.IncludeStudent();
+        }
     }
 }

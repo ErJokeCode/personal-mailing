@@ -17,7 +17,7 @@ public class SignalHub : Hub
 public class CoreDb : IdentityDbContext<AdminUser>
 {
     public DbSet<ActiveStudent> ActiveStudents => Set<ActiveStudent>();
-    // public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<Notification> Notifications => Set<Notification>();
 
     public CoreDb(DbContextOptions<CoreDb> options) : base(options)
     {
@@ -26,8 +26,8 @@ public class CoreDb : IdentityDbContext<AdminUser>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        // modelBuilder.Entity<ActiveStudent>().HasOne(e => e.Group).WithOne(e =>
-        // e.ActiveStudent).HasForeignKey("Group");
+
+        modelBuilder.Entity<ActiveStudent>().HasMany(e => e.Notifications).WithMany(e => e.ActiveStudents);
     }
 }
 
@@ -98,16 +98,24 @@ public class ActiveStudent
 
     public string Email { get; set; }
     public string ChatId { get; set; }
-    // public ICollection<Notification> Notifications { get; set; }
+
+    public ICollection<Notification> Notifications { get; } = [];
 }
 
-// public class Notification
-// {
-//     public int Id { get; set; }
-//
-//     public Guid ActiveStudentId { get; set; }
-//     public ActiveStudent ActiveStudent { get; set; }
-//
-//     public string Content { get; set; }
-//     public string Date { get; set; }
-// }
+public class Notification
+{
+    public int Id { get; set; }
+
+    public string Content { get; set; }
+    public string Date { get; set; }
+
+    public ICollection<ActiveStudent> ActiveStudents { get; } = [];
+}
+
+public class NotificationDto
+{
+    public int Id { get; set; }
+    public string Content { get; set; }
+    public string Date { get; set; }
+    public ICollection<Guid> StudentIds { get; } = [];
+}
