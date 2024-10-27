@@ -6,7 +6,7 @@ meta {
 
 post {
   url: {{base_api}}/core/send_notification
-  body: json
+  body: multipartForm
   auth: none
 }
 
@@ -17,4 +17,16 @@ body:json {
       "75d83c02-cc9f-4ad4-8241-5ad3a52c43ac"
     ]
   }
+}
+
+body:multipart-form {
+  json: '''
+    {
+      "content": "Важное сообщение!",
+      "studentIds": [
+        "75d83c02-cc9f-4ad4-8241-5ad3a52c43ac"
+      ]
+    }
+  '''
+  ~file: @file(/home/nick/Documents/StudentSamples (12).xls)
 }

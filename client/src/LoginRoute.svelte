@@ -6,6 +6,8 @@
     let message = "";
 
     async function login() {
+        message = "Logging in...";
+
         let response;
 
         try {
@@ -21,7 +23,7 @@
                     "Content-Type": "application/json",
                 },
             });
-        } catch(err) {
+        } catch (err) {
             message = "Something went wrong! " + response.statusText;
         }
 

@@ -5,6 +5,7 @@
     let login_status = "";
     let send_status = "";
     let content = "";
+    let files = [];
     let ids = [];
 
     let activeStudents = [];
@@ -33,23 +34,30 @@
     }
 
     async function send() {
+        send_status = "Sending...";
+
         let response;
 
         try {
+            let data = new FormData();
+
+            let body = JSON.stringify({
+                content: content,
+                studentIds: ids,
+            });
+
+            data.append("json", body);
+            if (files.length > 0) {
+                data.append("file", files[0]);
+            }
+
             response = await fetch(`${server_url}/core/send_notification`, {
                 method: "Post",
-                body: JSON.stringify({
-                    content: content,
-                    studentIds: ids,
-                }),
+                body: data,
                 credentials: "include",
-                headers: {
-                    Accept: "application/json",
-                    "Content-Type": "application/json",
-                },
             });
         } catch (err) {
-            send_status = "Something went wrong! " + response.statusText;
+            send_status = "Something went wrong! " + err;
         }
 
         if (response?.ok) {
@@ -69,6 +77,10 @@
 <label>
     Content:
     <input type="text" bind:value={content} />
+</label>
+<label>
+    File:
+    <input type="file" bind:files />
 </label>
 
 <br />

@@ -94,6 +94,12 @@ public static class Handlers
         public string text { get; set; }
     }
 
+    public class DocumentMessage
+    {
+        public string chat_id { get; set; }
+        public IFormFile document { get; set; }
+    }
+
     public static async Task<bool> SendToBot(string chatId, string content)
     {
         HttpClient httpClient = new() { BaseAddress = new Uri("https://api.telegram.org") };
@@ -104,9 +110,26 @@ public static class Handlers
             text = content,
         };
 
-        var bot_token = Environment.GetEnvironmentVariable("TOKEN_BOT");
+        var botToken = Environment.GetEnvironmentVariable("TOKEN_BOT");
 
-        var response = await httpClient.PostAsJsonAsync($"/bot{bot_token}/sendMessage", message);
+        var response = await httpClient.PostAsJsonAsync($"/bot{botToken}/sendMessage", message);
+
+        return response.IsSuccessStatusCode;
+    }
+
+    public static async Task<bool> SendDocumentToBot(string chatId, IFormFile file, string caption)
+    {
+        HttpClient httpClient = new() { BaseAddress = new Uri("https://api.telegram.org") };
+
+        var content = new MultipartFormDataContent();
+
+        content.Add(new StringContent(chatId), "chat_id");
+        content.Add(new StringContent(caption), "caption");
+        content.Add(new StreamContent(file.OpenReadStream()), "document", file.FileName);
+
+        var botToken = Environment.GetEnvironmentVariable("TOKEN_BOT");
+
+        var response = await httpClient.PostAsync($"/bot{botToken}/sendDocument", content);
 
         return response.IsSuccessStatusCode;
     }
@@ -118,9 +141,12 @@ public static class Handlers
         public string Content { get; set; }
     }
 
-    public static async Task<IResult> SendNotification(NotificationDetails details, CoreDb db, HttpContext context,
-                                                       UserManager<AdminUser> userManager)
+    public static async Task<IResult> SendNotification([FromForm] IFormFile file, [FromForm] string json, CoreDb db,
+                                                       HttpContext context, UserManager<AdminUser> userManager)
     {
+        var details = JsonSerializer.Deserialize<NotificationDetails>(
+            json, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+
         var adminId = userManager.GetUserId(context.User);
 
         if (adminId == null)
@@ -144,7 +170,16 @@ public static class Handlers
                 continue;
             }
 
-            var sent = await SendToBot(activeStudent.ChatId, notification.Content);
+            bool sent;
+
+            if (file != null)
+            {
+                sent = await SendDocumentToBot(activeStudent.ChatId, file, notification.Content);
+            }
+            else
+            {
+                sent = await SendToBot(activeStudent.ChatId, notification.Content);
+            }
 
             if (!sent)
             {

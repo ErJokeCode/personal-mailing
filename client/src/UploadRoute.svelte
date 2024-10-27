@@ -66,6 +66,8 @@
     async function send_students() {
         if (student_files.length <= 0) return;
 
+        student_success = "Sending...";
+
         let file = student_files[0];
 
         var data = new FormData();
@@ -85,6 +87,8 @@
 
     async function send_modeus() {
         if (modeus_files.length <= 0) return;
+
+        modeus_success = "Sending...";
 
         let file = modeus_files[0];
 
@@ -108,6 +112,8 @@
 
     async function send_courses() {
         if (courses_files.length <= 0) return;
+
+        courses_success = "Sending...";
 
         let file = courses_files[0];
 
