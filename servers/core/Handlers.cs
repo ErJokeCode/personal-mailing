@@ -13,6 +13,9 @@ using System.Net.Http.Json;
 using System.Text;
 using Microsoft.EntityFrameworkCore;
 using Core.Messages;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
 
 namespace Core;
 
@@ -20,15 +23,16 @@ public static class Handlers
 {
     public class AuthDetails
     {
-        [JsonPropertyName("email")]
         public string Email { get; set; }
+
         [JsonPropertyName("personal_number")]
         public string PersonalNumber { get; set; }
+
         [JsonPropertyName("chat_id")]
         public string ChatId { get; set; }
     }
 
-    public static async Task<IResult> HandleAuth(AuthDetails details, IPublishEndpoint endpoint, CoreDb db)
+    public static async Task<IResult> AuthStudent(AuthDetails details, IPublishEndpoint endpoint, CoreDb db)
     {
         var activeStudent = db.ActiveStudents.SingleOrDefault(a => a.Email == details.Email);
 
@@ -48,7 +52,7 @@ public static class Handlers
 
         if (!found || activeStudent.Student.PersonalNumber != details.PersonalNumber)
         {
-            return Results.NotFound();
+            return Results.NotFound("Could not find the student");
         }
 
         db.ActiveStudents.Add(activeStudent);
@@ -62,13 +66,13 @@ public static class Handlers
         return Results.Created<ActiveStudent>("", activeStudent);
     }
 
-    public static async Task<IResult> HandleCourses(Guid id, CoreDb db)
+    public static async Task<IResult> GetStudentCourses(Guid id, CoreDb db)
     {
         var activeStudent = db.ActiveStudents.Find(id);
 
         if (activeStudent == null)
         {
-            return Results.NotFound();
+            return Results.NotFound("Could not find the student");
         }
 
         await activeStudent.IncludeStudent();
@@ -76,7 +80,7 @@ public static class Handlers
         return Results.Ok(activeStudent.Student.OnlineCourse);
     }
 
-    public static async Task<IResult> HandleStudents(CoreDb db)
+    public static async Task<IResult> GetStudents(CoreDb db)
     {
         var activeStudents = db.ActiveStudents.ToArray();
         await activeStudents.IncludeStudents();
@@ -114,12 +118,21 @@ public static class Handlers
         public string Content { get; set; }
     }
 
-    public static async Task<IResult> SendNotification(NotificationDetails details, CoreDb db)
+    public static async Task<IResult> SendNotification(NotificationDetails details, CoreDb db, HttpContext context,
+                                                       UserManager<AdminUser> userManager)
     {
+        var adminId = userManager.GetUserId(context.User);
+
+        if (adminId == null)
+        {
+            Results.NotFound("Could not get the admin");
+        }
+
         var notification = new Notification()
         {
             Content = details.Content,
             Date = DateTime.Now.ToString(),
+            AdminId = adminId,
         };
 
         foreach (var guid in details.StudentIds)
@@ -145,8 +158,10 @@ public static class Handlers
 
         var dto = new NotificationDto()
         {
+            Id = notification.Id,
             Content = notification.Content,
             Date = notification.Date,
+            AdminId = adminId,
         };
 
         foreach (var active in notification.ActiveStudents)
@@ -156,6 +171,68 @@ public static class Handlers
 
         await db.SaveChangesAsync();
         return Results.Ok(dto);
+    }
+
+    public static async Task<IResult> GetStudentNotifications(Guid id, CoreDb db)
+    {
+        var activeStudent = await db.ActiveStudents.Include(a => a.Notifications).SingleAsync(a => a.Id == id);
+
+        if (activeStudent == null)
+        {
+            return Results.NotFound("Could not find student");
+        }
+
+        var notifications = new List<NotificationDto>();
+
+        foreach (var notif in activeStudent.Notifications)
+        {
+            var dto = new NotificationDto()
+            {
+                Id = notif.Id,
+                Content = notif.Content,
+                Date = notif.Date,
+                AdminId = notif.AdminId,
+            };
+            notifications.Add(dto);
+        }
+
+        return Results.Ok(notifications);
+    }
+
+    public static async Task<IResult> GetAdminNotifications(HttpContext context, UserManager<AdminUser> userManager,
+                                                            CoreDb db)
+    {
+        var id = userManager.GetUserId(context.User);
+        var admin = await db.Users.Include(a => a.Notifications)
+                        .ThenInclude(n => n.ActiveStudents)
+                        .SingleAsync(a => a.Id == id);
+
+        if (admin == null)
+        {
+            return Results.NotFound("Could not find admin");
+        }
+
+        var notifications = new List<NotificationDto>();
+
+        foreach (var notif in admin.Notifications)
+        {
+            var dto = new NotificationDto()
+            {
+                Id = notif.Id,
+                Content = notif.Content,
+                Date = notif.Date,
+                AdminId = notif.AdminId,
+            };
+
+            foreach (var student in notif.ActiveStudents)
+            {
+                dto.StudentIds.Add(student.Id);
+            }
+
+            notifications.Add(dto);
+        }
+
+        return Results.Ok(notifications);
     }
 
     public static async Task<T> GetFromParser<T>(string path, Dictionary<string, string> query)

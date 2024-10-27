@@ -28,6 +28,11 @@ public class CoreDb : IdentityDbContext<AdminUser>
         base.OnModelCreating(modelBuilder);
 
         modelBuilder.Entity<ActiveStudent>().HasMany(e => e.Notifications).WithMany(e => e.ActiveStudents);
+
+        modelBuilder.Entity<AdminUser>()
+            .HasMany(e => e.Notifications)
+            .WithOne(e => e.Admin)
+            .HasForeignKey(e => e.AdminId);
     }
 }
 
@@ -87,6 +92,7 @@ public class Student
 
 public class AdminUser : IdentityUser
 {
+    public ICollection<Notification> Notifications { get; } = [];
 }
 
 public class ActiveStudent
@@ -109,6 +115,8 @@ public class Notification
     public string Content { get; set; }
     public string Date { get; set; }
 
+    public string AdminId { get; set; }
+    public AdminUser Admin { get; set; }
     public ICollection<ActiveStudent> ActiveStudents { get; } = [];
 }
 
@@ -117,5 +125,7 @@ public class NotificationDto
     public int Id { get; set; }
     public string Content { get; set; }
     public string Date { get; set; }
+
+    public string AdminId { get; set; }
     public ICollection<Guid> StudentIds { get; } = [];
 }
