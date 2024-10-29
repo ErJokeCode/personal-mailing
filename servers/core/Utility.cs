@@ -13,6 +13,7 @@ public class CoreDb : IdentityDbContext<AdminUser>
 {
     public DbSet<ActiveStudent> ActiveStudents => Set<ActiveStudent>();
     public DbSet<Notification> Notifications => Set<Notification>();
+    public DbSet<Document> Documents => Set<Document>();
 
     public CoreDb(DbContextOptions<CoreDb> options) : base(options)
     {
@@ -28,5 +29,10 @@ public class CoreDb : IdentityDbContext<AdminUser>
             .HasMany(e => e.Notifications)
             .WithOne(e => e.Admin)
             .HasForeignKey(e => e.AdminId);
+
+        modelBuilder.Entity<Notification>()
+            .HasMany(e => e.Documents)
+            .WithOne(e => e.Notification)
+            .HasForeignKey(e => e.NotificationId);
     }
 }

@@ -28,12 +28,14 @@ public static class NotificationHandler
         public IFormFile document { get; set; }
     }
 
+    // TODO send this to the bot api instead of telegram directly
+    // Combine this in one method preferably
+
     public static async Task<bool> SendToBot(string chatId, string content)
     {
         HttpClient httpClient = new() { BaseAddress = new Uri("https://api.telegram.org") };
 
-        var message = new Message()
-        {
+        var message = new Message() {
             chat_id = chatId,
             text = content,
         };
@@ -92,8 +94,7 @@ public static class NotificationHandler
             Results.NotFound("Could not get the admin");
         }
 
-        var notification = new Notification()
-        {
+        var notification = new Notification() {
             Content = details.Content,
             Date = DateTime.Now.ToString(),
             AdminId = adminId,
@@ -127,54 +128,29 @@ public static class NotificationHandler
             notification.ActiveStudents.Add(activeStudent);
         }
 
-        var fileNames = await DocumentHandler.StoreDocuments(documents);
-        notification.FileNames = fileNames;
-
         db.Notifications.Add(notification);
-
-        var dto = new NotificationDto()
-        {
-            Id = notification.Id,
-            Content = notification.Content,
-            Date = notification.Date,
-            AdminId = adminId,
-            FileNames = notification.FileNames,
-        };
-
-        foreach (var active in notification.ActiveStudents)
-        {
-            dto.StudentIds.Add(active.Id);
-        }
-
         await db.SaveChangesAsync();
+
+        await DocumentHandler.StoreDocuments(documents, notification.Id, db);
+
+        var dto = Mapper.Map(notification);
         return Results.Ok(dto);
     }
 
     public static async Task<IResult> GetStudentNotifications(Guid id, CoreDb db)
     {
-        var activeStudent = await db.ActiveStudents.Include(a => a.Notifications).SingleAsync(a => a.Id == id);
+        var activeStudent = await db.ActiveStudents.Include(a => a.Notifications)
+                                .ThenInclude(n => n.Documents)
+                                .SingleAsync(a => a.Id == id);
 
         if (activeStudent == null)
         {
             return Results.NotFound("Could not find student");
         }
 
-        var notifications = new List<NotificationDto>();
+        var dtos = Mapper.Map(activeStudent.Notifications);
 
-        foreach (var notif in activeStudent.Notifications)
-        {
-            var dto = new NotificationDto()
-            {
-                Id = notif.Id,
-                Content = notif.Content,
-                Date = notif.Date,
-                AdminId = notif.AdminId,
-                FileNames = notif.FileNames,
-            };
-            notifications.Add(dto);
-        }
-
-        return Results.Ok(notifications);
+        return Results.Ok(dtos);
     }
 
     public static async Task<IResult> GetAdminNotifications(HttpContext context, UserManager<AdminUser> userManager,
@@ -183,6 +159,8 @@ public static class NotificationHandler
         var id = userManager.GetUserId(context.User);
         var admin = await db.Users.Include(a => a.Notifications)
                         .ThenInclude(n => n.ActiveStudents)
+                        .Include(a => a.Notifications)
+                        .ThenInclude(n => n.Documents)
                         .SingleAsync(a => a.Id == id);
 
         if (admin == null)
@@ -190,27 +168,8 @@ public static class NotificationHandler
             return Results.NotFound("Could not find admin");
         }
 
-        var notifications = new List<NotificationDto>();
+        var dtos = Mapper.Map(admin.Notifications);
 
-        foreach (var notif in admin.Notifications)
-        {
-            var dto = new NotificationDto()
-            {
-                Id = notif.Id,
-                Content = notif.Content,
-                Date = notif.Date,
-                AdminId = notif.AdminId,
-                FileNames = notif.FileNames,
-            };
-
-            foreach (var student in notif.ActiveStudents)
-            {
-                dto.StudentIds.Add(student.Id);
-            }
-
-            notifications.Add(dto);
-        }
-
-        return Results.Ok(notifications);
+        return Results.Ok(dtos);
     }
 }
