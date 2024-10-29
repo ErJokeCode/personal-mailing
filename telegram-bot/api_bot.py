@@ -1,29 +1,32 @@
 from fastapi import APIRouter, Request
 from aiogram.types import Update
 from aiogram import Bot, Dispatcher
+from fastapi import FastAPI, Request
 
-class Info_Bot():
-    bot: Bot
-    dp: Dispatcher
+import uvicorn
+from aiogram.fsm.storage.base import StorageKey
+from aiogram.fsm.context import FSMContext
+from aiogram.fsm.storage.base import StorageKey
+from aiogram.fsm.storage.redis import RedisStorage
+
+from config import TOKEN
+
+bot = Bot(token=TOKEN)
 
 router_send = APIRouter(
     prefix="/send",
     tags=["Send"],
 )
 
-router_WH = APIRouter(
-    prefix="",
-    tags=["Webhook"],
-)
-
-
 @router_send.post("/{chat_id}")
 async def send_text(chat_id: str, text : str):
-    await Info_Bot.bot.send_message(chat_id="1362536052", text=text) 
-    return {"":""}
+    await bot.send_message(chat_id="1362536052", text=text) 
+    return {"status": "success"}
 
-@router_WH.post("/webhook")
-async def webhook(request: Request) -> None:
-    update = Update.model_validate(await request.json(), context={"bot": Info_Bot.bot})
-    print(update, await request.json())
-    await Info_Bot.dp.feed_update(Info_Bot.bot, update)
+
+app = FastAPI()
+app.include_router(router_send)
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="localhost", port=8000)
+    

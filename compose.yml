@@ -18,8 +18,6 @@ services:
   bot:
     build: ./telegram-bot
     command: python main.py
-    ports:
-      - 8000:8000
     depends_on:
       redis:
         condition: service_started
