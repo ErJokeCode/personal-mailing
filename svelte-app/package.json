@@ -1,0 +1,84 @@
+{
+	"name": "flowbite-svelte-admin-dashboard",
+	"version": "0.1.2",
+	"description": "Flowbite Admin Dashboard components for Svelte",
+	"homepage": "https://flowbite-svelte-admin-dashboard.vercel.app/",
+	"private": false,
+	"license": "MIT",
+	"scripts": {
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"test": "npm run test:integration && npm run test:unit",
+		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
+		"lint": "prettier --check . && eslint .",
+		"format": "prettier --write .",
+		"test:integration": "playwright test",
+		"test:unit": "vitest"
+	},
+	"devDependencies": {
+		"@playwright/test": "^1.47.2",
+		"@sveltejs/adapter-auto": "^3.2.5",
+		"@sveltejs/kit": "^2.6.1",
+		"@sveltejs/vite-plugin-svelte": "^3.1.2",
+		"@types/eslint": "^9.6.1",
+		"apexcharts": "^3.54.0",
+		"autoprefixer": "^10.4.20",
+		"dayjs": "^1.11.13",
+		"eslint": "^9.11.1",
+		"eslint-config-prettier": "^9.1.0",
+		"eslint-plugin-svelte": "^2.44.1",
+		"flowbite-svelte": "^0.46.22",
+		"flowbite-svelte-icons": "^1.6.1",
+		"globals": "^15.9.0",
+		"prettier": "^3.3.3",
+		"prettier-plugin-svelte": "^3.2.7",
+		"prettier-plugin-tailwindcss": "^0.6.8",
+		"runatics": "^0.1.3",
+		"svelte": "^4.2.19",
+		"svelte-check": "^4.0.4",
+		"svelte-meta-tags": "^3.1.4",
+		"tailwind-merge": "^2.5.2",
+		"tailwindcss": "^3.4.13",
+		"typescript": "^5.6.2",
+		"typescript-eslint": "^8.7.0",
+		"vite": "^5.4.8",
+		"vitest": "^2.1.1"
+	},
+	"type": "module",
+	"peerDependencies": {
+		"svelte": "^4.0.0"
+	},
+	"dependencies": {
+		"flowbite-svelte-admin-dashboard": "^0.1.2",
+		"flowbite-svelte-icons": "^1.6.1",
+		"tailwind-merge": "^2.5.2"
+	},
+	"keywords": [
+		"svelte",
+		"sveltekit",
+		"tailwindcss",
+		"flowbite",
+		"ui",
+		"admin dashboard",
+		"signup"
+	],
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/themesberg/flowbite-svelte-admin-dashboard"
+	},
+	"files": [
+		"dist",
+		"!dist/**/*.test.*",
+		"!dist/**/*.spec.*"
+	],
+	"svelte": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"svelte": "./dist/index.js"
+		}
+	}
+}
