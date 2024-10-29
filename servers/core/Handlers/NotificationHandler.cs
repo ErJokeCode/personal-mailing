@@ -1,94 +1,21 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Core.Models;
+using Core.Models.Dto;
+using Core.Utility;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.WebUtilities;
-using MassTransit;
-using System.Net.Http.Json;
-using System.Text;
-using Microsoft.EntityFrameworkCore;
-using Core.Messages;
-using System.Security.Claims;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Identity;
-using System.IO;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
-namespace Core;
+namespace Core.Handlers;
 
-public static class Handlers
+public static class NotificationHandler
 {
-    public class AuthDetails
-    {
-        public string Email { get; set; }
-
-        [JsonPropertyName("personal_number")]
-        public string PersonalNumber { get; set; }
-
-        [JsonPropertyName("chat_id")]
-        public string ChatId { get; set; }
-    }
-
-    public static async Task<IResult> AuthStudent(AuthDetails details, IPublishEndpoint endpoint, CoreDb db)
-    {
-        var activeStudent = db.ActiveStudents.SingleOrDefault(a => a.Email == details.Email);
-
-        if (activeStudent != null)
-        {
-            await activeStudent.IncludeStudent();
-            return Results.Ok(activeStudent);
-        }
-
-        activeStudent = new ActiveStudent()
-        {
-            Email = details.Email,
-            ChatId = details.ChatId,
-        };
-
-        var found = await activeStudent.IncludeStudent();
-
-        if (!found || activeStudent.Student.PersonalNumber != details.PersonalNumber)
-        {
-            return Results.NotFound("Could not find the student");
-        }
-
-        db.ActiveStudents.Add(activeStudent);
-        await db.SaveChangesAsync();
-
-        await endpoint.Publish<NewStudentAuthed>(new()
-        {
-            ActiveStudent = activeStudent,
-        });
-
-        return Results.Created<ActiveStudent>("", activeStudent);
-    }
-
-    public static async Task<IResult> GetStudentCourses(Guid id, CoreDb db)
-    {
-        var activeStudent = db.ActiveStudents.Find(id);
-
-        if (activeStudent == null)
-        {
-            return Results.NotFound("Could not find the student");
-        }
-
-        await activeStudent.IncludeStudent();
-
-        return Results.Ok(activeStudent.Student.OnlineCourse);
-    }
-
-    public static async Task<IResult> GetStudents(CoreDb db)
-    {
-        var activeStudents = db.ActiveStudents.ToArray();
-        await activeStudents.IncludeStudents();
-
-        return Results.Ok(activeStudents);
-    }
-
     public class Message
     {
         public string chat_id { get; set; }
@@ -142,26 +69,6 @@ public static class Handlers
         var response = await httpClient.PostAsync($"/bot{botToken}/sendDocument", content);
 
         return response.IsSuccessStatusCode;
-    }
-
-    public static async Task<List<string>> StoreDocuments(IFormFileCollection documents)
-    {
-        var now = DateTime.Now.ToString();
-        var fileNames = new List<string>();
-
-        foreach (var document in documents)
-        {
-            var fileName = (now + " " + document.FileName).Replace("/", "-");
-            fileNames.Add(fileName);
-
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "Documents", fileName);
-            var writeFile = File.Create(path);
-            var stream = document.OpenReadStream();
-            stream.Position = 0;
-            await stream.CopyToAsync(writeFile);
-        }
-
-        return fileNames;
     }
 
     public class NotificationDetails
@@ -220,7 +127,7 @@ public static class Handlers
             notification.ActiveStudents.Add(activeStudent);
         }
 
-        var fileNames = await StoreDocuments(documents);
+        var fileNames = await DocumentHandler.StoreDocuments(documents);
         notification.FileNames = fileNames;
 
         db.Notifications.Add(notification);
@@ -305,56 +212,5 @@ public static class Handlers
         }
 
         return Results.Ok(notifications);
-    }
-
-    public static async Task<T> GetFromParser<T>(string path, Dictionary<string, string> query)
-    {
-        HttpClient httpClient = new()
-        {
-            BaseAddress = new Uri("http://parser:8000"),
-        };
-
-        var response = await httpClient.GetAsync(QueryHelpers.AddQueryString(path, query));
-
-        if (!response.IsSuccessStatusCode)
-        {
-            return default(T);
-        }
-
-        var serializerSettings = new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower };
-
-        var result = await response.Content.ReadAsStringAsync();
-        var obj = JsonSerializer.Deserialize<T>(result, serializerSettings);
-
-        return obj;
-    }
-}
-
-public static class ActiveStudentExtensions
-{
-    public static async Task<bool> IncludeStudent(this ActiveStudent active)
-    {
-        var query = new Dictionary<string, string>
-        {
-            ["email"] = active.Email,
-        };
-
-        var student = await Handlers.GetFromParser<Student>("/student", query);
-
-        if (student == null)
-        {
-            return false;
-        }
-
-        active.Student = student;
-        return true;
-    }
-
-    public static async Task IncludeStudents(this ICollection<ActiveStudent> actives)
-    {
-        foreach (var active in actives)
-        {
-            await active.IncludeStudent();
-        }
     }
 }

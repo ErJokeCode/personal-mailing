@@ -1,12 +1,11 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using MassTransit;
-using Core.Messages;
-using Core.Models;
+using Core.Utility;
 
-namespace Core;
+namespace Core.Messages;
 
-public static class MessageHandlers
+public static class AuthConsumer
 {
     public static IHubContext<SignalHub> Hub = null;
 

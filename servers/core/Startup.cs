@@ -15,11 +15,10 @@ using System;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using System.IO;
+using Core.Utility;
+using Core.Messages;
 
 namespace Core;
-
-// TODO Create Documents folder in root, if it's not there
-// Otherwise gonna break when pushing git changes
 
 public static class Startup
 {
@@ -77,7 +76,7 @@ public static class Startup
 
         Action<IBusRegistrationConfigurator> busOptions = options =>
         {
-            options.AddConsumer<MessageHandlers.NewStudentAuthedConsumer>();
+            options.AddConsumer<AuthConsumer.NewStudentAuthedConsumer>();
 
             Action<IBusRegistrationContext, IRabbitMqBusFactoryConfigurator> busContext = (context, cfg) =>
             {

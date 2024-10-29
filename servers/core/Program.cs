@@ -1,5 +1,8 @@
 using System.Threading.Tasks;
+using Core.Handlers;
+using Core.Messages;
 using Core.Models;
+using Core.Utility;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.SignalR;
@@ -20,16 +23,17 @@ public static class Program
         var app = builder.Build();
         await app.InitialzieServices();
 
-        MessageHandlers.Hub = app.Services.GetService<IHubContext<SignalHub>>();
+        AuthConsumer.Hub = app.Services.GetService<IHubContext<SignalHub>>();
 
         var group = app.MapGroup("/core").RequireAuthorization("AdminPolicy");
 
-        group.MapPost("/auth", Handlers.AuthStudent);
-        group.MapGet("/{id}/courses", Handlers.GetStudentCourses);
-        group.MapGet("/students", Handlers.GetStudents);
-        group.MapPost("/send_notification", Handlers.SendNotification).DisableAntiforgery();
-        group.MapGet("/student_notifications", Handlers.GetStudentNotifications);
-        group.MapGet("/admin_notifications", Handlers.GetAdminNotifications);
+        group.MapPost("/auth", AuthHandler.AuthStudent);
+        group.MapGet("/{id}/courses", StudentHandler.GetStudentCourses);
+        group.MapGet("/students", StudentHandler.GetStudents);
+        group.MapPost("/send_notification", NotificationHandler.SendNotification).DisableAntiforgery();
+        group.MapGet("/student_notifications", NotificationHandler.GetStudentNotifications);
+        group.MapGet("/admin_notifications", NotificationHandler.GetAdminNotifications);
+        group.MapGet("/document", DocumentHandler.GetDocument);
 
         app.Run();
     }
