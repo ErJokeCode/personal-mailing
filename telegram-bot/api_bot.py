@@ -9,9 +9,10 @@ from aiogram.fsm.context import FSMContext
 from aiogram.fsm.storage.base import StorageKey
 from aiogram.fsm.storage.redis import RedisStorage
 
-from config import TOKEN
+from config import TOKEN, URL_REDIS
 
 bot = Bot(token=TOKEN)
+storage = RedisStorage.from_url(URL_REDIS)
 
 router_send = APIRouter(
     prefix="/send",
@@ -20,7 +21,17 @@ router_send = APIRouter(
 
 @router_send.post("/{chat_id}")
 async def send_text(chat_id: str, text : str):
-    await bot.send_message(chat_id="1362536052", text=text) 
+    res = await bot.send_message(chat_id="1362536052", text=text) 
+    print(await storage.get_data(key=StorageKey(
+        bot_id=bot.id, 
+        chat_id=res.chat.id, 
+        user_id=res.from_user.id
+    )))
+    # await storage.set_data(key=StorageKey(
+    #     bot_id=bot.id, 
+    #     chat_id=res.chat.id, 
+    #     user_id=res.from_user.id
+    # ), data={"message_id":res.message_id})
     return {"status": "success"}
 
 
