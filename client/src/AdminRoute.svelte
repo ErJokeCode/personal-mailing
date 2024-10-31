@@ -4,13 +4,13 @@
     import { Link } from "svelte-routing";
 
     let login_status = "";
-    let notifications = [];
+    let admins = [];
 
     onMount(async () => {
         let response;
 
         try {
-            response = await fetch(`${server_url}/core/admin_notifications`, {
+            response = await fetch(`${server_url}/core/auth/admins`, {
                 credentials: "include",
             });
         } catch (err) {
@@ -18,32 +18,24 @@
         }
 
         let json = await response.json();
-        notifications = json;
+        admins = json;
     });
 </script>
 
 <h1>{login_status}</h1>
 
-<h2>Your Notifications</h2>
+<h2>Admins:</h2>
 <table>
     <tr>
-        <th>Content</th>
-        <th>Date</th>
-        <th>Sent To</th>
+        <th>Email</th>
     </tr>
-    {#each notifications as notification}
+    {#each admins as admin}
         <tr>
-            <th>{notification.content}</th>
-            <th>{notification.date}</th>
-            <th>
-                {#each notification.students as student}
-                    {student.email},
-                {/each}
-            </th>
+            <th>{admin.email}</th>
         </tr>
     {/each}
 
-    <Link to="/send-notification">Send Notification</Link>
+    <Link to="/create-admin">Create Admin</Link>
 </table>
 
 <style>

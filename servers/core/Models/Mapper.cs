@@ -5,18 +5,59 @@ namespace Core.Models;
 
 public static class Mapper
 {
+    public static AdminUserDto Map(AdminUser orig)
+    {
+        var dto = new AdminUserDto() { Id = orig.Id, Email = orig.Email };
+
+        return dto;
+    }
+
+    public static List<AdminUserDto> Map(ICollection<AdminUser> origs)
+    {
+        var dtos = new List<AdminUserDto>();
+
+        foreach (var orig in origs)
+        {
+            var dto = Mapper.Map(orig);
+            dtos.Add(dto);
+        }
+
+        return dtos;
+    }
+
+    public static ActiveStudentDto Map(ActiveStudent orig)
+    {
+        var dto =
+            new ActiveStudentDto() { Id = orig.Id, Email = orig.Email, ChatId = orig.ChatId, Info = orig.Student };
+
+        return dto;
+    }
+
+    public static List<ActiveStudentDto> Map(ICollection<ActiveStudent> origs)
+    {
+        var dtos = new List<ActiveStudentDto>();
+
+        foreach (var orig in origs)
+        {
+            var dto = Mapper.Map(orig);
+            dtos.Add(dto);
+        }
+
+        return dtos;
+    }
+
     public static NotificationDto Map(Notification orig)
     {
         var dto = new NotificationDto() {
             Id = orig.Id,
             Content = orig.Content,
             Date = orig.Date,
-            AdminId = orig.AdminId,
+            Admin = Map(orig.Admin),
         };
 
         foreach (var student in orig.ActiveStudents)
         {
-            dto.StudentIds.Add(student.Id);
+            dto.Students.Add(Map(student));
         }
 
         foreach (var document in orig.Documents)

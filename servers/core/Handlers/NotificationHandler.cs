@@ -35,7 +35,8 @@ public static class NotificationHandler
     {
         HttpClient httpClient = new() { BaseAddress = new Uri("https://api.telegram.org") };
 
-        var message = new Message() {
+        var message = new Message()
+        {
             chat_id = chatId,
             text = content,
         };
@@ -94,11 +95,15 @@ public static class NotificationHandler
             Results.NotFound("Could not get the admin");
         }
 
-        var notification = new Notification() {
+        var notification = new Notification()
+        {
             Content = details.Content,
             Date = DateTime.Now.ToString(),
             AdminId = adminId,
         };
+
+        var admin = db.Users.Find(adminId);
+        notification.Admin = admin;
 
         foreach (var guid in details.StudentIds)
         {
@@ -141,6 +146,8 @@ public static class NotificationHandler
     {
         var activeStudent = await db.ActiveStudents.Include(a => a.Notifications)
                                 .ThenInclude(n => n.Documents)
+                                .Include(a => a.Notifications)
+                                .ThenInclude(n => n.Admin)
                                 .SingleAsync(a => a.Id == id);
 
         if (activeStudent == null)

@@ -27,13 +27,17 @@ public static class Program
 
         var group = app.MapGroup("/core").RequireAuthorization("AdminPolicy");
 
-        group.MapPost("/auth", AuthHandler.AuthStudent);
-        group.MapPost("/auth/new", AuthHandler.AddNewAdmin);
-        group.MapGet("/{id}/courses", StudentHandler.GetStudentCourses);
-        group.MapGet("/students", StudentHandler.GetStudents);
-        group.MapPost("/send_notification", NotificationHandler.SendNotification).DisableAntiforgery();
-        group.MapGet("/student_notifications", NotificationHandler.GetStudentNotifications);
-        group.MapGet("/admin_notifications", NotificationHandler.GetAdminNotifications);
+        group.MapPost("/student/auth", StudentHandler.AuthStudent);
+        group.MapGet("/student/{id}/courses", StudentHandler.GetStudentCourses);
+        group.MapGet("/student", StudentHandler.GetStudents);
+
+        group.MapPost("/admin/create", AdminHandler.AddNewAdmin);
+        group.MapGet("/admin", AdminHandler.GetAdmins);
+
+        group.MapPost("/notification", NotificationHandler.SendNotification).DisableAntiforgery();
+        group.MapGet("/student/notifications", NotificationHandler.GetStudentNotifications);
+        group.MapGet("/admin/notifications", NotificationHandler.GetAdminNotifications);
+
         group.MapGet("/document", DocumentHandler.GetDocument);
 
         app.Run();

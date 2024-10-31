@@ -148,6 +148,6 @@ public static class Startup
     {
         var userManager = services.GetRequiredService<UserManager<AdminUser>>();
         var userStore = services.GetRequiredService<IUserStore<AdminUser>>();
-        await AuthHandler.CreateAdmin("admin", "admin", userManager, userStore);
+        await AdminHandler.CreateAdmin("admin", "admin", userManager, userStore);
     }
 }
