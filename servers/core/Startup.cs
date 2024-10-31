@@ -17,6 +17,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.IO;
 using Core.Utility;
 using Core.Messages;
+using Core.Handlers;
 
 namespace Core;
 
@@ -147,15 +148,6 @@ public static class Startup
     {
         var userManager = services.GetRequiredService<UserManager<AdminUser>>();
         var userStore = services.GetRequiredService<IUserStore<AdminUser>>();
-        var emailStore = (IUserEmailStore<AdminUser>)userStore;
-
-        var email = "admin";
-        var password = "admin";
-        var user = new AdminUser();
-
-        await userStore.SetUserNameAsync(user, email, CancellationToken.None);
-        await emailStore.SetEmailAsync(user, email, CancellationToken.None);
-        var result = await userManager.CreateAsync(user, password);
-        await userManager.AddClaimAsync(user, new Claim("Admin", ""));
+        await AuthHandler.CreateAdmin("admin", "admin", userManager, userStore);
     }
 }

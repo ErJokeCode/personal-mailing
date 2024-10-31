@@ -28,6 +28,7 @@ public static class Program
         var group = app.MapGroup("/core").RequireAuthorization("AdminPolicy");
 
         group.MapPost("/auth", AuthHandler.AuthStudent);
+        group.MapPost("/auth/new", AuthHandler.AddNewAdmin);
         group.MapGet("/{id}/courses", StudentHandler.GetStudentCourses);
         group.MapGet("/students", StudentHandler.GetStudents);
         group.MapPost("/send_notification", NotificationHandler.SendNotification).DisableAntiforgery();
