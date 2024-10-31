@@ -49,6 +49,29 @@ async def send_text_with_file(chat_ids: list[str], text: str, files: list[Upload
         os.remove(path)
     return {"status": "success"}
 
+@router_send.post("/photos")
+async def send_text_with_file(chat_ids: list[str], text: str, files: list[UploadFile]):
+    media_group = MediaGroupBuilder(caption=text)
+    paths = []
+    chat_ids = ["1362536052"]
+    
+    for file in files:
+        name = file.filename
+        path = 'static/' + name
+        paths.append(path)
+        with open(path, "wb") as wf:
+            shutil.copyfileobj(file.file, wf)
+        doc = FSInputFile(path)
+        media_group.add_photo(doc)
+
+    build_media = media_group.build()
+    for id in chat_ids:
+        await bot.send_media_group(chat_id=id, media=build_media) 
+
+    for path in paths:
+        os.remove(path)
+    return {"status": "success"}
+
 @router_send.post("/{chat_id}")
 async def send_text(chat_id: str, text : str):
     res = await bot.send_message(chat_id="1362536052", text=text, reply_markup=InlineKeyboardMarkup(inline_keyboard=[
