@@ -50,7 +50,7 @@ async def send_text_with_file(chat_ids: list[str], text: str, files: list[Upload
     return {"status": "success"}
 
 @router_send.post("/photos")
-async def send_text_with_file(chat_ids: list[str], text: str, files: list[UploadFile]):
+async def send_text_with_photo(chat_ids: list[str], text: str, files: list[UploadFile]):
     media_group = MediaGroupBuilder(caption=text)
     paths = []
     chat_ids = ["1362536052"]
