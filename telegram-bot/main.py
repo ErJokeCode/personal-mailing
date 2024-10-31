@@ -12,10 +12,7 @@ import asyncio
 import json
 import requests
 
-from fastapi import FastAPI, Request
-import uvicorn
-
-from config import URL_REDIS, URL_SERVER, TOKEN
+from config import URL_REDIS, URL_SERVER, TOKEN, NGROK_TUNNEL_URL
 from handlers import start, main_menu, information_teaching
 
 
@@ -25,10 +22,8 @@ bot = Bot(token=TOKEN)
 dp = Dispatcher(storage=storage)
 dp.include_routers(start.router, main_menu.router, information_teaching.router)
 
-
 async def main():
     await dp.start_polling(bot)
-
 
 if __name__ == "__main__":
     asyncio.run(main())
