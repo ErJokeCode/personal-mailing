@@ -30,7 +30,7 @@ router_send = APIRouter(
 async def send_text_with_file(chat_ids: list[str], text: str, files: list[UploadFile]):
     media_group = MediaGroupBuilder(caption=text)
     paths = []
-    chat_ids = ["1362536052"]
+    chat_ids = chat_ids
     
     for file in files:
         name = file.filename
@@ -53,7 +53,7 @@ async def send_text_with_file(chat_ids: list[str], text: str, files: list[Upload
 async def send_text_with_photo(chat_ids: list[str], text: str, files: list[UploadFile]):
     media_group = MediaGroupBuilder(caption=text)
     paths = []
-    chat_ids = ["1362536052"]
+    chat_ids = chat_ids
     
     for file in files:
         name = file.filename
@@ -74,7 +74,7 @@ async def send_text_with_photo(chat_ids: list[str], text: str, files: list[Uploa
 
 @router_send.post("/{chat_id}")
 async def send_text(chat_id: str, text : str):
-    res = await bot.send_message(chat_id="1362536052", text=text, reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+    res = await bot.send_message(chat_id=chat_id, text=text, reply_markup=InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="В архив", callback_data="to_archive")], 
             [InlineKeyboardButton(text="В избранное", callback_data="to_favourite")]
         ])) 
@@ -97,5 +97,5 @@ app = FastAPI()
 app.include_router(router_send)
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="localhost", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
     

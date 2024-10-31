@@ -52,7 +52,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
         async with aiohttp.ClientSession() as session:
             headers = {"cookie": f"{get_cookie()}"}
             async with session.post(
-                f"{URL_SERVER}/core/auth", json=body, headers=headers
+                f"{URL_SERVER}/core/student/auth", json=body, headers=headers
             ) as response:
                 if response.status < 400:
                     response_data = await response.json()
@@ -99,7 +99,7 @@ async def process_student_id(message: types.Message, state: FSMContext):
     async with aiohttp.ClientSession() as session:
         headers = {"cookie": f"{get_cookie()}"}
         async with session.post(
-            f"{URL_SERVER}/core/auth", json=body, headers=headers
+            f"{URL_SERVER}/core/student/auth", json=body, headers=headers
         ) as response:
             if response.status < 400:
                 response_data = await response.json()

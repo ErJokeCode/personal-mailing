@@ -31,39 +31,35 @@ public static class NotificationHandler
     // TODO send this to the bot api instead of telegram directly
     // Combine this in one method preferably
 
-    public static async Task<bool> SendToBot(string chatId, string content)
-    {
-        HttpClient httpClient = new() { BaseAddress = new Uri("https://api.telegram.org") };
-
-        var message = new Message() {
-            chat_id = chatId,
-            text = content,
-        };
-
-        var botToken = Environment.GetEnvironmentVariable("TOKEN_BOT");
-
-        var response = await httpClient.PostAsJsonAsync($"/bot{botToken}/sendMessage", message);
-
-        return response.IsSuccessStatusCode;
-    }
+    // public static async Task<bool> SendToBot(string chatId, string content)
+    // {
+    //     HttpClient httpClient = new() { BaseAddress = new Uri("https://api.telegram.org") };
+    //
+    //     var message = new Message() {
+    //         chat_id = chatId,
+    //         text = content,
+    //     };
+    //
+    //     var botToken = Environment.GetEnvironmentVariable("TOKEN_BOT");
+    //
+    //     var response = await httpClient.PostAsJsonAsync($"/bot{botToken}/sendMessage", message);
+    //
+    //     return response.IsSuccessStatusCode;
+    // }
 
     public static async Task<bool> SendDocumentToBot(string chatId, IFormFileCollection documents, string caption)
     {
-        HttpClient httpClient = new() { BaseAddress = new Uri("https://api.telegram.org") };
-
+        HttpClient httpClient = new() { BaseAddress = new Uri("http://bot:8000/") };
         var content = new MultipartFormDataContent();
 
-        content.Add(new StringContent(chatId), "chat_id");
-        content.Add(new StringContent(caption), "caption");
+        content.Add(new StringContent(chatId), "chat_ids");
+        // content.Add(new StringContent(caption), "text");
 
         foreach (var document in documents)
         {
-            content.Add(new StreamContent(document.OpenReadStream()), "document", document.FileName);
+            content.Add(new StreamContent(document.OpenReadStream()), "files", document.FileName);
         }
-
-        var botToken = Environment.GetEnvironmentVariable("TOKEN_BOT");
-
-        var response = await httpClient.PostAsync($"/bot{botToken}/sendDocument", content);
+        var response = await httpClient.PostAsync($"/send/files/?text={caption}", content);
 
         return response.IsSuccessStatusCode;
     }
@@ -107,16 +103,16 @@ public static class NotificationHandler
                 continue;
             }
 
-            bool sent;
+            // bool sent;
 
-            if (documents != null)
-            {
-                sent = await SendDocumentToBot(activeStudent.ChatId, documents, notification.Content);
-            }
-            else
-            {
-                sent = await SendToBot(activeStudent.ChatId, notification.Content);
-            }
+            // if (documents != null)
+            // {
+            await SendDocumentToBot(activeStudent.ChatId, documents, notification.Content);
+            // }
+            // else
+            // {
+            //     sent = await SendToBot(activeStudent.ChatId, notification.Content);
+            // }
 
             // Console.WriteLine(activeStudent.ChatId);
 

@@ -66,7 +66,7 @@ async def process_online_courses(callback_query: types.CallbackQuery, state: FSM
     # Отправляем запрос на сервер для получения списка онлайн курсов
     async with aiohttp.ClientSession() as session:
         headers = {"cookie": f"{get_cookie()}"}
-        async with session.get(f"{URL_SERVER}/core/{user_data.get('user_id')}/courses", headers=headers) as response:
+        async with session.get(f"{URL_SERVER}/core/student/{user_data.get('user_id')}/courses", headers=headers) as response:
             if response.status == 200:
                 courses_data = await response.json()
             else:
