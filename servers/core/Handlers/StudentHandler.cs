@@ -34,8 +34,7 @@ public static class StudentHandler
             return Results.Ok(activeStudent);
         }
 
-        activeStudent = new ActiveStudent()
-        {
+        activeStudent = new ActiveStudent() {
             Email = details.Email,
             ChatId = details.ChatId,
         };
@@ -50,8 +49,7 @@ public static class StudentHandler
         db.ActiveStudents.Add(activeStudent);
         await db.SaveChangesAsync();
 
-        await endpoint.Publish<NewStudentAuthed>(new()
-        {
+        await endpoint.Publish<NewStudentAuthed>(new() {
             ActiveStudent = activeStudent,
         });
 
@@ -73,7 +71,22 @@ public static class StudentHandler
         return Results.Ok(activeStudent.Student.OnlineCourse);
     }
 
-    public static async Task<IResult> GetStudents(CoreDb db)
+    public static async Task<IResult> GetStudent(Guid id, CoreDb db)
+    {
+        var activeStudent = db.ActiveStudents.Find(id);
+
+        if (activeStudent == null)
+        {
+            return Results.NotFound("Student not found");
+        }
+
+        await activeStudent.IncludeStudent();
+        var dto = Mapper.Map(activeStudent);
+
+        return Results.Ok(dto);
+    }
+
+    public static async Task<IResult> GetAllStudents(CoreDb db)
     {
         var activeStudents = db.ActiveStudents.ToArray();
         await activeStudents.IncludeStudents();
@@ -88,8 +101,7 @@ public static class ActiveStudentExtensions
 {
     public static async Task<bool> IncludeStudent(this ActiveStudent active)
     {
-        var query = new Dictionary<string, string>
-        {
+        var query = new Dictionary<string, string> {
             ["email"] = active.Email,
         };
 

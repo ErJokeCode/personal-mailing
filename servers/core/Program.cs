@@ -29,16 +29,20 @@ public static class Program
 
         group.MapPost("/student/auth", StudentHandler.AuthStudent);
         group.MapGet("/student/{id}/courses", StudentHandler.GetStudentCourses);
-        group.MapGet("/student", StudentHandler.GetStudents);
+        group.MapGet("/student/{id}", StudentHandler.GetStudent);
+        group.MapGet("/student", StudentHandler.GetAllStudents);
 
+        group.MapGet("/admin", AdminHandler.GetAllAdmins);
+        group.MapGet("/admin/me", AdminHandler.GetAdminMe);
+        group.MapGet("/admin/{id}", AdminHandler.GetAdmin);
         group.MapPost("/admin/create", AdminHandler.AddNewAdmin);
-        group.MapGet("/admin", AdminHandler.GetAdmins);
 
         group.MapPost("/notification", NotificationHandler.SendNotification).DisableAntiforgery();
-        group.MapGet("/student/notifications", NotificationHandler.GetStudentNotifications);
+        group.MapGet("/student/{id}/notifications", NotificationHandler.GetStudentNotifications);
         group.MapGet("/admin/notifications", NotificationHandler.GetAdminNotifications);
 
-        group.MapGet("/document", DocumentHandler.GetDocument);
+        group.MapGet("/document/{id}", DocumentHandler.GetDocument);
+        group.MapGet("/document/{id}/data", DocumentHandler.GetDocumentData);
 
         app.Run();
     }

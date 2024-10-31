@@ -44,6 +44,20 @@ public static class DocumentHandler
             return Results.NotFound("Could not find the document");
         }
 
+        var dto = Mapper.Map(document);
+
+        return Results.Ok(dto);
+    }
+
+    public static async Task<IResult> GetDocumentData(int id, CoreDb db)
+    {
+        var document = await db.Documents.FindAsync(id);
+
+        if (document == null)
+        {
+            return Results.NotFound("Could not find the document");
+        }
+
         var path = Path.Combine(Directory.GetCurrentDirectory(), "Documents", document.InternalName);
 
         return Results.File(path, document.MimeType, document.Name);

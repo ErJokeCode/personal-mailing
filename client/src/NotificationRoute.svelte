@@ -10,7 +10,7 @@
         let response;
 
         try {
-            response = await fetch(`${server_url}/core/admin_notifications`, {
+            response = await fetch(`${server_url}/core/admin/notifications`, {
                 credentials: "include",
             });
         } catch (err) {

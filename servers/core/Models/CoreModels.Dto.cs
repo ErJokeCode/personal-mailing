@@ -12,9 +12,10 @@ public class AdminUserDto
 public class ActiveStudentDto
 {
     public Guid Id { get; set; }
-    public Student Info { get; set; }
     public string Email { get; set; }
     public string ChatId { get; set; }
+
+    public Student Info { get; set; }
 }
 
 public class NotificationDto
@@ -23,10 +24,11 @@ public class NotificationDto
     public string Content { get; set; }
     public string Date { get; set; }
 
+    public List<DocumentDto> Documents { get; } = [];
+
     public AdminUserDto Admin { get; set; }
     public List<ActiveStudentDto> Students { get; } = [];
 
-    public List<DocumentDto> Documents { get; } = [];
 }
 
 public class DocumentDto
@@ -34,5 +36,6 @@ public class DocumentDto
     public int Id { get; set; }
     public string Name { get; set; }
     public string MimeType { get; set; }
+
     public int NotificationId { get; set; }
 }

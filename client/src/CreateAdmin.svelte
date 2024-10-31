@@ -13,7 +13,7 @@
         let response;
 
         try {
-            response = await fetch(`${server_url}/core/auth/new`, {
+            response = await fetch(`${server_url}/core/admin/create`, {
                 method: "Post",
                 body: JSON.stringify({
                     password: password,

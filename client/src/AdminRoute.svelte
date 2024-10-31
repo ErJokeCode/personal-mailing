@@ -10,7 +10,7 @@
         let response;
 
         try {
-            response = await fetch(`${server_url}/core/auth/admins`, {
+            response = await fetch(`${server_url}/core/admin`, {
                 credentials: "include",
             });
         } catch (err) {

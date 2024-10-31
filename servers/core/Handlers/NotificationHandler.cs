@@ -35,8 +35,7 @@ public static class NotificationHandler
     {
         HttpClient httpClient = new() { BaseAddress = new Uri("https://api.telegram.org") };
 
-        var message = new Message()
-        {
+        var message = new Message() {
             chat_id = chatId,
             text = content,
         };
@@ -44,11 +43,6 @@ public static class NotificationHandler
         var botToken = Environment.GetEnvironmentVariable("TOKEN_BOT");
 
         var response = await httpClient.PostAsJsonAsync($"/bot{botToken}/sendMessage", message);
-
-        if (!response.IsSuccessStatusCode)
-        {
-            Console.WriteLine(await response.Content.ReadAsStringAsync());
-        }
 
         return response.IsSuccessStatusCode;
     }
@@ -95,8 +89,7 @@ public static class NotificationHandler
             Results.NotFound("Could not get the admin");
         }
 
-        var notification = new Notification()
-        {
+        var notification = new Notification() {
             Content = details.Content,
             Date = DateTime.Now.ToString(),
             AdminId = adminId,
@@ -125,10 +118,12 @@ public static class NotificationHandler
                 sent = await SendToBot(activeStudent.ChatId, notification.Content);
             }
 
-            if (!sent)
-            {
-                continue;
-            }
+            // Console.WriteLine(activeStudent.ChatId);
+
+            // if (!sent)
+            // {
+            //     continue;
+            // }
 
             notification.ActiveStudents.Add(activeStudent);
         }

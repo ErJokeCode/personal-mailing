@@ -41,7 +41,37 @@ public static class AdminHandler
         return Results.Ok();
     }
 
-    public static async Task<IResult> GetAdmins(CoreDb db)
+    public static async Task<IResult> GetAdmin(string id, CoreDb db)
+    {
+        var admin = db.Users.Find(id);
+
+        if (admin == null)
+        {
+            return Results.NotFound("Admin not found");
+        }
+
+        var dto = Mapper.Map(admin);
+
+        return Results.Ok(dto);
+    }
+
+    public static async Task<IResult> GetAdminMe(HttpContext context, UserManager<AdminUser> userManager, CoreDb db)
+    {
+        var adminId = userManager.GetUserId(context.User);
+
+        if (adminId == null)
+        {
+            return Results.NotFound("Admin not found");
+        }
+
+        var admin = db.Users.Find(adminId);
+
+        var dto = Mapper.Map(admin);
+
+        return Results.Ok(dto);
+    }
+
+    public static async Task<IResult> GetAllAdmins(CoreDb db)
     {
         var dtos = Mapper.Map(db.Users.ToList());
 

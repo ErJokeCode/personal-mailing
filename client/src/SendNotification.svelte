@@ -14,7 +14,7 @@
         let response;
 
         try {
-            response = await fetch(`${server_url}/core/students`, {
+            response = await fetch(`${server_url}/core/student`, {
                 credentials: "include",
             });
         } catch (err) {
@@ -46,12 +46,12 @@
                 studentIds: ids,
             });
 
-            data.append("json", body);
+            data.append("body", body);
             if (files.length > 0) {
                 data.append("file", files[0]);
             }
 
-            response = await fetch(`${server_url}/core/send_notification`, {
+            response = await fetch(`${server_url}/core/notification`, {
                 method: "Post",
                 body: data,
                 credentials: "include",
