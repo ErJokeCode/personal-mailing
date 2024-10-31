@@ -35,7 +35,9 @@ def is_valid_email(email):
 
 @router.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext):
+    # await state.clear()
     user_data = await state.get_data()
+    
     if not user_data.get("email") and not user_data.get("personal_number"):
         welcome_msg = await message.answer(
             "Добро пожаловать! Пожалуйста, введите вашу почту."

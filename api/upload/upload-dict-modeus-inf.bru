@@ -1,0 +1,15 @@
+meta {
+  name: upload-dict-modeus-inf
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{base_api}}/parser/upload/dict_modeus_inf
+  body: json
+  auth: none
+}
+
+body:json {
+  {"a" : "b"}
+}
