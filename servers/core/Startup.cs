@@ -18,6 +18,7 @@ using System.IO;
 using Core.Utility;
 using Core.Messages;
 using Core.Handlers;
+using Core.Identity;
 
 namespace Core;
 
@@ -100,9 +101,7 @@ public static class Startup
         var connection = builder.Configuration.GetConnectionString("Database");
         builder.Services.AddDbContext<CoreDb>(options => options.UseNpgsql(connection));
 
-        Action<AuthorizationOptions> authOptions = options =>
-        { options.AddPolicy("AdminPolicy", policy => policy.RequireClaim("Admin")); };
-        builder.Services.AddAuthorization(authOptions);
+        builder.Services.AddPermissions();
 
         Action<IdentityOptions> identityOptions = options =>
         {
@@ -112,6 +111,9 @@ public static class Startup
             options.Password.RequireUppercase = false;
             options.Password.RequiredUniqueChars = 0;
             options.Password.RequiredLength = 1;
+            // TODO in production probably add this back
+            // doesnt allow "admin" as email so comment out for now
+            // options.User.RequireUniqueEmail = true;
         };
         builder.Services.AddIdentityApiEndpoints<AdminUser>(identityOptions).AddEntityFrameworkStores<CoreDb>();
     }
@@ -148,6 +150,7 @@ public static class Startup
     {
         var userManager = services.GetRequiredService<UserManager<AdminUser>>();
         var userStore = services.GetRequiredService<IUserStore<AdminUser>>();
-        await AdminHandler.CreateAdmin("admin", "admin", userManager, userStore);
+        var db = services.GetRequiredService<CoreDb>();
+        await AdminHandler.CreateAdmin("admin", "admin", Permissions.All, userManager, userStore, db);
     }
 }

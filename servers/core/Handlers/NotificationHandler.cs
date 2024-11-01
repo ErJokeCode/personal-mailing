@@ -85,7 +85,8 @@ public static class NotificationHandler
             Results.NotFound("Could not get the admin");
         }
 
-        var notification = new Notification() {
+        var notification = new Notification()
+        {
             Content = details.Content,
             Date = DateTime.Now.ToString(),
             AdminId = adminId,
@@ -131,6 +132,18 @@ public static class NotificationHandler
 
         var dto = Mapper.Map(notification);
         return Results.Ok(dto);
+    }
+
+    public static async Task<IResult> GetAllNotifications(CoreDb db)
+    {
+        var notifications = await db.Notifications.Include(n => n.ActiveStudents)
+                                .Include(n => n.Documents)
+                                .Include(n => n.Admin)
+                                .ToListAsync();
+
+        var dtos = Mapper.Map(notifications);
+
+        return Results.Ok(dtos);
     }
 
     public static async Task<IResult> GetStudentNotifications(Guid id, CoreDb db)

@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Core.Handlers;
+using Core.Identity;
 using Core.Messages;
 using Core.Models;
 using Core.Utility;
@@ -25,24 +26,35 @@ public static class Program
 
         AuthConsumer.Hub = app.Services.GetService<IHubContext<SignalHub>>();
 
-        var group = app.MapGroup("/core").RequireAuthorization("AdminPolicy");
+        var group = app.MapGroup("/core");
 
-        group.MapPost("/student/auth", StudentHandler.AuthStudent);
-        group.MapGet("/student/{id}/courses", StudentHandler.GetStudentCourses);
-        group.MapGet("/student/{id}", StudentHandler.GetStudent);
-        group.MapGet("/student", StudentHandler.GetAllStudents);
+        group.MapPost("/student/auth", StudentHandler.AuthStudent).RequireAuthorization(Permissions.CreateAdminsPolicy);
+        group.MapGet("/student/{id}/courses", StudentHandler.GetStudentCourses)
+            .RequireAuthorization(Permissions.ViewPolicy);
+        group.MapGet("/student/{id}", StudentHandler.GetStudent).RequireAuthorization(Permissions.ViewPolicy);
+        group.MapGet("/student", StudentHandler.GetAllStudents).RequireAuthorization(Permissions.ViewPolicy);
 
-        group.MapGet("/admin", AdminHandler.GetAllAdmins);
-        group.MapGet("/admin/me", AdminHandler.GetAdminMe);
-        group.MapGet("/admin/{id}", AdminHandler.GetAdmin);
-        group.MapPost("/admin/create", AdminHandler.AddNewAdmin);
+        group.MapGet("/admin", AdminHandler.GetAllAdmins).RequireAuthorization(Permissions.ViewPolicy);
+        group.MapGet("/admin/me", AdminHandler.GetAdminMe).RequireAuthorization(Permissions.ViewPolicy);
+        group.MapGet("/admin/{id}", AdminHandler.GetAdmin).RequireAuthorization(Permissions.ViewPolicy);
+        group.MapPost("/admin/create", AdminHandler.AddNewAdmin).RequireAuthorization(Permissions.CreateAdminsPolicy);
 
-        group.MapPost("/notification", NotificationHandler.SendNotification).DisableAntiforgery();
-        group.MapGet("/student/{id}/notifications", NotificationHandler.GetStudentNotifications);
-        group.MapGet("/admin/notifications", NotificationHandler.GetAdminNotifications);
+        group.MapPost("/notification", NotificationHandler.SendNotification)
+            .RequireAuthorization(Permissions.SendNotificationsPolicy)
+            .DisableAntiforgery();
 
-        group.MapGet("/document/{id}", DocumentHandler.GetDocument);
-        group.MapGet("/document/{id}/data", DocumentHandler.GetDocumentData);
+        group.MapGet("/notification", NotificationHandler.GetAllNotifications)
+            .RequireAuthorization(Permissions.ViewPolicy);
+
+        group.MapGet("/student/{id}/notifications", NotificationHandler.GetStudentNotifications)
+            .RequireAuthorization(Permissions.ViewPolicy);
+
+        group.MapGet("/admin/notifications", NotificationHandler.GetAdminNotifications)
+            .RequireAuthorization(Permissions.ViewPolicy);
+
+        group.MapGet("/document/{id}", DocumentHandler.GetDocument).RequireAuthorization(Permissions.ViewPolicy);
+        group.MapGet("/document/{id}/data", DocumentHandler.GetDocumentData)
+            .RequireAuthorization(Permissions.ViewPolicy);
 
         app.Run();
     }
