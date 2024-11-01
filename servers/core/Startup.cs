@@ -67,7 +67,7 @@ public static class Startup
         {
             Action<CorsPolicyBuilder> corsPolicy = policy =>
             {
-                policy.WithOrigins(new string[] { "http://localhost:5010" })
+                policy.WithOrigins(new string[] { "http://localhost:5010", "http://localhost:5015" })
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();

@@ -7,6 +7,14 @@ services:
     volumes:
       - ./client:/opt/client
 
+  admin-panel:
+    build: ./admin-panel
+    command: pnpm run dev
+    ports:
+      - 5015:5015
+    volumes:
+      - ./admin-panel:/opt/admin-panel
+
   redis:
     image: redis
     restart: always
