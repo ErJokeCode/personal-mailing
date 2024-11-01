@@ -3,10 +3,9 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 def Menu() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="Информация об обучении", callback_data="info_teaching")],
-            [InlineKeyboardButton(text="Архив уведомлений", callback_data="notif")],
             [InlineKeyboardButton(text="Предметы", callback_data="subjects")],
             [InlineKeyboardButton(text="Онлайн курсы", callback_data="online_courses")],
-            [InlineKeyboardButton(text="Чат с куратором", callback_data="chat_curator")],
+            [InlineKeyboardButton(text="Чат с куратором", url="https://t.me/RespectStoreBot")],
             [InlineKeyboardButton(text="FAQ", callback_data="faq")],
             # [InlineKeyboardButton(text="Выйти из аккаунта", callback_data="logout")]
         ])
