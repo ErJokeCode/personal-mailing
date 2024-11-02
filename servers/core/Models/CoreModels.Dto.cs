@@ -14,10 +14,11 @@ public class AdminUserDto : IMappable<AdminUserDto, AdminUser>
 {
     public string Id { get; set; }
     public string Email { get; set; }
+    public string Date { get; set; }
 
     public static AdminUserDto Map(AdminUser orig)
     {
-        return new AdminUserDto() { Id = orig.Id, Email = orig.Email };
+        return new AdminUserDto() { Id = orig.Id, Email = orig.Email, Date = orig.Date };
     }
 
     public static List<AdminUserDto> Maps(List<AdminUser> origs)
@@ -31,12 +32,23 @@ public class ActiveStudentDto : IMappable<ActiveStudentDto, ActiveStudent>
     public Guid Id { get; set; }
     public string Email { get; set; }
     public string ChatId { get; set; }
+    public string Date { get; set; }
+
+    public List<string> OnboardStatus { get; set; } = [];
 
     public Student Info { get; set; }
 
     public static ActiveStudentDto Map(ActiveStudent orig)
     {
-        return new ActiveStudentDto() { Id = orig.Id, Email = orig.Email, ChatId = orig.ChatId, Info = orig.Student };
+        return new ActiveStudentDto()
+        {
+            Id = orig.Id,
+            Email = orig.Email,
+            ChatId = orig.ChatId,
+            Info = orig.Student,
+            Date = orig.Date,
+            OnboardStatus = orig.OnboardStatus,
+        };
     }
 
     public static List<ActiveStudentDto> Maps(List<ActiveStudent> origs)

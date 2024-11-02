@@ -24,18 +24,19 @@ public static class AdminHandler
         public string Password { get; set; }
     }
 
-    public static async Task CreateAdmin(string email, string password, List<string> permissons,
-                                         UserManager<AdminUser> userManager, IUserStore<AdminUser> userStore, CoreDb db)
+    public static async Task<bool> CreateAdmin(string email, string password, List<string> permissons,
+                                               UserManager<AdminUser> userManager, IUserStore<AdminUser> userStore,
+                                               CoreDb db)
     {
         var admin = await userManager.FindByEmailAsync(email);
 
         if (admin != null)
         {
-            return;
+            return true;
         }
 
         var emailStore = (IUserEmailStore<AdminUser>)userStore;
-        var user = new AdminUser();
+        var user = new AdminUser() { Date = DateTime.Now.ToString() };
 
         await userStore.SetUserNameAsync(user, email, CancellationToken.None);
         await emailStore.SetEmailAsync(user, email, CancellationToken.None);
@@ -48,20 +49,28 @@ public static class AdminHandler
             {
                 Console.WriteLine(error.Description);
             }
+            return false;
         }
 
         foreach (var permisson in permissons)
         {
             await userManager.AddClaimAsync(user, new Claim($"{permisson}", ""));
         }
+
+        return true;
     }
 
     public static async Task<IResult> AddNewAdmin(AdminDetails details, HttpContext context,
                                                   UserManager<AdminUser> userManager, IUserStore<AdminUser> userStore,
                                                   CoreDb db)
     {
-        await CreateAdmin(details.Email, details.Password, [Permissions.SendNotifications, Permissions.View],
-                          userManager, userStore, db);
+        var created = await CreateAdmin(details.Email, details.Password,
+                                        [Permissions.SendNotifications, Permissions.View], userManager, userStore, db);
+        if (!created)
+        {
+            return Results.BadRequest("Could not create an admin");
+        }
+
         return Results.Ok();
     }
 

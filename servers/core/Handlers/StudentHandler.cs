@@ -35,11 +35,8 @@ public static class StudentHandler
             return Results.Ok(activeStudent);
         }
 
-        activeStudent = new ActiveStudent()
-        {
-            Email = details.Email,
-            ChatId = details.ChatId,
-        };
+        activeStudent =
+            new ActiveStudent() { Email = details.Email, ChatId = details.ChatId, Date = DateTime.Now.ToString() };
 
         var found = await activeStudent.IncludeStudent();
 
@@ -58,6 +55,27 @@ public static class StudentHandler
 
         var dto = ActiveStudentDto.Map(activeStudent);
         return Results.Created("", dto);
+    }
+
+    public static async Task<IResult> AddOnboardStatus(Guid id, string status, CoreDb db)
+    {
+        var activeStudent = db.ActiveStudents.Find(id);
+
+        if (activeStudent == null)
+        {
+            return Results.NotFound("Could not find student");
+        }
+
+        if (activeStudent.OnboardStatus == null)
+        {
+            activeStudent.OnboardStatus = new();
+        }
+
+        activeStudent.OnboardStatus.Add(status);
+
+        await db.SaveChangesAsync();
+
+        return Results.Ok(activeStudent.OnboardStatus);
     }
 
     public static async Task<IResult> GetStudentCourses(Guid id, CoreDb db)

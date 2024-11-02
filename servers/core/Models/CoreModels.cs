@@ -12,6 +12,8 @@ namespace Core.Models;
 
 public class AdminUser : IdentityUser
 {
+    public string Date { get; set; }
+
     public ICollection<Notification> Notifications { get; } = [];
 }
 
@@ -22,8 +24,11 @@ public class ActiveStudent
     [NotMapped]
     public Student Student { get; set; }
 
+    public string Date { get; set; }
     public string Email { get; set; }
     public string ChatId { get; set; }
+
+    public List<string> OnboardStatus { get; set; } = [];
 
     public ICollection<Notification> Notifications { get; } = [];
 }

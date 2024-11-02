@@ -33,6 +33,8 @@ public static class Program
             .RequireAuthorization(Permissions.ViewPolicy);
         group.MapGet("/student/{id}", StudentHandler.GetStudent).RequireAuthorization(Permissions.ViewPolicy);
         group.MapGet("/student", StudentHandler.GetAllStudents).RequireAuthorization(Permissions.ViewPolicy);
+        group.MapPut("/student/addOnboard/{id}", StudentHandler.AddOnboardStatus)
+            .RequireAuthorization(Permissions.CreateAdminsPolicy);
 
         group.MapGet("/admin", AdminHandler.GetAllAdmins).RequireAuthorization(Permissions.ViewPolicy);
         group.MapGet("/admin/me", AdminHandler.GetAdminMe).RequireAuthorization(Permissions.ViewPolicy);
