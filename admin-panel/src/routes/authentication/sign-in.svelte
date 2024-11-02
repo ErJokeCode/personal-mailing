@@ -2,7 +2,8 @@
 	import { Label, Input } from 'flowbite-svelte';
 	import SignIn from '../utils/authentication/SignIn.svelte';
   import MetaTag from '../utils/MetaTag.svelte';
-  import { server_url } from "../../../../client/src/store";
+  import { goto } from '$app/navigation';
+
 	let title = 'Sign in to platform';
 	let site = {
 		name: 'Flowbite',
@@ -33,7 +34,7 @@
     async function login(data: Record<string, string | File>) {
         let response;
         try {
-          response = await fetch(`${server_url}/login`, {
+          response = await fetch("http://localhost:5000/login", {
             method: "Post",
             body: JSON.stringify({
               email: data.email,
@@ -50,6 +51,7 @@
         }
         if (response?.ok) {
           console.log("You successfully logged in!");
+          goto('/');
         }
     }
 
