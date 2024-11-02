@@ -10,6 +10,7 @@ using Core.Utility;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 
 namespace Core.Handlers;
@@ -22,46 +23,38 @@ public static class NotificationHandler
         public string text { get; set; }
     }
 
-    public class DocumentMessage
-    {
-        public string chat_id { get; set; }
-        public IFormFile document { get; set; }
-    }
-
-    // TODO send this to the bot api instead of telegram directly
-    // Combine this in one method preferably
-
-    // public static async Task<bool> SendToBot(string chatId, string content)
-    // {
-    //     HttpClient httpClient = new() { BaseAddress = new Uri("https://api.telegram.org") };
-    //
-    //     var message = new Message() {
-    //         chat_id = chatId,
-    //         text = content,
-    //     };
-    //
-    //     var botToken = Environment.GetEnvironmentVariable("TOKEN_BOT");
-    //
-    //     var response = await httpClient.PostAsJsonAsync($"/bot{botToken}/sendMessage", message);
-    //
-    //     return response.IsSuccessStatusCode;
-    // }
-
-    public static async Task<bool> SendDocumentToBot(string chatId, IFormFileCollection documents, string caption)
+    public static async Task<bool> SendToBot(string chatId, string text, IFormFileCollection documents)
     {
         HttpClient httpClient = new() { BaseAddress = new Uri("http://bot:8000/") };
-        var content = new MultipartFormDataContent();
 
-        content.Add(new StringContent(chatId), "chat_ids");
-        // content.Add(new StringContent(caption), "text");
-
-        foreach (var document in documents)
+        if (documents.Count > 0)
         {
-            content.Add(new StreamContent(document.OpenReadStream()), "files", document.FileName);
-        }
-        var response = await httpClient.PostAsync($"/send/files/?text={caption}", content);
+            var content = new MultipartFormDataContent();
 
-        return response.IsSuccessStatusCode;
+            content.Add(new StringContent(chatId), "chat_ids");
+
+            foreach (var document in documents)
+            {
+                content.Add(new StreamContent(document.OpenReadStream()), "files", document.FileName);
+            }
+
+            var uri = QueryHelpers.AddQueryString("/send/files", "text", text);
+            var response = await httpClient.PostAsync(uri, content);
+
+            return response.IsSuccessStatusCode;
+        }
+        else
+        {
+            var message = new Message() {
+                chat_id = chatId,
+                text = text,
+            };
+
+            var uri = QueryHelpers.AddQueryString($"/send/{chatId}", "text", text);
+            var response = await httpClient.PostAsJsonAsync(uri, message);
+
+            return response.IsSuccessStatusCode;
+        }
     }
 
     public class NotificationDetails
@@ -85,8 +78,7 @@ public static class NotificationHandler
             Results.NotFound("Could not get the admin");
         }
 
-        var notification = new Notification()
-        {
+        var notification = new Notification() {
             Content = details.Content,
             Date = DateTime.Now.ToString(),
             AdminId = adminId,
@@ -104,23 +96,7 @@ public static class NotificationHandler
                 continue;
             }
 
-            // bool sent;
-
-            // if (documents != null)
-            // {
-            await SendDocumentToBot(activeStudent.ChatId, documents, notification.Content);
-            // }
-            // else
-            // {
-            //     sent = await SendToBot(activeStudent.ChatId, notification.Content);
-            // }
-
-            // Console.WriteLine(activeStudent.ChatId);
-
-            // if (!sent)
-            // {
-            //     continue;
-            // }
+            var sent = await SendToBot(activeStudent.ChatId, notification.Content, documents);
 
             notification.ActiveStudents.Add(activeStudent);
         }
