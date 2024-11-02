@@ -6,6 +6,7 @@ services:
       - 5010:5010
     volumes:
       - ./client:/opt/client
+      - client_node_modules:/opt/client/node_modules
 
   admin-panel:
     build: ./admin-panel
@@ -14,7 +15,7 @@ services:
       - 5015:5015
     volumes:
       - ./admin-panel:/opt/admin-panel
-
+      - admin-panel_node_modules:/opt/admin-panel/node_modules
   redis:
     image: redis
     restart: always
@@ -90,6 +91,8 @@ services:
       - ./servers/parser:/opt/parser
 
 volumes:
+  client_node_modules:
+  admin-panel_node_modules:
   redisdata:
   parserdata:
   coredata:
