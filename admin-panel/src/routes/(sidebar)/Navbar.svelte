@@ -36,7 +36,7 @@
 		<span
 			class="ml-px self-center whitespace-nowrap text-xl font-semibold dark:text-white sm:text-2xl"
 		>
-			Flowbite
+			ADMIIIN
 		</span>
 	</NavBrand>
 	<div class="hidden lg:block lg:ps-3">
@@ -66,6 +66,6 @@
 		<Notifications />
 		<AppsMenu />
 		<DarkMode />
-		<UserMenu {...Users[4]} />
+		<UserMenu {...Users[0]} />
 	</div>
 </Navbar>

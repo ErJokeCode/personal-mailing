@@ -51,12 +51,20 @@
 	let posts = [
 		{ name: 'Dashboard', icon: ChartPieOutline, href: '/dashboard' },
 		{
+			name: 'Layouts',
+			icon: TableColumnSolid,
+			children: {
+				Stacked: '/layouts/stacked',
+				Sidebar: '/layouts/sidebar'
+			}
+		},
+		{
 			name: 'CRUD',
 			icon: RectangleListSolid,
 			children: {
+                Table: '/crud/table',
 				Products: '/crud/products',
-				Users: '/crud/users',
-                Table: '/crud/table'
+				Users: '/crud/users'
 			}
 		},
 		{ name: 'Settings', icon: CogOutline, href: '/settings' },
@@ -80,14 +88,32 @@
 				'Reset password': '/authentication/reset-password',
 				'Profile lock': '/authentication/profile-lock'
 			}
+		},
+		{
+			name: 'Playground',
+			icon: WandMagicSparklesOutline,
+			children: {
+				Stacked: '/playground/stacked',
+				Sidebar: '/playground/sidebar'
+			}
 		}
 	];
 
 	let links = [
 		{
-			label: 'Components',
-			href: 'https://flowbite-svelte.com/docs/components/accordion',
+			label: 'icon',
+			href: '',
+			icon: ClipboardListSolid
+		},
+		{
+			label: 'icon2',
+			href: '',
 			icon: LayersSolid
+		},
+		{
+			label: 'Support',
+			href: '',
+			icon: LifeSaverSolid
 		}
 	];
 	let dropdowns = Object.fromEntries(Object.keys(posts).map((x) => [x, false]));
