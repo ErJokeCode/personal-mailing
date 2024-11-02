@@ -14,6 +14,8 @@ public class CoreDb : IdentityDbContext<AdminUser>
     public DbSet<ActiveStudent> ActiveStudents => Set<ActiveStudent>();
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<Document> Documents => Set<Document>();
+    public DbSet<Chat> Chats => Set<Chat>();
+    public DbSet<Message> Messages => Set<Message>();
 
     public CoreDb(DbContextOptions<CoreDb> options) : base(options)
     {
@@ -34,5 +36,19 @@ public class CoreDb : IdentityDbContext<AdminUser>
             .HasMany(e => e.Documents)
             .WithOne(e => e.Notification)
             .HasForeignKey(e => e.NotificationId);
+
+        modelBuilder.Entity<AdminUser>().HasMany(e => e.Chats).WithOne(e => e.Admin).HasForeignKey(e => e.AdminId);
+
+        modelBuilder.Entity<ActiveStudent>()
+            .HasMany(e => e.Chats)
+            .WithOne(e => e.ActiveStudent)
+            .HasForeignKey(e => e.ActiveStudentId);
+
+        modelBuilder.Entity<Chat>().HasMany(e => e.Messages).WithOne(e => e.Chat).HasForeignKey(e => e.ChatId);
+
+        modelBuilder.Entity<Message>()
+            .HasMany(e => e.Documents)
+            .WithOne(e => e.Message)
+            .HasForeignKey(e => e.MessageId);
     }
 }

@@ -58,6 +58,10 @@ public static class Program
         group.MapGet("/document/{id}/data", DocumentHandler.GetDocumentData)
             .RequireAuthorization(Permissions.ViewPolicy);
 
+        group.MapGet("/admin/chats", ChatHandler.GetAdminChats).RequireAuthorization(Permissions.ViewPolicy);
+        group.MapPost("/chat/admin-to-student", ChatHandler.AdminSendToStudent)
+            .RequireAuthorization(Permissions.SendNotificationsPolicy);
+
         app.Run();
     }
 }

@@ -104,6 +104,7 @@ public class DocumentDto : IMappable<DocumentDto, Document>
     public string MimeType { get; set; }
 
     public int NotificationId { get; set; }
+    public int MessageId { get; set; }
 
     public static DocumentDto Map(Document orig)
     {
@@ -113,6 +114,7 @@ public class DocumentDto : IMappable<DocumentDto, Document>
             Name = orig.Name,
             MimeType = orig.MimeType,
             NotificationId = orig.NotificationId,
+            MessageId = orig.MessageId,
         };
     }
 

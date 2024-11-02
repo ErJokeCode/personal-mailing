@@ -17,7 +17,7 @@ namespace Core.Handlers;
 
 public static class NotificationHandler
 {
-    public class Message
+    public class BotMessage
     {
         public string chat_id { get; set; }
         public string text { get; set; }
@@ -45,7 +45,7 @@ public static class NotificationHandler
         }
         else
         {
-            var message = new Message() {
+            var message = new BotMessage() {
                 chat_id = chatId,
                 text = text,
             };

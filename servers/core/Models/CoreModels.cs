@@ -15,6 +15,7 @@ public class AdminUser : IdentityUser
     public string Date { get; set; }
 
     public ICollection<Notification> Notifications { get; } = [];
+    public ICollection<Chat> Chats { get; } = [];
 }
 
 public class ActiveStudent
@@ -31,6 +32,7 @@ public class ActiveStudent
     public List<string> OnboardStatus { get; set; } = [];
 
     public ICollection<Notification> Notifications { get; } = [];
+    public ICollection<Chat> Chats { get; } = [];
 }
 
 public class Notification
@@ -56,4 +58,7 @@ public class Document
 
     public int NotificationId { get; set; }
     public Notification Notification { get; set; }
+
+    public int MessageId { get; set; }
+    public Message Message { get; set; }
 }
