@@ -130,7 +130,7 @@ public static class NotificationHandler
 
         await DocumentHandler.StoreDocuments(documents, notification.Id, db);
 
-        var dto = Mapper.Map(notification);
+        var dto = NotificationDto.Map(notification);
         return Results.Ok(dto);
     }
 
@@ -141,7 +141,7 @@ public static class NotificationHandler
                                 .Include(n => n.Admin)
                                 .ToListAsync();
 
-        var dtos = Mapper.Map(notifications);
+        var dtos = NotificationDto.Maps(notifications);
 
         return Results.Ok(dtos);
     }
@@ -159,7 +159,7 @@ public static class NotificationHandler
             return Results.NotFound("Could not find student");
         }
 
-        var dtos = Mapper.Map(activeStudent.Notifications);
+        var dtos = NotificationDto.Maps((List<Notification>)activeStudent.Notifications);
 
         return Results.Ok(dtos);
     }
@@ -179,7 +179,7 @@ public static class NotificationHandler
             return Results.NotFound("Could not find admin");
         }
 
-        var dtos = Mapper.Map(admin.Notifications);
+        var dtos = NotificationDto.Maps((List<Notification>)admin.Notifications);
 
         return Results.Ok(dtos);
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using Core.Models;
+using Core.Models.Dto;
 using Core.Utility;
 using Microsoft.AspNetCore.Http;
 
@@ -16,7 +17,8 @@ public static class DocumentHandler
         {
             var mimeType = MimeTypes.GetMimeType(document.FileName);
 
-            var newDocument = new Document() {
+            var newDocument = new Document()
+            {
                 Name = document.FileName,
                 MimeType = mimeType,
                 NotificationId = notificationId,
@@ -44,7 +46,7 @@ public static class DocumentHandler
             return Results.NotFound("Could not find the document");
         }
 
-        var dto = Mapper.Map(document);
+        var dto = DocumentDto.Map(document);
 
         return Results.Ok(dto);
     }

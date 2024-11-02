@@ -12,6 +12,7 @@ using System.Security.Claims;
 using System.Collections.Generic;
 using Core.Identity;
 using System;
+using Core.Models.Dto;
 
 namespace Core.Handlers;
 
@@ -73,7 +74,7 @@ public static class AdminHandler
             return Results.NotFound("Admin not found");
         }
 
-        var dto = Mapper.Map(admin);
+        var dto = AdminUserDto.Map(admin);
 
         return Results.Ok(dto);
     }
@@ -89,14 +90,14 @@ public static class AdminHandler
 
         var admin = db.Users.Find(adminId);
 
-        var dto = Mapper.Map(admin);
+        var dto = AdminUserDto.Map(admin);
 
         return Results.Ok(dto);
     }
 
     public static async Task<IResult> GetAllAdmins(CoreDb db)
     {
-        var dtos = Mapper.Map(db.Users.ToList());
+        var dtos = AdminUserDto.Maps(db.Users.ToList());
 
         return Results.Ok(dtos);
     }

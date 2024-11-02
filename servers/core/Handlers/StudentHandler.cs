@@ -5,6 +5,7 @@ using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 using Core.Messages;
 using Core.Models;
+using Core.Models.Dto;
 using Core.Utility;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
@@ -34,7 +35,8 @@ public static class StudentHandler
             return Results.Ok(activeStudent);
         }
 
-        activeStudent = new ActiveStudent() {
+        activeStudent = new ActiveStudent()
+        {
             Email = details.Email,
             ChatId = details.ChatId,
         };
@@ -49,11 +51,12 @@ public static class StudentHandler
         db.ActiveStudents.Add(activeStudent);
         await db.SaveChangesAsync();
 
-        await endpoint.Publish<NewStudentAuthed>(new() {
+        await endpoint.Publish<NewStudentAuthed>(new()
+        {
             ActiveStudent = activeStudent,
         });
 
-        var dto = Mapper.Map(activeStudent);
+        var dto = ActiveStudentDto.Map(activeStudent);
         return Results.Created("", dto);
     }
 
@@ -81,17 +84,17 @@ public static class StudentHandler
         }
 
         await activeStudent.IncludeStudent();
-        var dto = Mapper.Map(activeStudent);
+        var dto = ActiveStudentDto.Map(activeStudent);
 
         return Results.Ok(dto);
     }
 
     public static async Task<IResult> GetAllStudents(CoreDb db)
     {
-        var activeStudents = db.ActiveStudents.ToArray();
+        var activeStudents = db.ActiveStudents.ToList();
         await activeStudents.IncludeStudents();
 
-        var dtos = Mapper.Map(activeStudents);
+        var dtos = ActiveStudentDto.Maps(activeStudents);
 
         return Results.Ok(dtos);
     }
@@ -101,7 +104,8 @@ public static class ActiveStudentExtensions
 {
     public static async Task<bool> IncludeStudent(this ActiveStudent active)
     {
-        var query = new Dictionary<string, string> {
+        var query = new Dictionary<string, string>
+        {
             ["email"] = active.Email,
         };
 
