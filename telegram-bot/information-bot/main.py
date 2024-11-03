@@ -12,7 +12,7 @@ import asyncio
 import json
 import requests
 
-from config import URL_REDIS, URL_SERVER, TOKEN, NGROK_TUNNEL_URL
+from config import URL_REDIS, TOKEN
 from handlers import start, main_menu, information_teaching
 
 

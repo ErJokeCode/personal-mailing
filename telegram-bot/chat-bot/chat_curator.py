@@ -13,7 +13,6 @@ import json
 import requests
 
 from config import URL_REDIS, TOKEN_CHAT_CURATOR
-from handlers import start, main_menu, information_teaching
 
 
 storage = RedisStorage.from_url(URL_REDIS)
@@ -36,9 +35,9 @@ async def all_message(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
     res = user_data.get("user_id")
     if res == None:
-        await message.answer("Зарегестрируйтесть в боте @test123show_bot")
+        await message.answer("Войдите в аккаунт в @test123show_bot")
     else:
-        await message.bot.send_message(chat_id="1362536052", text = message.text)
+        await message.bot.send_message(chat_id="1362536052", text = f"{res} : {message.text}")
     
 
 async def main():
