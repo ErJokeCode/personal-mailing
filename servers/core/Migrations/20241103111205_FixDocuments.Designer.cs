@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Core.Migrations
 {
     [DbContext(typeof(CoreDb))]
-    [Migration("20241102150534_AddChats")]
-    partial class AddChats
+    [Migration("20241103111205_FixDocuments")]
+    partial class FixDocuments
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -165,7 +165,7 @@ namespace Core.Migrations
                     b.Property<string>("InternalName")
                         .HasColumnType("text");
 
-                    b.Property<int>("MessageId")
+                    b.Property<int?>("MessageId")
                         .HasColumnType("integer");
 
                     b.Property<string>("MimeType")
@@ -174,7 +174,7 @@ namespace Core.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
-                    b.Property<int>("NotificationId")
+                    b.Property<int?>("NotificationId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
@@ -408,15 +408,11 @@ namespace Core.Migrations
                 {
                     b.HasOne("Core.Models.Message", "Message")
                         .WithMany("Documents")
-                        .HasForeignKey("MessageId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("MessageId");
 
                     b.HasOne("Core.Models.Notification", "Notification")
                         .WithMany("Documents")
-                        .HasForeignKey("NotificationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("NotificationId");
 
                     b.Navigation("Message");
 

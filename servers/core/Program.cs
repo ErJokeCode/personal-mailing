@@ -62,6 +62,10 @@ public static class Program
         group.MapPost("/chat/admin-to-student", ChatHandler.AdminSendToStudent)
             .RequireAuthorization(Permissions.SendNotificationsPolicy);
 
+        group.MapGet("/student/{id}/chats", ChatHandler.GetStudentChats).RequireAuthorization(Permissions.ViewPolicy);
+        group.MapPost("/chat/student-to-admin", ChatHandler.StudentSendToAdmin)
+            .RequireAuthorization(Permissions.SendNotificationsPolicy);
+
         app.Run();
     }
 }

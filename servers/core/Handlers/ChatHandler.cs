@@ -23,7 +23,7 @@ public static class ChatHandler
         }
         var admin = db.Users.Find(adminId);
 
-        var activeStudent = await db.ActiveStudents.Include(a => a.Chats).SingleAsync(s => s.Id == studentId);
+        var activeStudent = await db.ActiveStudents.Include(a => a.Chats).SingleOrDefaultAsync(s => s.Id == studentId);
 
         if (activeStudent == null)
         {
@@ -34,15 +34,15 @@ public static class ChatHandler
 
         if (chat == null)
         {
-            chat = new Chat()
-            {
+            chat = new Chat() {
                 ActiveStudentId = activeStudent.Id,
                 AdminId = adminId,
             };
+
+            db.Chats.Add(chat);
         }
 
-        var message = new Message()
-        {
+        var message = new Message() {
             Date = DateTime.Now.ToString(),
             Sender = "Admin",
             Receiver = "Student",
@@ -50,7 +50,6 @@ public static class ChatHandler
         };
 
         chat.Messages.Add(message);
-        db.Chats.Add(chat);
 
         await db.SaveChangesAsync();
 
@@ -70,8 +69,66 @@ public static class ChatHandler
                         .ThenInclude(ch => ch.Messages)
                         .Include(a => a.Chats)
                         .ThenInclude(ch => ch.ActiveStudent)
-                        .Single(a => a.Id == adminId);
+                        .SingleOrDefault(a => a.Id == adminId);
 
         return Results.Ok(ChatDto.Maps(admin.Chats.ToList()));
+    }
+
+    public static async Task<IResult> StudentSendToAdmin(string content, Guid studentId, string adminId, CoreDb db)
+    {
+        var admin = db.Users.Find(adminId);
+
+        if (adminId == null)
+        {
+            return Results.NotFound("Admin not found");
+        }
+
+        var activeStudent = await db.ActiveStudents.Include(a => a.Chats).SingleOrDefaultAsync(s => s.Id == studentId);
+
+        if (activeStudent == null)
+        {
+            return Results.NotFound("Student not found");
+        }
+
+        var chat = activeStudent.Chats.SingleOrDefault(ch => ch.ActiveStudentId == activeStudent.Id);
+
+        if (chat == null)
+        {
+            chat = new Chat() {
+                ActiveStudentId = activeStudent.Id,
+                AdminId = adminId,
+            };
+
+            db.Chats.Add(chat);
+        }
+
+        var message = new Message() {
+            Date = DateTime.Now.ToString(),
+            Sender = "Student",
+            Receiver = "Admin",
+            Content = content,
+        };
+
+        chat.Messages.Add(message);
+
+        await db.SaveChangesAsync();
+
+        return Results.Ok();
+    }
+
+    public static async Task<IResult> GetStudentChats(Guid id, CoreDb db)
+    {
+        var activeStudent = db.ActiveStudents.Include(a => a.Chats)
+                                .ThenInclude(ch => ch.Messages)
+                                .Include(a => a.Chats)
+                                .ThenInclude(ch => ch.Admin)
+                                .SingleOrDefault(a => a.Id == id);
+
+        if (activeStudent == null)
+        {
+            return Results.NotFound("Student not found");
+        }
+
+        return Results.Ok(ChatDto.Maps(activeStudent.Chats.ToList()));
     }
 }

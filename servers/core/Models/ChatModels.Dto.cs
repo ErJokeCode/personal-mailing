@@ -14,8 +14,7 @@ public class ChatDto : IMappable<ChatDto, Chat>
 
     public static ChatDto Map(Chat orig)
     {
-        var dto = new ChatDto()
-        {
+        var dto = new ChatDto() {
             Id = orig.Id,
             Admin = AdminUserDto.Map(orig.Admin),
             Student = ActiveStudentDto.Map(orig.ActiveStudent),
@@ -45,20 +44,12 @@ public class MessageDto : IMappable<MessageDto, Message>
     public string Sender { get; set; }
     public string Receiver { get; set; }
 
-    public int ChatId { get; set; }
-
     public List<DocumentDto> Documents { get; set; } = [];
 
     public static MessageDto Map(Message orig)
     {
-        var dto = new MessageDto()
-        {
-            Id = orig.Id,
-            Date = orig.Date,
-            Content = orig.Content,
-            Sender = orig.Sender,
-            Receiver = orig.Receiver,
-            ChatId = orig.ChatId,
+        var dto = new MessageDto() {
+            Id = orig.Id, Date = orig.Date, Content = orig.Content, Sender = orig.Sender, Receiver = orig.Receiver,
         };
 
         foreach (var document in orig.Documents)

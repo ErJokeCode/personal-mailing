@@ -35,7 +35,8 @@ public class CoreDb : IdentityDbContext<AdminUser>
         modelBuilder.Entity<Notification>()
             .HasMany(e => e.Documents)
             .WithOne(e => e.Notification)
-            .HasForeignKey(e => e.NotificationId);
+            .HasForeignKey(e => e.NotificationId)
+            .IsRequired(false);
 
         modelBuilder.Entity<AdminUser>().HasMany(e => e.Chats).WithOne(e => e.Admin).HasForeignKey(e => e.AdminId);
 
@@ -49,6 +50,7 @@ public class CoreDb : IdentityDbContext<AdminUser>
         modelBuilder.Entity<Message>()
             .HasMany(e => e.Documents)
             .WithOne(e => e.Message)
-            .HasForeignKey(e => e.MessageId);
+            .HasForeignKey(e => e.MessageId)
+            .IsRequired(false);
     }
 }

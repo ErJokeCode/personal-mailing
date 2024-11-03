@@ -128,7 +128,7 @@ public static class NotificationHandler
                                 .ThenInclude(n => n.Documents)
                                 .Include(a => a.Notifications)
                                 .ThenInclude(n => n.Admin)
-                                .SingleAsync(a => a.Id == id);
+                                .SingleOrDefaultAsync(a => a.Id == id);
 
         if (activeStudent == null)
         {
@@ -148,7 +148,7 @@ public static class NotificationHandler
                         .ThenInclude(n => n.ActiveStudents)
                         .Include(a => a.Notifications)
                         .ThenInclude(n => n.Documents)
-                        .SingleAsync(a => a.Id == id);
+                        .SingleOrDefaultAsync(a => a.Id == id);
 
         if (admin == null)
         {

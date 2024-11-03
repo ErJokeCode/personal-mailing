@@ -40,14 +40,9 @@ public class ActiveStudentDto : IMappable<ActiveStudentDto, ActiveStudent>
 
     public static ActiveStudentDto Map(ActiveStudent orig)
     {
-        return new ActiveStudentDto()
-        {
-            Id = orig.Id,
-            Email = orig.Email,
-            ChatId = orig.ChatId,
-            Info = orig.Student,
-            Date = orig.Date,
-            OnboardStatus = orig.OnboardStatus,
+        return new ActiveStudentDto() {
+            Id = orig.Id,        Email = orig.Email, ChatId = orig.ChatId,
+            Info = orig.Student, Date = orig.Date,   OnboardStatus = orig.OnboardStatus,
         };
     }
 
@@ -70,8 +65,7 @@ public class NotificationDto : IMappable<NotificationDto, Notification>
 
     public static NotificationDto Map(Notification orig)
     {
-        var dto = new NotificationDto()
-        {
+        var dto = new NotificationDto() {
             Id = orig.Id,
             Content = orig.Content,
             Date = orig.Date,
@@ -103,18 +97,12 @@ public class DocumentDto : IMappable<DocumentDto, Document>
     public string Name { get; set; }
     public string MimeType { get; set; }
 
-    public int NotificationId { get; set; }
-    public int MessageId { get; set; }
-
     public static DocumentDto Map(Document orig)
     {
-        return new DocumentDto()
-        {
+        return new DocumentDto() {
             Id = orig.Id,
             Name = orig.Name,
             MimeType = orig.MimeType,
-            NotificationId = orig.NotificationId,
-            MessageId = orig.MessageId,
         };
     }
 

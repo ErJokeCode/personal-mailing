@@ -56,9 +56,9 @@ public class Document
     public string MimeType { get; set; }
     public string InternalName { get; set; }
 
-    public int NotificationId { get; set; }
+    public int? NotificationId { get; set; }
     public Notification Notification { get; set; }
 
-    public int MessageId { get; set; }
+    public int? MessageId { get; set; }
     public Message Message { get; set; }
 }
