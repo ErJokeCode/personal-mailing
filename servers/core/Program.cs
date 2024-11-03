@@ -28,6 +28,8 @@ public static class Program
 
         var group = app.MapGroup("/core");
 
+        // TODO refactor this to Routes/ folder
+
         group.MapPost("/student/auth", StudentHandler.AuthStudent).RequireAuthorization(Permissions.CreateAdminsPolicy);
         group.MapGet("/student/{id}/courses", StudentHandler.GetStudentCourses)
             .RequireAuthorization(Permissions.ViewPolicy);
@@ -48,6 +50,9 @@ public static class Program
         group.MapGet("/notification", NotificationHandler.GetAllNotifications)
             .RequireAuthorization(Permissions.ViewPolicy);
 
+        group.MapPut("/notification/{id}/set-status", NotificationHandler.SetNotificationStatus)
+            .RequireAuthorization(Permissions.SendNotificationsPolicy);
+
         group.MapGet("/student/{id}/notifications", NotificationHandler.GetStudentNotifications)
             .RequireAuthorization(Permissions.ViewPolicy);
 
@@ -64,6 +69,9 @@ public static class Program
 
         group.MapGet("/student/{id}/chats", ChatHandler.GetStudentChats).RequireAuthorization(Permissions.ViewPolicy);
         group.MapPost("/chat/student-to-admin", ChatHandler.StudentSendToAdmin)
+            .RequireAuthorization(Permissions.SendNotificationsPolicy);
+
+        group.MapPut("/message/{id}/set-status", ChatHandler.SetMessageStatus)
             .RequireAuthorization(Permissions.SendNotificationsPolicy);
 
         app.Run();

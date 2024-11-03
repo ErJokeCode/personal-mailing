@@ -45,7 +45,8 @@ public static class NotificationHandler
         }
         else
         {
-            var message = new BotMessage() {
+            var message = new BotMessage()
+            {
                 chat_id = chatId,
                 text = text,
             };
@@ -78,7 +79,8 @@ public static class NotificationHandler
             Results.NotFound("Could not get the admin");
         }
 
-        var notification = new Notification() {
+        var notification = new Notification()
+        {
             Content = details.Content,
             Date = DateTime.Now.ToString(),
             AdminId = adminId,
@@ -90,6 +92,15 @@ public static class NotificationHandler
         foreach (var guid in details.StudentIds)
         {
             var activeStudent = db.ActiveStudents.Find(guid);
+            notification.ActiveStudents.Add(activeStudent);
+
+            var status = new NotificationStatus()
+            {
+                StudentId = guid,
+            };
+            status.SetLost();
+
+            notification.Statuses.Add(status);
 
             if (activeStudent == null)
             {
@@ -97,8 +108,6 @@ public static class NotificationHandler
             }
 
             var sent = await SendToBot(activeStudent.ChatId, notification.Content, documents);
-
-            notification.ActiveStudents.Add(activeStudent);
         }
 
         db.Notifications.Add(notification);
@@ -110,11 +119,42 @@ public static class NotificationHandler
         return Results.Ok(dto);
     }
 
+    public static async Task<IResult> SetNotificationStatus(int id, Guid studentId, int code, CoreDb db)
+    {
+        var status =
+            await db.NotificationStatuses.SingleOrDefaultAsync(n => n.NotificationId == id && n.StudentId == studentId);
+
+        if (status == null)
+        {
+            return Results.NotFound("Status not found");
+        }
+
+        switch (code)
+        {
+            case -1:
+                status.SetLost();
+                break;
+            case 0:
+                status.SetSent();
+                break;
+            case 1:
+                status.SetRead();
+                break;
+            default:
+                return Results.BadRequest("Wrong status code");
+        }
+
+        await db.SaveChangesAsync();
+
+        return Results.Ok(NotificationStatusDto.Map(status));
+    }
+
     public static async Task<IResult> GetAllNotifications(CoreDb db)
     {
         var notifications = await db.Notifications.Include(n => n.ActiveStudents)
                                 .Include(n => n.Documents)
                                 .Include(n => n.Admin)
+                                .Include(n => n.Statuses)
                                 .ToListAsync();
 
         var dtos = NotificationDto.Maps(notifications);
@@ -128,6 +168,8 @@ public static class NotificationHandler
                                 .ThenInclude(n => n.Documents)
                                 .Include(a => a.Notifications)
                                 .ThenInclude(n => n.Admin)
+                                .Include(a => a.Notifications)
+                                .ThenInclude(n => n.Statuses)
                                 .SingleOrDefaultAsync(a => a.Id == id);
 
         if (activeStudent == null)
@@ -148,6 +190,8 @@ public static class NotificationHandler
                         .ThenInclude(n => n.ActiveStudents)
                         .Include(a => a.Notifications)
                         .ThenInclude(n => n.Documents)
+                        .Include(a => a.Notifications)
+                        .ThenInclude(n => n.Statuses)
                         .SingleOrDefaultAsync(a => a.Id == id);
 
         if (admin == null)

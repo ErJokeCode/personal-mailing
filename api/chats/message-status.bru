@@ -1,0 +1,15 @@
+meta {
+  name: message-status
+  type: http
+  seq: 5
+}
+
+put {
+  url: {{base_api}}/core/message/1/set-status?code=0
+  body: none
+  auth: none
+}
+
+params:query {
+  code: 0
+}

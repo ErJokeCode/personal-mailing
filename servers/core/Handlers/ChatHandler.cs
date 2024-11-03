@@ -34,7 +34,8 @@ public static class ChatHandler
 
         if (chat == null)
         {
-            chat = new Chat() {
+            chat = new Chat()
+            {
                 ActiveStudentId = activeStudent.Id,
                 AdminId = adminId,
             };
@@ -42,12 +43,17 @@ public static class ChatHandler
             db.Chats.Add(chat);
         }
 
-        var message = new Message() {
+        var message = new Message()
+        {
             Date = DateTime.Now.ToString(),
             Sender = "Admin",
             Receiver = "Student",
             Content = content,
         };
+
+        var status = new MessageStatus();
+        status.SetLost();
+        message.Status = status;
 
         chat.Messages.Add(message);
 
@@ -67,6 +73,7 @@ public static class ChatHandler
 
         var admin = db.Users.Include(a => a.Chats)
                         .ThenInclude(ch => ch.Messages)
+                        .ThenInclude(m => m.Status)
                         .Include(a => a.Chats)
                         .ThenInclude(ch => ch.ActiveStudent)
                         .SingleOrDefault(a => a.Id == adminId);
@@ -94,7 +101,8 @@ public static class ChatHandler
 
         if (chat == null)
         {
-            chat = new Chat() {
+            chat = new Chat()
+            {
                 ActiveStudentId = activeStudent.Id,
                 AdminId = adminId,
             };
@@ -102,12 +110,17 @@ public static class ChatHandler
             db.Chats.Add(chat);
         }
 
-        var message = new Message() {
+        var message = new Message()
+        {
             Date = DateTime.Now.ToString(),
             Sender = "Student",
             Receiver = "Admin",
             Content = content,
         };
+
+        var status = new MessageStatus();
+        status.SetLost();
+        message.Status = status;
 
         chat.Messages.Add(message);
 
@@ -120,6 +133,7 @@ public static class ChatHandler
     {
         var activeStudent = db.ActiveStudents.Include(a => a.Chats)
                                 .ThenInclude(ch => ch.Messages)
+                                .ThenInclude(m => m.Status)
                                 .Include(a => a.Chats)
                                 .ThenInclude(ch => ch.Admin)
                                 .SingleOrDefault(a => a.Id == id);
@@ -130,5 +144,34 @@ public static class ChatHandler
         }
 
         return Results.Ok(ChatDto.Maps(activeStudent.Chats.ToList()));
+    }
+
+    public static async Task<IResult> SetMessageStatus(int id, int code, CoreDb db)
+    {
+        var status = await db.MessageStatuses.SingleOrDefaultAsync(n => n.MessageId == id);
+
+        if (status == null)
+        {
+            return Results.NotFound("Status not found");
+        }
+
+        switch (code)
+        {
+            case -1:
+                status.SetLost();
+                break;
+            case 0:
+                status.SetSent();
+                break;
+            case 1:
+                status.SetRead();
+                break;
+            default:
+                return Results.BadRequest("Wrong status code");
+        }
+
+        await db.SaveChangesAsync();
+
+        return Results.Ok(MessageStatusDto.Map(status));
     }
 }
