@@ -76,6 +76,7 @@
         let result = await fetch(`${server_url}/parser/upload/student`, {
             method: "POST",
             body: data,
+            credentials: "include",
         });
 
         if (result.ok) {
@@ -100,6 +101,7 @@
             {
                 method: "POST",
                 body: data,
+                credentials: "include",
             },
         );
 
@@ -125,6 +127,7 @@
             {
                 method: "POST",
                 body: data,
+                credentials: "include",
             },
         );
 
