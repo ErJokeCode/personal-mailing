@@ -1,3 +1,4 @@
+import json
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
 
@@ -16,7 +17,7 @@ router = Router()
 async def show_main_menu(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
     if user_data.get('email') and user_data.get('personal_number'):
-        await message.answer("Главное меню:", reply_markup=keyboard.Menu())
+        await message.answer("Главное меню\n\n👋 Привет! Я ваш помощник. Вы можете получить доступ к следующей информации:\n\n📚 Основная информация о предметах\nУзнайте расписание, материалы и темы лекций по вашим предметам.\n\n💻 Онлайн-курсы\nПросмотрите доступные онлайн-курсы, их описание и расписание. \n\n🔔 Уведомления\nПолучите последние уведомления о важных событиях, изменениях в расписании и других новостях.", reply_markup=keyboard.Menu())
     else:
         await message.delete()
         await message.answer(Registration.no())
@@ -97,11 +98,43 @@ async def process_course_info(callback_query: types.CallbackQuery, state: FSMCon
                     course_data = {}
 
         await callback_query.message.delete()
-        await callback_query.message.answer(f"Информация о курсе {course_data['name']}\n{course_data['info']}\n{course_data['date']}\n{course_data['university']}\n\n Баллы: {courses_data[course_id]['score']}", reply_markup=keyboard.Back_to_courses())
+        await callback_query.message.answer(f"Информация о курсе {course_data['name']}\n{course_data['info']}\n{course_data['date']}\n{course_data['university']}\n\n Баллы: {courses_data[course_id]['score']}\n\n Если возникли вопросы по входу на онлайн курс, изучите раздел информация об обучении/онлайн курсы", reply_markup=keyboard.Back_to_courses())
     else:
         await callback_query.message.delete()
         await callback_query.message.answer(Registration.no())
 
+
+@router.callback_query(lambda c: c.data == "subjects")
+async def process_subjects(callback_query: types.CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    # Отправляем запрос на сервер для получения списка онлайн курсов
+    async with aiohttp.ClientSession() as session:
+        headers = {"cookie": f"{get_cookie()}"}
+        async with session.get(f"{URL_SERVER}/core/student/{user_data.get('user_id')}", headers=headers) as response:
+            if response.status == 200:
+                st_data = await response.json()
+                info = st_data.get("info")
+                subjects_data = info.get("subjects")
+            else:
+                subjects_data = []
+    await state.update_data(subjects_data=subjects_data)
+
+    if user_data.get('email') and user_data.get('personal_number'):
+        await callback_query.message.delete()
+        await callback_query.message.answer(create_text_subject(subjects_data), reply_markup=keyboard.Back_to_main())
+    else:
+        await callback_query.message.delete()
+        await callback_query.message.answer(Registration.no())
+
+def create_text_subject(data: list):
+    res = ""
+    i = 1
+    for item in data:
+        item = item
+        full_name = item.get("fullName")
+        res += f"{i}. {full_name}\n\n"
+        i += 1
+    return res
 
 
 @router.callback_query(lambda c: c.data == "faq")
