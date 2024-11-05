@@ -1,18 +1,25 @@
 <script>
     import { onMount } from "svelte";
     import { server_url } from "../store";
+    import { navigate } from "svelte-routing";
 
-    let activeStudents = [];
+    let chats = [];
 
     onMount(async () => {
-        let response = await fetch(`${server_url}/core/student`, {
+        let response = await fetch(`${server_url}/core/admin/chats`, {
             credentials: "include",
         });
 
         let json = await response.json();
-        activeStudents = json;
+        chats = json;
     });
+
+    async function open_chat(id) {
+        navigate("/chat/" + id);
+    }
 </script>
+
+<h2>Your Chats:</h2>
 
 <table>
     <thead>
@@ -22,10 +29,13 @@
         </tr>
     </thead>
     <tbody>
-        {#each activeStudents as student}
+        {#each chats as chat}
             <tr>
-                <th><button>Open</button></th>
-                <th>{student.email}</th>
+                <th
+                    ><button on:click={() => open_chat(chat.id)}>Open</button
+                    ></th
+                >
+                <th>{chat.student.email}</th>
             </tr>
         {/each}
     </tbody>

@@ -7,6 +7,7 @@
     import AdminRoute from "./Admin/AdminRoute.svelte";
     import CreateAdmin from "./Admin/CreateAdmin.svelte";
     import ChatRoute from "./Chat/ChatRoute.svelte";
+    import Chat from "./Chat/Chat.svelte";
 
     export let url = "";
 </script>
@@ -32,6 +33,7 @@
         <Route path="/admin" component={AdminRoute} />
         <Route path="/create-admin" component={CreateAdmin} />
         <Route path="/chat" component={ChatRoute} />
+        <Route path="/chat/:id" component={Chat} />
         <main></main>
     </main>
 </Router>

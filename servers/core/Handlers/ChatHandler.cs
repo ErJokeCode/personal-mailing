@@ -34,8 +34,7 @@ public static class ChatHandler
 
         if (chat == null)
         {
-            chat = new Chat()
-            {
+            chat = new Chat() {
                 ActiveStudentId = activeStudent.Id,
                 AdminId = adminId,
             };
@@ -43,8 +42,7 @@ public static class ChatHandler
             db.Chats.Add(chat);
         }
 
-        var message = new Message()
-        {
+        var message = new Message() {
             Date = DateTime.Now.ToString(),
             Sender = "Admin",
             Receiver = "Student",
@@ -81,6 +79,22 @@ public static class ChatHandler
         return Results.Ok(ChatDto.Maps(admin.Chats.ToList()));
     }
 
+    public static async Task<IResult> GetChatById(int id, CoreDb db)
+    {
+        var chat = db.Chats.Include(ch => ch.Messages)
+                       .ThenInclude(m => m.Status)
+                       .Include(ch => ch.ActiveStudent)
+                       .Include(ch => ch.Admin)
+                       .SingleOrDefault(ch => ch.Id == id);
+
+        if (chat == null)
+        {
+            return Results.NotFound("Chat not found");
+        }
+
+        return Results.Ok(ChatDto.Map(chat));
+    }
+
     public static async Task<IResult> StudentSendToAdmin(string content, Guid studentId, string adminId, CoreDb db)
     {
         var admin = db.Users.Find(adminId);
@@ -101,8 +115,7 @@ public static class ChatHandler
 
         if (chat == null)
         {
-            chat = new Chat()
-            {
+            chat = new Chat() {
                 ActiveStudentId = activeStudent.Id,
                 AdminId = adminId,
             };
@@ -110,8 +123,7 @@ public static class ChatHandler
             db.Chats.Add(chat);
         }
 
-        var message = new Message()
-        {
+        var message = new Message() {
             Date = DateTime.Now.ToString(),
             Sender = "Student",
             Receiver = "Admin",
@@ -157,17 +169,17 @@ public static class ChatHandler
 
         switch (code)
         {
-            case -1:
-                status.SetLost();
-                break;
-            case 0:
-                status.SetSent();
-                break;
-            case 1:
-                status.SetRead();
-                break;
-            default:
-                return Results.BadRequest("Wrong status code");
+        case -1:
+            status.SetLost();
+            break;
+        case 0:
+            status.SetSent();
+            break;
+        case 1:
+            status.SetRead();
+            break;
+        default:
+            return Results.BadRequest("Wrong status code");
         }
 
         await db.SaveChangesAsync();
