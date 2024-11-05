@@ -14,6 +14,9 @@ importers:
       flowbite-svelte-icons:
         specifier: ^1.6.1
         version: 1.6.1(svelte@4.2.19)(tailwind-merge@2.5.2)(tailwindcss@3.4.13)
+      svelte-routing:
+        specifier: ^2.13.0
+        version: 2.13.0
       tailwind-merge:
         specifier: ^2.5.2
         version: 2.5.2
@@ -1523,6 +1526,9 @@ packages:
     resolution: {integrity: sha512-TUIfhut0iVeTm7f5v/ZuU/tZ9XsNig9bNN8yK0t2x2WL9qw6AxAVRe9i5XddYJE0SuVwkoDCzjoSg5hXv7oWbQ==}
     peerDependencies:
       svelte: ^3.55.0 || ^4.0.0
+
+  svelte-routing@2.13.0:
+    resolution: {integrity: sha512-/NTxqTwLc7Dq306hARJrH2HLXOBtKd7hu8nxgoFDlK0AC4SOKnzisiX/9m8Uksei1QAWtlAEdF91YphNM8iDMg==}
 
   svelte@4.2.19:
     resolution: {integrity: sha512-IY1rnGr6izd10B0A8LqsBfmlT5OILVuZ7XsI0vdGPEvuonFV7NYEUK4dAkm9Zg2q0Um92kYjTpS1CAP3Nh/KWw==}
@@ -3062,6 +3068,8 @@ snapshots:
       svelte: 4.2.19
     transitivePeerDependencies:
       - typescript
+
+  svelte-routing@2.13.0: {}
 
   svelte@4.2.19:
     dependencies:

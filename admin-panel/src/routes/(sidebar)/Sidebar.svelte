@@ -15,7 +15,7 @@
 		ClipboardListSolid,
 		CogOutline,
 		FileChartBarSolid,
-		GithubSolid,
+		UserSettingsOutline,
 		LayersSolid,
 		LifeSaverSolid,
 		LockSolid,
@@ -50,14 +50,10 @@
 
 	let posts = [
 		{ name: 'Dashboard', icon: ChartPieOutline, href: '/dashboard' },
-		{
-			name: 'Layouts',
-			icon: TableColumnSolid,
-			children: {
-				Stacked: '/layouts/stacked',
-				Sidebar: '/layouts/sidebar'
-			}
-		},
+		{ name: 'Login', icon: LockSolid, href: '/authentication/sign-in' },
+		{ name: 'Upload', icon: FileChartBarSolid, href: '/upload' },
+		{ name: 'Notifications', icon: ClipboardListSolid, href: '/notifications' },
+		{ name: 'Admin', icon: UserSettingsOutline, href: '/admin' },
 		{
 			name: 'CRUD',
 			icon: RectangleListSolid,
@@ -69,32 +65,10 @@
 		},
 		{ name: 'Settings', icon: CogOutline, href: '/settings' },
 		{
-			name: 'Pages',
-			icon: FileChartBarSolid,
-			children: {
-				Pricing: '/pages/pricing',
-				Maintenance: '/errors/400',
-				'404 not found': '/errors/404',
-				'500 server error': '/errors/500'
-			}
-		},
-		{
-			name: 'Authenication',
-			icon: LockSolid,
-			children: {
-				'Sign in': '/authentication/sign-in',
-				'Sign up': '/authentication/sign-up',
-				'Forgot password': '/authentication/forgot-password',
-				'Reset password': '/authentication/reset-password',
-				'Profile lock': '/authentication/profile-lock'
-			}
-		},
-		{
 			name: 'Playground',
 			icon: WandMagicSparklesOutline,
 			children: {
-				Stacked: '/playground/stacked',
-				Sidebar: '/playground/sidebar'
+				Sidebar: '/'
 			}
 		}
 	];
@@ -102,11 +76,6 @@
 	let links = [
 		{
 			label: 'icon',
-			href: '',
-			icon: ClipboardListSolid
-		},
-		{
-			label: 'icon2',
 			href: '',
 			icon: LayersSolid
 		},
