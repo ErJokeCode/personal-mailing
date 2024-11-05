@@ -2,7 +2,6 @@ from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
 
 import keyboards.main_menu as keyboard
-from texts.error import Registration
 
 
 router = Router()

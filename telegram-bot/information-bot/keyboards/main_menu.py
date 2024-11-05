@@ -2,6 +2,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 def menu() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
+            [InlineKeyboardButton(text="Онбординг", callback_data="start_onboarding")],
             [InlineKeyboardButton(text="Информация об обучении", callback_data="info_teaching")],
             [InlineKeyboardButton(text="Предметы", callback_data="subjects")],
             [InlineKeyboardButton(text="Онлайн курсы", callback_data="online_courses")],

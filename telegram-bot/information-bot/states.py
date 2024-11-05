@@ -17,3 +17,7 @@ class Info_teaching(StatesGroup):
     LK_URFU = State()
     ONLINE_COURSE = State()
     REITING = State()
+
+class Onboarding(StatesGroup):
+    ONE = State()
+    TWO = State()

@@ -14,7 +14,6 @@ from handlers.information_teaching import show_info_teaching
 
 router = Router()
 
-
 async def show_main_menu(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
     if user_data.get('user_id'):
@@ -122,7 +121,7 @@ async def process_main_menu(callback_query: types.CallbackQuery, state: FSMConte
 
 
 @router.callback_query(lambda c: c.data == "info_teaching")
-async def process_main_menu(callback_query: types.CallbackQuery, state: FSMContext): 
+async def process_main_menu_info_teaching(callback_query: types.CallbackQuery, state: FSMContext): 
     user_data = await state.get_data()
 
     if user_data.get('user_id'):
