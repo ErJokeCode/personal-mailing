@@ -57,7 +57,7 @@ public static class ChatHandler
 
         await db.SaveChangesAsync();
 
-        return Results.Ok();
+        return Results.Ok(MessageDto.Map(message));
     }
 
     public static async Task<IResult> GetAdminChats(HttpContext context, UserManager<AdminUser> userManager, CoreDb db)

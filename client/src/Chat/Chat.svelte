@@ -4,19 +4,24 @@
     import http from "../http";
 
     export let id;
+    export let studentId;
 
-    let studentId = "cabfa570-d6f3-4156-9723-3222a7458d66";
     let content = "";
     let status = http.default_message();
     let messages = [];
 
-    onMount(async () => {
+    async function get_messages() {
         let response = await fetch(`${server_url}/core/chat/${id}`, {
             credentials: "include",
         });
 
         let json = await response.json();
         messages = json.messages;
+    }
+
+    onMount(async () => {
+        await get_messages();
+        window.scrollTo(0, document.body.scrollHeight);
     });
 
     async function send_message() {
@@ -27,7 +32,12 @@
             "Post",
             {},
         );
+        content = "";
         status.load = "false";
+
+        await get_messages();
+
+        window.scrollTo(0, document.body.scrollHeight);
     }
 </script>
 
@@ -54,9 +64,8 @@
 <footer>
     <fieldset class="container" role="group">
         <input bind:value={content} type="text" />
-        <button aria-busy={status.load} on:click={send_message}
-            >{status.value} Send</button
-        >
+        <button aria-busy={status.load} on:click={send_message}>Send</button>
+        {status.value}
     </fieldset>
 </footer>
 

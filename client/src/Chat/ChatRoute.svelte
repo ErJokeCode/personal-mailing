@@ -14,8 +14,8 @@
         chats = json;
     });
 
-    async function open_chat(id) {
-        navigate("/chat/" + id);
+    async function open_chat(id, studentId) {
+        navigate(`/chat/${id}/${studentId}`);
     }
 </script>
 
@@ -32,7 +32,9 @@
         {#each chats as chat}
             <tr>
                 <th
-                    ><button on:click={() => open_chat(chat.id)}>Open</button
+                    ><button
+                        on:click={() => open_chat(chat.id, chat.student.id)}
+                        >Open</button
                     ></th
                 >
                 <th>{chat.student.email}</th>

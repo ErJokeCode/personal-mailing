@@ -33,7 +33,7 @@
         <Route path="/admin" component={AdminRoute} />
         <Route path="/create-admin" component={CreateAdmin} />
         <Route path="/chat" component={ChatRoute} />
-        <Route path="/chat/:id" component={Chat} />
+        <Route path="/chat/:id/:studentId" component={Chat} />
         <main></main>
     </main>
 </Router>
