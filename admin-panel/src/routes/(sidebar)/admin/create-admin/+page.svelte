@@ -30,7 +30,7 @@
       } catch (err) {
         create_status = "Something went wrong! " + err;
       }
-
+      
       if (response?.ok) {
         create_status = "You successfully created an admin!";
       }

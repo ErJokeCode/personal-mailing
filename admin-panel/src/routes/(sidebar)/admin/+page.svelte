@@ -11,16 +11,15 @@
   onMount(async () => {
     let response;
 
-      try {
-        response = await fetch('http://localhost:5000/core/admin', {
+    try {
+      response = await fetch('http://localhost:5000/core/admin', {
           credentials: "include",
-      	});
-      } catch (err) {
-        login_status = "Not Logged In";
-      }
-
-      let json = await response?.json();
-      admins = json;
+      });
+    } catch (err) {
+      login_status = "Not Logged In";
+    }
+    let json = await response?.json();
+    admins = json;
   });
 </script>
 
