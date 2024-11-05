@@ -74,20 +74,11 @@ async def send_text_with_photo(chat_ids: list[str], text: str, files: list[Uploa
 
 @router_send.post("/{chat_id}")
 async def send_text(chat_id: str, text : str):
-    res = await bot.send_message(chat_id=chat_id, text=text, reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="В архив", callback_data="to_archive")], 
-            [InlineKeyboardButton(text="В избранное", callback_data="to_favourite")]
-        ])) 
-    # print(await storage.get_data(key=StorageKey(
-    #     bot_id=bot.id, 
-    #     chat_id=res.chat.id, 
-    #     user_id=res.from_user.id
-    # )))
-    # await storage.set_data(key=StorageKey(
-    #     bot_id=bot.id, 
-    #     chat_id=res.chat.id, 
-    #     user_id=res.from_user.id
-    # ), data={"message_id":res.message_id})
+    await bot.send_message(chat_id=chat_id, text=text)
+    # res = await bot.send_message(chat_id=chat_id, text=text, reply_markup=InlineKeyboardMarkup(inline_keyboard=[
+    #         [InlineKeyboardButton(text="В архив", callback_data="to_archive")], 
+    #         [InlineKeyboardButton(text="В избранное", callback_data="to_favourite")]
+    #     ])) 
     return {"status": "success"}
 
 

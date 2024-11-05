@@ -21,18 +21,6 @@ def is_valid_email(email):
     return re.match(pattern, email) is not None
 
 
-# @router.message(Command("start"))
-# async def cmd_start(message: types.Message, state: FSMContext):
-#     await message.answer("jdjhdfjh", reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-#             [InlineKeyboardButton(text="Да", callback_data="yes")],
-#             [InlineKeyboardButton(text="Нет", callback_data="no")],
-#         ]))
-
-# @router.message(F.data == "yes")
-# async def yes(message: types.Message, state: FSMContext):
-#     await message.answer("jdjhdfjh")
-
-
 @router.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext):
     # await state.clear()
