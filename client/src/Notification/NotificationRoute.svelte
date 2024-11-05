@@ -1,24 +1,16 @@
 <script>
     import { onMount } from "svelte";
-    import { server_url } from "../store";
+    import http from "../http";
     import { Link } from "svelte-routing";
 
-    let login_status = "";
+    let status = http.status();
     let notifications = [];
 
     onMount(async () => {
-        let response;
-
-        try {
-            response = await fetch(`${server_url}/core/admin/notifications`, {
-                credentials: "include",
-            });
-        } catch (err) {
-            login_status = "Not Logged In";
-        }
-
-        let json = await response.json();
-        notifications = json;
+        status = status.start_load();
+        notifications =
+            (await http.get("/core/admin/notifications", status)) ?? [];
+        status = status.end_load();
     });
 </script>
 
@@ -27,7 +19,7 @@
 <hr />
 
 <h2>Your Notifications</h2>
-<table>
+<table aria-busy={status.load}>
     <thead>
         <tr>
             <th>Content</th>

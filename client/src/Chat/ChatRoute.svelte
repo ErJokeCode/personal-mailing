@@ -1,17 +1,15 @@
 <script>
     import { onMount } from "svelte";
-    import { server_url } from "../store";
     import { navigate } from "svelte-routing";
+    import http from "../http";
 
     let chats = [];
+    let status = http.status();
 
     onMount(async () => {
-        let response = await fetch(`${server_url}/core/admin/chats`, {
-            credentials: "include",
-        });
-
-        let json = await response.json();
-        chats = json;
+        status = status.start_load();
+        chats = (await http.get("/core/admin/chats", status)) ?? [];
+        status = status.end_load();
     });
 
     async function open_chat(id, studentId) {
@@ -21,7 +19,7 @@
 
 <h2>Your Chats:</h2>
 
-<table>
+<table aria-busy={status.load}>
     <thead>
         <tr>
             <th>Chat</th>

@@ -2,16 +2,15 @@
     import { onMount } from "svelte";
     import { server_url } from "../store";
     import { Link } from "svelte-routing";
+    import http from "../http";
 
     let admins = [];
+    let status = http.status();
 
     onMount(async () => {
-        let response = await fetch(`${server_url}/core/admin`, {
-            credentials: "include",
-        });
-
-        let json = await response.json();
-        admins = json;
+        status = status.start_load();
+        admins = (await http.get("/core/admin", status)) ?? [];
+        status = status.end_load();
     });
 </script>
 
@@ -20,7 +19,7 @@
 <hr />
 
 <h2>Admins:</h2>
-<table>
+<table aria-busy={status.load}>
     <thead>
         <tr>
             <th>Email</th>

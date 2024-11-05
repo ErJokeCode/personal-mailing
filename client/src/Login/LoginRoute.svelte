@@ -1,18 +1,30 @@
 <script>
     import http from "../http.js";
+    import { admin } from "../store.js";
+    import { navigate } from "svelte-routing";
 
     let email = "";
     let password = "";
-    let message = http.default_message();
+    let status = http.status();
 
     async function login() {
-        message.load = "true";
-        message.value = "";
-        message.value = await http.http_json("/login", "Post", {
-            email,
-            password,
-        });
-        message.load = "false";
+        status = status.start_load();
+
+        await http.post_json(
+            "/login",
+            {
+                email,
+                password,
+            },
+            status,
+        );
+
+        status = status.end_load();
+
+        let new_admin = { email: email, date: "" };
+
+        admin.update((_) => new_admin);
+        navigate("/me");
     }
 </script>
 
@@ -27,8 +39,8 @@
         <input type="text" bind:value={password} />
     </label>
 
-    <button type="button" on:click={login} aria-busy={message.load}
-        >{message.value} Login
+    <button type="button" on:click={login} aria-busy={status.load}
+        >{status.value} Login
     </button>
 </form>
 

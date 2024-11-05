@@ -1,4 +1,6 @@
 <script>
+    import { admin } from "./store";
+
     import { Router, Link, Route } from "svelte-routing";
     import UploadRoute from "./Upload/UploadRoute.svelte";
     import LoginRoute from "./Login/LoginRoute.svelte";
@@ -8,24 +10,40 @@
     import CreateAdmin from "./Admin/CreateAdmin.svelte";
     import ChatRoute from "./Chat/ChatRoute.svelte";
     import Chat from "./Chat/Chat.svelte";
+    import Profile from "./Admin/Profile.svelte";
 
     export let url = "";
+
+    function isEmptyObject(obj) {
+        return JSON.stringify(obj) === "{}";
+    }
 </script>
 
 <Router {url}>
-    <nav class="container">
-        <ul>
-            <li><Link to="/login">Login</Link></li>
-            <li><Link to="/upload">Upload</Link></li>
-            <li><Link to="/notification">Notification</Link></li>
-            <li><Link to="/admin">Admin</Link></li>
-            <li><Link to="/chat">Chat</Link></li>
-        </ul>
-    </nav>
+    <div class="pico-background-slate-900">
+        <nav class="container">
+            <ul>
+                <li><Link to="/upload">Upload</Link></li>
+                <li><Link to="/notification">Notification</Link></li>
+                <li><Link to="/admin">Admin</Link></li>
+                <li><Link to="/chat">Chat</Link></li>
+            </ul>
+            <ul>
+                {#if !isEmptyObject($admin)}
+                    <li>
+                        <Link class="contrast" to="/me">{$admin.email}</Link>
+                    </li>
+                {:else}
+                    <li><Link to="/login">Login</Link></li>
+                {/if}
+            </ul>
+        </nav>
+    </div>
 
     <br />
 
     <main class="container">
+        <Route path="/me" component={Profile} />
         <Route path="/login" component={LoginRoute} />
         <Route path="/upload" component={UploadRoute} />
         <Route path="/notification" component={NotificationRoute} />
@@ -37,3 +55,6 @@
         <main></main>
     </main>
 </Router>
+
+<style>
+</style>

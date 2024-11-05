@@ -6,24 +6,29 @@
     export let field = "file";
 
     let files;
-    let message = http.default_message();
+    let status = http.status();
 
     async function send_students() {
-        message.load = "true";
-        message.value = "";
-        message.value = await http.http_files(url, "Post", field, files);
-        message.load = "false";
+        let data = new FormData();
+
+        for (let file of files) {
+            data.append(field, file);
+        }
+
+        status = status.start_load();
+        await http.post(url, data, status);
+        status = status.end_load();
     }
 </script>
 
 <fieldset>
     <label>
         {label}
-        <input type="file" multiple bind:files />
+        <input type="file" bind:files />
     </label>
 
-    <button on:click={send_students} aria-busy={message.load}>
-        {message.value} Upload
+    <button on:click={send_students} aria-busy={status.load}>
+        {status.value} Upload
     </button>
 </fieldset>
 

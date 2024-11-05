@@ -1,20 +1,21 @@
 <script>
-    import { onMount } from "svelte";
-    import { server_url } from "../store";
     import http from "../http.js";
 
-    let message = http.default_message();
+    let status = http.status();
     let email = "";
     let password = "";
 
     async function create() {
-        message.load = "true";
-        message.value = "";
-        message.value = await http.http_json("/core/admin/create", "Post", {
-            password,
-            email,
-        });
-        message.load = "false";
+        status = status.start_load();
+        await http.post_json(
+            "/core/admin/create",
+            {
+                password,
+                email,
+            },
+            status,
+        );
+        status = status.end_load();
     }
 </script>
 
@@ -28,9 +29,7 @@
     <input type="password" bind:value={password} />
 </label>
 
-<button on:click={create} aria-busy={message.load}
-    >{message.value} Create</button
->
+<button on:click={create} aria-busy={status.load}>{status.value} Create</button>
 
 <style>
 </style>

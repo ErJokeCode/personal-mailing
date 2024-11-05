@@ -7,15 +7,11 @@
     export let studentId;
 
     let content = "";
-    let status = http.default_message();
+    let status = http.status();
     let messages = [];
 
     async function get_messages() {
-        let response = await fetch(`${server_url}/core/chat/${id}`, {
-            credentials: "include",
-        });
-
-        let json = await response.json();
+        let json = (await http.get(`/core/chat/${id}`, http.status())) ?? [];
         messages = json.messages;
     }
 
@@ -25,15 +21,15 @@
     });
 
     async function send_message() {
-        status.load = "true";
-        status.value = "";
-        status.value = await http.http_json(
+        status = status.start_load();
+        await http.post_json(
             `/core/chat/admin-to-student?studentId=${studentId}&content=${content}`,
-            "Post",
             {},
+            status,
         );
+
         content = "";
-        status.load = "false";
+        status = status.end_load();
 
         await get_messages();
 

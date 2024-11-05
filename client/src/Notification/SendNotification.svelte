@@ -1,22 +1,19 @@
 <script>
     import { onMount } from "svelte";
-    import { server_url } from "../store";
     import http from "../http.js";
 
-    let message = http.default_message();
     let content = "";
     let files = [];
     let ids = [];
-
     let activeStudents = [];
 
-    onMount(async () => {
-        let response = await fetch(`${server_url}/core/student`, {
-            credentials: "include",
-        });
+    let studentStatus = http.status();
+    let sendStatus = http.status();
 
-        let json = await response.json();
-        activeStudents = json;
+    onMount(async () => {
+        studentStatus = studentStatus.start_load();
+        activeStudents = (await http.get("/core/student", studentStatus)) ?? [];
+        studentStatus = studentStatus.end_load();
     });
 
     function add_id(checked, id) {
@@ -28,40 +25,24 @@
     }
 
     async function send() {
-        message.load = "true";
+        sendStatus = sendStatus.start_load();
 
-        let response;
+        let data = new FormData();
 
-        try {
-            let data = new FormData();
-
-            let body = JSON.stringify({
-                content: content,
-                studentIds: ids,
-            });
-
-            data.append("body", body);
-
-            if (files.length > 0) {
-                for (let file of files) {
-                    data.append("file", file);
-                }
-            }
-
-            response = await fetch(`${server_url}/core/notification`, {
-                method: "Post",
-                body: data,
-                credentials: "include",
-            });
-        } catch (err) {
-            message.load = "false";
-            message.value = "❌" + err;
+        for (let file of files) {
+            data.append("file", file);
         }
 
-        if (response?.ok) {
-            message.load = "false";
-            message.value = "✅";
-        }
+        let body = JSON.stringify({
+            content: content,
+            studentIds: ids,
+        });
+
+        data.append("body", body);
+
+        await http.post("/core/notification", data, sendStatus);
+
+        sendStatus = sendStatus.end_load();
     }
 </script>
 
@@ -75,11 +56,13 @@
     <input type="file" multiple bind:files />
 </label>
 
-<button on:click={send} aria-busy={message.load}>{message.value} Send</button>
+<button on:click={send} aria-busy={sendStatus.load}
+    >{sendStatus.value} Send</button
+>
 
 <hr />
 
-<table>
+<table aira-busy={studentStatus.load}>
     <thead>
         <tr>
             <th>Select</th>
