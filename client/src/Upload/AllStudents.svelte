@@ -1,7 +1,7 @@
 <script>
     import { onMount } from "svelte";
     import http from "../http";
-    import { Link } from "svelte-routing";
+    import { navigate, Link } from "svelte-routing";
 
     let status = http.status();
     let students = [];

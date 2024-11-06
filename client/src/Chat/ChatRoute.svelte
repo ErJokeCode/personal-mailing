@@ -13,7 +13,7 @@
     });
 
     async function open_chat(id, studentId) {
-        navigate(`/chat/${id}/${studentId}`);
+        navigate(`/chat/${studentId}`);
     }
 </script>
 

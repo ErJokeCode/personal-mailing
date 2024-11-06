@@ -95,6 +95,25 @@ public static class ChatHandler
         return Results.Ok(ChatDto.Map(chat));
     }
 
+    public static async Task<IResult> GetAdminChatWithStudent(Guid studentId, CoreDb db,
+                                                              UserManager<AdminUser> userManager, HttpContext context)
+    {
+        var adminId = userManager.GetUserId(context.User);
+
+        var chat = db.Chats.Include(ch => ch.Messages)
+                       .ThenInclude(m => m.Status)
+                       .Include(ch => ch.ActiveStudent)
+                       .Include(ch => ch.Admin)
+                       .SingleOrDefault(ch => ch.AdminId == adminId && ch.ActiveStudentId == studentId);
+
+        if (chat == null)
+        {
+            return Results.NotFound("Chat not found");
+        }
+
+        return Results.Ok(ChatDto.Map(chat));
+    }
+
     public static async Task<IResult> StudentSendToAdmin(string content, Guid studentId, string adminId, CoreDb db)
     {
         var admin = db.Users.Find(adminId);

@@ -12,6 +12,7 @@
     import Chat from "./Chat/Chat.svelte";
     import Profile from "./Admin/Profile.svelte";
     import AllStudents from "./Upload/AllStudents.svelte";
+    import ActiveRoute from "./Login/ActiveRoute.svelte";
 
     export let url = "";
 
@@ -25,6 +26,7 @@
         <nav class="container">
             <ul>
                 <li><Link to="/student">Student</Link></li>
+                <li><Link to="/active">Active</Link></li>
                 <li><Link to="/notification">Notification</Link></li>
                 <li><Link to="/admin">Admin</Link></li>
                 <li><Link to="/chat">Chat</Link></li>
@@ -45,6 +47,7 @@
 
     <main class="container">
         <Route path="/me" component={Profile} />
+        <Route path="/active" component={ActiveRoute} />
         <Route path="/login" component={LoginRoute} />
         <Route path="/upload" component={UploadRoute} />
         <Route path="/notification" component={NotificationRoute} />
@@ -53,7 +56,7 @@
         <Route path="/create-admin" component={CreateAdmin} />
         <Route path="/chat" component={ChatRoute} />
         <Route path="/student" component={AllStudents} />
-        <Route path="/chat/:id/:studentId" component={Chat} />
+        <Route path="/chat/:studentId" component={Chat} />
         <main></main>
     </main>
 </Router>

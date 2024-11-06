@@ -21,9 +21,9 @@
 
         status = status.end_load();
 
-        let new_admin = { email: email, date: "" };
+        let the_admin = await http.get("/core/admin/me", http.status());
+        admin.update((_) => the_admin);
 
-        admin.update((_) => new_admin);
         navigate("/me");
     }
 </script>

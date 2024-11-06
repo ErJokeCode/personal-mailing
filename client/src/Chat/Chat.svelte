@@ -1,9 +1,7 @@
 <script>
     import { onMount } from "svelte";
-    import { server_url } from "../store";
     import http from "../http";
 
-    export let id;
     export let studentId;
 
     let content = "";
@@ -11,8 +9,12 @@
     let messages = [];
 
     async function get_messages() {
-        let json = (await http.get(`/core/chat/${id}`, http.status())) ?? [];
-        messages = json.messages;
+        let json =
+            (await http.get(
+                `/core/chat/admin-with/${studentId}`,
+                http.status(),
+            )) ?? undefined;
+        messages = json?.messages ?? [];
     }
 
     onMount(async () => {

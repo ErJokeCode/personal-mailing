@@ -12,6 +12,9 @@ public static class ChatRoute
 
         group.MapGet("/{id}", ChatHandler.GetChatById).RequireAuthorization(Permissions.ViewPolicy);
 
+        group.MapGet("/admin-with/{studentId}", ChatHandler.GetAdminChatWithStudent)
+            .RequireAuthorization(Permissions.ViewPolicy);
+
         group.MapPost("/admin-to-student", ChatHandler.AdminSendToStudent)
             .RequireAuthorization(Permissions.SendNotificationsPolicy);
 

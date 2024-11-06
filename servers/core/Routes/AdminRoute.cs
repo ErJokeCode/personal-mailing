@@ -12,6 +12,7 @@ public static class AdminRoute
 
         group.MapGet("/", AdminHandler.GetAllAdmins).RequireAuthorization(Permissions.ViewPolicy);
         group.MapGet("/me", AdminHandler.GetAdminMe).RequireAuthorization(Permissions.ViewPolicy);
+        group.MapGet("/by-email/{email}", AdminHandler.GetAdminByEmail).RequireAuthorization(Permissions.ViewPolicy);
 
         group.MapGet("/notifications", NotificationHandler.GetAdminNotifications)
             .RequireAuthorization(Permissions.ViewPolicy);

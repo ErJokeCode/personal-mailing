@@ -110,4 +110,16 @@ public static class AdminHandler
 
         return Results.Ok(dtos);
     }
+
+    public static async Task<IResult> GetAdminByEmail(string email, CoreDb db)
+    {
+        var admin = db.Users.SingleOrDefault(a => a.Email == email);
+
+        if (admin == null)
+        {
+            return Results.NotFound("Admin nto found");
+        }
+
+        return Results.Ok(AdminUserDto.Map(admin));
+    }
 }
