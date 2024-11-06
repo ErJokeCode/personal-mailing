@@ -63,3 +63,16 @@ async def get_student(email: str):
         raise HTTPException(status_code=404, detail="User not found")
 
     return json.loads(json.dumps(user, default=my_handler))
+
+
+@router_user.get("/all")
+async def get_student():
+    try:
+        collection = DB.get_student()
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail="Error DB")
+
+    users = collection.find({}).to_list()
+
+    return json.loads(json.dumps(users, default=my_handler))

@@ -11,6 +11,7 @@
     import ChatRoute from "./Chat/ChatRoute.svelte";
     import Chat from "./Chat/Chat.svelte";
     import Profile from "./Admin/Profile.svelte";
+    import AllStudents from "./Upload/AllStudents.svelte";
 
     export let url = "";
 
@@ -23,7 +24,7 @@
     <div class="pico-background-slate-900">
         <nav class="container">
             <ul>
-                <li><Link to="/upload">Upload</Link></li>
+                <li><Link to="/student">Student</Link></li>
                 <li><Link to="/notification">Notification</Link></li>
                 <li><Link to="/admin">Admin</Link></li>
                 <li><Link to="/chat">Chat</Link></li>
@@ -51,6 +52,7 @@
         <Route path="/admin" component={AdminRoute} />
         <Route path="/create-admin" component={CreateAdmin} />
         <Route path="/chat" component={ChatRoute} />
+        <Route path="/student" component={AllStudents} />
         <Route path="/chat/:id/:studentId" component={Chat} />
         <main></main>
     </main>
