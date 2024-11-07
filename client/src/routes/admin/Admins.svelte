@@ -1,8 +1,7 @@
 <script>
     import { onMount } from "svelte";
-    import { server_url } from "../store";
-    import { Link } from "svelte-routing";
-    import http from "../http";
+    import http from "src/utility/http";
+    import { navigate } from "svelte-routing";
 
     let admins = [];
     let status = http.status();
@@ -12,11 +11,11 @@
         admins = (await http.get("/core/admin", status)) ?? [];
         status = status.end_load();
     });
+
+    async function fullInfo(id) {
+        navigate(`/admin/${id}`);
+    }
 </script>
-<!---->
-<!-- <Link to="/create-admin"><button>Create Admin</button></Link> -->
-<!---->
-<!-- <hr /> -->
 
 <h2>Admins:</h2>
 <table aria-busy={status.load}>
@@ -27,7 +26,7 @@
         </tr>
     </thead>
     {#each admins as admin}
-        <tr>
+        <tr role="link" class="contrast" on:click={() => fullInfo(admin.id)}>
             <th>{admin.email}</th>
             <th>{admin.date}</th>
         </tr>

@@ -1,5 +1,5 @@
 <script>
-    import { admin } from "../store";
+    import { admin } from "src/utility/store";
 </script>
 
 <h2>Profile</h2>

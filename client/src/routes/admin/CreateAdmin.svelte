@@ -1,5 +1,5 @@
 <script>
-    import http from "../http.js";
+    import http from "src/utility/http.js";
 
     let status = http.status();
     let email = "";

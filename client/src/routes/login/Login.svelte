@@ -1,6 +1,6 @@
 <script>
-    import http from "../http.js";
-    import { admin } from "../store.js";
+    import http from "src/utility/http.js";
+    import { admin } from "src/utility/store.js";
     import { navigate } from "svelte-routing";
 
     let email = "";

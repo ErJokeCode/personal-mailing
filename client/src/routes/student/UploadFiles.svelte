@@ -1,5 +1,5 @@
 <script>
-    import FileUpload from "./FileUpload.svelte";
+    import FileUpload from "src/components/FileUpload.svelte";
 </script>
 
 <main>

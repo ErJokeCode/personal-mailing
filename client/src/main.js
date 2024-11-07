@@ -1,6 +1,6 @@
 import App from './App.svelte'
-import { admin } from "./store";
-import http from "./http";
+import { admin } from "src/utility/store";
+import http from "src/utility/http";
 
 let the_admin = await http.get("/core/admin/me", http.status());
 if (the_admin) {

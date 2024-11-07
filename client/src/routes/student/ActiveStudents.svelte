@@ -1,6 +1,6 @@
 <script>
     import { onMount } from "svelte";
-    import http from "../http.js";
+    import http from "src/utility/http.js";
     import { navigate } from "svelte-routing";
 
     let activeStudents = [];
@@ -13,8 +13,8 @@
         studentStatus = studentStatus.end_load();
     });
 
-    async function start_chat(studentId) {
-        navigate(`/chat/${studentId}`);
+    async function fullInfo(id) {
+        navigate(`/student/active/${id}`);
     }
 </script>
 
@@ -25,19 +25,17 @@
         <tr>
             <th>Id</th>
             <th>Email</th>
-            <th>Chat</th>
         </tr>
     </thead>
     <tbody>
         {#each activeStudents as student}
-            <tr>
+            <tr
+                role="link"
+                class="contrast"
+                on:click={() => fullInfo(student.id)}
+            >
                 <th>{student.id}</th>
                 <th>{student.email}</th>
-                <th>
-                    <button on:click={() => start_chat(student.id)}
-                        >Start Chat</button
-                    >
-                </th>
             </tr>
         {/each}
     </tbody>

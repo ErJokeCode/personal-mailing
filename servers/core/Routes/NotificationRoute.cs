@@ -14,7 +14,10 @@ public static class NotificationRoute
             .RequireAuthorization(Permissions.SendNotificationsPolicy)
             .DisableAntiforgery();
 
+
         group.MapGet("/", NotificationHandler.GetAllNotifications).RequireAuthorization(Permissions.ViewPolicy);
+
+        group.MapGet("/{id}", NotificationHandler.GetNotification).RequireAuthorization(Permissions.ViewPolicy);
 
         group.MapPut("/{id}/set-status", NotificationHandler.SetNotificationStatus)
             .RequireAuthorization(Permissions.SendNotificationsPolicy);

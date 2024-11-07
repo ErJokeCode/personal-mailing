@@ -1,6 +1,7 @@
 <script>
     import { onMount } from "svelte";
-    import http from "../http";
+    import http from "src/utility/http";
+    import { navigate } from "svelte-routing";
 
     let status = http.status();
     let students = [];
@@ -27,6 +28,10 @@
         status = status.end_load();
         maxPage = Math.floor(students.length / amountPage);
     });
+
+    async function fullInfo(email) {
+        navigate(`/student/${email}`);
+    }
 </script>
 
 <div class="grid">
@@ -40,7 +45,7 @@
     <button on:click={() => toPage(curPage + 1)}>Next</button>
 </div>
 
-<table aria-busy={status.load}>
+<table aria-busy={status.load} class="striped">
     <thead>
         <tr>
             <th>Email</th>
@@ -51,7 +56,11 @@
     </thead>
     <tbody>
         {#each students.slice(curPage * amountPage, curPage * amountPage + amountPage) as student}
-            <tr>
+            <tr
+                on:click={() => fullInfo(student.email)}
+                role="link"
+                class="contrast"
+            >
                 <th>{student.email}</th>
                 <th>{student.personal_number}</th>
                 <th>{student.name}</th>
@@ -72,5 +81,8 @@
     select {
         width: fit-content;
         margin-bottom: 0;
+    }
+    tr:hover {
+        cursor: pointer;
     }
 </style>

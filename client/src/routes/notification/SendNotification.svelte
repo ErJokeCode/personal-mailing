@@ -1,6 +1,6 @@
 <script>
     import { onMount } from "svelte";
-    import http from "../http.js";
+    import http from "src/utility/http.js";
     import { navigate } from "svelte-routing";
 
     let content = "";

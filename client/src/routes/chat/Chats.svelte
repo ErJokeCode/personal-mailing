@@ -1,7 +1,7 @@
 <script>
     import { onMount } from "svelte";
     import { navigate } from "svelte-routing";
-    import http from "../http";
+    import http from "src/utility/http";
 
     let chats = [];
     let status = http.status();

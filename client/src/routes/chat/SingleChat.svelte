@@ -1,6 +1,6 @@
 <script>
     import { onMount } from "svelte";
-    import http from "../http";
+    import http from "src/utility/http";
 
     export let studentId;
 
