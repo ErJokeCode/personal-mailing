@@ -9,7 +9,6 @@ from config import URL_SERVER, get_cookie
 import keyboards.main_menu as keyboard
 from states import Info_teaching, LKStates
 from texts.error import Registration, Input
-from texts.main_menu import ToCurator
 from handlers.information_teaching import show_info_teaching
 
 router = Router()
@@ -64,9 +63,9 @@ async def process_course_info(callback_query: types.CallbackQuery, state: FSMCon
 
             async with session.get(f"{URL_SERVER}/parser/course/search", headers=headers, params={"name": online_courses[course_id]["name"], "university": online_courses[course_id]["university"]}) as response:
                 if response.status == 200:
-                    indo_course = await response.json()
+                    info_course = await response.json()
                     await callback_query.message.delete()
-                    await callback_query.message.answer(f"Информация о курсе {indo_course['name']}\n{indo_course['university']}\n{indo_course['date_start']}\n{indo_course['deadline']}\n{indo_course['info']}\n\n Баллы: {online_courses[course_id]['score']}\n\n Если возникли вопросы по входу на онлайн курс, изучите раздел информация об обучении/онлайн курсы", reply_markup=keyboard.back_to_courses())
+                    await callback_query.message.answer(f"Информация о курсе {info_course['name']}\n{info_course['university']}\n{info_course['date_start']}\n{info_course['deadline']}\n{info_course['info']}\n\n Баллы: {online_courses[course_id]['score']}\n\n Если возникли вопросы по входу на онлайн курс, изучите раздел информация об обучении/онлайн курсы", reply_markup=keyboard.back_to_courses())
                 else:
                     not_info = await callback_query.message.answer("Пока нет информации, подожтите немного")
                     sleep(5)

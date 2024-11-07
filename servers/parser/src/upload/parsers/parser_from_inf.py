@@ -58,6 +58,9 @@ def parse_courses():
                         if(len(cols) == 3):
                             info = cols[2].text.replace("\xa0", " ")
 
+                        split_university = university.split()
+                        if split_university[0] == "Курсы" or split_university[0] == "курсы":
+                            university = " ".join(split_university[1:])
                         course = OnlineCourse(name=name, date_start=date, deadline=None, university=university, info=info).model_dump(by_alias=True, exclude=["id"])
 
                         res = collection.update_one(
