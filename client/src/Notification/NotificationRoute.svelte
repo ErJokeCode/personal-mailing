@@ -13,10 +13,10 @@
         status = status.end_load();
     });
 </script>
-
-<Link to="/send-notification"><button>Send Notification</button></Link>
-
-<hr />
+<!---->
+<!-- <Link to="/send-notification"><button>Send Notification</button></Link> -->
+<!---->
+<!-- <hr /> -->
 
 <h2>Your Notifications</h2>
 <table aria-busy={status.load}>

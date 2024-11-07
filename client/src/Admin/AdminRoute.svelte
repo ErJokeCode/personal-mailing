@@ -13,10 +13,10 @@
         status = status.end_load();
     });
 </script>
-
-<Link to="/create-admin"><button>Create Admin</button></Link>
-
-<hr />
+<!---->
+<!-- <Link to="/create-admin"><button>Create Admin</button></Link> -->
+<!---->
+<!-- <hr /> -->
 
 <h2>Admins:</h2>
 <table aria-busy={status.load}>

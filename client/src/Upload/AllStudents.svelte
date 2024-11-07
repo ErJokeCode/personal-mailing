@@ -13,9 +13,9 @@
     });
 </script>
 
-<Link to="/upload"><button>Upload Files</button></Link>
-
-<hr />
+<!-- <Link to="/upload"><button>Upload Files</button></Link> -->
+<!---->
+<!-- <hr /> -->
 
 <h2>All Students</h2>
 <table aria-busy={status.load}>

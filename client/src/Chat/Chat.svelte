@@ -7,6 +7,7 @@
     let content = "";
     let status = http.status();
     let messages = [];
+    let chatArea = document.querySelector(".offset");
 
     async function get_messages() {
         let json =
@@ -19,7 +20,7 @@
 
     onMount(async () => {
         await get_messages();
-        window.scrollTo(0, document.body.scrollHeight);
+        chatArea.scrollTo(0, chatArea.scrollHeight);
     });
 
     async function send_message() {
@@ -35,49 +36,59 @@
 
         await get_messages();
 
-        window.scrollTo(0, document.body.scrollHeight);
+        chatArea.scrollTo(0, chatArea.scrollHeight);
     }
 </script>
 
-<div class="offset">
-    {#each messages as message}
-        {#if message.sender == "Student"}
-            <article class="right">
-                <header>
-                    {message.sender}
-                </header>
-                {message.content}
-            </article>
-        {:else}
-            <article>
-                <header>
-                    {message.sender}
-                </header>
-                {message.content}
-            </article>
-        {/if}
-    {/each}
+<div class="wrapper">
+    <div class="chats" bind:this={chatArea}>
+        {#each messages as message}
+            {#if message.sender == "Student"}
+                <article class="right">
+                    <header>
+                        {message.sender}
+                    </header>
+                    {message.content}
+                </article>
+            {:else}
+                <article>
+                    <header>
+                        {message.sender}
+                    </header>
+                    {message.content}
+                </article>
+            {/if}
+        {/each}
+    </div>
+
+    <footer>
+        <fieldset class="container" role="group">
+            <input bind:value={content} type="text" />
+            <button aria-busy={status.load} on:click={send_message}>Send</button
+            >
+            {status.value}
+        </fieldset>
+    </footer>
 </div>
 
-<footer>
-    <fieldset class="container" role="group">
-        <input bind:value={content} type="text" />
-        <button aria-busy={status.load} on:click={send_message}>Send</button>
-        {status.value}
-    </fieldset>
-</footer>
-
 <style>
+    .wrapper {
+        display: flex;
+        flex-flow: column;
+        height: 100%;
+    }
+
     .right {
         text-align: right;
     }
 
     fieldset {
-        position: fixed;
         bottom: 0;
+        width: 100%;
     }
 
-    .offset {
-        padding-bottom: 5rem;
+    .chats {
+        overflow: scroll;
+        flex: 1;
     }
 </style>
