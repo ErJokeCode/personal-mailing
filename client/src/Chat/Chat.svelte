@@ -88,6 +88,7 @@
     }
 
     .chats {
+        padding: 1rem;
         overflow: scroll;
         flex: 1;
     }
