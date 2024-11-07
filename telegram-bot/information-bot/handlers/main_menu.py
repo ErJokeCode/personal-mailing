@@ -61,15 +61,29 @@ async def process_course_info(callback_query: types.CallbackQuery, state: FSMCon
         async with aiohttp.ClientSession() as session:
             headers = {"cookie": f"{get_cookie()}"}
 
-            async with session.get(f"{URL_SERVER}/parser/course/search", headers=headers, params={"name": online_courses[course_id]["name"], "university": online_courses[course_id]["university"]}) as response:
-                if response.status == 200:
-                    info_course = await response.json()
-                    await callback_query.message.delete()
-                    await callback_query.message.answer(f"Информация о курсе {info_course['name']}\n{info_course['university']}\n{info_course['date_start']}\n{info_course['deadline']}\n{info_course['info']}\n\n Баллы: {online_courses[course_id]['score']}\n\n Если возникли вопросы по входу на онлайн курс, изучите раздел информация об обучении/онлайн курсы", reply_markup=keyboard.back_to_courses())
+            async with session.get(f"{URL_SERVER}/parser/course/modeus_to_inf", headers=headers, params={"name_modeus": online_courses[course_id]["name"]}) as resp:
+                if resp.status == 200:
+                    inf_course = await resp.json()
+                    async with session.get(f"{URL_SERVER}/parser/course/search", headers=headers, params={"name": inf_course["inf"], "university": online_courses[course_id]["university"]}) as response:
+                        if response.status == 200:
+                            info_course = await response.json()
+                            await callback_query.message.delete()
+                            await callback_query.message.answer(f"Информация о курсе {info_course['name']}\n{info_course['university']}\n{info_course['date_start']}\n{info_course['deadline']}\n{info_course['info']}\n\n Баллы: {online_courses[course_id]['score']}\n\n Если возникли вопросы по входу на онлайн курс, изучите раздел информация об обучении/онлайн курсы", reply_markup=keyboard.back_to_courses())
+                        else:
+                            not_info = await callback_query.message.answer("Пока нет информации, подожтите немного")
+                            await sleep(5)
+                            await not_info.delete()
                 else:
-                    not_info = await callback_query.message.answer("Пока нет информации, подожтите немного")
-                    sleep(5)
-                    await not_info.delete()
+                    async with session.get(f"{URL_SERVER}/parser/course/search", headers=headers, params={"name": online_courses[course_id]["name"], "university": online_courses[course_id]["university"]}) as response:
+                        if response.status == 200:
+                            info_course = await response.json()
+                            await callback_query.message.delete()
+                            await callback_query.message.answer(f"Информация о курсе {info_course['name']}\n{info_course['university']}\n{info_course['date_start']}\n{info_course['deadline']}\n{info_course['info']}\n\n Баллы: {online_courses[course_id]['score']}\n\n Если возникли вопросы по входу на онлайн курс, изучите раздел информация об обучении/онлайн курсы", reply_markup=keyboard.back_to_courses())
+                        else:
+                            not_info = await callback_query.message.answer("Пока нет информации, подожтите немного")
+                            await sleep(5)
+                            await not_info.delete()
+    
     else:
         await callback_query.message.delete()
         await callback_query.message.answer(Registration.no())

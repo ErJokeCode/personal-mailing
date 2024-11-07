@@ -35,8 +35,6 @@ def update_report(file: UploadFile):
                 all_students[email]["courses"].append(course_db)
 
     for student in all_students.values():
-        if  student["email"] == "erik.solovev@urfu.me":
-            print(student)
         collection_student.update_one({"name": student["name"], "surname": student["surname"], "patronymic" : student["patronymic"], "group.number" : student["group"]}, 
                               {"$set" : {"email" : student["email"], "online_course" : student["courses"]}})
     
@@ -90,6 +88,6 @@ def create_student_course(item, course, email, group) -> StudentCourse:
 
 def create_info_online_course(collection_course, name, university) -> OnlineCourse:
     inline_course = OnlineCourse(name=name, university=university)
-    res = collection_course.insert_one(inline_course.model_dump())
+    res = collection_course.insert_one(inline_course.model_dump(by_alias=True, exclude=["id"]))
     return inline_course
 

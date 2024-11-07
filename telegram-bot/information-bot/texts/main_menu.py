@@ -6,4 +6,10 @@ def create_text_online_course(info_course: dict, score: str) -> str:
     university = info_course['university']
     
     text = ""
-    
+
+    if score == "Нет на курсе":
+        pass 
+    elif score == "Not column":
+        pass
+    else:
+        pass
