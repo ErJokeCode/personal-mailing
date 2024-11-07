@@ -40,6 +40,10 @@ class Onboarding(StatesGroup):
     QUE_STUD_CARD = State()
     ANS_STUD_CARD = State()
 
+    INFO_ELECTR_PASS = State()
+
+    INFO_BANK_CARD = State()
+
     INFO_PROGECT = State()
 
     INFO_EXAM = State()

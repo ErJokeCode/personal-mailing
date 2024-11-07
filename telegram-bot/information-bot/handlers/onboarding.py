@@ -278,8 +278,35 @@ async def start_onboarding(callback_query: types.CallbackQuery, state: FSMContex
 
     await state.update_data(del_msgs_onboarding = [last_msg.message_id])
 
-#Переходим к проектам
+
+#Переходим к электронным пропускам
 @router.callback_query(Onboarding.QUE_STUD_CARD, lambda c: c.data == "next_onb")
+async def start_onboarding(callback_query: types.CallbackQuery, state: FSMContext):
+    await state.set_state(Onboarding.INFO_ELECTR_PASS)
+    await callback_query.message.delete()
+    
+    user_data = await state.get_data()
+    del_msgs_onboarding = user_data.get("del_msgs_onboarding")
+
+    for msg in del_msgs_onboarding:
+        await callback_query.message.bot.delete_message(callback_query.message.chat.id, msg)
+    
+    await state.update_data(del_msgs_onboarding = [])
+
+    await callback_query.message.answer(t_onboarding.info_electr_pass(), reply_markup=kb_onboarding.next())
+
+
+#Переходим к банковским картам
+@router.callback_query(Onboarding.INFO_ELECTR_PASS, lambda c: c.data == "next_onb")
+async def start_onboarding(callback_query: types.CallbackQuery, state: FSMContext):
+    await state.set_state(Onboarding.INFO_BANK_CARD)
+    await callback_query.message.delete()
+
+    await callback_query.message.answer(t_onboarding.info_bank_card(), reply_markup=kb_onboarding.next())
+    
+
+#Переходим к проектам
+@router.callback_query(Onboarding.INFO_BANK_CARD, lambda c: c.data == "next_onb")
 async def start_onboarding(callback_query: types.CallbackQuery, state: FSMContext):
     await state.set_state(Onboarding.INFO_PROGECT)
     await callback_query.message.delete()

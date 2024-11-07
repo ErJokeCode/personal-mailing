@@ -53,11 +53,17 @@ async def all_message(message: types.Message, state: FSMContext):
 
                     async with session.post(f"{URL_SERVER}/core/chat/student-to-admin", headers=headers, params={"content": message.text, "studentId": user_id, "adminId": admins[0]["id"]}) as resp:
                         if resp.status == 200:
-                            await message.answer("Сообщение отправлено, ожидайте ответа")
+                            msg = await message.answer("Сообщение отправлено, ожидайте ответа")
+                            await asyncio.sleep(5)
+                            await msg.delete()
                         else:
-                            await message.answer("Неполучилось доставить сообщение куратору, попробуй ещё раз")
+                            msg = await message.answer("Неполучилось доставить сообщение куратору, попробуй ещё раз")
+                            await asyncio.sleep(5)
+                            await msg.delete()
                 else:
-                    await message.answer("Неполучилось доставить сообщение куратору, попробуй ещё раз")
+                    msg = await message.answer("Неполучилось доставить сообщение куратору, попробуй ещё раз")
+                    await asyncio.sleep(5)
+                    await msg.delete()
         
     
 

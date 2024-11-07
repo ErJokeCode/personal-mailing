@@ -5,6 +5,7 @@ from aiogram.fsm.context import FSMContext
 from states import Info_teaching
 from keyboards.info_teaching import next_and_back, list_topics
 from texts.error import Registration
+import texts.information_teaching as text
 
 
 router = Router()
@@ -30,9 +31,8 @@ async def cards(callback_query: types.CallbackQuery, state: FSMContext):
     del_msg = user_data.get('del_msg')
     await callback_query.message.bot.delete_messages(chat_id=callback_query.message.chat.id, message_ids=del_msg)
 
-    msg_1 = await callback_query.message.answer("Что-то о картах, студиках и тп 1")
-    msg_2 = await callback_query.message.answer("Что-то о картах, студиках и тп 2", reply_markup=next_and_back())
-    await state.update_data(del_msg = [msg_1.message_id, msg_2.message_id], cards = True)
+    msg_1 = await callback_query.message.answer(text.cards(), reply_markup=next_and_back())
+    await state.update_data(del_msg = [msg_1.message_id], cards = True)
 
 
 @router.callback_query(lambda c: c.data == "auditoria")
@@ -43,7 +43,7 @@ async def auditoria(callback_query: types.CallbackQuery, state: FSMContext):
     del_msg = user_data.get('del_msg')
     await callback_query.message.bot.delete_messages(chat_id=callback_query.message.chat.id, message_ids=del_msg)
 
-    msg_2 = await callback_query.message.answer("Что-то о номерах", reply_markup=next_and_back())
+    msg_2 = await callback_query.message.answer(text.auditoria(), reply_markup=next_and_back())
     await state.update_data(del_msg = [ msg_2.message_id], auditoria = True)
 
 
@@ -55,7 +55,7 @@ async def navigator(callback_query: types.CallbackQuery, state: FSMContext):
     del_msg = user_data.get('del_msg')
     await callback_query.message.bot.delete_messages(chat_id=callback_query.message.chat.id, message_ids=del_msg)
     
-    msg_2 = await callback_query.message.answer("Что-то о navigator", reply_markup=next_and_back())
+    msg_2 = await callback_query.message.answer(text.navigator(), reply_markup=next_and_back())
     await state.update_data(del_msg = [msg_2.message_id], navigator = True)
 
 
@@ -67,7 +67,7 @@ async def lk_student(callback_query: types.CallbackQuery, state: FSMContext):
     del_msg = user_data.get('del_msg')
     await callback_query.message.bot.delete_messages(chat_id=callback_query.message.chat.id, message_ids=del_msg)
     
-    msg_2 = await callback_query.message.answer("Что-то о lk_student", reply_markup=next_and_back())
+    msg_2 = await callback_query.message.answer(text.lk_student(), reply_markup=next_and_back())
     await state.update_data(del_msg = [msg_2.message_id], lk_student = True)
 
 
@@ -79,7 +79,7 @@ async def online_course_all_info(callback_query: types.CallbackQuery, state: FSM
     del_msg = user_data.get('del_msg')
     await callback_query.message.bot.delete_messages(chat_id=callback_query.message.chat.id, message_ids=del_msg)
     
-    msg_2 = await callback_query.message.answer("Что-то о online_course_all_info", reply_markup=next_and_back())
+    msg_2 = await callback_query.message.answer(text.online_course_all_info(), reply_markup=next_and_back())
     await state.update_data(del_msg = [msg_2.message_id], online_course_all_info=True)
 
 
@@ -91,7 +91,7 @@ async def rating(callback_query: types.CallbackQuery, state: FSMContext):
     del_msg = user_data.get('del_msg')
     await callback_query.message.bot.delete_messages(chat_id=callback_query.message.chat.id, message_ids=del_msg)
     
-    msg_2 = await callback_query.message.answer("Что-то о rating", reply_markup=next_and_back(next=False))
+    msg_2 = await callback_query.message.answer(text.rating(), reply_markup=next_and_back(next=False))
     await state.update_data(del_msg = [msg_2.message_id], rating = True)
 
 
