@@ -13,14 +13,14 @@ import json
 import requests
 
 from config import URL_REDIS, TOKEN
-from handlers import start, main_menu, information_teaching
+from handlers import start, main_menu, information_teaching, faq, onboarding
 
 
 storage = RedisStorage.from_url(URL_REDIS)
 
 bot = Bot(token=TOKEN)
 dp = Dispatcher(storage=storage)
-dp.include_routers(start.router, main_menu.router, information_teaching.router)
+dp.include_routers(start.router, main_menu.router, information_teaching.router, faq.router, onboarding.router)
 
 async def main():
     await dp.start_polling(bot)

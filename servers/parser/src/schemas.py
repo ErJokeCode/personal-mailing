@@ -96,3 +96,8 @@ class StudentMoseus(BaseModel):
     code: str
     speciality: str
     subjects: list[str]
+
+class Modeus_to_inf(BaseModel):
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    modeus: str
+    inf: str

@@ -1,7 +1,8 @@
+from typing import List
 from fastapi import APIRouter, HTTPException
 
 from config import DB
-from src.schemas import Course, Course_info, StudentCourse
+from src.schemas import Course, Course_info, Modeus_to_inf, OnlineCourse, StudentCourse
 from bson import ObjectId
 
 
@@ -47,10 +48,21 @@ async def get_by_id(id: str):
 
 
 @router_course.get("/search")
-async def get_courses(name: str, university: str | None = None) -> Course_info:
+async def get_courses(name: str, university: str | None = None) -> OnlineCourse:
     collection = DB.get_course_info_collection()
     query = {"name": {"$regex": name, "$options": "i"}}
     if university:
         query["university"] = {"$regex": university, "$options": "i"}
     course = collection.find_one(query)
-    return Course_info(**course)
+    return OnlineCourse(**course)
+
+
+@router_course.get("/modeus_to_inf")
+async def get_modeus_to_inf(name_modeus: str = None) -> Modeus_to_inf:
+    col_mod = DB.get_modeus_inf()
+    res = col_mod.find_one({"modeus" : name_modeus})
+    if res == None:
+        raise HTTPException(status_code=404, detail="Course not found")
+    return Modeus_to_inf(**res)
+
+

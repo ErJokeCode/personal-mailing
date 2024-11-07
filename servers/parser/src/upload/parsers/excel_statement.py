@@ -3,7 +3,7 @@ from fastapi import HTTPException, UploadFile
 import pandas as pd
 
 from config import DB
-from src.schemas import Course, StudentCourse
+from src.schemas import Course, OnlineCourse, StudentCourse
 
 
 def update_report(file: UploadFile):
@@ -13,7 +13,7 @@ def update_report(file: UploadFile):
         print(e)
         raise HTTPException(status_code=500, detail="File read error")
     
-    collection = DB.get_student()
+    collection_student = DB.get_student()
     collection_course = DB.get_course_info_collection()
     all_students = {}
     
@@ -24,7 +24,10 @@ def update_report(file: UploadFile):
         for student in data:
             email = get_email(student)
             course = get_course(student).model_dump()
+
             course_db = collection_course.find_one({"name" : course["name"], "university" : {"$regex": course["university"]}})
+            if course_db == None:
+                course_db = create_info_online_course(collection_course, course["name"], course["university"]).model_dump()
             course_db["score"] = course["score"]
             if email not in all_students.keys():
                 all_students[email] = create_student_course(student, course_db, get_email(student), get_group(student)).model_dump()
@@ -32,7 +35,7 @@ def update_report(file: UploadFile):
                 all_students[email]["courses"].append(course_db)
 
     for student in all_students.values():
-        collection.update_one({"name": student["name"], "surname": student["surname"], "patronymic" : student["patronymic"], "group.number" : student["group"]}, 
+        collection_student.update_one({"name": student["name"], "surname": student["surname"], "patronymic" : student["patronymic"], "group.number" : student["group"]}, 
                               {"$set" : {"email" : student["email"], "online_course" : student["courses"]}})
     
     return {"status" : "success"}
@@ -55,7 +58,10 @@ def get_student(item, collection):
         raise HTTPException(status_code=500, detail="Parse student error")
 
 def get_course(item) -> Course:
-    return Course(name=item["Название ОК"], score=str(item["Итоговый балл"]), university=item["держатель курса"])
+    if "Итоговый балл" in item:
+        return Course(name=item["Название ОК"], score=str(item["Итоговый балл"]), university=item["держатель курса"])
+    else:
+        return Course(name=item["Название ОК"], score=str("Not column"), university=item["держатель курса"])
     
 def get_email(item):
     email = ""
@@ -79,3 +85,9 @@ def create_student_course(item, course, email, group) -> StudentCourse:
         group=group,
         courses=[course]
     )
+
+def create_info_online_course(collection_course, name, university) -> OnlineCourse:
+    inline_course = OnlineCourse(name=name, university=university)
+    res = collection_course.insert_one(inline_course.model_dump(by_alias=True, exclude=["id"]))
+    return inline_course
+

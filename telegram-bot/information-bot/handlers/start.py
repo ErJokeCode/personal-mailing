@@ -11,6 +11,7 @@ import re
 
 from config import URL_SERVER, get_cookie
 from handlers.main_menu import show_main_menu
+from handlers.onboarding import choice_onboarding
 from states import RegistrationStates, LKStates
 
 router = Router()
@@ -21,21 +22,9 @@ def is_valid_email(email):
     return re.match(pattern, email) is not None
 
 
-# @router.message(Command("start"))
-# async def cmd_start(message: types.Message, state: FSMContext):
-#     await message.answer("jdjhdfjh", reply_markup=InlineKeyboardMarkup(inline_keyboard=[
-#             [InlineKeyboardButton(text="Да", callback_data="yes")],
-#             [InlineKeyboardButton(text="Нет", callback_data="no")],
-#         ]))
-
-# @router.message(F.data == "yes")
-# async def yes(message: types.Message, state: FSMContext):
-#     await message.answer("jdjhdfjh")
-
-
 @router.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext):
-    # await state.clear()
+    await state.clear()
     user_data = await state.get_data()
     
     if not user_data.get("email") and not user_data.get("personal_number"):
@@ -59,7 +48,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
                 if response.status < 400:
                     response_data = await response.json()
                     await state.update_data(user_id=response_data.get("id"))
-                    await show_main_menu(message, state)
+                    await choice_onboarding(message, state)
                 elif response.status == 423:
                     msg_login = await message.answer("Пользователь уже вошел в аккаунт")
                     await asyncio.sleep(5)
@@ -124,7 +113,7 @@ async def process_student_id(message: types.Message, state: FSMContext):
                     personal_number=body["personal_number"],
                     user_id=response_data.get("id"),
                 )
-                await show_main_menu(message, state)
+                await choice_onboarding(message, state)
             else:
                 await message.answer(
                     "Произошла ошибка при регистрации. Пожалуйста, введите вашу почту."
