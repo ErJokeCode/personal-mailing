@@ -23,7 +23,27 @@
         { id: 1, maker: 'Toyota', type: 'ABC', make: 2017 },
         { id: 2, maker: 'Ford', type: 'CDE', make: 2018 },
         { id: 3, maker: 'Volvo', type: 'FGH', make: 2019 },
-        { id: 4, maker: 'Saab', type: 'IJK', make: 2020 }
+        { id: 4, maker: 'Saab', type: 'IJK', make: 2020 },
+        { id: 5, maker: 'Toyota', type: 'ABC', make: 2017 },
+        { id: 6, maker: 'Ford', type: 'CDE', make: 2018 },
+        { id: 7, maker: 'Volvo', type: 'FGH', make: 2019 },
+        { id: 8, maker: 'Saab', type: 'IJK', make: 2020 },
+        { id: 9, maker: 'Toyota', type: 'ABC', make: 2017 },
+        { id: 10, maker: 'Ford', type: 'CDE', make: 2018 },
+        { id: 11, maker: 'Volvo', type: 'FGH', make: 2019 },
+        { id: 12, maker: 'Saab', type: 'IJK', make: 2020 },
+        { id: 13, maker: 'Toyota', type: 'ABC', make: 2017 },
+        { id: 14, maker: 'Ford', type: 'CDE', make: 2018 },
+        { id: 15, maker: 'Volvo', type: 'FGH', make: 2019 },
+        { id: 16, maker: 'Saab', type: 'IJK', make: 2020 },
+        { id: 17, maker: 'Toyota', type: 'ABC', make: 2017 },
+        { id: 19, maker: 'Ford', type: 'CDE', make: 2018 },
+        { id: 20, maker: 'Volvo', type: 'FGH', make: 2019 },
+        { id: 21, maker: 'Saab', type: 'IJK', make: 2020 },
+        { id: 22, maker: 'Toyota', type: 'ABC', make: 2017 },
+        { id: 23, maker: 'Ford', type: 'CDE', make: 2018 },
+        { id: 24, maker: 'Volvo', type: 'FGH', make: 2019 },
+        { id: 25, maker: 'Saab', type: 'IJK', make: 2020 }
     ];
     let totalItems = paginationData.length;
     /**
