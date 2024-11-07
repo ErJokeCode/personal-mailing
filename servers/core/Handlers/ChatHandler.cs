@@ -34,7 +34,8 @@ public static class ChatHandler
 
         if (chat == null)
         {
-            chat = new Chat() {
+            chat = new Chat()
+            {
                 ActiveStudentId = activeStudent.Id,
                 AdminId = adminId,
             };
@@ -42,7 +43,8 @@ public static class ChatHandler
             db.Chats.Add(chat);
         }
 
-        var message = new Message() {
+        var message = new Message()
+        {
             Date = DateTime.Now.ToString(),
             Sender = "Admin",
             Receiver = "Student",
@@ -54,6 +56,8 @@ public static class ChatHandler
         message.Status = status;
 
         chat.Messages.Add(message);
+
+        var sent = await NotificationHandler.SendToBot(activeStudent.AdminChatId, content, null, false);
 
         await db.SaveChangesAsync();
 
@@ -134,7 +138,8 @@ public static class ChatHandler
 
         if (chat == null)
         {
-            chat = new Chat() {
+            chat = new Chat()
+            {
                 ActiveStudentId = activeStudent.Id,
                 AdminId = adminId,
             };
@@ -142,7 +147,8 @@ public static class ChatHandler
             db.Chats.Add(chat);
         }
 
-        var message = new Message() {
+        var message = new Message()
+        {
             Date = DateTime.Now.ToString(),
             Sender = "Student",
             Receiver = "Admin",
@@ -188,17 +194,17 @@ public static class ChatHandler
 
         switch (code)
         {
-        case -1:
-            status.SetLost();
-            break;
-        case 0:
-            status.SetSent();
-            break;
-        case 1:
-            status.SetRead();
-            break;
-        default:
-            return Results.BadRequest("Wrong status code");
+            case -1:
+                status.SetLost();
+                break;
+            case 0:
+                status.SetSent();
+                break;
+            case 1:
+                status.SetRead();
+                break;
+            default:
+                return Results.BadRequest("Wrong status code");
         }
 
         await db.SaveChangesAsync();

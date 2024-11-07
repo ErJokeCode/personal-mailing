@@ -23,11 +23,12 @@ public static class NotificationHandler
         public string text { get; set; }
     }
 
-    public static async Task<bool> SendToBot(string chatId, string text, IFormFileCollection documents)
+    public static async Task<bool> SendToBot(string chatId, string text, IFormFileCollection documents,
+                                             bool isNotification = true)
     {
         HttpClient httpClient = new() { BaseAddress = new Uri("http://bot:8000/") };
 
-        if (documents.Count > 0)
+        if (documents != null && documents.Count > 0)
         {
             var content = new MultipartFormDataContent();
 
@@ -38,10 +39,18 @@ public static class NotificationHandler
                 content.Add(new StreamContent(document.OpenReadStream()), "files", document.FileName);
             }
 
-            var uri = QueryHelpers.AddQueryString("/send/files", "text", text);
-            var response = await httpClient.PostAsync(uri, content);
-
-            return response.IsSuccessStatusCode;
+            if (isNotification)
+            {
+                var uri = QueryHelpers.AddQueryString($"/send/files", "text", text);
+                var response = await httpClient.PostAsync(uri, content);
+                return response.IsSuccessStatusCode;
+            }
+            else
+            {
+                var uri = QueryHelpers.AddQueryString($"/chat_student/{chatId}/files", "text", text);
+                var response = await httpClient.PostAsync(uri, content);
+                return response.IsSuccessStatusCode;
+            }
         }
         else
         {
@@ -51,10 +60,18 @@ public static class NotificationHandler
                 text = text,
             };
 
-            var uri = QueryHelpers.AddQueryString($"/send/{chatId}", "text", text);
-            var response = await httpClient.PostAsJsonAsync(uri, message);
-
-            return response.IsSuccessStatusCode;
+            if (isNotification)
+            {
+                var uri = QueryHelpers.AddQueryString($"/send/{chatId}", "text", text);
+                var response = await httpClient.PostAsJsonAsync(uri, message);
+                return response.IsSuccessStatusCode;
+            }
+            else
+            {
+                var uri = QueryHelpers.AddQueryString($"/chat_student/{chatId}/text", "text", text);
+                var response = await httpClient.PostAsJsonAsync(uri, message);
+                return response.IsSuccessStatusCode;
+            }
         }
     }
 

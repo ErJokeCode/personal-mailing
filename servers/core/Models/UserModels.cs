@@ -23,6 +23,7 @@ public class ActiveStudent
     public string Date { get; set; }
     public string Email { get; set; }
     public string ChatId { get; set; }
+    public string AdminChatId { get; set; }
 
     public List<string> OnboardStatus { get; set; } = [];
 

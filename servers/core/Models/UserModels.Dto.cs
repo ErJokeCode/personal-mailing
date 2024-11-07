@@ -32,6 +32,7 @@ public class ActiveStudentDto : IMappable<ActiveStudentDto, ActiveStudent>
     public Guid Id { get; set; }
     public string Email { get; set; }
     public string ChatId { get; set; }
+    public string AdminChatId { get; set; } = null;
     public string Date { get; set; }
 
     public List<string> OnboardStatus { get; set; } = [];
@@ -40,11 +41,11 @@ public class ActiveStudentDto : IMappable<ActiveStudentDto, ActiveStudent>
 
     public static ActiveStudentDto Map(ActiveStudent orig)
     {
-        return new ActiveStudentDto()
-        {
+        return new ActiveStudentDto() {
             Id = orig.Id,
             Email = orig.Email,
             ChatId = orig.ChatId,
+            AdminChatId = orig.AdminChatId,
             Info = orig.Student,
             Date = orig.Date,
             OnboardStatus = orig.OnboardStatus,

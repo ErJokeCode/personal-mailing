@@ -16,6 +16,9 @@ public static class StudentRoute
         group.MapPut("/addOnboard/{id}", StudentHandler.AddOnboardStatus)
             .RequireAuthorization(Permissions.CreateAdminsPolicy);
 
+        group.MapPut("/addChat/{id}", StudentHandler.AddCuratorChat)
+            .RequireAuthorization(Permissions.CreateAdminsPolicy);
+
         group.MapGet("/{id}", StudentHandler.GetStudent).RequireAuthorization(Permissions.ViewPolicy);
         group.MapGet("/{id}/chats", ChatHandler.GetStudentChats).RequireAuthorization(Permissions.ViewPolicy);
         group.MapGet("/{id}/courses", StudentHandler.GetStudentCourses).RequireAuthorization(Permissions.ViewPolicy);

@@ -48,8 +48,7 @@ public static class StudentHandler
         db.ActiveStudents.Add(activeStudent);
         await db.SaveChangesAsync();
 
-        await endpoint.Publish<NewStudentAuthed>(new()
-        {
+        await endpoint.Publish<NewStudentAuthed>(new() {
             ActiveStudent = activeStudent,
         });
 
@@ -116,14 +115,29 @@ public static class StudentHandler
 
         return Results.Ok(dtos);
     }
+
+    public static async Task<IResult> AddCuratorChat(Guid id, string chatId, CoreDb db)
+    {
+        var activeStudent = db.ActiveStudents.Find(id);
+
+        if (activeStudent == null)
+        {
+            return Results.NotFound("Student not found");
+        }
+
+        activeStudent.AdminChatId = chatId;
+
+        db.SaveChangesAsync();
+
+        return Results.Ok();
+    }
 }
 
 public static class ActiveStudentExtensions
 {
     public static async Task<bool> IncludeStudent(this ActiveStudent active)
     {
-        var query = new Dictionary<string, string>
-        {
+        var query = new Dictionary<string, string> {
             ["email"] = active.Email,
         };
 
