@@ -1,13 +1,16 @@
 <script>
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import http from "src/utility/http";
+    import { signal } from "src/utility/signal";
 
     export let studentId;
 
     let content = "";
     let status = http.status();
     let messages = [];
-    let chatArea = document.querySelector(".offset");
+    let chatArea;
+    let student = {};
+    let admin = {};
 
     async function get_messages() {
         let json =
@@ -15,13 +18,10 @@
                 `/core/chat/admin-with/${studentId}`,
                 http.status(),
             )) ?? undefined;
+        student = json?.student ?? {};
+        admin = json?.admin ?? {};
         messages = json?.messages ?? [];
     }
-
-    onMount(async () => {
-        await get_messages();
-        chatArea.scrollTo(0, chatArea.scrollHeight);
-    });
 
     async function send_message() {
         status = status.start_load();
@@ -35,25 +35,44 @@
         status = status.end_load();
 
         await get_messages();
+        chatArea.scrollTo(0, chatArea.scrollHeight);
+    }
+
+    onMount(async () => {
+        await get_messages();
 
         chatArea.scrollTo(0, chatArea.scrollHeight);
+
+        signal.on("StudentSentMessage", handle_student_message);
+    });
+
+    onDestroy(async () => {
+        signal.off("StudentSentMessage", handle_student_message);
+    });
+
+    async function handle_student_message(message) {
+        if (message.student.id == studentId) {
+            await get_messages();
+
+            chatArea.scrollTo(0, chatArea.scrollHeight);
+        }
     }
 </script>
 
 <div class="wrapper">
     <div class="chats" bind:this={chatArea}>
         {#each messages as message}
-            {#if message.sender == "Student"}
+            {#if message.sender == "Admin"}
                 <article class="right">
                     <header>
-                        {message.sender}
+                        {admin.email}
                     </header>
                     {message.content}
                 </article>
             {:else}
                 <article>
                     <header>
-                        {message.sender}
+                        {student.email}
                     </header>
                     {message.content}
                 </article>

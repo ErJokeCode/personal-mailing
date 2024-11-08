@@ -25,7 +25,7 @@ public static class StudentHandler
         public string ChatId { get; set; }
     }
 
-    public static async Task<IResult> AuthStudent(AuthDetails details, IPublishEndpoint endpoint, CoreDb db)
+    public static async Task<IResult> AuthStudent(AuthDetails details, CoreDb db)
     {
         var activeStudent = db.ActiveStudents.SingleOrDefault(a => a.Email == details.Email);
 
@@ -47,10 +47,6 @@ public static class StudentHandler
 
         db.ActiveStudents.Add(activeStudent);
         await db.SaveChangesAsync();
-
-        await endpoint.Publish<NewStudentAuthed>(new() {
-            ActiveStudent = activeStudent,
-        });
 
         var dto = ActiveStudentDto.Map(activeStudent);
         return Results.Created("", dto);
@@ -137,7 +133,8 @@ public static class ActiveStudentExtensions
 {
     public static async Task<bool> IncludeStudent(this ActiveStudent active)
     {
-        var query = new Dictionary<string, string> {
+        var query = new Dictionary<string, string>
+        {
             ["email"] = active.Email,
         };
 

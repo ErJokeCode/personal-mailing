@@ -1,9 +1,11 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Core.Messages;
 using Core.Models;
 using Core.Models.Dto;
 using Core.Utility;
+using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -118,7 +120,8 @@ public static class ChatHandler
         return Results.Ok(ChatDto.Map(chat));
     }
 
-    public static async Task<IResult> StudentSendToAdmin(string content, Guid studentId, string adminId, CoreDb db)
+    public static async Task<IResult> StudentSendToAdmin(string content, Guid studentId, string adminId,
+                                                         IPublishEndpoint endpoint, CoreDb db)
     {
         var admin = db.Users.Find(adminId);
 
@@ -162,6 +165,13 @@ public static class ChatHandler
         chat.Messages.Add(message);
 
         await db.SaveChangesAsync();
+
+        await endpoint.Publish(new StudentSentMessage()
+        {
+            Admin = AdminUserDto.Map(admin),
+            Message = MessageDto.Map(message),
+            Student = ActiveStudentDto.Map(activeStudent)
+        });
 
         return Results.Ok();
     }

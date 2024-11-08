@@ -21,7 +21,7 @@ public static class Program
         var app = builder.Build();
         await app.InitialzieServices();
 
-        AuthConsumer.Hub = app.Services.GetService<IHubContext<SignalHub>>();
+        ChatConsumer.Hub = app.Services.GetService<IHubContext<SignalHub>>();
 
         app.MapStudentRoutes();
         app.MapAdminRoutes();

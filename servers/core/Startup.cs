@@ -78,7 +78,7 @@ public static class Startup
 
         Action<IBusRegistrationConfigurator> busOptions = options =>
         {
-            options.AddConsumer<AuthConsumer.NewStudentAuthedConsumer>();
+            options.AddConsumer<ChatConsumer.StudentSentMessageConsumer>();
 
             Action<IBusRegistrationContext, IRabbitMqBusFactoryConfigurator> busContext = (context, cfg) =>
             {
@@ -131,8 +131,11 @@ public static class Startup
         app.UseHttpLogging();
         app.UseCors();
         app.MapCustomIdentityApi<AdminUser>();
-        app.MapReverseProxy();
 
+        app.UseAuthentication();
+        app.UseAuthorization();
+
+        app.MapReverseProxy();
         app.MapHub<SignalHub>("/signal");
     }
 

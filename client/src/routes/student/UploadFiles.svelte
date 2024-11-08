@@ -2,17 +2,15 @@
     import FileUpload from "src/components/FileUpload.svelte";
 </script>
 
-<main>
-    <FileUpload label="Students" url="/parser/upload/student" />
+<FileUpload label="Students" url="/parser/upload/student" />
 
-    <hr />
+<hr />
 
-    <FileUpload label="Modeus" url="/parser/upload/choice_in_modeus" />
+<FileUpload label="Modeus" url="/parser/upload/choice_in_modeus" />
 
-    <hr />
+<hr />
 
-    <FileUpload label="Courses" url="/parser/upload/report_online_course" />
-</main>
+<FileUpload label="Courses" url="/parser/upload/report_online_course" />
 
 <style>
 </style>
