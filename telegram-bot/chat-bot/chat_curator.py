@@ -1,10 +1,12 @@
-from aiogram import Bot, Dispatcher, types
+from aiogram import F, Bot, Dispatcher, types
 from aiogram.filters.command import Command
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from contextlib import asynccontextmanager
 from aiogram.types import Update
+from aiogram.types import ChatMemberUpdated
+from aiogram.filters import IS_MEMBER, IS_NOT_MEMBER, ChatMemberUpdatedFilter
 from aiogram.fsm.storage.redis import RedisStorage
 
 import aiohttp
@@ -20,7 +22,20 @@ storage = RedisStorage.from_url(URL_REDIS)
 bot = Bot(token=TOKEN_CHAT_CURATOR)
 dp = Dispatcher(storage=storage)
 
-@dp.message(Command("start"))
+
+
+@dp.message(Command("start"), F.chat.type.in_({"group", "supergroup"}) & F.from_user.id == 1362536052)
+async def all_message_in_group(message: types.Message, state: FSMContext):
+    await message.answer(f"Отправить данные о чате на сервер для добавления информации в бота\n\nИнформация:\n{message.chat.full_name}\n{await message.bot.export_chat_invite_link(message.chat.id)}")
+
+@dp.chat_member(ChatMemberUpdatedFilter(IS_NOT_MEMBER >> IS_MEMBER))
+async def all_message_in_group(event: ChatMemberUpdated, state: FSMContext):
+    await event.answer("Отправить данные на сервер")
+
+
+
+
+@dp.message(Command("start"), F.chat.type.in_({"private"}))
 async def cmd_start(message: types.Message, state: FSMContext):
     # await state.clear()
     user_data = await state.get_data()
@@ -37,7 +52,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
                 else:
                     await message.answer("Пожалуйста нажми ещё раз /start")
 
-@dp.message()
+@dp.message(F.chat.type.in_({"private"}))
 async def all_message(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
     user_id = user_data.get("user_id")
@@ -64,7 +79,6 @@ async def all_message(message: types.Message, state: FSMContext):
                     msg = await message.answer("Неполучилось доставить сообщение куратору, попробуй ещё раз")
                     await asyncio.sleep(5)
                     await msg.delete()
-        
     
 
 async def main():
