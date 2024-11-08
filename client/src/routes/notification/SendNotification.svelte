@@ -48,17 +48,17 @@
 </script>
 
 <label>
-    Content:
+    Содержание:
     <input type="text" bind:value={content} />
 </label>
 
 <label>
-    Files:
+    Файлы:
     <input type="file" multiple bind:files />
 </label>
 
 <button on:click={send} aria-busy={sendStatus.load}
-    >{sendStatus.value} Send</button
+    >{sendStatus.value} Отправить</button
 >
 
 <hr />
@@ -66,9 +66,9 @@
 <table aira-busy={studentStatus.load}>
     <thead>
         <tr>
-            <th>Select</th>
-            <th>Id</th>
-            <th>Email</th>
+            <th>Выбрать</th>
+            <th>Айди</th>
+            <th>Почта</th>
         </tr>
     </thead>
     <tbody>

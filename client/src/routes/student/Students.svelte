@@ -35,23 +35,23 @@
 </script>
 
 <div class="grid">
-    <h2>All Students</h2>
-    <button on:click={() => toPage(curPage - 1)}>Prev</button>
+    <h2>Все студенты</h2>
+    <button on:click={() => toPage(curPage - 1)}>&lt</button>
     <select name="select" aria-label="Select" bind:this={select}>
         {#each [...Array(maxPage + 1).keys()] as page}
             <option on:click={() => toPage(page)}>{page}</option>
         {/each}
     </select>
-    <button on:click={() => toPage(curPage + 1)}>Next</button>
+    <button on:click={() => toPage(curPage + 1)}>&gt</button>
 </div>
 
 <table aria-busy={status.load} class="striped">
     <thead>
         <tr>
-            <th>Email</th>
-            <th>Personal Number</th>
-            <th>Name</th>
-            <th>Surname</th>
+            <th>Почта</th>
+            <th>Номер студенческого</th>
+            <th>Имя</th>
+            <th>Фамилия</th>
         </tr>
     </thead>
     <tbody>

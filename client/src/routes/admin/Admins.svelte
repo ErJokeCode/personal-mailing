@@ -17,12 +17,13 @@
     }
 </script>
 
-<h2>Admins:</h2>
+<h2>Админы</h2>
+
 <table aria-busy={status.load}>
     <thead>
         <tr>
-            <th>Email</th>
-            <th>Date</th>
+            <th>Почта</th>
+            <th>Дата</th>
         </tr>
     </thead>
     {#each admins as admin}

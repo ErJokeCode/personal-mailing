@@ -17,13 +17,13 @@
     }
 </script>
 
-<h2>Your Chats:</h2>
+<h2>Мои чаты</h2>
 
 <table aria-busy={status.load}>
     <thead>
         <tr>
-            <th>Chat</th>
-            <th>Email</th>
+            <th>Чат</th>
+            <th>Почта</th>
         </tr>
     </thead>
     <tbody>

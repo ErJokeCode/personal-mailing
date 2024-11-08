@@ -18,13 +18,13 @@
     }
 </script>
 
-<h2>Active Students</h2>
+<h2>Активные студенты</h2>
 
 <table aira-busy={studentStatus.load}>
     <thead>
         <tr>
-            <th>Id</th>
-            <th>Email</th>
+            <th>Айди</th>
+            <th>Почта</th>
         </tr>
     </thead>
     <tbody>

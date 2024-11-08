@@ -5,27 +5,27 @@
 
 <aside class="pico-background-slate-50">
     <nav class="container">
-        <Accordion summary="Students">
-            <li><Link to="/student/upload">Upload Files</Link></li>
-            <li><Link to="/student">All Students</Link></li>
-            <li><Link to="/student/active">Active Students</Link></li>
+        <Accordion summary="Студенты">
+            <li><Link to="/student/upload">Загрузить файлы</Link></li>
+            <li><Link to="/student">Все студенты</Link></li>
+            <li><Link to="/student/active">Активные студенты</Link></li>
         </Accordion>
 
-        <Accordion summary="Notifications">
+        <Accordion summary="Рассылки">
             <li>
-                <Link to="/notification/send">Send Notification</Link>
-                <Link to="/notification">Your Notifications</Link>
+                <Link to="/notification/send">Отправить рассылку</Link>
+                <Link to="/notification">Мои рассылки</Link>
             </li>
         </Accordion>
 
-        <Accordion summary="Chats">
-            <li><Link to="/chat">Your Chats</Link></li>
+        <Accordion summary="Чаты">
+            <li><Link to="/chat">Мои чаты</Link></li>
         </Accordion>
 
-        <Accordion summary="Admins">
-            <li><Link to="/admin">All Admins</Link></li>
+        <Accordion summary="Админы">
+            <li><Link to="/admin">Все админы</Link></li>
             <li>
-                <Link to="/admin/create">Create Admin</Link>
+                <Link to="/admin/create">Создать админа</Link>
             </li>
         </Accordion>
     </nav>

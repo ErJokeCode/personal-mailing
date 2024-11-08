@@ -30,17 +30,17 @@
 
 <form>
     <label>
-        Email
+        Почта
         <input type="text" bind:value={email} />
     </label>
 
     <label>
-        Password
+        Пароль
         <input type="text" bind:value={password} />
     </label>
 
     <button type="button" on:click={login} aria-busy={status.load}
-        >{status.value} Login
+        >{status.value} Логин
     </button>
 </form>
 

@@ -2,7 +2,7 @@
     import { admin } from "src/utility/store";
 </script>
 
-<h2>Profile</h2>
+<h2>Профиль</h2>
 
 <article>
     <header>{$admin.email}</header>

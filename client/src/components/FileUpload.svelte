@@ -28,7 +28,7 @@
     </label>
 
     <button on:click={send_students} aria-busy={status.load}>
-        {status.value} Upload
+        {status.value} Загрузить
     </button>
 </fieldset>
 

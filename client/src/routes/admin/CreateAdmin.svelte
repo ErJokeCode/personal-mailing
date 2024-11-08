@@ -20,16 +20,16 @@
 </script>
 
 <label>
-    Email
+    Почта
     <input type="text" bind:value={email} />
 </label>
 
 <label>
-    Password
+    Пароль
     <input type="password" bind:value={password} />
 </label>
 
-<button on:click={create} aria-busy={status.load}>{status.value} Create</button>
+<button on:click={create} aria-busy={status.load}>{status.value} Создать</button>
 
 <style>
 </style>

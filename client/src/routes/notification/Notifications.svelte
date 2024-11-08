@@ -18,13 +18,14 @@
     }
 </script>
 
-<h2>Your Notifications</h2>
+<h2>Мои рассылки</h2>
+
 <table aria-busy={status.load}>
     <thead>
         <tr>
-            <th>Content</th>
-            <th>Date</th>
-            <th>Sent To</th>
+            <th>Содержание</th>
+            <th>Дата</th>
+            <th>Отправлено</th>
         </tr>
     </thead>
     <tbody>

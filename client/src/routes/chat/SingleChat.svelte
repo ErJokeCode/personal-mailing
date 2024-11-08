@@ -38,6 +38,12 @@
         chatArea.scrollTo(0, chatArea.scrollHeight);
     }
 
+    async function handle_keypress(event) {
+        if (event.key == "Enter") {
+            send_message();
+        }
+    }
+
     onMount(async () => {
         await get_messages();
 
@@ -82,7 +88,11 @@
 
     <footer>
         <fieldset class="container" role="group">
-            <input bind:value={content} type="text" />
+            <input
+                bind:value={content}
+                type="text"
+                on:keypress={handle_keypress}
+            />
             <button aria-busy={status.load} on:click={send_message}>Send</button
             >
             {status.value}
