@@ -1,0 +1,19 @@
+meta {
+  name: auth-student
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{base_api}}/core/student/auth
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "rere@urfu.me",
+    "personal_number": "101",
+    "chat_id": ""
+  }
+}

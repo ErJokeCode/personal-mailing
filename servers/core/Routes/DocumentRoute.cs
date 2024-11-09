@@ -1,6 +1,7 @@
 using Core.Handlers;
 using Core.Identity;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
 
 namespace Core.Routes;
 
@@ -10,7 +11,14 @@ public static class DocumentRoute
     {
         var group = app.MapGroup("/core/document");
 
-        group.MapGet("/{id}", DocumentHandler.GetDocument).RequireAuthorization(Permissions.ViewPolicy);
-        group.MapGet("/{id}/data", DocumentHandler.GetDocumentData).RequireAuthorization(Permissions.ViewPolicy);
+        MapGet(group);
+    }
+
+    public static void MapGet(RouteGroupBuilder group)
+    {
+        var getGroup = group.MapGroup("/").RequireAuthorization(Permissions.ViewPolicy);
+
+        getGroup.MapGet("/{id}", DocumentHandler.GetDocument);
+        getGroup.MapGet("/{id}/data", DocumentHandler.GetDocumentData);
     }
 }

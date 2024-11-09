@@ -1,0 +1,19 @@
+meta {
+  name: student-send
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{base_api}}/core/chat/studentSend
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "content": "Ответ",
+    "studentId": "cabfa570-d6f3-4156-9723-3222a7458d66",
+    "adminId": "124e363a-ad66-439e-ba6e-bd73074439bd"
+  }
+}

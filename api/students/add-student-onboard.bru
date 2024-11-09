@@ -1,0 +1,17 @@
+meta {
+  name: add-student-onboard
+  type: http
+  seq: 8
+}
+
+put {
+  url: {{base_api}}/core/student/addOnboard/411628cb-d1fb-4aa1-82ed-d44516539234
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "status": "Первый шаг"
+  }
+}

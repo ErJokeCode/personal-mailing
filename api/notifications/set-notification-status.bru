@@ -1,0 +1,18 @@
+meta {
+  name: set-notification-status
+  type: http
+  seq: 6
+}
+
+put {
+  url: {{base_api}}/core/notification/1/setStatus
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "studentId": "cabfa570-d6f3-4156-9723-3222a7458d66",
+    "code": "1"
+  }
+}

@@ -1,6 +1,7 @@
 using Core.Handlers;
 using Core.Identity;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
 
 namespace Core.Routes;
 
@@ -10,16 +11,30 @@ public static class NotificationRoute
     {
         var group = app.MapGroup("/core/notification");
 
+        MapGet(group);
+        MapPost(group);
+        MapPut(group);
+    }
+
+    public static void MapGet(RouteGroupBuilder group)
+    {
+        var getGroup = group.MapGroup("/").RequireAuthorization(Permissions.ViewPolicy);
+
+        getGroup.MapGet("/", NotificationHandler.GetAllNotifications);
+
+        getGroup.MapGet("/{id}", NotificationHandler.GetNotification);
+    }
+
+    public static void MapPost(RouteGroupBuilder group)
+    {
         group.MapPost("/", NotificationHandler.SendNotification)
             .RequireAuthorization(Permissions.SendNotificationsPolicy)
             .DisableAntiforgery();
+    }
 
-
-        group.MapGet("/", NotificationHandler.GetAllNotifications).RequireAuthorization(Permissions.ViewPolicy);
-
-        group.MapGet("/{id}", NotificationHandler.GetNotification).RequireAuthorization(Permissions.ViewPolicy);
-
-        group.MapPut("/{id}/set-status", NotificationHandler.SetNotificationStatus)
+    public static void MapPut(RouteGroupBuilder group)
+    {
+        group.MapPut("/{id}/setStatus", NotificationHandler.SetNotificationStatus)
             .RequireAuthorization(Permissions.SendNotificationsPolicy);
     }
 }

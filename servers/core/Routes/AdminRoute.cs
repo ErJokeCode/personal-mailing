@@ -1,6 +1,7 @@
 using Core.Handlers;
 using Core.Identity;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
 
 namespace Core.Routes;
 
@@ -10,15 +11,26 @@ public static class AdminRoute
     {
         var group = app.MapGroup("/core/admin");
 
-        group.MapGet("/", AdminHandler.GetAllAdmins).RequireAuthorization(Permissions.ViewPolicy);
-        group.MapGet("/me", AdminHandler.GetAdminMe).RequireAuthorization(Permissions.ViewPolicy);
-        group.MapGet("/by-email/{email}", AdminHandler.GetAdminByEmail).RequireAuthorization(Permissions.ViewPolicy);
+        MapGet(group);
+        MapPost(group);
+    }
 
-        group.MapGet("/notifications", NotificationHandler.GetAdminNotifications)
-            .RequireAuthorization(Permissions.ViewPolicy);
-        group.MapGet("/chats", ChatHandler.GetAdminChats).RequireAuthorization(Permissions.ViewPolicy);
+    public static void MapGet(RouteGroupBuilder group)
+    {
+        var getGroup = group.MapGroup("/").RequireAuthorization(Permissions.ViewPolicy);
 
-        group.MapPost("/create", AdminHandler.AddNewAdmin).RequireAuthorization(Permissions.CreateAdminsPolicy);
-        group.MapGet("/{id}", AdminHandler.GetAdmin).RequireAuthorization(Permissions.ViewPolicy);
+        getGroup.MapGet("/", AdminHandler.GetAllAdmins);
+        getGroup.MapGet("/me", AdminHandler.GetAdminMe);
+        getGroup.MapGet("/byEmail/{email}", AdminHandler.GetAdminByEmail);
+
+        getGroup.MapGet("/chats", AdminHandler.GetAdminChats);
+        getGroup.MapGet("/notifications", AdminHandler.GetAdminNotifications);
+
+        getGroup.MapGet("/{id}", AdminHandler.GetAdmin);
+    }
+
+    public static void MapPost(RouteGroupBuilder group)
+    {
+        group.MapPost("/create", AdminHandler.AddAdmin).RequireAuthorization(Permissions.CreateAdminsPolicy);
     }
 }

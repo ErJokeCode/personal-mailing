@@ -1,0 +1,18 @@
+meta {
+  name: create-admin
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{base_api}}/core/admin/create
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "newadmin",
+    "password": "newadmin"
+  }
+}

@@ -1,0 +1,32 @@
+meta {
+  name: send-notification
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{base_api}}/core/notification
+  body: multipartForm
+  auth: none
+}
+
+body:json {
+  {
+    "content": "Важное сообщение!",
+    "studentIds": [
+      "75d83c02-cc9f-4ad4-8241-5ad3a52c43ac"
+    ]
+  }
+}
+
+body:multipart-form {
+  body: '''
+    {
+      "content": "Важное сообщение!",
+      "studentIds": [
+        "cabfa570-d6f3-4156-9723-3222a7458d66"
+      ]
+    }
+  '''
+  documents: @file(C:\Users\eriks\Downloads\05 Нотации UML_Диаграммы_Приложение (1).docx)
+}
