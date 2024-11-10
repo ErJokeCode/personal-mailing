@@ -10,6 +10,7 @@ import keyboards.main_menu as keyboard
 from states import Info_teaching, LKStates
 from texts.error import Registration, Input
 from handlers.information_teaching import show_info_teaching
+import texts.main_menu as text_main_menu
 
 router = Router()
 
@@ -68,7 +69,7 @@ async def process_course_info(callback_query: types.CallbackQuery, state: FSMCon
                         if response.status == 200:
                             info_course = await response.json()
                             await callback_query.message.delete()
-                            await callback_query.message.answer(f"Информация о курсе {info_course['name']}\n{info_course['university']}\n{info_course['date_start']}\n{info_course['deadline']}\n{info_course['info']}\n\n Баллы: {online_courses[course_id]['score']}\n\n Если возникли вопросы по входу на онлайн курс, изучите раздел информация об обучении/онлайн курсы", reply_markup=keyboard.back_to_courses())
+                            await callback_query.message.answer(text_main_menu.create_text_online_course(info_course, online_courses[course_id]['score']), reply_markup=keyboard.back_to_courses())
                         else:
                             not_info = await callback_query.message.answer("Пока нет информации, подожтите немного")
                             await sleep(5)
@@ -78,7 +79,7 @@ async def process_course_info(callback_query: types.CallbackQuery, state: FSMCon
                         if response.status == 200:
                             info_course = await response.json()
                             await callback_query.message.delete()
-                            await callback_query.message.answer(f"Информация о курсе {info_course['name']}\n{info_course['university']}\n{info_course['date_start']}\n{info_course['deadline']}\n{info_course['info']}\n\n Баллы: {online_courses[course_id]['score']}\n\n Если возникли вопросы по входу на онлайн курс, изучите раздел информация об обучении/онлайн курсы", reply_markup=keyboard.back_to_courses())
+                            await callback_query.message.answer(text_main_menu.create_text_online_course(info_course, online_courses[course_id]['score']), reply_markup=keyboard.back_to_courses())
                         else:
                             not_info = await callback_query.message.answer("Пока нет информации, подожтите немного")
                             await sleep(5)
@@ -96,20 +97,10 @@ async def process_subjects(callback_query: types.CallbackQuery, state: FSMContex
     if user_data.get('user_id'):
         subjects = user_data.get("subjects")
         await callback_query.message.delete()
-        await callback_query.message.answer(create_text_subject(subjects), reply_markup=keyboard.back_to_main())
+        await callback_query.message.answer(text_main_menu.create_text_subjects(subjects), reply_markup=keyboard.back_to_main())
     else:
         await callback_query.message.delete()
         await callback_query.message.answer(Registration.no())
-
-def create_text_subject(data: list):
-    res = ""
-    i = 1
-    for item in data:
-        item = item
-        full_name = item.get("fullName")
-        res += f"{i}. {full_name}\n\n"
-        i += 1
-    return res
 
 
 @router.callback_query(lambda c: c.data == "faq")
