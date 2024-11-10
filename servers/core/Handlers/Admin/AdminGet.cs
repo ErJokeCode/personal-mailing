@@ -71,13 +71,19 @@ public static partial class AdminHandler
         }
 
         var admin = await db.Users.Include(a => a.Chats)
-                        .ThenInclude(ch => ch.Messages.OrderByDescending(m => m.Date).Take(1))
+                        .ThenInclude(ch => ch.Messages)
                         .ThenInclude(m => m.Status)
                         .Include(a => a.Chats)
                         .ThenInclude(ch => ch.ActiveStudent)
                         .SingleOrDefaultAsync(a => a.Id == adminId);
 
-        return Results.Ok(ChatDto.Maps(admin.Chats.ToList()));
+        var dtos = ChatDto.Maps(admin.Chats.ToList());
+
+        return Results.Ok(dtos.Select(dto =>
+                                      {
+                                          dto.Messages = dto.Messages.OrderByDescending(m => m.Date).Take(1).ToList();
+                                          return dto;
+                                      }));
     }
 
     public static async Task<IResult> GetAdminNotifications(HttpContext context, UserManager<AdminUser> userManager,

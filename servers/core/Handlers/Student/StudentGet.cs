@@ -54,8 +54,6 @@ public static partial class StudentHandler
     public static async Task<IResult> GetStudentChats(Guid id, CoreDb db)
     {
         var activeStudent = await db.ActiveStudents.Include(a => a.Chats)
-                                .ThenInclude(ch => ch.Messages.OrderByDescending(m => m.Date).Take(1))
-                                .ThenInclude(m => m.Status)
                                 .Include(a => a.Chats)
                                 .ThenInclude(ch => ch.Admin)
                                 .SingleOrDefaultAsync(a => a.Id == id);

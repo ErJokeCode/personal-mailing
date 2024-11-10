@@ -72,6 +72,11 @@ public static partial class ChatHandler
 
         var sent = await BotHandler.SendToBot(activeStudent.AdminChatId, details.Content, documents, false);
 
+        if (sent)
+        {
+            message.Status.SetSent();
+        }
+
         await db.SaveChangesAsync();
 
         await DocumentHandler.StoreDocuments(documents, message.Id, db, false);
@@ -130,7 +135,7 @@ public static partial class ChatHandler
             Status = new MessageStatus(),
         };
 
-        message.Status.SetLost();
+        message.Status.SetSent();
         chat.Messages.Add(message);
 
         await db.SaveChangesAsync();

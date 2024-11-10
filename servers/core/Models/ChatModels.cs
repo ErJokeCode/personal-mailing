@@ -40,4 +40,3 @@ public class MessageStatus : BaseStatus
     public int MessageId { get; set; }
     public Message Message { get; set; }
 }
-

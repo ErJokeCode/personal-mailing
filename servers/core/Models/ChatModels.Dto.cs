@@ -6,11 +6,13 @@ namespace Core.Models.Dto;
 public class ChatDto : IMappable<ChatDto, Chat>
 {
     public int Id { get; set; }
+    public int UnreadCount { get; set; }
 
     public AdminUserDto Admin { get; set; }
     public ActiveStudentDto Student { get; set; }
 
     public List<MessageDto> Messages { get; set; } = [];
+
     public static ChatDto Map(Chat orig)
     {
         var dto = new ChatDto()
@@ -24,6 +26,8 @@ public class ChatDto : IMappable<ChatDto, Chat>
         {
             dto.Messages.Add(MessageDto.Map(message));
         }
+
+        dto.UnreadCount = dto.Messages.Count(m => m.Status.Code == 0);
 
         return dto;
     }
@@ -43,6 +47,7 @@ public class MessageDto : IMappable<MessageDto, Message>
 
     public string Sender { get; set; }
     public string Receiver { get; set; }
+
     public MessageStatusDto Status { get; set; }
 
     public List<DocumentDto> Documents { get; set; } = [];
