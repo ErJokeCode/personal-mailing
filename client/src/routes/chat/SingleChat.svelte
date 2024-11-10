@@ -15,7 +15,7 @@
     async function get_messages() {
         let json =
             (await http.get(
-                `/core/chat/admin-with/${studentId}`,
+                `/core/chat/adminWith/${studentId}`,
                 http.status(),
             )) ?? undefined;
         student = json?.student ?? {};
@@ -26,8 +26,11 @@
     async function send_message() {
         status = status.start_load();
         await http.post_json(
-            `/core/chat/admin-to-student?studentId=${studentId}&content=${content}`,
-            {},
+            `/core/chat/adminSend`,
+            {
+                studentId,
+                content,
+            },
             status,
         );
 

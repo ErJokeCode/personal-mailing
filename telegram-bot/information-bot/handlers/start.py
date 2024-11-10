@@ -37,8 +37,8 @@ async def cmd_start(message: types.Message, state: FSMContext):
         user_data = await state.get_data()
         body = {
             "email": user_data.get("email"),
-            "personal_number": user_data.get("personal_number"),
-            "chat_id": str(message.chat.id),
+            "personalNumber": user_data.get("personal_number"),
+            "chatId": str(message.chat.id),
         }
         async with aiohttp.ClientSession() as session:
             headers = {"cookie": f"{get_cookie()}"}
@@ -84,8 +84,8 @@ async def process_student_id(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
     body = {
         "email": user_data.get("email"),
-        "personal_number": user_data.get("personal_number"),
-        "chat_id": str(message.chat.id),
+        "personalNumber": user_data.get("personal_number"),
+        "chatId": str(message.chat.id),
     }
     async with aiohttp.ClientSession() as session:
         headers = {"cookie": f"{get_cookie()}"}

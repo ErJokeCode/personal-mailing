@@ -1,5 +1,3 @@
-using System;
-using System.Threading.Tasks;
 using Core.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -11,9 +9,6 @@ namespace Core.Utility;
 [Authorize]
 public class SignalHub : Hub
 {
-    public override async Task OnConnectedAsync()
-    {
-    }
 }
 
 public class CoreDb : IdentityDbContext<AdminUser>

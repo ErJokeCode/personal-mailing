@@ -14,11 +14,7 @@ public static partial class StudentHandler
     public class AuthDetails
     {
         public string Email { get; set; }
-
-        [JsonPropertyName("personal_number")]
         public string PersonalNumber { get; set; }
-
-        [JsonPropertyName("chat_id")]
         public string ChatId { get; set; }
     }
 

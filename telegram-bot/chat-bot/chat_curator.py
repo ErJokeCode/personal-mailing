@@ -31,7 +31,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
         async with aiohttp.ClientSession() as session:
             headers = {"cookie": f"{get_cookie()}"}
 
-            async with session.put(f"{URL_SERVER}/core/student/addChat/{user_id}", headers=headers, params={"chatId": message.chat.id}) as resp:
+            async with session.put(f"{URL_SERVER}/core/student/addChat/{user_id}", headers=headers, json={"chatId": message.chat.id}) as resp:
                 if resp.status == 200:
                     await message.answer("Какой вопрос вас интенресует")
                 else:
@@ -51,7 +51,7 @@ async def all_message(message: types.Message, state: FSMContext):
                 if response_admins.status == 200:
                     admins = await response_admins.json()
 
-                    async with session.post(f"{URL_SERVER}/core/chat/student-to-admin", headers=headers, params={"content": message.text, "studentId": user_id, "adminId": admins[0]["id"]}) as resp:
+                    async with session.post(f"{URL_SERVER}/core/chat/studentSend", headers=headers, json={"content": message.text, "studentId": user_id, "adminId": admins[0]["id"]}) as resp:
                         if resp.status == 200:
                             await message.answer("Сообщение отправлено, ожидайте ответа")
                         else:
