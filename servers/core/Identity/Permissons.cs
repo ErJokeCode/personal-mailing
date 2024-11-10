@@ -1,25 +1,49 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Core.Identity;
 
+public class Permission
+{
+    public string Claim { get; private set; }
+    public string Policy => Claim + "Policy";
+
+    public Permission(string name)
+    {
+        Claim = name;
+    }
+}
+
+public static class RouteHandlerBuilderExtensions
+{
+    public static RouteHandlerBuilder AddPermission(this RouteHandlerBuilder handler, Permission permission)
+    {
+        handler.RequireAuthorization(permission.Policy);
+        return handler;
+    }
+}
+
+public static class RouteGroupBuilderExtensions
+{
+    public static RouteGroupBuilder AddPermission(this RouteGroupBuilder group, Permission permission)
+    {
+        group.RequireAuthorization(permission.Policy);
+        return group;
+    }
+}
+
 public static class Permissions
 {
-    public static string View => "View";
-    public static string ViewPolicy => View + "Policy";
+    public static Permission View => new Permission("View");
+    public static Permission UploadFiles => new Permission("UploadFiles");
+    public static Permission SendNotifications => new Permission("SendNotifications");
+    public static Permission CreateAdmins => new Permission("CreateAdmins");
 
-    public static string UploadFiles => "UploadFiles";
-    public static string UploadFilesPolicy => UploadFiles + "Policy";
-
-    public static string SendNotifications => "SendNotifications";
-    public static string SendNotificationsPolicy => SendNotifications + "Policy";
-
-    public static string CreateAdmins => "CreateAdmins";
-    public static string CreateAdminsPolicy => CreateAdmins + "Policy";
-
-    public static List<string> All => [View, UploadFiles, SendNotifications, CreateAdmins];
+    public static List<Permission> All => [View, UploadFiles, SendNotifications, CreateAdmins];
 }
 
 public static class AuthorizationExtensions
@@ -30,7 +54,7 @@ public static class AuthorizationExtensions
         {
             foreach (var permission in Permissions.All)
             {
-                options.AddPolicy($"{permission}Policy", policy => policy.RequireClaim($"{permission}"));
+                options.AddPolicy(permission.Policy, policy => policy.RequireClaim(permission.Claim));
             }
         };
 

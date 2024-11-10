@@ -11,7 +11,8 @@ namespace Core.Handlers;
 
 public static partial class DocumentHandler
 {
-    public static async Task StoreDocuments(IFormFileCollection documents, int notificationId, CoreDb db)
+    public static async Task StoreDocuments(IFormFileCollection documents, int id, CoreDb db,
+                                            bool isNotification = true)
     {
         foreach (var document in documents)
         {
@@ -21,9 +22,17 @@ public static partial class DocumentHandler
             {
                 Name = document.FileName,
                 MimeType = mimeType,
-                NotificationId = notificationId,
                 InternalName = Guid.NewGuid().ToString(),
             };
+
+            if (isNotification)
+            {
+                newDocument.NotificationId = id;
+            }
+            else
+            {
+                newDocument.MessageId = id;
+            }
 
             var path = Path.Combine(Directory.GetCurrentDirectory(), "Documents", newDocument.InternalName);
             var writeFile = File.Create(path);

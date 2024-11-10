@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Core.Messages;
 using Core.Models;
@@ -8,6 +9,7 @@ using Core.Utility;
 using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Core.Handlers;
@@ -20,9 +22,13 @@ public static partial class ChatHandler
         public Guid StudentId { get; set; }
     }
 
-    public static async Task<IResult> AdminSendToStudent(AdminMessage details, CoreDb db, HttpContext context,
+    public static async Task<IResult> AdminSendToStudent([FromForm] IFormFileCollection documents,
+                                                         [FromForm] string body, CoreDb db, HttpContext context,
                                                          UserManager<AdminUser> userManager)
     {
+        var details = JsonSerializer.Deserialize<AdminMessage>(
+            body, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+
         var adminId = userManager.GetUserId(context.User);
 
         if (adminId == null)
@@ -64,9 +70,11 @@ public static partial class ChatHandler
         message.Status.SetLost();
         chat.Messages.Add(message);
 
-        var sent = await BotHandler.SendToBot(activeStudent.AdminChatId, details.Content, null, false);
+        var sent = await BotHandler.SendToBot(activeStudent.AdminChatId, details.Content, documents, false);
 
         await db.SaveChangesAsync();
+
+        await DocumentHandler.StoreDocuments(documents, message.Id, db, false);
 
         return Results.Ok(MessageDto.Map(message));
     }
@@ -78,8 +86,13 @@ public static partial class ChatHandler
         public string AdminId { get; set; }
     }
 
-    public static async Task<IResult> StudentSendToAdmin(StudentMessage details, IPublishEndpoint endpoint, CoreDb db)
+    public static async Task<IResult> StudentSendToAdmin([FromForm] string body,
+                                                         [FromForm] IFormFileCollection documents,
+                                                         IPublishEndpoint endpoint, CoreDb db)
     {
+        var details = JsonSerializer.Deserialize<StudentMessage>(
+            body, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+
         var admin = db.Users.Find(details.AdminId);
 
         if (details.AdminId == null)
@@ -121,6 +134,8 @@ public static partial class ChatHandler
         chat.Messages.Add(message);
 
         await db.SaveChangesAsync();
+
+        await DocumentHandler.StoreDocuments(documents, message.Id, db, false);
 
         await endpoint.Publish(new StudentSentMessage()
         {

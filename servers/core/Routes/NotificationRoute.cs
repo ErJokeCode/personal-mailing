@@ -18,7 +18,7 @@ public static class NotificationRoute
 
     public static void MapGet(RouteGroupBuilder group)
     {
-        var getGroup = group.MapGroup("/").RequireAuthorization(Permissions.ViewPolicy);
+        var getGroup = group.MapGroup("/").AddPermission(Permissions.View);
 
         getGroup.MapGet("/", NotificationHandler.GetAllNotifications);
 
@@ -28,13 +28,13 @@ public static class NotificationRoute
     public static void MapPost(RouteGroupBuilder group)
     {
         group.MapPost("/", NotificationHandler.SendNotification)
-            .RequireAuthorization(Permissions.SendNotificationsPolicy)
+            .AddPermission(Permissions.SendNotifications)
             .DisableAntiforgery();
     }
 
     public static void MapPut(RouteGroupBuilder group)
     {
         group.MapPut("/{id}/setStatus", NotificationHandler.SetNotificationStatus)
-            .RequireAuthorization(Permissions.SendNotificationsPolicy);
+            .AddPermission(Permissions.SendNotifications);
     }
 }

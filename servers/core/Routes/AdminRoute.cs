@@ -17,7 +17,7 @@ public static class AdminRoute
 
     public static void MapGet(RouteGroupBuilder group)
     {
-        var getGroup = group.MapGroup("/").RequireAuthorization(Permissions.ViewPolicy);
+        var getGroup = group.MapGroup("/").AddPermission(Permissions.View);
 
         getGroup.MapGet("/", AdminHandler.GetAllAdmins);
         getGroup.MapGet("/me", AdminHandler.GetAdminMe);
@@ -31,6 +31,6 @@ public static class AdminRoute
 
     public static void MapPost(RouteGroupBuilder group)
     {
-        group.MapPost("/create", AdminHandler.AddAdmin).RequireAuthorization(Permissions.CreateAdminsPolicy);
+        group.MapPost("/create", AdminHandler.AddAdmin).AddPermission(Permissions.CreateAdmins);
     }
 }

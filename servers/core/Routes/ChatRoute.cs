@@ -18,24 +18,25 @@ public static class ChatRoute
 
     public static void MapGet(RouteGroupBuilder group)
     {
-        var getGroup = group.MapGroup("/").RequireAuthorization(Permissions.ViewPolicy);
+        var getGroup = group.MapGroup("/").AddPermission(Permissions.View);
 
-        getGroup.MapGet("/adminWith/{studentId}", ChatHandler.GetAdminChatWithStudent)
-            .RequireAuthorization(Permissions.ViewPolicy);
+        getGroup.MapGet("/adminWith/{studentId}", ChatHandler.GetAdminChatWithStudent);
     }
 
     public static void MapPost(RouteGroupBuilder group)
     {
         group.MapPost("/adminSend", ChatHandler.AdminSendToStudent)
-            .RequireAuthorization(Permissions.SendNotificationsPolicy);
+            .AddPermission(Permissions.SendNotifications)
+            .DisableAntiforgery();
 
         group.MapPost("/studentSend", ChatHandler.StudentSendToAdmin)
-            .RequireAuthorization(Permissions.SendNotificationsPolicy);
+            .AddPermission(Permissions.SendNotifications)
+            .DisableAntiforgery();
     }
 
     public static void MapPut(RouteGroupBuilder group)
     {
         group.MapPut("/message/{id}/setStatus/{code}", ChatHandler.SetMessageStatus)
-            .RequireAuthorization(Permissions.SendNotificationsPolicy);
+            .AddPermission(Permissions.SendNotifications);
     }
 }

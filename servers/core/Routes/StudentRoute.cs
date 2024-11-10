@@ -18,7 +18,7 @@ public static class StudentRoute
 
     public static void MapGet(RouteGroupBuilder group)
     {
-        var getGroup = group.MapGroup("/").RequireAuthorization(Permissions.ViewPolicy);
+        var getGroup = group.MapGroup("/").AddPermission(Permissions.View);
 
         getGroup.MapGet("/", StudentHandler.GetAllStudents);
         getGroup.MapGet("/{id}", StudentHandler.GetStudent);
@@ -30,15 +30,13 @@ public static class StudentRoute
 
     public static void MapPost(RouteGroupBuilder group)
     {
-        group.MapPost("/auth", StudentHandler.AuthStudent).RequireAuthorization(Permissions.CreateAdminsPolicy);
+        group.MapPost("/auth", StudentHandler.AuthStudent).AddPermission(Permissions.CreateAdmins);
     }
 
     public static void MapPut(RouteGroupBuilder group)
     {
-        group.MapPut("/addOnboard/{id}", StudentHandler.AddOnboardStatus)
-            .RequireAuthorization(Permissions.CreateAdminsPolicy);
+        group.MapPut("/addOnboard/{id}", StudentHandler.AddOnboardStatus).AddPermission(Permissions.CreateAdmins);
 
-        group.MapPut("/addChat/{id}", StudentHandler.AddCuratorChat)
-            .RequireAuthorization(Permissions.CreateAdminsPolicy);
+        group.MapPut("/addChat/{id}", StudentHandler.AddCuratorChat).AddPermission(Permissions.CreateAdmins);
     }
 }

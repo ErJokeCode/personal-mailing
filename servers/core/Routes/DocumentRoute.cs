@@ -16,7 +16,7 @@ public static class DocumentRoute
 
     public static void MapGet(RouteGroupBuilder group)
     {
-        var getGroup = group.MapGroup("/").RequireAuthorization(Permissions.ViewPolicy);
+        var getGroup = group.MapGroup("/").AddPermission(Permissions.View);
 
         getGroup.MapGet("/{id}", DocumentHandler.GetDocument);
         getGroup.MapGet("/{id}/data", DocumentHandler.GetDocumentData);

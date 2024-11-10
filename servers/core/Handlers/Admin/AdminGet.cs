@@ -71,7 +71,7 @@ public static partial class AdminHandler
         }
 
         var admin = await db.Users.Include(a => a.Chats)
-                        .ThenInclude(ch => ch.Messages)
+                        .ThenInclude(ch => ch.Messages.OrderByDescending(m => m.Date).Take(1))
                         .ThenInclude(m => m.Status)
                         .Include(a => a.Chats)
                         .ThenInclude(ch => ch.ActiveStudent)

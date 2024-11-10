@@ -154,6 +154,7 @@ public static class Startup
         var userManager = services.GetRequiredService<UserManager<AdminUser>>();
         var userStore = services.GetRequiredService<IUserStore<AdminUser>>();
         var db = services.GetRequiredService<CoreDb>();
-        await AdminHandler.CreateAdmin("admin", "admin", Permissions.All, userManager, userStore, db);
+        await AdminHandler.CreateAdmin("admin", "admin", Permissions.All.Select(p => p.Claim).ToList(), userManager,
+                                       userStore, db);
     }
 }

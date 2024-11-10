@@ -51,11 +51,15 @@ async def all_message(message: types.Message, state: FSMContext):
                 if response_admins.status == 200:
                     admins = await response_admins.json()
 
-                    async with session.post(f"{URL_SERVER}/core/chat/studentSend", headers=headers, json={"content": message.text, "studentId": user_id, "adminId": admins[0]["id"]}) as resp:
-                        if resp.status == 200:
-                            await message.answer("Сообщение отправлено, ожидайте ответа")
-                        else:
-                            await message.answer("Неполучилось доставить сообщение куратору, попробуй ещё раз")
+                    with aiohttp.MultipartWriter('form-data') as mpwriter:
+                        part = mpwriter.append_json({"content": message.text, "studentId": user_id, "adminId": admins[0]["id"]})
+                        part.set_content_disposition('form-data', name="body")
+
+                        async with session.post(f"{URL_SERVER}/core/chat/studentSend", headers=headers, data=mpwriter) as resp:
+                            if resp.status == 200:
+                                await message.answer("Сообщение отправлено, ожидайте ответа")
+                            else:
+                                await message.answer("Неполучилось доставить сообщение куратору, попробуй ещё раз")
                 else:
                     await message.answer("Неполучилось доставить сообщение куратору, попробуй ещё раз")
         

@@ -47,6 +47,12 @@ public static partial class NotificationHandler
         foreach (var guid in details.StudentIds)
         {
             var activeStudent = db.ActiveStudents.Find(guid);
+
+            if (activeStudent == null)
+            {
+                continue;
+            }
+
             notification.ActiveStudents.Add(activeStudent);
 
             var status = new NotificationStatus()
@@ -56,11 +62,6 @@ public static partial class NotificationHandler
             status.SetLost();
 
             notification.Statuses.Add(status);
-
-            if (activeStudent == null)
-            {
-                continue;
-            }
 
             var sent = await BotHandler.SendToBot(activeStudent.ChatId, notification.Content, documents);
         }
