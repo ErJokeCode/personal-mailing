@@ -24,6 +24,16 @@ class Subject(BaseModel):
     info: str | None = None
 
 
+class OnlineCourseStudent(BaseModel):
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    name: str
+    university: str | None = None
+    date_start: str | None = None
+    deadline: list[str] | None = None
+    info: str | None = None
+    score: str | None = None
+
+
 class Student(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     personal_number: str
@@ -36,18 +46,8 @@ class Student(BaseModel):
     status: bool | None = False
     type_of_cost: str | None = None
     type_of_education: str | None = None
-    subjects: list[object]
-    online_course: list[object]
-
-
-class OnlineCourseStudent(BaseModel):
-    id: Optional[PyObjectId] = Field(alias="_id", default=None)
-    name: str
-    university: str | None = None
-    date_start: str | None = None
-    deadline: list[str] | None = None
-    info: str | None = None
-    score: str | None = None
+    subjects: list[Subject]
+    online_course: list[OnlineCourseStudent]
 
 
 class Course(BaseModel):

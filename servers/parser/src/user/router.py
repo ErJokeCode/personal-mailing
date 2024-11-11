@@ -72,7 +72,9 @@ async def get_student():
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Error DB")
+    
+    users = []
+    for user in collection.find({}):
+        users.append(Student(**user).model_dump())
 
-    users = collection.find({}).to_list()
-
-    return json.loads(json.dumps(users, default=my_handler))
+    return users

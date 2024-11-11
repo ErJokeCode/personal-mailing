@@ -90,8 +90,8 @@ def fill_students(df : DataFrame, collection_subject, collection_student, collec
 
         info_subjects = []
             
-        for choice in choice_subjects:
-            info_subjects.append(collection_subject.find_one({"full_name" : choice})) 
+        for choice_subject in choice_subjects:
+            info_subjects.append(collection_subject.find_one({"full_name" : choice_subject})) 
 
         group = info_student[1]
         speciality = info_student[2] 
