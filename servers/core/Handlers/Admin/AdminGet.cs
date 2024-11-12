@@ -93,7 +93,6 @@ public static partial class AdminHandler
         var admin = await db.Users.Include(a => a.Notifications)
                         .ThenInclude(n => n.ActiveStudents)
                         .Include(a => a.Notifications)
-                        .ThenInclude(n => n.Documents)
                         .Include(a => a.Notifications)
                         .ThenInclude(n => n.Statuses)
                         .SingleOrDefaultAsync(a => a.Id == id);
@@ -102,6 +101,8 @@ public static partial class AdminHandler
         {
             return Results.NotFound("Could not find admin");
         }
+
+        admin.Notifications.IncludeDocuments(db);
 
         var dtos = NotificationDto.Maps((List<Notification>)admin.Notifications);
 

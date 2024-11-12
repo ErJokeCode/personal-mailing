@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using Core.Handlers;
+using Core.Utility;
 
 namespace Core.Models;
 
@@ -26,13 +29,33 @@ public class Message
     public string Sender { get; set; }
     public string Receiver { get; set; }
 
+    public List<int> DocumentIds { get; set; } = [];
+    [NotMapped]
+    public List<Document> Documents { get; } = [];
+
     public int StatusId { get; set; }
     public MessageStatus Status { get; set; }
 
     public int ChatId { get; set; }
     public Chat Chat { get; set; }
+}
 
-    public ICollection<Document> Documents { get; } = [];
+public static class MessageExtensions
+{
+    public static Message IncludeDocuments(this Message message, CoreDb db)
+    {
+        message.Documents.AddRange(DocumentHandler.GetFromIds(message.DocumentIds, db));
+        return message;
+    }
+
+    public static ICollection<Message> IncludeDocuments(this ICollection<Message> messages, CoreDb db)
+    {
+        foreach (var message in messages)
+        {
+            message.IncludeDocuments(db);
+        }
+        return messages;
+    }
 }
 
 public class MessageStatus : BaseStatus

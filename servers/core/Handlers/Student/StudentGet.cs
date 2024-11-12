@@ -81,6 +81,8 @@ public static partial class StudentHandler
             return Results.NotFound("Could not find student");
         }
 
+        activeStudent.Notifications.IncludeDocuments(db);
+
         var dtos = NotificationDto.Maps((List<Notification>)activeStudent.Notifications);
 
         return Results.Ok(dtos);

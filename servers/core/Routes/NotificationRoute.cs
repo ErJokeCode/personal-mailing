@@ -14,6 +14,7 @@ public static class NotificationRoute
         MapGet(group);
         MapPost(group);
         MapPut(group);
+        MapDelete(group);
     }
 
     public static void MapGet(RouteGroupBuilder group)
@@ -21,8 +22,10 @@ public static class NotificationRoute
         var getGroup = group.MapGroup("/").AddPermission(Permissions.View);
 
         getGroup.MapGet("/", NotificationHandler.GetAllNotifications);
+        getGroup.MapGet("/template", NotificationHandler.GetAllTemplates);
 
         getGroup.MapGet("/{id}", NotificationHandler.GetNotification);
+        getGroup.MapGet("/template/{id}", NotificationHandler.GetTemplate);
     }
 
     public static void MapPost(RouteGroupBuilder group)
@@ -30,11 +33,25 @@ public static class NotificationRoute
         group.MapPost("/", NotificationHandler.SendNotification)
             .AddPermission(Permissions.SendNotifications)
             .DisableAntiforgery();
+
+        group.MapPost("/template", NotificationHandler.SaveNotificationTemplate)
+            .AddPermission(Permissions.SendNotifications)
+            .DisableAntiforgery();
     }
 
     public static void MapPut(RouteGroupBuilder group)
     {
+        group.MapPut("/template/{id}", NotificationHandler.UpdateTemplate)
+            .AddPermission(Permissions.SendNotifications)
+            .DisableAntiforgery();
+
         group.MapPut("/{id}/setStatus", NotificationHandler.SetNotificationStatus)
+            .AddPermission(Permissions.SendNotifications);
+    }
+
+    public static void MapDelete(RouteGroupBuilder group)
+    {
+        group.MapDelete("/template/{id}", NotificationHandler.DeleteTemplate)
             .AddPermission(Permissions.SendNotifications);
     }
 }

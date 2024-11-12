@@ -15,8 +15,7 @@ public class ChatDto : IMappable<ChatDto, Chat>
 
     public static ChatDto Map(Chat orig)
     {
-        var dto = new ChatDto()
-        {
+        var dto = new ChatDto() {
             Id = orig.Id,
             Admin = AdminUserDto.Map(orig.Admin),
             Student = ActiveStudentDto.Map(orig.ActiveStudent),
@@ -27,7 +26,7 @@ public class ChatDto : IMappable<ChatDto, Chat>
             dto.Messages.Add(MessageDto.Map(message));
         }
 
-        dto.UnreadCount = dto.Messages.Count(m => m.Status.Code == 0);
+        dto.UnreadCount = dto.Messages.Count(m => m.Sender == "Student" && m.Status.Code == 0);
 
         return dto;
     }
@@ -54,14 +53,9 @@ public class MessageDto : IMappable<MessageDto, Message>
 
     public static MessageDto Map(Message orig)
     {
-        var dto = new MessageDto()
-        {
-            Id = orig.Id,
-            Date = orig.Date,
-            Content = orig.Content,
-            Sender = orig.Sender,
-            Receiver = orig.Receiver,
-            Status = MessageStatusDto.Map(orig.Status)
+        var dto = new MessageDto() {
+            Id = orig.Id,         Date = orig.Date,         Content = orig.Content,
+            Sender = orig.Sender, Receiver = orig.Receiver, Status = MessageStatusDto.Map(orig.Status)
         };
 
         foreach (var document in orig.Documents)
@@ -86,8 +80,7 @@ public class MessageStatusDto : IMappable<MessageStatusDto, MessageStatus>
 
     public static MessageStatusDto Map(MessageStatus orig)
     {
-        return new MessageStatusDto()
-        {
+        return new MessageStatusDto() {
             Code = orig.Code,
             Short = orig.Short,
             Description = orig.Description,
