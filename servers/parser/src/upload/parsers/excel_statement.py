@@ -3,7 +3,7 @@ from fastapi import HTTPException, UploadFile
 import pandas as pd
 
 from config import DB
-from src.schemas import Course, OnlineCourse, StudentCourse
+from src.schemas import Course, OnlineCourseInDB, StudentCourse
 
 
 def update_report(file: UploadFile):
@@ -86,8 +86,8 @@ def create_student_course(item, course, email, group) -> StudentCourse:
         courses=[course]
     )
 
-def create_info_online_course(collection_course, name, university) -> OnlineCourse:
-    inline_course = OnlineCourse(name=name, university=university)
+def create_info_online_course(collection_course, name, university) -> OnlineCourseInDB:
+    inline_course = OnlineCourseInDB(name=name, university=university)
     res = collection_course.insert_one(inline_course.model_dump(by_alias=True, exclude=["id"]))
     return inline_course
 

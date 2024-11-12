@@ -1,13 +1,13 @@
-from typing import Annotated, Optional
+from typing import Annotated, List, Optional
 from pydantic import AfterValidator, BaseModel, BeforeValidator, Field
 
-from bson import ObjectId
+from bson import DBRef, ObjectId
 
 
 PyObjectId = Annotated[str, BeforeValidator(str)]
 
 
-class OnlineCourse(BaseModel):
+class OnlineCourseInDB(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     name: str
     university: str | None = None
@@ -22,6 +22,16 @@ class Subject(BaseModel):
     name: str
     form_education: str
     info: str | None = None
+    online_course: OnlineCourseInDB | None = None
+
+
+class SubjectInBD(BaseModel):
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    full_name: str
+    name: str
+    form_education: str
+    info: str | None = None
+    online_course_id: PyObjectId | None = None
 
 
 class OnlineCourseStudent(BaseModel):
@@ -47,6 +57,21 @@ class Student(BaseModel):
     type_of_cost: str | None = None
     type_of_education: str | None = None
     subjects: list[Subject]
+    online_course: list[OnlineCourseStudent]
+
+class StudentInBD(BaseModel):
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    personal_number: str
+    name: str
+    surname: str
+    patronymic: str | None = None
+    email: str | None = None
+    date_of_birth: str
+    group: dict
+    status: bool | None = False
+    type_of_cost: str | None = None
+    type_of_education: str | None = None
+    subjects: list[PyObjectId]
     online_course: list[OnlineCourseStudent]
 
 
@@ -79,14 +104,6 @@ class GetUserAuth(BaseModel):
     email: str
     personal_number: str
     chat_id: str
-
-
-class Course_info(BaseModel):
-    id: Optional[PyObjectId] = Field(alias="_id", default=None)
-    name: str
-    date: str
-    university: str
-    info: str
 
 
 class StudentMoseus(BaseModel):

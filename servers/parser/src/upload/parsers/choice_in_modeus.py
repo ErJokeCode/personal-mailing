@@ -1,10 +1,12 @@
+from bson import ObjectId
 from fastapi import HTTPException, UploadFile
 import pandas as pd
 from pandas.core.frame import DataFrame
 from io import BytesIO
+from pymongo.collection import Collection
 
 from config import DB
-from src.schemas import StudentMoseus, Subject
+from src.schemas import Modeus_to_inf, OnlineCourseInDB, StudentMoseus, Subject, SubjectInBD
 
 def choice_in_modeus(file: UploadFile):
     try:
@@ -69,12 +71,24 @@ def get_subject_info(subject : str) -> Subject:
     else:
         return Subject(full_name=subject, name=subject.strip(), form_education="traditional", info=None)
 
-def fill_subjects(df : DataFrame, collection_subject):
+
+def fill_subjects(df : DataFrame, collection_subject: Collection):
     subjects = set(df["Муп название"].unique())
     parse_subjects = []
     for subject in subjects:
-        parse_subjects.append(get_subject_info(subject).model_dump(by_alias=True, exclude=["id"]))
+        subject_info = get_subject_info(subject)
+
+        online_course_id = get_id_online_course_for_subject(subject_info.name)
+        subject_db = SubjectInBD(
+            full_name=subject_info.full_name, 
+            name=subject_info.name, 
+            form_education=subject_info.form_education,
+            info=subject_info.info, 
+            online_course_id=online_course_id)
+
+        parse_subjects.append(subject_db.model_dump(by_alias=True, exclude=["id"]))
     collection_subject.insert_many(parse_subjects)
+
 
 def fill_students(df : DataFrame, collection_subject, collection_student, collection_not_found):
     df_choices_student = df[["ФИО", "Код", "Специальность", "Муп название"]].groupby(['ФИО',"Код", "Специальность"])['Муп название']
@@ -91,7 +105,8 @@ def fill_students(df : DataFrame, collection_subject, collection_student, collec
         info_subjects = []
             
         for choice_subject in choice_subjects:
-            info_subjects.append(collection_subject.find_one({"full_name" : choice_subject})) 
+            subject = collection_subject.find_one({"full_name" : choice_subject})
+            info_subjects.append(subject["_id"]) 
 
         group = info_student[1]
         speciality = info_student[2] 
@@ -103,3 +118,28 @@ def fill_students(df : DataFrame, collection_subject, collection_student, collec
         else:
             not_found.append({"name" : name, "surname" : surname, "patronymic" : patronymic, "subjects" : info_subjects, "group" : {"direction_code" : group, "name_speciality" : speciality}})
     collection_not_found.insert_many(not_found)
+
+
+def get_id_online_course_for_subject(name: str) -> ObjectId:
+    try: 
+        
+        col_online_course = DB.get_course_info_collection()
+    except:
+        raise HTTPException(status_code=500, detail="Error DB")
+    
+    name_online_course = get_inf(name)
+    if name_online_course == None:
+        return None
+    
+    online_course = col_online_course.find_one({"name" : name_online_course})
+    if online_course != None:
+        course = OnlineCourseInDB(**online_course)
+        return ObjectId(course.id)
+    return None
+    
+def get_inf(name: str):
+    col_mod_inf = DB.get_modeus_inf()
+    dict = col_mod_inf.find_one({"modeus" : name})
+    if dict != None:
+        return  Modeus_to_inf(**dict).inf
+    return None
