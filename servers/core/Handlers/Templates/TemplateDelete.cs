@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Handlers;
 
-public static partial class NotificationHandler
+public static partial class TemplateHandler
 {
     public static async Task<IResult> DeleteTemplate(int id, CoreDb db)
     {

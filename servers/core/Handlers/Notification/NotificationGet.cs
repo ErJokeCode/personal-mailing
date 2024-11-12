@@ -40,27 +40,4 @@ public static partial class NotificationHandler
 
         return Results.Ok(dtos);
     }
-
-    public static IResult GetAllTemplates(CoreDb db)
-    {
-        var templates = db.NotificationTemplates.Include(n => n.Admin).ToList();
-
-        templates.IncludeDocuments(db).IncludeStudents(db);
-
-        return Results.Ok(NotificationTemplateDto.Maps(templates.ToList()));
-    }
-
-    public static async Task<IResult> GetTemplate(int id, CoreDb db)
-    {
-        var template = await db.NotificationTemplates.Include(n => n.Admin).SingleOrDefaultAsync(n => n.Id == id);
-
-        if(template == null)
-        {
-            return Results.NotFound("Template not found");
-        }
-
-        template.IncludeDocuments(db).IncludeStudents(db);
-
-        return Results.Ok(NotificationTemplateDto.Map(template));
-    }
 }

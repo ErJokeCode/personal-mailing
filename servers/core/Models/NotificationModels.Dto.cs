@@ -18,7 +18,8 @@ public class NotificationDto : IMappable<NotificationDto, Notification>
 
     public static NotificationDto Map(Notification orig)
     {
-        var dto = new NotificationDto() {
+        var dto = new NotificationDto()
+        {
             Id = orig.Id,
             Content = orig.Content,
             Date = orig.Date,
@@ -49,46 +50,6 @@ public class NotificationDto : IMappable<NotificationDto, Notification>
     }
 }
 
-public class NotificationTemplateDto : IMappable<NotificationTemplateDto, NotificationTemplate>
-{
-    public int Id { get; set; }
-    public string Content { get; set; }
-    public string Date { get; set; }
-
-    public AdminUserDto Admin { get; set; }
-
-    public List<DocumentDto> Documents { get; } = [];
-    // TODO get that from orig.StudentIds, same as documents
-    public List<ActiveStudentDto> Students { get; } = [];
-
-    public static NotificationTemplateDto Map(NotificationTemplate orig)
-    {
-        var dto = new NotificationTemplateDto() {
-            Id = orig.Id,
-            Content = orig.Content,
-            Date = orig.Date,
-            Admin = AdminUserDto.Map(orig.Admin),
-        };
-
-        foreach (var student in orig.ActiveStudents)
-        {
-            dto.Students.Add(ActiveStudentDto.Map(student));
-        }
-
-        foreach (var document in orig.Documents)
-        {
-            dto.Documents.Add(DocumentDto.Map(document));
-        }
-
-        return dto;
-    }
-
-    public static List<NotificationTemplateDto> Maps(List<NotificationTemplate> origs)
-    {
-        return origs.Select(o => NotificationTemplateDto.Map(o)).ToList();
-    }
-}
-
 public class DocumentDto : IMappable<DocumentDto, Document>
 {
     public int Id { get; set; }
@@ -97,7 +58,8 @@ public class DocumentDto : IMappable<DocumentDto, Document>
 
     public static DocumentDto Map(Document orig)
     {
-        return new DocumentDto() {
+        return new DocumentDto()
+        {
             Id = orig.Id,
             Name = orig.Name,
             MimeType = orig.MimeType,
@@ -119,7 +81,8 @@ public class NotificationStatusDto : IMappable<NotificationStatusDto, Notificati
 
     public static NotificationStatusDto Map(NotificationStatus orig)
     {
-        return new NotificationStatusDto() {
+        return new NotificationStatusDto()
+        {
             Code = orig.Code,
             Short = orig.Short,
             Description = orig.Description,

@@ -27,6 +27,7 @@ public static class Program
         app.MapAdminRoutes();
         app.MapChatRoutes();
         app.MapNotificationRoutes();
+        app.MapTemplateRoutes();
         app.MapDocumentRoutes();
 
         app.Run();

@@ -44,6 +44,7 @@ public static class MessageExtensions
 {
     public static Message IncludeDocuments(this Message message, CoreDb db)
     {
+        message.Documents.Clear();
         message.Documents.AddRange(DocumentHandler.GetFromIds(message.DocumentIds, db));
         return message;
     }

@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Core.Models;
@@ -8,21 +7,15 @@ using Core.Utility;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using static Core.Handlers.NotificationHandler;
 
 namespace Core.Handlers;
 
-public static partial class NotificationHandler
+public static partial class TemplateHandler
 {
-    public class NotificationDetails
-    {
-        public List<Guid> StudentIds { get; set; }
-
-        public string Content { get; set; }
-    }
-
-    public static async Task<IResult> SendNotification([FromForm] IFormFileCollection documents, [FromForm] string body,
-                                                       CoreDb db, HttpContext context,
-                                                       UserManager<AdminUser> userManager)
+    public static async Task<IResult> SaveNotificationTemplate([FromForm] IFormFileCollection documents,
+                                                               [FromForm] string body, CoreDb db, HttpContext context,
+                                                               UserManager<AdminUser> userManager)
     {
         var details = JsonSerializer.Deserialize<NotificationDetails>(
             body, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
@@ -34,7 +27,7 @@ public static partial class NotificationHandler
             Results.NotFound("Could not get the admin");
         }
 
-        var notification = new Notification()
+        var notification = new NotificationTemplate()
         {
             Content = details.Content,
             Date = DateTime.Now.ToString(),
@@ -53,28 +46,18 @@ public static partial class NotificationHandler
                 continue;
             }
 
-            notification.ActiveStudents.Add(activeStudent);
-
-            var status = new NotificationStatus()
-            {
-                StudentId = guid,
-            };
-            status.SetLost();
-
-            notification.Statuses.Add(status);
-
-            var sent = await BotHandler.SendToBot(activeStudent.ChatId, notification.Content, documents);
+            notification.StudentIds.Add(activeStudent.Id);
         }
 
         var docs = await DocumentHandler.StoreDocuments(documents, db);
         notification.DocumentIds.AddRange(docs);
 
-        db.Notifications.Add(notification);
+        db.NotificationTemplates.Add(notification);
         await db.SaveChangesAsync();
 
-        notification.IncludeDocuments(db);
+        notification.IncludeDocuments(db).IncludeStudents(db);
 
-        var dto = NotificationDto.Map(notification);
+        var dto = NotificationTemplateDto.Map(notification);
         return Results.Ok(dto);
     }
 }
