@@ -6,7 +6,7 @@ from io import BytesIO
 from pymongo.collection import Collection
 
 from config import DB
-from src.schemas import Modeus_to_inf, OnlineCourseInDB, StudentMoseus, Subject, SubjectInBD
+from src.schemas import DictNames, OnlineCourseInDB, StudentMoseus, Subject, SubjectInBD
 
 def choice_in_modeus(file: UploadFile):
     try:
@@ -122,7 +122,6 @@ def fill_students(df : DataFrame, collection_subject, collection_student, collec
 
 def get_id_online_course_for_subject(name: str) -> ObjectId:
     try: 
-        
         col_online_course = DB.get_course_info_collection()
     except:
         raise HTTPException(status_code=500, detail="Error DB")
@@ -138,8 +137,8 @@ def get_id_online_course_for_subject(name: str) -> ObjectId:
     return None
     
 def get_inf(name: str):
-    col_mod_inf = DB.get_modeus_inf()
+    col_mod_inf = DB.get_dict_names()
     dict = col_mod_inf.find_one({"modeus" : name})
     if dict != None:
-        return  Modeus_to_inf(**dict).inf
+        return  DictNames(**dict).inf
     return None

@@ -114,7 +114,8 @@ class StudentMoseus(BaseModel):
     speciality: str
     subjects: list[str]
 
-class Modeus_to_inf(BaseModel):
+class DictNames(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     modeus: str
-    inf: str
+    site_inf: str | None = None
+    file_course: str | None = None

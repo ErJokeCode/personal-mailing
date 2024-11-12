@@ -1,4 +1,5 @@
 from io import BytesIO
+from bson import ObjectId
 from fastapi import HTTPException, UploadFile
 import pandas as pd
 
@@ -57,12 +58,14 @@ def get_student(item, collection):
         print(e)
         raise HTTPException(status_code=500, detail="Parse student error")
 
+
 def get_course(item) -> Course:
     if "Итоговый балл" in item:
         return Course(name=item["Название ОК"], score=str(item["Итоговый балл"]), university=item["держатель курса"])
     else:
         return Course(name=item["Название ОК"], score=str("Not column"), university=item["держатель курса"])
     
+
 def get_email(item):
     email = ""
     if("Адрес электронной почты" in item.keys()):
@@ -73,8 +76,10 @@ def get_email(item):
         print(item.keys())
     return email
 
+
 def get_group(item):
     return item["Группа"]
+
 
 def create_student_course(item, course, email, group) -> StudentCourse:
     return StudentCourse(
@@ -86,8 +91,23 @@ def create_student_course(item, course, email, group) -> StudentCourse:
         courses=[course]
     )
 
+
 def create_info_online_course(collection_course, name, university) -> OnlineCourseInDB:
     inline_course = OnlineCourseInDB(name=name, university=university)
     res = collection_course.insert_one(inline_course.model_dump(by_alias=True, exclude=["id"]))
     return inline_course
 
+
+def get_update_subject():
+    pass
+
+
+def get_id_course_from_collect(name:str) -> ObjectId:
+    collect_course = DB.get_course_info_collection()
+
+    course_info = collect_course.find_one({"name" : name})
+    
+    if course_info != None:
+        course_db = OnlineCourseInDB(**course_info)
+        return ObjectId(course_db.id)
+    return None
