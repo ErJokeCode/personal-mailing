@@ -140,5 +140,5 @@ def get_inf(name: str):
     col_mod_inf = DB.get_dict_names()
     dict = col_mod_inf.find_one({"modeus" : name})
     if dict != None:
-        return  DictNames(**dict).inf
+        return  DictNames(**dict).file_course
     return None

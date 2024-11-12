@@ -17,6 +17,7 @@ def update_report(file: UploadFile):
     collection_student = DB.get_student()
     collection_course = DB.get_course_info_collection()
     all_students = {}
+    all_course = ()
     
     for sheet_name in excel.sheet_names[1:]:
         df = excel.parse(sheet_name)
@@ -30,6 +31,7 @@ def update_report(file: UploadFile):
             if course_db == None:
                 course_db = create_info_online_course(collection_course, course["name"], course["university"]).model_dump()
             course_db["score"] = course["score"]
+
             if email not in all_students.keys():
                 all_students[email] = create_student_course(student, course_db, get_email(student), get_group(student)).model_dump()
             else:
@@ -96,18 +98,3 @@ def create_info_online_course(collection_course, name, university) -> OnlineCour
     inline_course = OnlineCourseInDB(name=name, university=university)
     res = collection_course.insert_one(inline_course.model_dump(by_alias=True, exclude=["id"]))
     return inline_course
-
-
-def get_update_subject():
-    pass
-
-
-def get_id_course_from_collect(name:str) -> ObjectId:
-    collect_course = DB.get_course_info_collection()
-
-    course_info = collect_course.find_one({"name" : name})
-    
-    if course_info != None:
-        course_db = OnlineCourseInDB(**course_info)
-        return ObjectId(course_db.id)
-    return None

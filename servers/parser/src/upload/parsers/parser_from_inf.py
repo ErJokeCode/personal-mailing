@@ -9,7 +9,6 @@ from src.schemas import OnlineCourseInDB
 def parse_courses():
 
     collection = DB.get_course_info_collection()
-    collection.delete_many({})
 
     url = "https://inf-online.urfu.ru/ru/onlain-kursy/#urfu"
 

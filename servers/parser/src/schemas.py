@@ -23,6 +23,7 @@ class Subject(BaseModel):
     form_education: str
     info: str | None = None
     online_course: OnlineCourseInDB | None = None
+    group_tg_link: str | None = None
 
 
 class SubjectInBD(BaseModel):
@@ -32,6 +33,7 @@ class SubjectInBD(BaseModel):
     form_education: str
     info: str | None = None
     online_course_id: PyObjectId | None = None
+    group_tg_link: str | None = None
 
 
 class OnlineCourseStudent(BaseModel):
