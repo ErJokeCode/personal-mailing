@@ -126,7 +126,8 @@ def create_Student(student_db: StudentInBD) -> Student:
 
 def create_Subject(subject_db: SubjectInBD, course: OnlineCourseInDB) -> Subject:
     return Subject(
-                full_name=subject_db.name,
+                _id=subject_db.id,
+                full_name=subject_db.full_name,
                 name=subject_db.name,
                 form_education=subject_db.form_education,
                 info=subject_db.info,

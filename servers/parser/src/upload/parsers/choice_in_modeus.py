@@ -78,7 +78,7 @@ def fill_subjects(df : DataFrame, collection_subject: Collection):
     for subject in subjects:
         subject_info = get_subject_info(subject)
 
-        online_course_id = get_id_online_course_for_subject(subject_info.name)
+        online_course_id = get_id_online_course_for_subject(subject_info.full_name)
         subject_db = SubjectInBD(
             full_name=subject_info.full_name, 
             name=subject_info.name, 
@@ -140,5 +140,5 @@ def get_inf(name: str):
     col_mod_inf = DB.get_dict_names()
     dict = col_mod_inf.find_one({"modeus" : name})
     if dict != None:
-        return  DictNames(**dict).file_course
+        return  DictNames(**dict).site_inf
     return None
