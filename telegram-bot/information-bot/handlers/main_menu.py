@@ -62,10 +62,10 @@ async def process_course_info(callback_query: types.CallbackQuery, state: FSMCon
         async with aiohttp.ClientSession() as session:
             headers = {"cookie": f"{get_cookie()}"}
 
-            async with session.get(f"{URL_SERVER}/parser/course/modeus_to_inf", headers=headers, params={"name_modeus": online_courses[course_id]["name"]}) as resp:
+            async with session.get(f"{URL_SERVER}/parser/course/dict_names", headers=headers, params={"site": online_courses[course_id]["name"]}) as resp:
                 if resp.status == 200:
                     inf_course = await resp.json()
-                    async with session.get(f"{URL_SERVER}/parser/course/search", headers=headers, params={"name": inf_course["inf"], "university": online_courses[course_id]["university"]}) as response:
+                    async with session.get(f"{URL_SERVER}/parser/course/search", headers=headers, params={"name": inf_course["site_inf"], "university": online_courses[course_id]["university"]}) as response:
                         if response.status == 200:
                             info_course = await response.json()
                             await callback_query.message.delete()

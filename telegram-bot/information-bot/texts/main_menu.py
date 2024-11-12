@@ -56,6 +56,7 @@ def create_text_subjects(data: list):
         name = item.get("name")
         form_education = item.get("form_education")
         info = item.get("info")
+        print(data)
 
         text += f"{i}. {name}\n\n"
         # if form_education == "traditional":
