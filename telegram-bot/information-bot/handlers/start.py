@@ -110,7 +110,7 @@ async def process_student_id(message: types.Message, state: FSMContext):
                 await state.clear()
                 await state.update_data(
                     email=body["email"],
-                    personal_number=body["personal_number"],
+                    personal_number=body["personalNumber"],
                     user_id=response_data.get("id"),
                 )
                 await choice_onboarding(message, state)
