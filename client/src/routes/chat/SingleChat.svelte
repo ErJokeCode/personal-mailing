@@ -25,14 +25,12 @@
 
     async function send_message() {
         status = status.start_load();
-        await http.post_json(
-            `/core/chat/adminSend`,
-            {
-                studentId,
-                content,
-            },
-            status,
-        );
+
+        var data = new FormData();
+        data.append("body", JSON.stringify({ studentId, content }));
+        // Can also add documents
+
+        await http.post(`/core/chat/adminSend`, data, status);
 
         content = "";
         status = status.end_load();
