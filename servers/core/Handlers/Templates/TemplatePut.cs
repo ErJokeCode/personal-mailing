@@ -43,7 +43,7 @@ public static partial class TemplateHandler
             template.ActiveStudents.Add(activeStudent);
         }
 
-        DocumentHandler.DeleteDocuments(template.Documents.Select(d => d.InternalName).ToList());
+        await DocumentHandler.DeleteDocuments(template.Documents.Select(d => d.Id).ToList(), db);
 
         var docs = await DocumentHandler.StoreDocuments(documents, db);
         template.DocumentIds.Clear();

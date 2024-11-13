@@ -63,7 +63,9 @@ public static partial class NotificationHandler
 
             notification.Statuses.Add(status);
 
-            var sent = await BotHandler.SendToBot(activeStudent.ChatId, notification.Content, documents);
+            var filled = await NotificationHandler.FillTemplate(notification.Content, activeStudent);
+
+            var sent = await BotHandler.SendToBot(activeStudent.ChatId, filled, documents);
         }
 
         var docs = await DocumentHandler.StoreDocuments(documents, db);

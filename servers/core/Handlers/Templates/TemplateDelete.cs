@@ -20,7 +20,7 @@ public static partial class TemplateHandler
 
         template.IncludeDocuments(db);
 
-        DocumentHandler.DeleteDocuments(template.Documents.Select(d => d.InternalName).ToList());
+        await DocumentHandler.DeleteDocuments(template.Documents.Select(d => d.Id).ToList(), db);
         db.NotificationTemplates.Remove(template);
 
         await db.SaveChangesAsync();

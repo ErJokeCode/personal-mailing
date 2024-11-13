@@ -36,7 +36,8 @@ public static partial class DocumentHandler
         {
             var mimeType = MimeTypes.GetMimeType(document.FileName);
 
-            var newDocument = new Document() {
+            var newDocument = new Document()
+            {
                 Name = document.FileName,
                 MimeType = mimeType,
                 InternalName = Guid.NewGuid().ToString(),
@@ -57,12 +58,18 @@ public static partial class DocumentHandler
         return savedDocs.Select(d => d.Id).ToList();
     }
 
-    public static void DeleteDocuments(List<string> internalNames)
+    public static async Task DeleteDocuments(List<int> ids, CoreDb db)
     {
-        foreach (var name in internalNames)
+        foreach (var id in ids)
         {
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "Documents", name);
+            var document = await db.Documents.FindAsync(id);
+
+            var path = Path.Combine(Directory.GetCurrentDirectory(), "Documents", document.InternalName);
             File.Delete(path);
+
+            db.Documents.Remove(document);
         }
+
+        await db.SaveChangesAsync();
     }
 }
