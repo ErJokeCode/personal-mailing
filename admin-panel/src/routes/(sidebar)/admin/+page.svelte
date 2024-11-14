@@ -1,8 +1,7 @@
 <script>
-	import { Breadcrumb, BreadcrumbItem, Heading } from 'flowbite-svelte';
+	import { Breadcrumb, BreadcrumbItem, Button, Heading } from 'flowbite-svelte';
 	import { TableHeadCell, Table, TableBody, TableBodyCell, TableBodyRow, TableHead } from 'flowbite-svelte';
   import { onMount } from "svelte";
-  import { A } from 'flowbite-svelte';
   import { ArrowRightOutline } from 'flowbite-svelte-icons';
 
   let login_status = "";
@@ -26,21 +25,21 @@
 <main class="relative h-full w-full overflow-y-auto bg-white dark:bg-gray-800">
 	<div class="p-4 px-6">
 		<Breadcrumb class="mb-5">
-			<BreadcrumbItem home href="/">Home</BreadcrumbItem>
-			<BreadcrumbItem>Admin</BreadcrumbItem>
+			<BreadcrumbItem home href="/">Главная</BreadcrumbItem>
+			<BreadcrumbItem>Администраторы</BreadcrumbItem>
 		</Breadcrumb>
-    <A href="/admin/create-admin" aClass="inline-flex items-center font-medium  hover:underline mb-3">
-      Create Admin
+    <Button href="/admin/create-admin" class="mb-3">
+      Создать
       <ArrowRightOutline class="w-6 h-6 ms-2" />
-    </A>
+    </Button>
 		<Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
-			Admins
+			Администраторы
       {login_status}
 		</Heading>
 	</div>
   <Table hoverable={true}>
     <TableHead>
-      <TableHeadCell class="px-8">Email</TableHeadCell>
+      <TableHeadCell class="px-8">Электронная почта</TableHeadCell>
     </TableHead>
     <TableBody tableBodyClass="divide-y">
 			{#each admins as admin}

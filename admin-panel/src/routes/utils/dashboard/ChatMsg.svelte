@@ -5,8 +5,8 @@
 		DotsHorizontalOutline
 	} from 'flowbite-svelte-icons';
 
-	export let avatar: string = 'https://flowbite.com/docs/images/people/profile-picture-2.jpg';
-	export let name: string = 'Michael Gough';
+	export let avatar= '';
+	export let name: string = 'Aboba';
 	export let timestamp: Date = new Date();
 	export let replays: number = 0;
 </script>

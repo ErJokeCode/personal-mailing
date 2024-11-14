@@ -40,17 +40,17 @@
 <main class="relative h-full w-full overflow-y-auto bg-white dark:bg-gray-800">
 	<div class="p-4 px-6">
 		<Breadcrumb class="mb-5">
-			<BreadcrumbItem home href="/">Home</BreadcrumbItem>
-			<BreadcrumbItem href="/admin">Admin</BreadcrumbItem>
-			<BreadcrumbItem>Create Admin</BreadcrumbItem>
+			<BreadcrumbItem home href="/">Главная</BreadcrumbItem>
+			<BreadcrumbItem href="/admin">Администраторы</BreadcrumbItem>
+			<BreadcrumbItem>Создать</BreadcrumbItem>
 		</Breadcrumb>
 		<Heading tag="h1" class="mb-5 text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
-			Create Admin
+			Создать администратора
       {login_status}
 		</Heading>
     <div class="mb-4">
       <Label class={labelClass}>
-      <span>Email</span>
+      <span>Электронная почта</span>
         <Input
           type="text"
           name="email"
@@ -63,7 +63,7 @@
     </div>
     <div class="mb-6">
       <Label class={labelClass}>
-       <span>Password</span>
+       <span>Пароль</span>
        <Input
           type="password"
           name="password"
@@ -74,7 +74,7 @@
         />
       </Label>
     </div>  
-    <Button class="mb-2" on:click={create}>Create</Button>
+    <Button class="mb-2" on:click={create}>Создать</Button>
     <Helper>{create_status}</Helper>
 	</div>
 </main>
