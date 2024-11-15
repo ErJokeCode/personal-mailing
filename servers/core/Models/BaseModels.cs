@@ -1,4 +1,12 @@
+using System.Collections.Generic;
+
 namespace Core.Models;
+
+public interface IMappable<TDto, TOrig>
+{
+    public static abstract TDto Map(TOrig orig);
+    public static abstract List<TDto> Maps(List<TOrig> origs);
+}
 
 public abstract class BaseStatus
 {

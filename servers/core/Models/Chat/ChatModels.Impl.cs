@@ -1,18 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
+using Core.Handlers;
+using Core.Utility;
 
 namespace Core.Models.Dto;
 
-public class ChatDto : IMappable<ChatDto, Chat>
+public partial class ChatDto : IMappable<ChatDto, Chat>
 {
-    public int Id { get; set; }
-    public int UnreadCount { get; set; }
-
-    public AdminUserDto Admin { get; set; }
-    public ActiveStudentDto Student { get; set; }
-
-    public List<MessageDto> Messages { get; set; } = [];
-
     public static ChatDto Map(Chat orig)
     {
         var dto = new ChatDto() {
@@ -36,20 +30,8 @@ public class ChatDto : IMappable<ChatDto, Chat>
     }
 }
 
-public class MessageDto : IMappable<MessageDto, Message>
+public partial class MessageDto : IMappable<MessageDto, Message>
 {
-    public int Id { get; set; }
-
-    public string Date { get; set; }
-    public string Content { get; set; }
-
-    public string Sender { get; set; }
-    public string Receiver { get; set; }
-
-    public MessageStatusDto Status { get; set; }
-
-    public List<DocumentDto> Documents { get; set; } = [];
-
     public static MessageDto Map(Message orig)
     {
         var dto = new MessageDto() {
@@ -71,12 +53,8 @@ public class MessageDto : IMappable<MessageDto, Message>
     }
 }
 
-public class MessageStatusDto : IMappable<MessageStatusDto, MessageStatus>
+public partial class MessageStatusDto : IMappable<MessageStatusDto, MessageStatus>
 {
-    public int Code { get; set; }
-    public string Short { get; set; }
-    public string Description { get; set; }
-
     public static MessageStatusDto Map(MessageStatus orig)
     {
         return new MessageStatusDto() {
@@ -89,5 +67,24 @@ public class MessageStatusDto : IMappable<MessageStatusDto, MessageStatus>
     public static List<MessageStatusDto> Maps(List<MessageStatus> origs)
     {
         return origs.Select(o => MessageStatusDto.Map(o)).ToList();
+    }
+}
+
+public static class MessageExtensions
+{
+    public static Message IncludeDocuments(this Message message, CoreDb db)
+    {
+        message.Documents.Clear();
+        message.Documents.AddRange(DocumentHandler.GetFromIds(message.DocumentIds, db));
+        return message;
+    }
+
+    public static ICollection<Message> IncludeDocuments(this ICollection<Message> messages, CoreDb db)
+    {
+        foreach (var message in messages)
+        {
+            message.IncludeDocuments(db);
+        }
+        return messages;
     }
 }

@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using Core.Handlers;
-using Core.Utility;
 
 namespace Core.Models;
 
@@ -39,25 +37,6 @@ public class Message
 
     public int ChatId { get; set; }
     public Chat Chat { get; set; }
-}
-
-public static class MessageExtensions
-{
-    public static Message IncludeDocuments(this Message message, CoreDb db)
-    {
-        message.Documents.Clear();
-        message.Documents.AddRange(DocumentHandler.GetFromIds(message.DocumentIds, db));
-        return message;
-    }
-
-    public static ICollection<Message> IncludeDocuments(this ICollection<Message> messages, CoreDb db)
-    {
-        foreach (var message in messages)
-        {
-            message.IncludeDocuments(db);
-        }
-        return messages;
-    }
 }
 
 public class MessageStatus : BaseStatus
