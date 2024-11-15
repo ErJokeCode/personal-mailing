@@ -19,14 +19,13 @@ public class ChatDto : IMappable<ChatDto, Chat>
             Id = orig.Id,
             Admin = AdminUserDto.Map(orig.Admin),
             Student = ActiveStudentDto.Map(orig.ActiveStudent),
+            UnreadCount = orig.UnreadCount,
         };
 
         foreach (var message in orig.Messages)
         {
             dto.Messages.Add(MessageDto.Map(message));
         }
-
-        dto.UnreadCount = dto.Messages.Count(m => m.Sender == "Student" && m.Status.Code == 0);
 
         return dto;
     }

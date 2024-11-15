@@ -15,10 +15,12 @@ public class AdminUserDto : IMappable<AdminUserDto, AdminUser>
     public string Id { get; set; }
     public string Email { get; set; }
     public string Date { get; set; }
+    public List<string> Permissions { get; set; } = [];
 
     public static AdminUserDto Map(AdminUser orig)
     {
-        return new AdminUserDto() { Id = orig.Id, Email = orig.Email, Date = orig.Date };
+        return new AdminUserDto() { Id = orig.Id, Email = orig.Email, Date = orig.Date,
+                                    Permissions = orig.Permissions };
     }
 
     public static List<AdminUserDto> Maps(List<AdminUser> origs)

@@ -10,7 +10,7 @@ services:
 
   admin-panel:
     build: ./admin-panel
-    command: pnpm run dev
+    command: pnpm dev
     ports:
       - 5015:5015
     volumes:

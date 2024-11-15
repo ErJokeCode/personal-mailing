@@ -8,6 +8,7 @@ namespace Core.Models;
 public class AdminUser : IdentityUser
 {
     public string Date { get; set; }
+    public List<string> Permissions { get; set; } = [];
 
     public ICollection<Notification> Notifications { get; } = [];
     public ICollection<Chat> Chats { get; } = [];

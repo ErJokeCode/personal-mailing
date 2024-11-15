@@ -22,6 +22,8 @@ public static partial class ChatHandler
                        .Include(ch => ch.Admin)
                        .SingleOrDefaultAsync(ch => ch.AdminId == adminId && ch.ActiveStudentId == studentId);
 
+        chat.Messages.IncludeDocuments(db);
+
         if (chat == null)
         {
             return Results.NotFound("Chat not found");

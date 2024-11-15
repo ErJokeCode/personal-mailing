@@ -9,6 +9,7 @@ namespace Core.Models;
 public class Chat
 {
     public int Id { get; set; }
+    public int UnreadCount { get; set; }
 
     public string AdminId { get; set; }
     public AdminUser Admin { get; set; }
