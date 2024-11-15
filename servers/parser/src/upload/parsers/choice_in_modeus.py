@@ -6,7 +6,7 @@ from io import BytesIO
 from pymongo.collection import Collection
 
 from config import DB
-from src.schemas import DictNames, OnlineCourseInDB, StudentMoseus, Subject, SubjectInBD
+from src.schemas import DictNames, InfoOnlineCourseInDB, StudentMoseus, Subject, SubjectInBD
 
 def choice_in_modeus(file: UploadFile):
     try:
@@ -132,7 +132,7 @@ def get_id_online_course_for_subject(name: str) -> ObjectId:
     
     online_course = col_online_course.find_one({"name" : name_online_course})
     if online_course != None:
-        course = OnlineCourseInDB(**online_course)
+        course = InfoOnlineCourseInDB(**online_course)
         return ObjectId(course.id)
     return None
     

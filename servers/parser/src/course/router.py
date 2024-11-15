@@ -2,7 +2,7 @@ from typing import List
 from fastapi import APIRouter, HTTPException
 
 from config import DB
-from src.schemas import Course, DictNames, OnlineCourseInDB, StudentCourse
+from src.schemas import Course, DictNames, InfoOnlineCourseInDB, StudentForDict
 from bson import ObjectId
 
 
@@ -25,7 +25,7 @@ async def get_by_email(email: str):
     if user_course is None:
         print("User not found")
         raise HTTPException(status_code=404, detail="User not found")
-    user_course = StudentCourse(**user_course)
+    user_course = StudentForDict(**user_course)
 
     return user_course
 
@@ -42,19 +42,19 @@ async def get_by_id(id: str):
     if user_course is None:
         print("User not found")
         raise HTTPException(status_code=404, detail="User not found")
-    user_course = StudentCourse(**user_course)
+    user_course = StudentForDict(**user_course)
 
     return user_course
 
 
 @router_course.get("/search")
-async def get_courses(name: str, university: str | None = None) -> OnlineCourseInDB:
+async def get_courses(name: str, university: str | None = None) -> InfoOnlineCourseInDB:
     collection = DB.get_course_info_collection()
     query = {"name": {"$regex": name, "$options": "i"}}
     if university:
         query["university"] = {"$regex": university, "$options": "i"}
     course = collection.find_one(query)
-    return OnlineCourseInDB(**course)
+    return InfoOnlineCourseInDB(**course)
 
 
 @router_course.get("/dict_names")

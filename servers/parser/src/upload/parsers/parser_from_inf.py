@@ -4,7 +4,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import asyncio
 
 from config import DB
-from src.schemas import OnlineCourseInDB
+from src.schemas import InfoOnlineCourseInDB
 
 def parse_courses():
 
@@ -60,7 +60,7 @@ def parse_courses():
                         split_university = university.split()
                         if split_university[0] == "Курсы" or split_university[0] == "курсы":
                             university = " ".join(split_university[1:])
-                        course = OnlineCourseInDB(name=name, date_start=date, deadline=None, university=university, info=info).model_dump(by_alias=True, exclude=["id"])
+                        course = InfoOnlineCourseInDB(name=name, date_start=date, deadline=None, university=university, info=info).model_dump(by_alias=True, exclude=["id"])
 
                         res = collection.update_one(
                             {"name" : course["name"], "university" : course["university"]}, 

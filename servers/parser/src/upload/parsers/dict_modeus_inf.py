@@ -5,7 +5,7 @@ from fastapi import Depends, HTTPException, UploadFile
 import pandas as pd
 
 from config import DB
-from src.schemas import DictNames, Student, OnlineCourseInDB
+from src.schemas import DictNames, Student, InfoOnlineCourseInDB
 
 
 def dict_names(modeus:str, site_inf: str, file_course: str):
@@ -25,7 +25,7 @@ def dict_names(modeus:str, site_inf: str, file_course: str):
     #                         {"$set":{"site_inf" : site_inf, "file_course": file_course}}, 
     #                         upsert=True)
 
-    course_db = OnlineCourseInDB(**collection_course.find_one({"name" : dict.site_inf}))
+    course_db = InfoOnlineCourseInDB(**collection_course.find_one({"name" : dict.site_inf}))
 
     collection_subject.update_one({"full_name" : dict.modeus}, {"$set" : {"online_course_id" : ObjectId(course_db.id)}})
 

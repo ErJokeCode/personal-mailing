@@ -12,8 +12,8 @@ from config import DB
 from src.schemas import (
     Course,
     GetUserAuth,
-    OnlineCourseInDB,
-    StudentCourse,
+    InfoOnlineCourseInDB,
+    StudentForDict,
     Student,
     StudentInBD,
     Subject,
@@ -99,7 +99,7 @@ def from_StudentInBD_to_Student(
 
             course=None
             if course_info != None:
-                course = OnlineCourseInDB(**course_info)
+                course = InfoOnlineCourseInDB(**course_info)
             subject = create_Subject(subject_db, course)
 
             student.subjects.append(subject)
@@ -124,7 +124,7 @@ def create_Student(student_db: StudentInBD) -> Student:
             online_course=student_db.online_course)
 
 
-def create_Subject(subject_db: SubjectInBD, course: OnlineCourseInDB) -> Subject:
+def create_Subject(subject_db: SubjectInBD, course: InfoOnlineCourseInDB) -> Subject:
     return Subject(
                 _id=subject_db.id,
                 full_name=subject_db.full_name,

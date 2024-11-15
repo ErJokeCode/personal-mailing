@@ -7,7 +7,7 @@ from bson import DBRef, ObjectId
 PyObjectId = Annotated[str, BeforeValidator(str)]
 
 
-class OnlineCourseInDB(BaseModel):
+class InfoOnlineCourseInDB(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     name: str
     university: str | None = None
@@ -22,7 +22,7 @@ class Subject(BaseModel):
     name: str
     form_education: str
     info: str | None = None
-    online_course: OnlineCourseInDB | None = None
+    online_course: InfoOnlineCourseInDB | None = None
     group_tg_link: str | None = None
 
 
@@ -36,14 +36,8 @@ class SubjectInBD(BaseModel):
     group_tg_link: str | None = None
 
 
-class OnlineCourseStudent(BaseModel):
-    id: Optional[PyObjectId] = Field(alias="_id", default=None)
-    name: str
-    university: str | None = None
-    date_start: str | None = None
-    deadline: list[str] | None = None
-    info: str | None = None
-    score: str | None = None
+class OnlineCourseStudent(InfoOnlineCourseInDB):
+    scores: dict | None = None
 
 
 class Student(BaseModel):
@@ -83,7 +77,7 @@ class Course(BaseModel):
     score: str | None = None
 
 
-class StudentCourse(BaseModel):
+class StudentForDict(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     surname: str | None = None
     name: str | None = None
