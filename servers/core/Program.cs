@@ -12,7 +12,6 @@ public static class Program
 {
     public static async Task Main(string[] args)
     {
-        Startup.LoadEnv(".env");
         Startup.CreateFolder("Documents");
 
         var builder = WebApplication.CreateBuilder(args);
@@ -29,6 +28,7 @@ public static class Program
         app.MapNotificationRoutes();
         app.MapTemplateRoutes();
         app.MapDocumentRoutes();
+        app.MapDataRoutes();
 
         app.Run();
     }
