@@ -1,4 +1,3 @@
-
 using Core.Handlers;
 using Core.Identity;
 using Microsoft.AspNetCore.Builder;
@@ -20,5 +19,6 @@ public static class DataRoute
         var getGroup = group.MapGroup("/").AddPermission(Permissions.View);
 
         getGroup.MapGet("/permissions", DataHandler.GetAllPermissions);
+        getGroup.MapGet("/templates", DataHandler.GetAllTemplates);
     }
 }

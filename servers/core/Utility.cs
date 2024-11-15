@@ -18,6 +18,7 @@ public class CoreDb : IdentityDbContext<AdminUser>
     public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<NotificationTemplate> NotificationTemplates => Set<NotificationTemplate>();
     public DbSet<NotificationStatus> NotificationStatuses => Set<NotificationStatus>();
+    public DbSet<NotificationSchedule> NotificationSchedules => Set<NotificationSchedule>();
     public DbSet<Document> Documents => Set<Document>();
 
     public DbSet<Chat> Chats => Set<Chat>();

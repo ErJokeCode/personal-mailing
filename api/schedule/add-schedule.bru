@@ -1,0 +1,19 @@
+meta {
+  name: add-schedule
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{base_api}}/core/schedule
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "templateId": 3,
+    "start": "2024-11-18T05:00:00Z",
+    "interval": "366.00:00:01"
+  }
+}

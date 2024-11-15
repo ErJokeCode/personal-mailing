@@ -20,7 +20,7 @@ public static class Program
         var app = builder.Build();
         await app.InitialzieServices();
 
-        ChatConsumer.Hub = app.Services.GetService<IHubContext<SignalHub>>();
+        BaseConsumer.Hub = app.Services.GetService<IHubContext<SignalHub>>();
 
         app.MapStudentRoutes();
         app.MapAdminRoutes();
@@ -29,6 +29,7 @@ public static class Program
         app.MapTemplateRoutes();
         app.MapDocumentRoutes();
         app.MapDataRoutes();
+        app.MapScheduleRoutes();
 
         app.Run();
     }

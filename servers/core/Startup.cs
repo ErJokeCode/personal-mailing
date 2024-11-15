@@ -19,6 +19,7 @@ using Core.Utility;
 using Core.Messages;
 using Core.Handlers;
 using Core.Identity;
+using Core.Workers;
 
 namespace Core;
 
@@ -102,6 +103,7 @@ public static class Startup
         builder.Services.AddDbContext<CoreDb>(options => options.UseNpgsql(connection));
 
         builder.Services.AddPermissions();
+        builder.Services.AddHostedService<ScheduleWorker>();
 
         Action<IdentityOptions> identityOptions = options =>
         {

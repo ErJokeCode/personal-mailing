@@ -10,4 +10,9 @@ public static class DataHandler
     {
         return Results.Ok(Permissions.All.Select(p => p.Claim));
     }
+
+    public static IResult GetAllTemplates()
+    {
+        return Results.Ok(NotificationHandler.Passes.Keys);
+    }
 }
