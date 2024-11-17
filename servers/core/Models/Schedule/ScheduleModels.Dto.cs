@@ -8,4 +8,5 @@ public partial class NotificationScheduleDto
 
     public DateTime Start { get; set; }
     public TimeSpan Interval { get; set; }
+    public DateTime Next {get; set;}
 }

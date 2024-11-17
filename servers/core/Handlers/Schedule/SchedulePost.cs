@@ -33,6 +33,7 @@ public static partial class ScheduleHandler
             Template = template,
             Start = details.Start,
             Interval = details.Interval,
+            Next = details.Start,
         };
 
         db.NotificationSchedules.Add(schedule);

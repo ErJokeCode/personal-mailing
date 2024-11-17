@@ -1,6 +1,7 @@
 
 using System;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -32,11 +33,26 @@ public class ScheduleWorker : BackgroundService, IDisposable
         using var scope = _services.CreateScope();
         using var context = scope.ServiceProvider.GetRequiredService<CoreDb>();
 
-        var count = context.NotificationSchedules.Count();
-        var now = DateTime.Now;
+        var list = context.NotificationSchedules.ToList();
+        var now = DateTime.UtcNow;
 
-        Console.WriteLine(count);
-        Console.WriteLine(now.ToString());
+        foreach (var schedule in list)
+        {
+            if (schedule.Next <= now)
+            {
+                var diff = now - schedule.Next;
+                var intervals = (int)(diff / schedule.Interval) + 1;
+
+                schedule.Next += intervals * schedule.Interval;
+
+                // TODO load the template from schedule
+                // create new notificitaion
+                // and actually send it = done, profit
+                Console.WriteLine("Sending notification");
+            }
+        }
+
+        context.SaveChanges();
     }
 
     public override Task StopAsync(CancellationToken cancellationToken)

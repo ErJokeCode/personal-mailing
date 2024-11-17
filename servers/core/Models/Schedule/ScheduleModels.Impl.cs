@@ -9,10 +9,10 @@ public partial class NotificationScheduleDto : IMappable<NotificationScheduleDto
     {
         return new NotificationScheduleDto()
         {
-
             Template = NotificationTemplateDto.Map(orig.Template),
             Start = orig.Start,
             Interval = orig.Interval,
+            Next = orig.Next,
         };
     }
 
