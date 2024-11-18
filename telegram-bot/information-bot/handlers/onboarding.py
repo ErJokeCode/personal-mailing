@@ -24,17 +24,10 @@ async def start_onboarding(callback_query: types.CallbackQuery, state: FSMContex
 
 #Информация о боте
 async def choice_onboarding(message: types.Message, state: FSMContext):
-    await state.set_state(Onboarding.INFO_START)
-
-    await message.answer(t_onboarding.info_bot(), reply_markup=kb_onboarding.next())
-
-#Продолжим?
-@router.callback_query(Onboarding.INFO_START, lambda c: c.data == "next_onb")
-async def start_onboarding(callback_query: types.CallbackQuery, state: FSMContext):
     await state.set_state(Onboarding.QUE_START)
 
-    last_msg = await callback_query.message.edit_reply_markup()
-    msg = await callback_query.message.answer(t_onboarding.start(), reply_markup=kb_onboarding.start_choice())
+    last_msg = await message.answer(t_onboarding.info_bot())
+    msg = await message.answer(t_onboarding.start(), reply_markup=kb_onboarding.start_choice())
 
     await state.update_data(del_msgs_onboarding = [last_msg.message_id, msg.message_id])
 

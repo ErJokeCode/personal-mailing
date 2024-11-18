@@ -4,6 +4,7 @@ def create_text_online_course(info_course: dict, score: str) -> str:
     deadline = info_course['deadline']
     info = info_course['info']
     university = info_course['university']
+    print(score)
     
     text = f"{name}\n\nКурс проводит {university}\n\n"
 
