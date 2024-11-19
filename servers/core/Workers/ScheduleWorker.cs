@@ -5,7 +5,11 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Core.Handlers;
+using Core.Models;
+using Core.Models.Dto;
 using Core.Utility;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -23,32 +27,30 @@ public class ScheduleWorker : BackgroundService, IDisposable
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
-        _timer = new Timer((state) => SendScheduled(_services), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+        _timer =
+            new Timer(async (state) => await CheckSchedule(_services), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
 
         return Task.CompletedTask;
     }
 
-    private void SendScheduled(IServiceScopeFactory scopeFactory)
+    private async Task CheckSchedule(IServiceScopeFactory scopeFactory)
     {
         using var scope = _services.CreateScope();
         using var context = scope.ServiceProvider.GetRequiredService<CoreDb>();
 
-        var list = context.NotificationSchedules.ToList();
+        var schedules = context.NotificationSchedules.ToList();
         var now = DateTime.UtcNow;
 
-        foreach (var schedule in list)
+        foreach (var scheduled in schedules)
         {
-            if (schedule.Next <= now)
+            if (scheduled.Next <= now)
             {
-                var diff = now - schedule.Next;
-                var intervals = (int)(diff / schedule.Interval) + 1;
+                var diff = now - scheduled.Next;
+                var intervals = (int)(diff / scheduled.Interval) + 1;
 
-                schedule.Next += intervals * schedule.Interval;
+                scheduled.Next += intervals * scheduled.Interval;
 
-                // TODO load the template from schedule
-                // create new notificitaion
-                // and actually send it = done, profit
-                Console.WriteLine("Sending notification");
+                await NotificationHandler.SendFromTemplate(scheduled.TemplateId, context);
             }
         }
 

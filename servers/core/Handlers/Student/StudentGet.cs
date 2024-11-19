@@ -48,8 +48,7 @@ public static partial class StudentHandler
 
         await activeStudent.IncludeStudent();
 
-        // return Results.Ok(activeStudent.Student.OnlineCourse);
-        return Results.Ok();
+        return Results.Ok(activeStudent.Student.OnlineCourse);
     }
 
     public static async Task<IResult> GetStudentChats(Guid id, CoreDb db)
