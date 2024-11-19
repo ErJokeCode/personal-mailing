@@ -29,7 +29,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
     
     if not user_data.get("email") and not user_data.get("personal_number"):
         welcome_msg = await message.answer(
-            "Добро пожаловать! Пожалуйста, введите вашу почту."
+            "Добро пожаловать! Пожалуйста, введите вашу почту УРФУ. Например ivanov@urfu.me"
         )
         await state.set_state(RegistrationStates.WAITING_FOR_EMAIL)
         await state.update_data(welcome_msg_id=welcome_msg.message_id)
@@ -57,7 +57,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
                     )
                 else:
                     await message.answer(
-                        "Произошла ошибка при регистрации. Пожалуйста, введите вашу почту."
+                        "Произошла ошибка при регистрации. Пожалуйста, введите вашу почту УРФУ. Например ivanov@urfu.me"
                     )
                     await state.set_state(RegistrationStates.WAITING_FOR_EMAIL)
                     await state.update_data(welcome_msg_id=welcome_msg.message_id)
@@ -68,7 +68,7 @@ async def process_email(message: types.Message, state: FSMContext):
     if is_valid_email(message.text):
         await state.update_data(email=message.text, email_msg_id=message.message_id)
         student_id_msg = await message.answer(
-            "Спасибо! Теперь введите номер вашего студенческого билета."
+            "Спасибо! Теперь введите номер вашего студенческого билета. Его вы можете посмотреть в студенческом билете после слов \"СТУДЕНЧЕСКИЙ БИЛЕТ №...\""
         )
         await state.update_data(student_id_msg_id=student_id_msg.message_id)
         await state.set_state(RegistrationStates.WAITING_FOR_STUDENT_ID)
@@ -116,6 +116,6 @@ async def process_student_id(message: types.Message, state: FSMContext):
                 await choice_onboarding(message, state)
             else:
                 await message.answer(
-                    "Произошла ошибка при регистрации. Пожалуйста, введите вашу почту."
+                    "Произошла ошибка при регистрации. Пожалуйста, введите вашу почту УРФУ. Например ivanov@urfu.me"
                 )
                 await state.set_state(RegistrationStates.WAITING_FOR_EMAIL)

@@ -5,15 +5,19 @@ meta {
 }
 
 post {
-  url: {{base_api}}/parser/upload/dict_modeus_inf
-  body: json
+  url: {{base_api}}/parser/upload/dict_names?file_course=sfd&site_inf=sdfsdf&modeus=sdfsdf
+  body: none
   auth: none
 }
 
-body:json {
-  {"sjlhdflkjskdfjksd" : "sljdhflsdhlf"}
+params:query {
+  file_course: sfd
+  site_inf: sdfsdf
+  modeus: sdfsdf
 }
 
 body:multipart-form {
-  : 
+  ~modeus: dfgdfd
+  ~site_inf: dfgdf
+  ~file_course: dfgdf
 }

@@ -4,12 +4,11 @@ from motor.motor_asyncio import AsyncIOMotorClient
 import asyncio
 
 from config import DB
-from src.schemas import OnlineCourse
+from src.schemas import InfoOnlineCourseInDB
 
 def parse_courses():
 
     collection = DB.get_course_info_collection()
-    collection.delete_many({})
 
     url = "https://inf-online.urfu.ru/ru/onlain-kursy/#urfu"
 
@@ -61,7 +60,7 @@ def parse_courses():
                         split_university = university.split()
                         if split_university[0] == "Курсы" or split_university[0] == "курсы":
                             university = " ".join(split_university[1:])
-                        course = OnlineCourse(name=name, date_start=date, deadline=None, university=university, info=info).model_dump(by_alias=True, exclude=["id"])
+                        course = InfoOnlineCourseInDB(name=name, date_start=date, deadline=None, university=university, info=info).model_dump(by_alias=True, exclude=["id"])
 
                         res = collection.update_one(
                             {"name" : course["name"], "university" : course["university"]}, 

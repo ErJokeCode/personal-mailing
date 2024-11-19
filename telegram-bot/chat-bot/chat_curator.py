@@ -24,9 +24,20 @@ dp = Dispatcher(storage=storage)
 
 
 
-@dp.message(Command("start"), F.chat.type.in_({"group", "supergroup"}) & F.from_user.id == 1362536052)
+@dp.message(Command("add_group"), F.chat.type.in_({"group", "supergroup"}) & F.from_user.id == 1362536052)
 async def all_message_in_group(message: types.Message, state: FSMContext):
-    await message.answer(f"Отправить данные о чате на сервер для добавления информации в бота\n\nИнформация:\n{message.chat.full_name}\n{await message.bot.export_chat_invite_link(message.chat.id)}")
+    full_name_course = " ".join(message.text.split()[1:])
+    link = await message.bot.export_chat_invite_link(message.chat.id)
+
+    async with aiohttp.ClientSession() as session:
+        headers = {"cookie": f"{get_cookie()}"}
+        async with session.post(
+            f"{URL_SERVER}/parser/subject/add_group_tg", 
+            headers=headers, 
+            params={"full_name": full_name_course, "link": link}
+            ) as resp:
+                if resp.status == 200:
+                    await message.answer(f"Группа успешно добавлена")
 
 @dp.chat_member(ChatMemberUpdatedFilter(IS_NOT_MEMBER >> IS_MEMBER))
 async def all_message_in_group(event: ChatMemberUpdated, state: FSMContext):
