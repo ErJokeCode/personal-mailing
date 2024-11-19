@@ -2,6 +2,7 @@ import asyncio
 from aiogram import F, Router, types
 from aiogram.fsm.context import FSMContext
 from aiogram.filters.command import Command
+from aiogram.fsm.state import State
 import requests
 
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
@@ -13,6 +14,13 @@ from config import URL_SERVER, get_cookie
 from handlers.main_menu import show_main_menu
 from handlers.onboarding import choice_onboarding
 from states import RegistrationStates, LKStates
+from texts.error import UserAlreadyRegistered, ErrorAuth, NotValueForAuth
+from texts.start import Start
+
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 router = Router()
 
@@ -22,100 +30,108 @@ def is_valid_email(email):
     return re.match(pattern, email) is not None
 
 
+async def del_msg(message: types.Message, msgs: list[types.Message]):
+    await message.bot.delete_messages(message.chat.id, msgs)
+
+
+async def auth_user(user_data, chat_id: str):
+    email = user_data.get("email")
+    persinal_number = user_data.get("personal_number")
+
+    if email == None or persinal_number == None or chat_id == None:
+        raise NotValueForAuth()
+    
+    headers = {"cookie": f"{get_cookie()}"}
+
+    body = {
+            "email": email,
+            "personalNumber": persinal_number,
+            "chatId": chat_id,
+            }
+
+    async with aiohttp.ClientSession() as session:
+        async with session.post(
+            f"{URL_SERVER}/core/student/auth", 
+            json=body, 
+            headers=headers) as response:
+            if response.status < 400:
+                response_data = await response.json()
+                return response_data.get("id")
+            elif response.status == 423:
+                raise UserAlreadyRegistered()
+            else:
+                raise ErrorAuth()
+
+
 @router.message(Command("start"))
 async def cmd_start(message: types.Message, state: FSMContext):
     await state.clear()
+
     user_data = await state.get_data()
-    
-    if not user_data.get("email") and not user_data.get("personal_number"):
-        welcome_msg = await message.answer(
-            "Добро пожаловать! Пожалуйста, введите вашу почту УРФУ. Например ivanov@urfu.me"
-        )
-        await state.set_state(RegistrationStates.WAITING_FOR_EMAIL)
-        await state.update_data(welcome_msg_id=welcome_msg.message_id)
-    else:
-        user_data = await state.get_data()
-        body = {
-            "email": user_data.get("email"),
-            "personalNumber": user_data.get("personal_number"),
-            "chatId": str(message.chat.id),
-        }
-        async with aiohttp.ClientSession() as session:
-            headers = {"cookie": f"{get_cookie()}"}
-            async with session.post(
-                f"{URL_SERVER}/core/student/auth", json=body, headers=headers
-            ) as response:
-                if response.status < 400:
-                    response_data = await response.json()
-                    await state.update_data(user_id=response_data.get("id"))
-                    await choice_onboarding(message, state)
-                elif response.status == 423:
-                    msg_login = await message.answer("Пользователь уже вошел в аккаунт")
-                    await asyncio.sleep(5)
-                    await message.bot.delete_messages(
-                        message.chat.id, [msg_login.message_id, message.message_id]
-                    )
-                else:
-                    await message.answer(
-                        "Произошла ошибка при регистрации. Пожалуйста, введите вашу почту УРФУ. Например ivanov@urfu.me"
-                    )
-                    await state.set_state(RegistrationStates.WAITING_FOR_EMAIL)
-                    await state.update_data(welcome_msg_id=welcome_msg.message_id)
+    if user_data.get("user_id") != None:
+        await choice_onboarding(message, state)
+
+    await state.set_state(RegistrationStates.WAITING_FOR_EMAIL)
+
+    welcome_msg = await message.answer(Start.hellow())
+
+    await state.update_data(start_message_del=[welcome_msg.message_id])
 
 
 @router.message(RegistrationStates.WAITING_FOR_EMAIL)
 async def process_email(message: types.Message, state: FSMContext):
+    user_data = await state.get_data()
+    list_del_msg = user_data.get("start_message_del")
+    print(list_del_msg)
+
     if is_valid_email(message.text):
-        await state.update_data(email=message.text, email_msg_id=message.message_id)
-        student_id_msg = await message.answer(
-            "Спасибо! Теперь введите номер вашего студенческого билета. Его вы можете посмотреть в студенческом билете после слов \"СТУДЕНЧЕСКИЙ БИЛЕТ №...\""
-        )
-        await state.update_data(student_id_msg_id=student_id_msg.message_id)
+        await state.update_data(email=message.text)
+
         await state.set_state(RegistrationStates.WAITING_FOR_STUDENT_ID)
+
+        msg = await message.answer(Start.input_number_student())
+        list_del_msg.append(message.message_id)
+        list_del_msg.append(msg.message_id)
+
+        await state.update_data(start_message_del=list_del_msg)
+        
     else:
-        await message.answer("Неверный формат почты. Пожалуйста, попробуйте еще раз.")
+        msg = await message.answer(Start.incorrect_format_email())
+        await asyncio.sleep(5)
+        await del_msg(message, [msg.message_id, message.message_id])
 
 
 @router.message(RegistrationStates.WAITING_FOR_STUDENT_ID)
 async def process_student_id(message: types.Message, state: FSMContext):
-    await state.update_data(
-        personal_number=message.text, student_id_response_msg_id=message.message_id
-    )
+    await state.update_data(personal_number=message.text)
+
     user_data = await state.get_data()
-    body = {
-        "email": user_data.get("email"),
-        "personalNumber": user_data.get("personal_number"),
-        "chatId": str(message.chat.id),
-    }
-    async with aiohttp.ClientSession() as session:
-        headers = {"cookie": f"{get_cookie()}"}
-        async with session.post(
-            f"{URL_SERVER}/core/student/auth", json=body, headers=headers
-        ) as response:
-            if response.status < 400:
-                response_data = await response.json()
-                # Delete all registration messages
-                for msg in [
-                    "welcome_msg_id",
-                    "email_msg_id",
-                    "student_id_msg_id",
-                    "student_id_response_msg_id",
-                ]:
-                    msg_id = user_data.get(msg)
-                    if msg_id:
-                        await message.bot.delete_message(
-                            chat_id=message.chat.id, message_id=msg_id
-                        )
-                await state.set_state(LKStates.MAIN_MENU)
-                await state.clear()
-                await state.update_data(
-                    email=body["email"],
-                    personal_number=body["personalNumber"],
-                    user_id=response_data.get("id"),
-                )
-                await choice_onboarding(message, state)
-            else:
-                await message.answer(
-                    "Произошла ошибка при регистрации. Пожалуйста, введите вашу почту УРФУ. Например ivanov@urfu.me"
-                )
-                await state.set_state(RegistrationStates.WAITING_FOR_EMAIL)
+    list_del_msg = user_data.get("start_message_del")
+    list_del_msg.append(message.message_id)
+
+    try:
+        user_id = await auth_user(user_data, message.chat.id)
+        await state.update_data(user_id=user_id)
+        await choice_onboarding(message, state)
+        await del_msg(message, list_del_msg)
+        await state.update_data(start_message_del=[])
+
+    except UserAlreadyRegistered as error_user:
+        msg = await message.answer(Start.person_in_account())
+        await asyncio.sleep(5)
+        list_del_msg.append(msg.message_id)
+        await del_msg(message, list_del_msg)
+
+        await state.set_state(RegistrationStates.WAITING_FOR_EMAIL)
+        msg2 = await message.answer(Start.second_input())
+        await state.update_data(start_message_del=[msg2.message_id])
+
+    except ErrorAuth as error_auth:
+        await del_msg(message, list_del_msg)
+
+        await state.set_state(RegistrationStates.WAITING_FOR_EMAIL)
+        msg = await message.answer(Start.second_input())
+        await state.update_data(start_message_del=[msg.message_id])
+        
+    except NotValueForAuth as not_val:
+        pass
