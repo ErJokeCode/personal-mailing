@@ -18,7 +18,6 @@
 		TrashBinSolid
 	} from 'flowbite-svelte-icons';
 	import Users from '../../../data/users.json';
-	import { imagesPath } from '../../../utils/variables';
 
 	import User from './User.svelte';
 	import Delete from './Delete.svelte';
@@ -102,7 +101,6 @@
 				<TableBodyRow class="text-base">
 					<TableBodyCell class="w-4 p-4"><Checkbox /></TableBodyCell>
 					<TableBodyCell class="mr-12 flex items-center space-x-6 whitespace-nowrap p-4">
-						<Avatar src={imagesPath(user.avatar, 'users')} />
 						<div class="text-sm font-normal text-gray-500 dark:text-gray-400">
 							<div class="text-base font-semibold text-gray-900 dark:text-white">{user.name}</div>
 							<div class="text-sm font-normal text-gray-500 dark:text-gray-400">{user.email}</div>

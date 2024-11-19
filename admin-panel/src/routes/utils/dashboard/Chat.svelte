@@ -1,5 +1,4 @@
 <script>
-	import { imagesPath } from '../variables';
 	import { Card, Textarea, ToolbarButton } from 'flowbite-svelte';
 	import {
 		ChevronUpOutline,
@@ -25,7 +24,7 @@
 	</div>
 	<!-- Chat -->
 	<form class="overflow-y-auto lg:max-h-[60rem] 2xl:max-h-fit">
-		<ChatMsg replays={4} name={Users[2].name} avatar={imagesPath(Users[2].avatar, 'users')}>
+		<ChatMsg replays={4} name={Users[2].name}>
 			<p>
 				Hello <a
 					href="#top"
@@ -35,7 +34,7 @@
 			</p>
 			<p>Looking forward to it! Thanks.</p>
 		</ChatMsg>
-		<ChatMsg replays={0} name={Users[4].name} avatar={imagesPath(Users[4].avatar, 'users')}>
+		<ChatMsg replays={0} name={Users[4].name}>
 			<p>Hello everyone,</p>
 			<p>
 				Thank you for the workshop, it was very productive meeting. I can't wait to start working on
@@ -176,7 +175,7 @@
 				</button>
 			</div>
 		</ChatMsg>
-		<ChatMsg replays={0} name={Users[3].name} avatar={imagesPath(Users[3].avatar, 'users')}>
+		<ChatMsg replays={0} name={Users[3].name}>
 			<p>
 				Ok <a href="#top" class="font-medium text-primary-600 hover:underline dark:text-primary-500"
 					>@team</a
@@ -234,7 +233,6 @@
 		<ChatMsg
 			replays={0}
 			name={Users[8].name}
-			avatar={imagesPath(Users[8].avatar, 'users')}
 			class="pl-12"
 		>
 			<p>
@@ -247,7 +245,6 @@
 		<ChatMsg
 			replays={0}
 			name={Users[3].name}
-			avatar={imagesPath(Users[3].avatar, 'users')}
 			class="pl-12"
 		>
 			<p class="mb-5">

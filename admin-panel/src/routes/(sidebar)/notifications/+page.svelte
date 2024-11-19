@@ -2,7 +2,7 @@
 	import { Breadcrumb, BreadcrumbItem, Heading } from 'flowbite-svelte';
 	import { TableHeadCell, Table, TableBody, TableBodyCell, TableBodyRow, TableHead } from 'flowbite-svelte';
   import { onMount } from "svelte";
-  import { A } from 'flowbite-svelte';
+  import { Button } from 'flowbite-svelte';
   import { ArrowRightOutline } from 'flowbite-svelte-icons';
 
   let login_status = "";
@@ -27,23 +27,23 @@
 <main class="relative h-full w-full overflow-y-auto bg-white dark:bg-gray-800">
 	<div class="p-4 px-6">
 		<Breadcrumb class="mb-5">
-			<BreadcrumbItem home href="/">Home</BreadcrumbItem>
-			<BreadcrumbItem>Notifications</BreadcrumbItem>
+			<BreadcrumbItem home href="/">Главная</BreadcrumbItem>
+			<BreadcrumbItem>Рассылки</BreadcrumbItem>
 		</Breadcrumb>
-    <A href="/notifications/send-notifications" aClass="inline-flex items-center font-medium  hover:underline mb-3">
-      Send Notifications
+    <Button href="/notifications/send-notifications" class="mb-3">
+      Создать рассылки
       <ArrowRightOutline class="w-6 h-6 ms-2" />
-    </A>
+    </Button>
 		<Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
-			Your Notifications
+			Ваши рассылки
       {login_status}
 		</Heading>
 	</div>
   <Table hoverable={true}>
     <TableHead>
-      <TableHeadCell class="px-8">Content</TableHeadCell>
-      <TableHeadCell class="px-8" defaultSort>Date</TableHeadCell>
-      <TableHeadCell class="px-8">Sent To</TableHeadCell>
+      <TableHeadCell class="px-8">Содержание</TableHeadCell>
+      <TableHeadCell class="px-8" defaultSort>Дата</TableHeadCell>
+      <TableHeadCell class="px-8">Отправлено</TableHeadCell>
     </TableHead>
     <TableBody tableBodyClass="divide-y">
       {#each notifications as notification}

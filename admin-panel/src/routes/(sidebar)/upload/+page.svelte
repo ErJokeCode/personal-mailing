@@ -77,9 +77,9 @@
         );
 
         if (result.ok) {
-					courses_success = "Success";
+			courses_success = "Success";
         } else {
-					courses_success = "Error";
+			courses_success = "Error";
         }
     }
 </script>
@@ -88,27 +88,27 @@
 	<div class="grid grid-cols-1 space-y-2 dark:bg-gray-800 xl:grid-cols-3 xl:gap-3.5">
 		<div class="col-span-full xl:mb-0">
 			<Breadcrumb class="mb-6">
-				<BreadcrumbItem home href="/">Home</BreadcrumbItem>
-				<BreadcrumbItem>Upload</BreadcrumbItem>
+				<BreadcrumbItem home href="/">Главная</BreadcrumbItem>
+				<BreadcrumbItem>Загрузить файлы</BreadcrumbItem>
 			</Breadcrumb>
 		</div>
 	</div>
-	<div class="space-y-2">
-		<Label for="larg_size">Students File</Label>
+	<div class="space-y-2 mb-5">
+		<Label for="larg_size">Студенты</Label>
 		<Fileupload value="" bind:files={student_files} id="larg_size" size="lg" />
 		<Helper>{student_success}</Helper>
-		<Button on:click={send_students}>Send Students</Button>
+		<Button on:click={send_students}>Загрузить</Button>
 	</div>
-		<div class="space-y-2 py-5">
-		<Label for="larg_size">Modeus File</Label>
+		<div class="space-y-2 mb-5">
+		<Label for="larg_size">Модеус</Label>
 		<Fileupload value="" bind:files={modeus_files} id="larg_size" size="lg" />
 		<Helper>{modeus_success}</Helper>
-		<Button on:click={send_modeus}>Send Modeus</Button>
+		<Button on:click={send_modeus}>Загрузить</Button>
 	</div>
-	<div class="space-y-2">
-		<Label for="larg_size">Courses File</Label>
+	<div class="space-y-2 mb-5">
+		<Label for="larg_size">Курсы</Label>
 		<Fileupload value="" bind:files={courses_files} id="larg_size" size="lg" />
 		<Helper>{courses_success}</Helper>
-		<Button on:click={send_courses}>Send Courses</Button>
+		<Button on:click={send_courses}>Загрузить</Button>
 	</div>
 </main>

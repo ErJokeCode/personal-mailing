@@ -56,8 +56,8 @@
             });
 
             data.append("body", body);
-            if (files.length > 0) {
-                data.append("file", files[0]);
+            for (let file of files) {
+                data.append("file", file);
             }
 
             response = await fetch('http://localhost:5000/core/notification', {
@@ -121,9 +121,9 @@
 <main class="relative h-full w-full overflow-y-auto bg-white dark:bg-gray-800">
 	<div class="p-4 px-6">
 		<Breadcrumb class="mb-5">
-			<BreadcrumbItem home href="/">Home</BreadcrumbItem>
-			<BreadcrumbItem href="/notifications">Notifications</BreadcrumbItem>
-			<BreadcrumbItem>Send Notifications</BreadcrumbItem>
+			<BreadcrumbItem home href="/">Главная</BreadcrumbItem>
+			<BreadcrumbItem href="/notifications">Рассылки</BreadcrumbItem>
+			<BreadcrumbItem>Отправить рассылку</BreadcrumbItem>
 		</Breadcrumb>
 		<form class="mb-4">
 			<div class="items-center px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700">
@@ -135,7 +135,7 @@
 						event.preventDefault();
 					}}
 					on:change={handleChange}
-					bind:files>
+					multiple bind:files>
 					<svg aria-hidden="true" class="mb-3 w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
 					{#if value.length === 0}
 						<p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
@@ -144,20 +144,20 @@
 						<p>{showFiles(value)}</p>
 					{/if}
 				</Dropzone>
-				<Textarea id="editor" rows="6" class="mb-2 bg-white dark:bg-gray-800" placeholder="Enter text" bind:value={content}></Textarea>
-				<Button class="mb-2" on:click={send}>Send Notification</Button>
+				<Textarea id="editor" rows="6" class="mb-2 bg-white dark:bg-gray-800" placeholder="Введите текст" bind:value={content}></Textarea>
+				<Button class="mb-2" on:click={send}>Отправить рассылку</Button>
 				<Helper>{send_status}</Helper>
 			</div>
 		</form>
 		<Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
-			All users
+			Все студенты
       {login_status}
 		</Heading>
 	</div>
 	<Table>
 		<TableHead class="border-y border-gray-200 bg-gray-100 dark:border-gray-700">
-			{#each ['Select', 'Id', 'Email'] as title}
-				<TableHeadCell class="w-4 p-4 px-10 font-medium">{title}</TableHeadCell>
+			{#each ['Выбрать', 'Id', 'Электронная почта'] as title}
+				<TableHeadCell class="w-4 p-4 px-6 font-medium">{title}</TableHeadCell>
 			{/each}
 		</TableHead>
 		<TableBody>

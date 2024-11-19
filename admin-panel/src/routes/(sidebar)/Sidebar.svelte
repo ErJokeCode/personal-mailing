@@ -16,13 +16,10 @@
 		CogOutline,
 		FileChartBarSolid,
 		UserSettingsOutline,
-		LayersSolid,
-		LifeSaverSolid,
 		LockSolid,
-		WandMagicSparklesOutline,
+		UsersGroupOutline,
 		ChartPieOutline,
-		RectangleListSolid,
-		TableColumnSolid
+		RectangleListSolid
 	} from 'flowbite-svelte-icons';
 
 	export let drawerHidden: boolean = false;
@@ -49,40 +46,28 @@
 	});
 
 	let posts = [
-		{ name: 'Dashboard', icon: ChartPieOutline, href: '/dashboard' },
-		{ name: 'Login', icon: LockSolid, href: '/authentication/sign-in' },
-		{ name: 'Upload', icon: FileChartBarSolid, href: '/upload' },
-		{ name: 'Notifications', icon: ClipboardListSolid, href: '/notifications' },
-		{ name: 'Admin', icon: UserSettingsOutline, href: '/admin' },
+		{ name: 'Главная', icon: ChartPieOutline, href: '/chat' },
+		{ name: 'Войти', icon: LockSolid, href: '/authentication/login' },
+		{ name: 'Загрузить файлы', icon: FileChartBarSolid, href: '/upload' },
+		{ name: 'Рассылки', icon: ClipboardListSolid, href: '/notifications' },
 		{
-			name: 'CRUD',
+			name: 'Студенты',
+			icon: UsersGroupOutline,
+			children: {
+				'Все студенты': '/students/all',
+                'Активные студенты': '/students/active'
+			}
+		},
+		{ name: 'Администраторы', icon: UserSettingsOutline, href: '/admin' },
+		{ name: 'Профиль', icon: CogOutline, href: '/settings' },
+		{
+			name: 'tests',
 			icon: RectangleListSolid,
 			children: {
                 Table: '/crud/table',
 				Products: '/crud/products',
 				Users: '/crud/users'
 			}
-		},
-		{ name: 'Settings', icon: CogOutline, href: '/settings' },
-		{
-			name: 'Playground',
-			icon: WandMagicSparklesOutline,
-			children: {
-				Sidebar: '/'
-			}
-		}
-	];
-
-	let links = [
-		{
-			label: 'icon',
-			href: '',
-			icon: LayersSolid
-		},
-		{
-			label: 'Support',
-			href: '',
-			icon: LifeSaverSolid
 		}
 	];
 	let dropdowns = Object.fromEntries(Object.keys(posts).map((x) => [x, false]));
@@ -129,17 +114,6 @@
 				{/each}
 			</SidebarGroup>
 			<SidebarGroup ulClass={groupClass}>
-				{#each links as { label, href, icon } (label)}
-					<SidebarItem
-						{label}
-						{href}
-						spanClass="ml-3"
-						class={itemClass}
-						target="_blank"
-					>
-						<svelte:component this={icon} slot="icon" class={iconClass} />
-					</SidebarItem>
-				{/each}
 			</SidebarGroup>
 		</nav>
 	</SidebarWrapper>

@@ -1,4 +1,4 @@
-export const imgDir = 'https://flowbite-admin-dashboard.vercel.app/images';
+export const imgDir = '';
 
 /** @type {(x:string) => string} */
 export const avatarPath = (src) => imgDir + '/users/' + src;
