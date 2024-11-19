@@ -36,19 +36,6 @@ public static partial class NotificationHandler
         return content;
     }
 
-    public static bool IsFileReady(string filename)
-    {
-        try
-        {
-            using (FileStream inputStream = File.Open(filename, FileMode.Open, FileAccess.Read,
-                                                      FileShare.None)) return inputStream.Length > 0;
-        }
-        catch (Exception)
-        {
-            return false;
-        }
-    }
-
     public static async Task SendFromTemplate(int templateId, CoreDb db)
     {
         var template =
@@ -77,15 +64,7 @@ public static partial class NotificationHandler
 
         foreach (var document in template.Documents)
         {
-            var path = Path.Combine(Directory.GetCurrentDirectory(), "Documents", document.InternalName);
-
-            // This will lock the execution until the file is ready
-            // TODO: Add some logic to make it async and cancelable
-            while (!IsFileReady(path))
-            {
-            }
-
-            var stream = File.OpenRead(path);
+            var stream = await DocumentHandler.GetDocumentStream(document.Id, db);
             var formFile = new FormFile(stream, 0, stream.Length, null, document.Name);
             fileCollection.Add(formFile);
         }
@@ -95,6 +74,12 @@ public static partial class NotificationHandler
         foreach (var student in template.ActiveStudents)
         {
             await BotHandler.SendToBot(student.ChatId, notification.Content, fileCollection);
+        }
+
+        foreach (var stream in fileCollection)
+        {
+            stream.OpenReadStream().Close();
+            stream.OpenReadStream().Dispose();
         }
     }
 }

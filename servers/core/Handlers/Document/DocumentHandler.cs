@@ -11,6 +11,21 @@ namespace Core.Handlers;
 
 public static partial class DocumentHandler
 {
+    public static async Task<Stream> GetDocumentStream(int documentId, CoreDb db)
+    {
+        var document = await db.Documents.FindAsync(documentId);
+
+        if (document == null)
+        {
+            return null;
+        }
+
+        var path = Path.Combine(Directory.GetCurrentDirectory(), "Documents", document.InternalName);
+        var stream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+
+        return stream;
+    }
+
     public static ICollection<Document> GetFromIds(List<int> ids, CoreDb db)
     {
         var collection = new List<Document>();
@@ -48,6 +63,12 @@ public static partial class DocumentHandler
             var stream = document.OpenReadStream();
             stream.Position = 0;
             await stream.CopyToAsync(writeFile);
+
+            writeFile.Close();
+            writeFile.Dispose();
+
+            stream.Close();
+            stream.Dispose();
 
             db.Documents.Add(newDocument);
             savedDocs.Add(newDocument);

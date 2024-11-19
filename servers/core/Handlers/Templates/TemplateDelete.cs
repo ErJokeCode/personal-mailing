@@ -19,9 +19,6 @@ public static partial class TemplateHandler
             return Results.NotFound("Template not found");
         }
 
-        template.IncludeDocuments(db);
-
-        await DocumentHandler.DeleteDocuments(template.Documents.Select(d => d.Id).ToList(), db);
         db.NotificationTemplates.Remove(template);
 
         await db.SaveChangesAsync();
