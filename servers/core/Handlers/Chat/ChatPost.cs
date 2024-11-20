@@ -49,8 +49,7 @@ public static partial class ChatHandler
 
         if (chat == null)
         {
-            chat = new Chat()
-            {
+            chat = new Chat() {
                 ActiveStudentId = activeStudent.Id,
                 AdminId = adminId,
             };
@@ -58,12 +57,8 @@ public static partial class ChatHandler
             db.Chats.Add(chat);
         }
 
-        var message = new Message()
-        {
-            Date = DateTime.Now.ToString(),
-            Sender = "Admin",
-            Receiver = "Student",
-            Content = details.Content,
+        var message = new Message() {
+            Date = DateTime.Now.ToString(), Sender = "Admin", Receiver = "Student", Content = details.Content,
             Status = new MessageStatus(),
         };
 
@@ -103,7 +98,7 @@ public static partial class ChatHandler
 
         var admin = db.Users.Find(details.AdminId);
 
-        if (details.AdminId == null)
+        if (admin == null)
         {
             return Results.NotFound("Admin not found");
         }
@@ -120,8 +115,7 @@ public static partial class ChatHandler
 
         if (chat == null)
         {
-            chat = new Chat()
-            {
+            chat = new Chat() {
                 ActiveStudentId = activeStudent.Id,
                 AdminId = details.AdminId,
             };
@@ -129,13 +123,9 @@ public static partial class ChatHandler
             db.Chats.Add(chat);
         }
 
-        var message = new Message()
-        {
-            Date = DateTime.Now.ToString(),
-            Sender = "Student",
-            Receiver = "Admin",
-            Content = details.Content,
-            Status = new MessageStatus(),
+        var message = new Message() {
+            Date = DateTime.Now.ToString(), Sender = "Student",           Receiver = "Admin",
+            Content = details.Content,      Status = new MessageStatus(),
         };
 
         message.Status.SetSent();
@@ -148,12 +138,9 @@ public static partial class ChatHandler
 
         await db.SaveChangesAsync();
 
-        await endpoint.Publish(new StudentSentMessage()
-        {
-            Admin = AdminUserDto.Map(admin),
-            Message = MessageDto.Map(message),
-            Student = ActiveStudentDto.Map(activeStudent)
-        });
+        await endpoint.Publish(new StudentSentMessage() { Admin = AdminUserDto.Map(admin),
+                                                          Message = MessageDto.Map(message),
+                                                          Student = ActiveStudentDto.Map(activeStudent) });
 
         return Results.Ok();
     }
