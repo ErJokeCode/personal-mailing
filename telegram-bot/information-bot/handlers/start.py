@@ -82,7 +82,6 @@ async def cmd_start(message: types.Message, state: FSMContext):
 async def process_email(message: types.Message, state: FSMContext):
     user_data = await state.get_data()
     list_del_msg = user_data.get("start_message_del")
-    print(list_del_msg)
 
     if is_valid_email(message.text):
         await state.update_data(email=message.text)
