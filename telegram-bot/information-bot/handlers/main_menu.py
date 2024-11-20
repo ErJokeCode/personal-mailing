@@ -69,7 +69,7 @@ async def process_course_info(callback_query: types.CallbackQuery, state: FSMCon
                         if response.status == 200:
                             info_course = await response.json()
                             await callback_query.message.delete()
-                            await callback_query.message.answer(text_main_menu.create_text_online_course(info_course, online_courses[course_id]['score']), reply_markup=keyboard.back_to_courses())
+                            await callback_query.message.answer(text_main_menu.create_text_online_course(info_course, online_courses[course_id]['scores']), reply_markup=keyboard.back_to_courses())
                         else:
                             not_info = await callback_query.message.answer("Пока нет информации, подожтите немного")
                             await sleep(5)
@@ -79,7 +79,7 @@ async def process_course_info(callback_query: types.CallbackQuery, state: FSMCon
                         if response.status == 200:
                             info_course = await response.json()
                             await callback_query.message.delete()
-                            await callback_query.message.answer(text_main_menu.create_text_online_course(info_course, online_courses[course_id]['score']), reply_markup=keyboard.back_to_courses())
+                            await callback_query.message.answer(text_main_menu.create_text_online_course(info_course, online_courses[course_id]['scores']), reply_markup=keyboard.back_to_courses())
                         else:
                             not_info = await callback_query.message.answer("Пока нет информации, подождите немного")
                             await sleep(5)

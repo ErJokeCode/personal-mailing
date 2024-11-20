@@ -1,10 +1,10 @@
-def create_text_online_course(info_course: dict, score: str) -> str:
+def create_text_online_course(info_course: dict, scores: dict) -> str:
+    print(scores)
     name = info_course['name']
     date_start = info_course['date_start']
     deadline = info_course['deadline']
     info = info_course['info']
     university = info_course['university']
-    print(score)
     
     text = f"{name}\n\nКурс проводит {university}\n\n"
 
@@ -17,24 +17,28 @@ def create_text_online_course(info_course: dict, score: str) -> str:
     if info != None:
         text += f"Информация для записи на курс:\n{info}\n\n"
 
-    if score == "Нет на курсе":
-        text += "Тебя нет на курсе! Перейди по ссылке выше или напиши куратору, он тебе обязательно поможет!"
-    elif score == "Not column":
-        text += "К сожалению пока информаци о итоговых баллов нет("
-    else:
-        if score.isdigit():
-            score = int(score)
-            if score < 40:
-                text += f"У тебя {plural(score, "балл", "балла", "баллов")}. Молодец! Для получения зачета надо набрать минимум 40 баллов"
-            elif 40 <= score < 60:
-                text += f"У тебя {plural(score, "балл", "балла", "баллов")}. Молодец! У тебя отлично получается!"
-            elif 60 <= score <= 80:
-                text += f"У тебя {plural(score, "балл", "балла", "баллов")}. Молодец! У тебя отлично получается! Осталось совсем чуть-чуть!"
-            else: 
-                text += f"У тебя {plural(score, "балл", "балла", "баллов")}. Молодец! У тебя велеколепные баллы!"
+    is_success = False
+    for name, score in scores.values():
+        if score == "Нет на курсе":
+            text += "Тебя нет на курсе! Перейди по ссылке выше или напиши куратору, он тебе обязательно поможет!"
+            break
         else:
-            #Надо логировать
-            pass
+            if score.isdigit():
+                text += "Контрольные точки:\n"
+                text += f"{name}: {plural(score, "балл", "балла", "баллов")}\n"
+
+                score = int(score)
+
+                if score >= 40:
+                    is_success = True
+            else:
+                #Надо логировать
+                pass
+
+    if is_success:
+        text += "Молодец! У тебя отлично получается!"
+    else:
+        text += "Для получения зачета надо набрать минимум 40 баллов по всем контрольным точкам"
 
     return text
 
@@ -51,22 +55,53 @@ def plural(input_int, one_form, two_form, three_form):
 
 def create_text_subjects(data: list):
     text = ""
-    i = 1
-    for item in data:
-        full_name = item.get("fullName")
-        name = item.get("name")
-        form_education = item.get("form_education")
-        info = item.get("info")
-        print(data)
 
-        text += f"{i}. {name}\n\n"
-        # if form_education == "traditional":
-        #     text += "Этот курс проводится в традиционной форме. Придется ходить на очный пары в универ))"
-        # elif form_education == "mixed":
-        #     text += "Этот курс проводится в смешанной форме. Придется ходить и на очный пары в универ, и решать онлайн курс"
-        # elif form_education == "online":
-        #     text += "Этот курс проводится онлайн. Не забудь пройти его!"
-        # elif form_education == "other":
-        #     text += "Этот курс от партнеров вуза"
-        i += 1
+    dict_edu = get_dict_form_edu(data)
+    for form_edu in dict_edu.keys():
+        i = 1
+        text += get_text_form_edu(form_edu)
+        for item in dict_edu[form_edu]:
+
+            name = item.get("name")
+            link = item.get("groupTgLink")
+            online_course = item.get("onlineCourse")
+
+            text += f"{i}. {name}\n"
+            text += get_text_online_course(online_course)
+            text += get_text_link(link)
+            text += "\n"
+
+            i += 1
+        text += "\n"
+    
+    text += "Если вы нашли несоответсвие сообщите куратору"
+
     return text
+
+
+def get_dict_form_edu(data):
+    dict = {"traditional" : [], "mixed": [], "online": [], "other": []}
+    for item in data:
+        dict[item.get("formEducation")].append(item)
+    return dict
+    
+
+def get_text_form_edu(name):
+    if name == "traditional":
+        return "Курсы проводятся в традиционной форме. Придется ходить на очный пары в универ))\n"
+    elif name == "mixed":
+        return "Курсы проводятся в смешанной форме. Придется ходить и на очный пары в универ, и решать онлайн курс\n"
+    elif name == "online":
+        return "Курсы проводятся онлайн. Не забудь пройти его!\n"
+    return "Курсы от партнеров вуза\n"
+
+
+def get_text_online_course(online_course):
+    if online_course != None:
+        return f"Курс включает в себя прохождение онлайн курса {online_course["name"]}, его проводит {online_course["university"]}. Оснонвая информация по курсу: {online_course["info"]}. Более подробную информацию можешь узнать в разделе \"Онлайн курсы\"\n"
+    return ""
+
+def get_text_link(link):
+    if link != None:
+        return f"Ссылка на группу по предмету {link}\n"
+    return ""
