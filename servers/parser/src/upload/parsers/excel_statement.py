@@ -76,20 +76,22 @@ def get_course2(row, col_name_course: str, col_university: str, cols_scores: str
 
     if info_course == None:
         info_course = create_default_info_course(name_course, university, collection_course)
+    else:
+        info_course = InfoOnlineCourseInDB(**info_course)
 
     course = create_course_in_student(info_course, scores)
 
     return course.model_dump()
 
     
-def create_default_info_course(name: str, university: str, collection_course: Collection):
+def create_default_info_course(name: str, university: str, collection_course: Collection) -> InfoOnlineCourseInDB:
     online_course = InfoOnlineCourseInDB(name=name, university=university)
     collection_course.insert_one(online_course.model_dump(by_alias=True, exclude=["id"]))
     return online_course
 
 
 def create_course_in_student(info_course: InfoOnlineCourseInDB, scores: dict):
-    return OnlineCourseStudent(**info_course, scores=scores)
+    return OnlineCourseStudent(**info_course.model_dump(), scores=scores)
 
 
 def create_student_for_dict(row, cols_full_name, col_group, email, course):
