@@ -46,7 +46,7 @@ async def auth_user(user_data, chat_id: str):
     body = {
             "email": email,
             "personalNumber": persinal_number,
-            "chatId": chat_id,
+            "chatId": str(chat_id),
             }
 
     async with aiohttp.ClientSession() as session:
