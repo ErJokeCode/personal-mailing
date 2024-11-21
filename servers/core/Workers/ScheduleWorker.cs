@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Handlers;
 using Core.Utility;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
@@ -49,7 +50,14 @@ public class ScheduleWorker : BackgroundService, IDisposable
             }
         }
 
-        context.SaveChanges();
+        try
+        {
+            context.SaveChanges();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            // Ignore the error for now
+        }
     }
 
     public override Task StopAsync(CancellationToken cancellationToken)
