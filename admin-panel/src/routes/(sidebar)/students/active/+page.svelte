@@ -18,7 +18,7 @@
     });
 
     async function fullInfo(id) {
-        goto(`/student/active/${id}`);
+        goto(`/students/active/${id}`);
     }
 </script>
 

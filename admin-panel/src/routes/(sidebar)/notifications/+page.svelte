@@ -48,7 +48,7 @@
     <TableBody tableBodyClass="divide-y">
       {#each notifications as notification}
         <TableBodyRow slot="row">
-          <TableBodyCell class="px-8">{notification.content}</TableBodyCell>
+          <TableBodyCell class="px-8 break-all">{notification.content}</TableBodyCell>
           <TableBodyCell class="px-8">{notification.date}</TableBodyCell>
           <TableBodyCell class="px-8">
             {#each notification.students as student}

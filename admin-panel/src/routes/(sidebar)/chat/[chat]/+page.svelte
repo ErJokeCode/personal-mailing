@@ -1,6 +1,5 @@
 <script>
-	import { Breadcrumb, BreadcrumbItem, Button, Heading, Textarea, ToolbarButton, Card } from 'flowbite-svelte';
-	import { ArrowRightOutline } from 'flowbite-svelte-icons';
+	import { Breadcrumb, BreadcrumbItem, Textarea, ToolbarButton } from 'flowbite-svelte';
     import { onDestroy, onMount } from "svelte";
     import http from "../../../../utility/http";
     import { signal } from "../../../../utility/signal";
@@ -69,7 +68,7 @@
     }
 </script>
 
-<main class="h-full w-full">
+<main class="h-full w-full bg-white dark:bg-gray-800">
 	<div class="p-4 px-6">
 		<Breadcrumb class="mb-5">
 			<BreadcrumbItem home>Главная</BreadcrumbItem>
@@ -77,43 +76,43 @@
 			<BreadcrumbItem>Чат</BreadcrumbItem>
 		</Breadcrumb>
 	</div>
-    <div class="px-20 mb-10 p-10">
-        <Card size="xxl" class="overflow-auto mb-5 p-10" bind:this={chatArea}>
+    <div class="px-20 mb-10 py-10">
+        <div class="bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 rounded-lg border border-gray-200 dark:border-gray-700
+                    divide-gray-200 dark:divide-gray-700 shadow-md flex w-full flex-col p-4 sm:p-6 overflow-auto mb-5"
+                bind:this={chatArea}>
             <div class="h-s">
                 {#each messages as message}
                     {#if message.sender == "Admin"}
-                        <article class="space-y-3 mx-5 mb-5">
-                            <footer class="flex items-center justify-end">
-                                <div class="flex items-center gap-2">
-                                    <p class="text-sm font-semibold text-gray-900 dark:text-white">
-                                        {admin.email}
-                                    </p>
-                                </div>
-                            </footer>
-                            <div class="space-y-2 text-gray-900 dark:text-white text-right">{message.content}</div>
+                        <article class="flex space-y-3 justify-end">
+                            <div class="bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded-lg border border-gray-200 dark:border-gray-700
+                                        divide-gray-200 dark:divide-gray-700 shadow-md flex w-full max-w-xl flex-col p-4 sm:px-5 mb-5">
+                                <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                                    {admin.email}
+                                </p>
+                                <div class="flex space-y-2 text-gray-900 dark:text-white break-all">{message.content}</div>
+                            </div>
                         </article>
                     {:else}
-                        <article class="space-y-3 mx-5 mb-5">
-                            <footer class="flex items-center">
-                                <div class="flex items-center gap-2">
-                                    <p class="text-sm font-semibold text-gray-900 dark:text-white">
-                                        {student.email}
-                                    </p>
-                                </div>
-                            </footer>
-                            <div class="space-y-2 text-gray-900 dark:text-white">{message.content}</div>
+                        <article class="flex space-y-3">
+                            <div class="bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded-lg border border-gray-200 dark:border-gray-700
+                                        divide-gray-200 dark:divide-gray-700 shadow-md flex w-full max-w-xl flex-col p-4 sm:px-5 mb-5">
+                                <p class="text-sm font-semibold text-gray-900 dark:text-white">
+                                    {student.email}
+                                </p>
+                                <div class="flex space-y-2 text-gray-900 dark:text-white break-all">{message.content}</div>
+                            </div>
                         </article>
                     {/if}
                 {/each}
             </div>
-        </Card>
+        </div>
         <div class="flex items-center gap-5">
             <Textarea
                 rows={1}
                 placeholder="Введите текст" 
                 bind:value={content}
                 on:keypress={handle_keypress}
-                class="bg-white dark:bg-gray-800"/>
+                class="bg-gray-50 dark:bg-gray-900"/>
             <ToolbarButton
                 type="submit"
                 color="default"
@@ -125,7 +124,6 @@
                     class="h-6 w-6 rotate-90"
                     fill="currentColor"
                     viewBox="0 0 20 20"
-                    xmlns="http://www.w3.org/2000/svg"
                     ><path
                         d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"
                     ></path></svg

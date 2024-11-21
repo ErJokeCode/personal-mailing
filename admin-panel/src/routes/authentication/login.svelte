@@ -26,7 +26,7 @@
         let the_admin = await http.get("/core/admin/me", http.status());
         admin.update((_) => the_admin);
 
-        goto("/");
+        goto("/chat");
     }
     
 	let title = 'Войти';

@@ -38,7 +38,6 @@
 	let activeMainSidebar: string;
 
 	afterNavigate((navigation) => {
-		// this fixes https://github.com/themesberg/flowbite-svelte/issues/364
 		document.getElementById('svelte')?.scrollTo({ top: 0 });
 		closeDrawer();
 

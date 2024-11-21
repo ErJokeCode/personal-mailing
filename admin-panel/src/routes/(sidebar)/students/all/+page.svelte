@@ -33,7 +33,7 @@
     });
 
     async function fullInfo(email) {
-        goto(`/student/${email}`);
+        goto(`/students/${email}`);
     }
 </script>
 
