@@ -4,6 +4,7 @@ def create_text_online_course(info_course: dict, score: str) -> str:
     deadline = info_course['deadline']
     info = info_course['info']
     university = info_course['university']
+    print(score)
     
     text = f"{name}\n\nКурс проводит {university}\n\n"
 
@@ -56,6 +57,7 @@ def create_text_subjects(data: list):
         name = item.get("name")
         form_education = item.get("form_education")
         info = item.get("info")
+        print(data)
 
         text += f"{i}. {name}\n\n"
         # if form_education == "traditional":

@@ -69,7 +69,6 @@ public static partial class StudentHandler
     public static async Task<IResult> GetStudentNotifications(Guid id, CoreDb db)
     {
         var activeStudent = await db.ActiveStudents.Include(a => a.Notifications)
-                                .ThenInclude(n => n.Documents)
                                 .Include(a => a.Notifications)
                                 .ThenInclude(n => n.Admin)
                                 .Include(a => a.Notifications)
@@ -80,6 +79,8 @@ public static partial class StudentHandler
         {
             return Results.NotFound("Could not find student");
         }
+
+        activeStudent.Notifications.IncludeDocuments(db);
 
         var dtos = NotificationDto.Maps((List<Notification>)activeStudent.Notifications);
 

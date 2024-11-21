@@ -11,22 +11,28 @@ public static partial class ChatHandler
 {
     public static async Task<IResult> SetMessageStatus(int id, int code, CoreDb db)
     {
-        var status = await db.MessageStatuses.SingleOrDefaultAsync(n => n.MessageId == id);
+        var message =
+            await db.Messages.Include(m => m.Status).Include(m => m.Chat).SingleOrDefaultAsync(m => m.Id == id);
 
-        if (status == null)
+        if (message == null)
         {
-            return Results.NotFound("Status not found");
+            return Results.NotFound("Message not found");
         }
 
-        var set = status.Set(code);
+        var set = message.Status.Set(code);
 
         if (!set)
         {
             return Results.BadRequest("Wrong status code");
         }
 
+        if (message.Receiver == "Admin" && message.Status.Code == 1)
+        {
+            message.Chat.UnreadCount -= 1;
+        }
+
         await db.SaveChangesAsync();
 
-        return Results.Ok(MessageStatusDto.Map(status));
+        return Results.Ok(MessageDto.Map(message));
     }
 }

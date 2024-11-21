@@ -14,6 +14,8 @@ public class Subject
     public string Name { get; set; }
     public string FormEducation { get; set; }
     public string Info { get; set; }
+    public string OnlineCourse { get; set; }
+    public string GroupTgLink { get; set; }
 }
 
 [Keyless]
@@ -26,7 +28,7 @@ public class CourseInfo
     public string DateStart { get; set; }
     public string Deadline { get; set; }
     public string Info { get; set; }
-    public string Score { get; set; }
+    public Dictionary<string, int> Scores { get; set; }
 }
 
 [Keyless]

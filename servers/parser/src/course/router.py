@@ -2,7 +2,7 @@ from typing import List
 from fastapi import APIRouter, HTTPException
 
 from config import DB
-from src.schemas import Course, Course_info, Modeus_to_inf, OnlineCourse, StudentCourse
+from src.schemas import Course, DictNames, InfoOnlineCourseInDB, StudentForDict
 from bson import ObjectId
 
 
@@ -25,7 +25,7 @@ async def get_by_email(email: str):
     if user_course is None:
         print("User not found")
         raise HTTPException(status_code=404, detail="User not found")
-    user_course = StudentCourse(**user_course)
+    user_course = StudentForDict(**user_course)
 
     return user_course
 
@@ -42,27 +42,37 @@ async def get_by_id(id: str):
     if user_course is None:
         print("User not found")
         raise HTTPException(status_code=404, detail="User not found")
-    user_course = StudentCourse(**user_course)
+    user_course = StudentForDict(**user_course)
 
     return user_course
 
 
 @router_course.get("/search")
-async def get_courses(name: str, university: str | None = None) -> OnlineCourse:
+async def get_courses(name: str, university: str | None = None) -> InfoOnlineCourseInDB:
     collection = DB.get_course_info_collection()
     query = {"name": {"$regex": name, "$options": "i"}}
     if university:
         query["university"] = {"$regex": university, "$options": "i"}
     course = collection.find_one(query)
-    return OnlineCourse(**course)
+    return InfoOnlineCourseInDB(**course)
 
 
-@router_course.get("/modeus_to_inf")
-async def get_modeus_to_inf(name_modeus: str = None) -> Modeus_to_inf:
-    col_mod = DB.get_modeus_inf()
-    res = col_mod.find_one({"modeus" : name_modeus})
+@router_course.get("/dict_names")
+async def get_modeus_to_inf(modeus:str = None, site_inf: str = None, file_course: str = None) -> DictNames:
+    col_mod = DB.get_dict_names()
+
+    req = {}
+    if modeus != None:
+        req["modeus"] = modeus
+    if site_inf != None:
+        req["site_inf"] = site_inf
+    if file_course != None:
+        req["file_course"] = file_course
+    
+    res = col_mod.find_one(req)
+    
     if res == None:
         raise HTTPException(status_code=404, detail="Course not found")
-    return Modeus_to_inf(**res)
+    return DictNames(**res)
 
 

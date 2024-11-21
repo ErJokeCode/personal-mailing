@@ -4,7 +4,7 @@ from src.upload.parsers.auth import upload_student
 from src.upload.parsers.excel_statement import update_report
 from src.upload.parsers.parser_from_inf import parse_courses
 from src.upload.parsers.choice_in_modeus import choice_in_modeus
-from src.upload.parsers.dict_modeus_inf import dict_modeus_inf
+from src.upload.parsers.dict_modeus_inf import dict_names
 
 
 router_data = APIRouter(
@@ -32,8 +32,8 @@ async def post_online_course_report(file: UploadFile):
     else:
         return res
 
-@router_data.post("/dict_modeus_inf")
-async def post_dict_modeus_inf(dict: dict):
-    return dict_modeus_inf(dict)
+@router_data.post("/dict_names")
+async def post_dict_modeus_inf(modeus:str = None, site_inf: str = None, file_course: str = None):
+    return dict_names(modeus, site_inf, file_course)
 
 

@@ -71,19 +71,20 @@ public static partial class AdminHandler
         }
 
         var admin = await db.Users.Include(a => a.Chats)
-                        .ThenInclude(ch => ch.Messages)
+                        .ThenInclude(ch => ch.Messages.OrderByDescending(m => m.Date).Take(1))
                         .ThenInclude(m => m.Status)
                         .Include(a => a.Chats)
                         .ThenInclude(ch => ch.ActiveStudent)
                         .SingleOrDefaultAsync(a => a.Id == adminId);
 
+        foreach (var chat in admin.Chats)
+        {
+            chat.Messages.IncludeDocuments(db);
+        }
+
         var dtos = ChatDto.Maps(admin.Chats.ToList());
 
-        return Results.Ok(dtos.Select(dto =>
-                                      {
-                                          dto.Messages = dto.Messages.OrderByDescending(m => m.Date).Take(1).ToList();
-                                          return dto;
-                                      }));
+        return Results.Ok(dtos);
     }
 
     public static async Task<IResult> GetAdminNotifications(HttpContext context, UserManager<AdminUser> userManager,
@@ -93,7 +94,6 @@ public static partial class AdminHandler
         var admin = await db.Users.Include(a => a.Notifications)
                         .ThenInclude(n => n.ActiveStudents)
                         .Include(a => a.Notifications)
-                        .ThenInclude(n => n.Documents)
                         .Include(a => a.Notifications)
                         .ThenInclude(n => n.Statuses)
                         .SingleOrDefaultAsync(a => a.Id == id);
@@ -102,6 +102,8 @@ public static partial class AdminHandler
         {
             return Results.NotFound("Could not find admin");
         }
+
+        admin.Notifications.IncludeDocuments(db);
 
         var dtos = NotificationDto.Maps((List<Notification>)admin.Notifications);
 

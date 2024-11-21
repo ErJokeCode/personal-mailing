@@ -12,7 +12,6 @@ public static class Program
 {
     public static async Task Main(string[] args)
     {
-        Startup.LoadEnv(".env");
         Startup.CreateFolder("Documents");
 
         var builder = WebApplication.CreateBuilder(args);
@@ -21,13 +20,16 @@ public static class Program
         var app = builder.Build();
         await app.InitialzieServices();
 
-        ChatConsumer.Hub = app.Services.GetService<IHubContext<SignalHub>>();
+        BaseConsumer.Hub = app.Services.GetService<IHubContext<SignalHub>>();
 
         app.MapStudentRoutes();
         app.MapAdminRoutes();
         app.MapChatRoutes();
         app.MapNotificationRoutes();
+        app.MapTemplateRoutes();
         app.MapDocumentRoutes();
+        app.MapDataRoutes();
+        app.MapScheduleRoutes();
 
         app.Run();
     }

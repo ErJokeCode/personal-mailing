@@ -39,11 +39,14 @@ public static class RouteGroupBuilderExtensions
 public static class Permissions
 {
     public static Permission View => new Permission("View");
-    public static Permission UploadFiles => new Permission("UploadFiles");
-    public static Permission SendNotifications => new Permission("SendNotifications");
     public static Permission CreateAdmins => new Permission("CreateAdmins");
+    public static Permission SendMessages => new Permission("SendMessages");
+    public static Permission SendNotifications => new Permission("SendNotifications");
+    public static Permission ManipulateStudents => new Permission("ManipulateStudents");
+    public static Permission UploadFiles => new Permission("UploadFiles");
 
-    public static List<Permission> All => [View, UploadFiles, SendNotifications, CreateAdmins];
+    public static List<Permission>
+        All => [View, CreateAdmins, SendMessages, SendNotifications, ManipulateStudents, UploadFiles];
 }
 
 public static class AuthorizationExtensions

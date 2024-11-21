@@ -1,0 +1,23 @@
+meta {
+  name: update-template
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{base_api}}/core/template/4
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  body: '''
+    {
+      "content": "Очень Важное сообщение!",
+      "studentIds": [
+        "08be96aa-97f2-4b93-b57f-5d7e6bf97215"
+      ]
+    }
+  '''
+  documents: @file(/home/nick/Documents/Students_in_RMUP2024-10-17-09-56-34.xlsx)
+}

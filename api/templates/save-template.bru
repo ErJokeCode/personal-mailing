@@ -1,0 +1,23 @@
+meta {
+  name: save-template
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{base_api}}/core/template
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  body: '''
+    {
+      "content": "Важное сообщение!",
+      "studentIds": [
+        "08be96aa-97f2-4b93-b57f-5d7e6bf97215"
+      ]
+    }
+  '''
+  ~documents: @file(/home/nick/Downloads/works.csv)
+}

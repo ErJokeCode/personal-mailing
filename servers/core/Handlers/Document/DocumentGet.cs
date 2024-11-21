@@ -32,7 +32,8 @@ public static partial class DocumentHandler
         }
 
         var path = Path.Combine(Directory.GetCurrentDirectory(), "Documents", document.InternalName);
+        var stream = await DocumentHandler.GetDocumentStream(id, db);
 
-        return Results.File(path, document.MimeType, document.Name);
+        return Results.File(stream, document.MimeType, document.Name);
     }
 }

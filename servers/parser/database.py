@@ -3,7 +3,7 @@ from pymongo import MongoClient
 
 class Database:
     def __init__(self, host: str, port: int, database: str, user_course_collection: str, course_info_collection: str, 
-                student_collection: str, user_auth_collection: str, student_not_found_modeus: str, subject : str, modeus_inf:str):
+                student_collection: str, user_auth_collection: str, student_not_found_modeus: str, subject : str, dict_names:str):
         self.host = host
         self.port = port
         self.database = database
@@ -13,7 +13,7 @@ class Database:
         self.course_info_collection = course_info_collection
         self.subject = subject
         self.student_collection = student_collection
-        self.modeus_inf = modeus_inf
+        self.dict_names = dict_names
 
 
         self.user_course_collection = user_course_collection
@@ -29,8 +29,8 @@ class Database:
     def get_student(self):
         return self.db[self.student_collection]
     
-    def get_modeus_inf(self):
-        return self.db[self.modeus_inf]
+    def get_dict_names(self):
+        return self.db[self.dict_names]
 
 
 

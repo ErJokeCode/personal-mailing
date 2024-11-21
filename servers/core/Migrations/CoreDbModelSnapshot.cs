@@ -103,6 +103,9 @@ namespace Core.Migrations
                     b.Property<string>("PasswordHash")
                         .HasColumnType("text");
 
+                    b.Property<List<string>>("Permissions")
+                        .HasColumnType("text[]");
+
                     b.Property<string>("PhoneNumber")
                         .HasColumnType("text");
 
@@ -145,6 +148,9 @@ namespace Core.Migrations
                     b.Property<string>("AdminId")
                         .HasColumnType("text");
 
+                    b.Property<int>("UnreadCount")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("ActiveStudentId");
@@ -165,23 +171,13 @@ namespace Core.Migrations
                     b.Property<string>("InternalName")
                         .HasColumnType("text");
 
-                    b.Property<int?>("MessageId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("MimeType")
                         .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .HasColumnType("text");
 
-                    b.Property<int?>("NotificationId")
-                        .HasColumnType("integer");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("MessageId");
-
-                    b.HasIndex("NotificationId");
 
                     b.ToTable("Documents");
                 });
@@ -202,6 +198,9 @@ namespace Core.Migrations
 
                     b.Property<string>("Date")
                         .HasColumnType("text");
+
+                    b.Property<List<int>>("DocumentIds")
+                        .HasColumnType("integer[]");
 
                     b.Property<string>("Receiver")
                         .HasColumnType("text");
@@ -264,11 +263,41 @@ namespace Core.Migrations
                     b.Property<string>("Date")
                         .HasColumnType("text");
 
+                    b.Property<List<int>>("DocumentIds")
+                        .HasColumnType("integer[]");
+
                     b.HasKey("Id");
 
                     b.HasIndex("AdminId");
 
                     b.ToTable("Notifications");
+                });
+
+            modelBuilder.Entity("Core.Models.NotificationSchedule", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<TimeSpan>("Interval")
+                        .HasColumnType("interval");
+
+                    b.Property<DateTime>("Next")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<DateTime>("Start")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("TemplateId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("TemplateId");
+
+                    b.ToTable("NotificationSchedules");
                 });
 
             modelBuilder.Entity("Core.Models.NotificationStatus", b =>
@@ -299,6 +328,36 @@ namespace Core.Migrations
                     b.HasIndex("NotificationId");
 
                     b.ToTable("NotificationStatuses");
+                });
+
+            modelBuilder.Entity("Core.Models.NotificationTemplate", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AdminId")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Date")
+                        .HasColumnType("text");
+
+                    b.Property<List<int>>("DocumentIds")
+                        .HasColumnType("integer[]");
+
+                    b.Property<List<Guid>>("StudentIds")
+                        .HasColumnType("uuid[]");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AdminId");
+
+                    b.ToTable("NotificationTemplates");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -465,21 +524,6 @@ namespace Core.Migrations
                     b.Navigation("Admin");
                 });
 
-            modelBuilder.Entity("Core.Models.Document", b =>
-                {
-                    b.HasOne("Core.Models.Message", "Message")
-                        .WithMany("Documents")
-                        .HasForeignKey("MessageId");
-
-                    b.HasOne("Core.Models.Notification", "Notification")
-                        .WithMany("Documents")
-                        .HasForeignKey("NotificationId");
-
-                    b.Navigation("Message");
-
-                    b.Navigation("Notification");
-                });
-
             modelBuilder.Entity("Core.Models.Message", b =>
                 {
                     b.HasOne("Core.Models.Chat", "Chat")
@@ -511,6 +555,17 @@ namespace Core.Migrations
                     b.Navigation("Admin");
                 });
 
+            modelBuilder.Entity("Core.Models.NotificationSchedule", b =>
+                {
+                    b.HasOne("Core.Models.NotificationTemplate", "Template")
+                        .WithMany()
+                        .HasForeignKey("TemplateId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Template");
+                });
+
             modelBuilder.Entity("Core.Models.NotificationStatus", b =>
                 {
                     b.HasOne("Core.Models.Notification", "Notification")
@@ -520,6 +575,15 @@ namespace Core.Migrations
                         .IsRequired();
 
                     b.Navigation("Notification");
+                });
+
+            modelBuilder.Entity("Core.Models.NotificationTemplate", b =>
+                {
+                    b.HasOne("Core.Models.AdminUser", "Admin")
+                        .WithMany()
+                        .HasForeignKey("AdminId");
+
+                    b.Navigation("Admin");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -592,15 +656,11 @@ namespace Core.Migrations
 
             modelBuilder.Entity("Core.Models.Message", b =>
                 {
-                    b.Navigation("Documents");
-
                     b.Navigation("Status");
                 });
 
             modelBuilder.Entity("Core.Models.Notification", b =>
                 {
-                    b.Navigation("Documents");
-
                     b.Navigation("Statuses");
                 });
 #pragma warning restore 612, 618
