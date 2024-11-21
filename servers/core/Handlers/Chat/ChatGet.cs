@@ -20,6 +20,8 @@ public static partial class ChatHandler
 
         var chat = await db.Chats.Include(ch => ch.Messages)
                        .ThenInclude(m => m.Status)
+                       .Include(ch => ch.Messages)
+                       .ThenInclude(m => m.Documents)
                        .Include(ch => ch.ActiveStudent)
                        .Include(ch => ch.Admin)
                        .SingleOrDefaultAsync(ch => ch.AdminId == adminId && ch.ActiveStudentId == studentId);
@@ -28,8 +30,6 @@ public static partial class ChatHandler
         {
             return Results.NotFound("Chat not found");
         }
-
-        chat.Messages.IncludeDocuments(db);
 
         var dto = ChatDto.Map(chat);
         var skipAmount = 0;

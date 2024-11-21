@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Core.Handlers;
-using Core.Utility;
 
 namespace Core.Models.Dto;
 
@@ -57,24 +55,5 @@ public partial class NotificationStatusDto : IMappable<NotificationStatusDto, No
     public static List<NotificationStatusDto> Maps(List<NotificationStatus> origs)
     {
         return origs.Select(o => NotificationStatusDto.Map(o)).ToList();
-    }
-}
-
-public static class NotificationExtensions
-{
-    public static Notification IncludeDocuments(this Notification notification, CoreDb db)
-    {
-        notification.Documents.Clear();
-        notification.Documents.AddRange(DocumentHandler.GetFromIds(notification.DocumentIds, db));
-        return notification;
-    }
-
-    public static ICollection<Notification> IncludeDocuments(this ICollection<Notification> notifications, CoreDb db)
-    {
-        foreach (var notification in notifications)
-        {
-            notification.IncludeDocuments(db);
-        }
-        return notifications;
     }
 }

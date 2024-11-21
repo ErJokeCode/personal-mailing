@@ -1,6 +1,4 @@
-using System.Linq;
 using System.Threading.Tasks;
-using Core.Models;
 using Core.Models.Dto;
 using Core.Utility;
 using Microsoft.AspNetCore.Http;
@@ -15,14 +13,13 @@ public static partial class NotificationHandler
         var notification = await db.Notifications.Include(n => n.ActiveStudents)
                                .Include(n => n.Statuses)
                                .Include(n => n.Admin)
+                               .Include(n => n.Documents)
                                .SingleOrDefaultAsync(n => n.Id == id);
 
         if (notification == null)
         {
             return Results.NotFound("Notification not found");
         }
-
-        notification.IncludeDocuments(db);
 
         return Results.Ok(NotificationDto.Map(notification));
     }
@@ -32,9 +29,8 @@ public static partial class NotificationHandler
         var notifications = await db.Notifications.Include(n => n.ActiveStudents)
                                 .Include(n => n.Admin)
                                 .Include(n => n.Statuses)
+                                .Include(n => n.Documents)
                                 .ToListAsync();
-
-        notifications.IncludeDocuments(db);
 
         var dtos = NotificationDto.Maps(notifications);
 

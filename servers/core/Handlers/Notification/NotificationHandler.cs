@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
 using Core.Models;
-using Core.Models.Dto;
 using Core.Utility;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
@@ -38,10 +36,10 @@ public static partial class NotificationHandler
 
     public static async Task SendFromTemplate(int templateId, CoreDb db)
     {
-        var template =
-            await db.NotificationTemplates.Include(t => t.Admin).SingleOrDefaultAsync(t => t.Id == templateId);
-
-        template.IncludeDocuments(db).IncludeStudents(db);
+        var template = await db.NotificationTemplates.Include(t => t.Admin)
+                           .Include(t => t.Documents)
+                           .Include(t => t.ActiveStudents)
+                           .SingleOrDefaultAsync(t => t.Id == templateId);
 
         var notification = new Notification()
         {
@@ -55,9 +53,9 @@ public static partial class NotificationHandler
         {
             notification.ActiveStudents.Add(student);
         }
-        foreach (var documentId in template.DocumentIds)
+        foreach (var documentId in template.Documents)
         {
-            notification.DocumentIds.Add(documentId);
+            notification.Documents.Add(documentId);
         }
 
         var fileCollection = new FormFileCollection();

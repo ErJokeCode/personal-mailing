@@ -43,7 +43,7 @@ public static partial class DocumentHandler
         return collection;
     }
 
-    public static async Task<List<int>> StoreDocuments(IFormFileCollection documents, CoreDb db)
+    public static async Task<List<Document>> StoreDocuments(IFormFileCollection documents, CoreDb db)
     {
         var savedDocs = new List<Document>();
 
@@ -76,7 +76,7 @@ public static partial class DocumentHandler
 
         await db.SaveChangesAsync();
 
-        return savedDocs.Select(d => d.Id).ToList();
+        return savedDocs.ToList();
     }
 
     public static async Task DeleteDocuments(List<int> ids, CoreDb db)

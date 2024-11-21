@@ -73,14 +73,14 @@ public static partial class StudentHandler
                                 .ThenInclude(n => n.Admin)
                                 .Include(a => a.Notifications)
                                 .ThenInclude(n => n.Statuses)
+                                .Include(a => a.Notifications)
+                                .ThenInclude(n => n.Documents)
                                 .SingleOrDefaultAsync(a => a.Id == id);
 
         if (activeStudent == null)
         {
             return Results.NotFound("Could not find student");
         }
-
-        activeStudent.Notifications.IncludeDocuments(db);
 
         var dtos = NotificationDto.Maps((List<Notification>)activeStudent.Notifications);
 

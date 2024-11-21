@@ -66,15 +66,22 @@ public static partial class NotificationHandler
             var filled = await NotificationHandler.FillTemplate(notification.Content, activeStudent);
 
             var sent = await BotHandler.SendToBot(activeStudent.ChatId, filled, documents);
+
+            if (sent)
+            {
+                status.SetSent();
+            }
         }
 
+        notification.Documents.Clear();
         var docs = await DocumentHandler.StoreDocuments(documents, db);
-        notification.DocumentIds.AddRange(docs);
+        foreach (var doc in docs)
+        {
+            notification.Documents.Add(doc);
+        }
 
         db.Notifications.Add(notification);
         await db.SaveChangesAsync();
-
-        notification.IncludeDocuments(db);
 
         var dto = NotificationDto.Map(notification);
         return Results.Ok(dto);

@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using Core.Handlers;
-using Core.Utility;
 
 namespace Core.Models.Dto;
 
@@ -9,7 +7,8 @@ public partial class ChatDto : IMappable<ChatDto, Chat>
 {
     public static ChatDto Map(Chat orig)
     {
-        var dto = new ChatDto() {
+        var dto = new ChatDto()
+        {
             Id = orig.Id,
             Admin = AdminUserDto.Map(orig.Admin),
             Student = ActiveStudentDto.Map(orig.ActiveStudent),
@@ -34,9 +33,14 @@ public partial class MessageDto : IMappable<MessageDto, Message>
 {
     public static MessageDto Map(Message orig)
     {
-        var dto = new MessageDto() {
-            Id = orig.Id,         Date = orig.Date,         Content = orig.Content,
-            Sender = orig.Sender, Receiver = orig.Receiver, Status = MessageStatusDto.Map(orig.Status)
+        var dto = new MessageDto()
+        {
+            Id = orig.Id,
+            Date = orig.Date,
+            Content = orig.Content,
+            Sender = orig.Sender,
+            Receiver = orig.Receiver,
+            Status = MessageStatusDto.Map(orig.Status)
         };
 
         foreach (var document in orig.Documents)
@@ -57,7 +61,8 @@ public partial class MessageStatusDto : IMappable<MessageStatusDto, MessageStatu
 {
     public static MessageStatusDto Map(MessageStatus orig)
     {
-        return new MessageStatusDto() {
+        return new MessageStatusDto()
+        {
             Code = orig.Code,
             Short = orig.Short,
             Description = orig.Description,
@@ -67,24 +72,5 @@ public partial class MessageStatusDto : IMappable<MessageStatusDto, MessageStatu
     public static List<MessageStatusDto> Maps(List<MessageStatus> origs)
     {
         return origs.Select(o => MessageStatusDto.Map(o)).ToList();
-    }
-}
-
-public static class MessageExtensions
-{
-    public static Message IncludeDocuments(this Message message, CoreDb db)
-    {
-        message.Documents.Clear();
-        message.Documents.AddRange(DocumentHandler.GetFromIds(message.DocumentIds, db));
-        return message;
-    }
-
-    public static ICollection<Message> IncludeDocuments(this ICollection<Message> messages, CoreDb db)
-    {
-        foreach (var message in messages)
-        {
-            message.IncludeDocuments(db);
-        }
-        return messages;
     }
 }

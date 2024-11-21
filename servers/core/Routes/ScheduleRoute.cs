@@ -26,7 +26,7 @@ public static class ScheduleRoute
 
     public static void MapPost(RouteGroupBuilder group)
     {
-        group.MapPost("/", ScheduleHandler.AddSchedule);
+        group.MapPost("/", ScheduleHandler.AddSchedule).AddPermission(Permissions.SendNotifications);
     }
 
     public static void MapPut(RouteGroupBuilder group)
@@ -35,5 +35,6 @@ public static class ScheduleRoute
 
     public static void MapDelete(RouteGroupBuilder group)
     {
+        group.MapDelete("/{id}", ScheduleHandler.DeleteSchedule).AddPermission(Permissions.SendNotifications);
     }
 }
