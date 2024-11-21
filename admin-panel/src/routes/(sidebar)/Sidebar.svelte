@@ -46,7 +46,7 @@
 
 	let posts = [
 		{ name: 'Главная', icon: ChartPieOutline, href: '/chat' },
-		{ name: 'Войти', icon: LockSolid, href: '/authentication/login' },
+		{ name: 'Войти', icon: LockSolid, href: '/login' },
 		{ name: 'Загрузить файлы', icon: FileChartBarSolid, href: '/upload' },
 		{ name: 'Рассылки', icon: ClipboardListSolid, href: '/notifications' },
 		{

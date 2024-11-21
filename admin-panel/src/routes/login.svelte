@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { Label, Input } from 'flowbite-svelte';
-	import SignIn from '../utils/authentication/SignIn.svelte';
-    import http from "../../utility/http";
-    import { admin } from "../../utility/store.js";
+	import SignIn from './utils/authentication/SignIn.svelte';
+    import http from "../utility/http";
+    import { admin } from "../utility/store.js";
     import { goto } from '$app/navigation';
 
     let email = "";

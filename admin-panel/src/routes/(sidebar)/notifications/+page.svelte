@@ -1,12 +1,13 @@
 <script>
 	import { Breadcrumb, BreadcrumbItem, Heading } from 'flowbite-svelte';
-	import { TableHeadCell, Table, TableBody, TableBodyCell, TableBodyRow, TableHead } from 'flowbite-svelte';
+	import { TableHeadCell, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableSearch } from 'flowbite-svelte';
   import { onMount } from "svelte";
   import { Button } from 'flowbite-svelte';
   import { ArrowRightOutline } from 'flowbite-svelte-icons';
 
   let login_status = "";
   let notifications = [];
+  let searchTerm = "";
 
   onMount(async () => {
     let response;
@@ -22,10 +23,11 @@
     let json = await response?.json();
     notifications = json;
   });
+  $: filtered = notifications.filter((item) => item.content.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1);
 </script>
 
 <main class="relative h-full w-full overflow-y-auto bg-white dark:bg-gray-800">
-	<div class="p-4 px-6">
+	<div class="pt-4 px-6">
 		<Breadcrumb class="mb-5">
 			<BreadcrumbItem home href="/">Главная</BreadcrumbItem>
 			<BreadcrumbItem>Рассылки</BreadcrumbItem>
@@ -39,6 +41,7 @@
       {login_status}
 		</Heading>
 	</div>
+    <TableSearch placeholder="Поиск" hoverable={true} bind:inputValue={searchTerm} />
   <Table hoverable={true}>
     <TableHead>
       <TableHeadCell class="px-8">Содержание</TableHeadCell>
@@ -46,7 +49,7 @@
       <TableHeadCell class="px-8">Отправлено</TableHeadCell>
     </TableHead>
     <TableBody tableBodyClass="divide-y">
-      {#each notifications as notification}
+      {#each filtered as notification}
         <TableBodyRow slot="row">
           <TableBodyCell class="px-8 break-all">{notification.content}</TableBodyCell>
           <TableBodyCell class="px-8">{notification.date}</TableBodyCell>
