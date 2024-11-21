@@ -46,16 +46,18 @@ public static partial class TemplateHandler
                 continue;
             }
 
-            notification.StudentIds.Add(activeStudent.Id);
+            notification.ActiveStudents.Add(activeStudent);
         }
 
+        notification.Documents.Clear();
         var docs = await DocumentHandler.StoreDocuments(documents, db);
-        notification.DocumentIds.AddRange(docs);
+        foreach (var doc in docs)
+        {
+            notification.Documents.Add(doc);
+        }
 
         db.NotificationTemplates.Add(notification);
         await db.SaveChangesAsync();
-
-        notification.IncludeDocuments(db).IncludeStudents(db);
 
         var dto = NotificationTemplateDto.Map(notification);
         return Results.Ok(dto);

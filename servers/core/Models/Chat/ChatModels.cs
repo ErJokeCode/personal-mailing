@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Core.Models;
 
@@ -28,9 +27,7 @@ public class Message
     public string Sender { get; set; }
     public string Receiver { get; set; }
 
-    public List<int> DocumentIds { get; set; } = [];
-    [NotMapped]
-    public List<Document> Documents { get; } = [];
+    public ICollection<Document> Documents { get; } = [];
 
     public int StatusId { get; set; }
     public MessageStatus Status { get; set; }

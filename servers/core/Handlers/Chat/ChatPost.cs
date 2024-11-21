@@ -64,8 +64,12 @@ public static partial class ChatHandler
 
         message.Status.SetLost();
 
+        message.Documents.Clear();
         var docs = await DocumentHandler.StoreDocuments(documents, db);
-        message.DocumentIds.AddRange(docs);
+        foreach(var doc in docs)
+        {
+            message.Documents.Add(doc);
+        }
 
         chat.Messages.Add(message);
 
@@ -77,7 +81,6 @@ public static partial class ChatHandler
         }
 
         await db.SaveChangesAsync();
-        message.IncludeDocuments(db);
 
         return Results.Ok(MessageDto.Map(message));
     }
@@ -130,8 +133,12 @@ public static partial class ChatHandler
 
         message.Status.SetSent();
 
+        message.Documents.Clear();
         var docs = await DocumentHandler.StoreDocuments(documents, db);
-        message.DocumentIds.AddRange(docs);
+        foreach(var doc in docs)
+        {
+            message.Documents.Add(doc);
+        }
 
         chat.UnreadCount += 1;
         chat.Messages.Add(message);

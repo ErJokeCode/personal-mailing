@@ -1,7 +1,4 @@
-using System.Linq;
 using System.Threading.Tasks;
-using Core.Models;
-using Core.Models.Dto;
 using Core.Utility;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;

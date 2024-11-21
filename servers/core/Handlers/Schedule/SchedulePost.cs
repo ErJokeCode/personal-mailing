@@ -19,8 +19,10 @@ public static partial class ScheduleHandler
 
     public static async Task<IResult> AddSchedule(ScheduleDetails details, CoreDb db)
     {
-        var template =
-            await db.NotificationTemplates.Include(t => t.Admin).SingleOrDefaultAsync(t => t.Id == details.TemplateId);
+        var template = await db.NotificationTemplates.Include(t => t.Admin)
+                           .Include(t => t.ActiveStudents)
+                           .Include(t => t.Documents)
+                           .SingleOrDefaultAsync(t => t.Id == details.TemplateId);
 
         if (template == null)
         {

@@ -1,7 +1,5 @@
-using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Core.Models;
 using Core.Models.Dto;
 using Core.Utility;
 using Microsoft.AspNetCore.Http;
@@ -19,14 +17,15 @@ public static partial class TemplateHandler
         var details = JsonSerializer.Deserialize<NotificationDetails>(
             body, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
-        var template = await db.NotificationTemplates.Include(t => t.Admin).SingleOrDefaultAsync(n => n.Id == id);
+        var template = await db.NotificationTemplates.Include(t => t.Documents)
+                           .Include(t => t.ActiveStudents)
+                           .Include(t => t.Admin)
+                           .SingleOrDefaultAsync(n => n.Id == id);
 
         if (template == null)
         {
             return Results.NotFound("Template not found");
         }
-
-        template.IncludeDocuments(db).IncludeStudents(db);
 
         template.Content = details.Content;
         template.ActiveStudents.Clear();
@@ -43,11 +42,12 @@ public static partial class TemplateHandler
             template.ActiveStudents.Add(activeStudent);
         }
 
+        template.Documents.Clear();
         var docs = await DocumentHandler.StoreDocuments(documents, db);
-        template.DocumentIds.Clear();
-        template.DocumentIds.AddRange(docs);
-
-        template.IncludeDocuments(db).IncludeStudents(db);
+        foreach (var doc in docs)
+        {
+            template.Documents.Add(doc);
+        }
 
         await db.SaveChangesAsync();
 
