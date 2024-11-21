@@ -1,5 +1,4 @@
 def create_text_online_course(info_course: dict, scores: dict) -> str:
-    print(scores)
     name = info_course['name']
     date_start = info_course['date_start']
     deadline = info_course['deadline']
@@ -17,35 +16,39 @@ def create_text_online_course(info_course: dict, scores: dict) -> str:
     if info != None:
         text += f"Информация для записи на курс:\n{info}\n\n"
 
-    is_success = False
-    for name, score in scores.values():
+    is_success = []
+    text_scores = "Контрольные точки:\n"
+    for name, score in scores.items():
         if score == "Нет на курсе":
             text += "Тебя нет на курсе! Перейди по ссылке выше или напиши куратору, он тебе обязательно поможет!"
             break
         else:
-            if score.isdigit():
-                text += "Контрольные точки:\n"
-                text += f"{name}: {plural(score, "балл", "балла", "баллов")}\n"
+            if isinstance(score, int) or (isinstance(score, str) and score.isdigit()):
+                text_scores += f"{name}: {plural(score, "балл", "балла", "баллов")}\n"
 
                 score = int(score)
 
                 if score >= 40:
-                    is_success = True
+                    is_success.append(True)
+                else:
+                    is_success.append(False)
             else:
                 #Надо логировать
                 pass
-
-    if is_success:
-        text += "Молодец! У тебя отлично получается!"
     else:
-        text += "Для получения зачета надо набрать минимум 40 баллов по всем контрольным точкам"
+        text += text_scores + "\n"
+
+        if all(is_success):
+            text += "Молодец! У тебя отлично получается!"
+        else:
+            text += "Для получения зачета надо набрать минимум 40 баллов по всем контрольным точкам"
 
     return text
 
 def plural(input_int, one_form, two_form, three_form):
     if input_int % 10 == 1 and input_int % 100 != 11:
         return str(input_int) + " " + one_form
-    elif input_int % 10 < 5 and (input_int % 100 < 10 or input_int % 100 > 20):
+    elif input_int % 10 < 5 and (input_int % 100 < 10 or input_int % 100 > 20) and input_int % 100 != 0:
         return str(input_int) + " " + two_form
     else:
         return str(input_int) + " " + three_form
@@ -88,12 +91,12 @@ def get_dict_form_edu(data):
 
 def get_text_form_edu(name):
     if name == "traditional":
-        return "Курсы проводятся в традиционной форме. Придется ходить на очный пары в универ))\n"
+        return "Курсы проводятся в традиционной форме. Придется ходить на очный пары в универ))\n\n"
     elif name == "mixed":
-        return "Курсы проводятся в смешанной форме. Придется ходить и на очный пары в универ, и решать онлайн курс\n"
+        return "Курсы проводятся в смешанной форме. Придется ходить и на очный пары в универ, и решать онлайн курс\n\n"
     elif name == "online":
-        return "Курсы проводятся онлайн. Не забудь пройти его!\n"
-    return "Курсы от партнеров вуза\n"
+        return "Курсы проводятся онлайн. Не забудь пройти его!\n\n"
+    return "Курсы от партнеров вуза\n\n"
 
 
 def get_text_online_course(online_course):
