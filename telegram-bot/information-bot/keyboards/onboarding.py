@@ -150,7 +150,7 @@ def topic_keyboard(data_course: dict, callback_data_topic: str, is_help=False, n
 def additional_courses_keyboard(list_courses: list[tuple[int, str, int]], crossed_topics:dict = None):
     list_btn = []
     for course in list_courses:
-        if course[1] in crossed_topics.keys() and len(crossed_topics[course[1]].keys()) == course[2]:
+        if crossed_topics != None and course[1] in crossed_topics.keys() and len(crossed_topics[course[1]].keys()) == course[2]:
             btn = [InlineKeyboardButton(text=f"✅ {course[1]}", callback_data=f"additional_courses__{course[0]}")]
         else:
             btn = [InlineKeyboardButton(text=f"☑️ {course[1]}", callback_data=f"additional_courses__{course[0]}")]

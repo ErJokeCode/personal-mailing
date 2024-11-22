@@ -19,16 +19,40 @@ class FormStates(StatesGroup):
 
 
 
-async def add_msgs_in_dels(state, msgs):
+async def add_msgs_in_dels(state:FSMContext, msgs: list[types.Message]):
     user_data = await state.get_data()
-    del_msgs_onboarding = user_data.get("del_msgs_onboarding")
+    del_msgs_onboarding: list = user_data.get("del_msg_add_course")
+
+    if del_msgs_onboarding == None:
+        del_msgs_onboarding = []
+
     for msg in msgs:
         del_msgs_onboarding.append(msg.message_id)
-    await state.update_data(del_msgs_onboarding = del_msgs_onboarding)
+    await state.update_data(del_msg_add_course = del_msgs_onboarding)
 
 
 async def del_msg(message: types.Message, msgs: list[types.Message]):
     await message.bot.delete_messages(message.chat.id, msgs)
+
+
+async def del_all_msg(callback_query: types.CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    del_msg_add_course = user_data.get("del_msg_add_course")
+
+    if del_msg_add_course != None:
+        await del_msg(callback_query.message, del_msg_add_course)
+
+    await state.update_data(del_msg_add_course = [])
+
+
+#Информация о боте
+async def choice_onboarding(message: types.Message, state: FSMContext):
+    await state.set_state(Onboarding.QUE_START)
+
+    last_msg = await message.answer(t_onboarding.info_bot())
+    msg = await message.answer(t_onboarding.start(), reply_markup=kb_onboarding.start_choice())
+
+    await add_msgs_in_dels(state, [last_msg, msg])
 
 
 @router.callback_query(lambda c: c.data == "start_onboarding")
@@ -40,10 +64,11 @@ async def start_onboarding(callback_query: types.CallbackQuery, state: FSMContex
 
     crossed_topics = user_data.get("crossed_topics")
 
-    await callback_query.message.answer("Выберите раздел:", 
+    msg = await callback_query.message.answer("Выберите раздел: start_onboarding", 
                                         reply_markup=kb_onboarding.get_sections_keyboard(
                                             MANAGER_ONB.onboarding, 
                                             crossed_topics=crossed_topics))
+    await add_msgs_in_dels(state, [msg])
 
     await callback_query.message.delete()
 
@@ -57,11 +82,41 @@ async def additional_courses(callback_query: types.CallbackQuery, state: FSMCont
 
     add_course = MANAGER_ONB.get_additional_courses()
 
-    await callback_query.message.answer("Выберите курс:", 
+    msg = await callback_query.message.answer("Выберите курс: additional_courses", 
                                         reply_markup=kb_onboarding.additional_courses_keyboard(
                                             add_course, crossed_topics=crossed_topics))
+    
+    await add_msgs_in_dels(state, [msg])
 
     await callback_query.message.delete()
+
+
+#Выбор курса в дополнительных
+@router.callback_query(FormStates.waiting_for_courses, lambda c: c.data.split("__")[0] == "additional_courses")
+async def additional_courses(callback_query: types.CallbackQuery, state: FSMContext):
+    index_course = callback_query.data.split("__")[-1]
+
+    await state.update_data(index_additional_course=index_course)
+
+    await start_additional_courses(callback_query, state)
+
+#Отоббражение выбранного курса
+async def start_additional_courses(callback_query: types.CallbackQuery, state: FSMContext):
+    await state.set_state(FormStates.waiting_for_section)
+
+    await del_all_msg(callback_query, state)
+
+    user_data = await state.get_data()
+    index_add_course = int(user_data.get("index_additional_course"))
+    crossed_topics = user_data.get("crossed_topics")
+
+    msg = await callback_query.message.answer("Выберите раздел:", 
+                                        reply_markup=kb_onboarding.get_sections_keyboard(
+                                            MANAGER_ONB.get_info_course(index_add_course), 
+                                            from_add_course=True, 
+                                            crossed_topics=crossed_topics))
+
+    await add_msgs_in_dels(state, [msg])
 
 
 @router.callback_query(FormStates.waiting_for_courses, lambda c: c.data == "end_onboarding")
@@ -71,109 +126,94 @@ async def end_onboarding(callback_query: types.CallbackQuery, state: FSMContext)
     if user_data.get('user_id'):
         await state.set_state(LKStates.MAIN_MENU)
         await show_main_menu(callback_query.message, state)
-        await callback_query.message.delete()
+        await del_all_msg(callback_query, state)
     else:
         await callback_query.message.answer(Registration.no())
-
-
-@router.callback_query(FormStates.waiting_for_courses, lambda c: c.data.split("__")[0] == "additional_courses")
-async def additional_courses(callback_query: types.CallbackQuery, state: FSMContext):
-    index_course = callback_query.data.split("__")[-1]
-
-    await state.update_data(index_additional_course=index_course)
-
-    await start_additional_courses(callback_query, state)
-
-
-async def start_additional_courses(callback_query: types.CallbackQuery, state: FSMContext):
-    await state.set_state(FormStates.waiting_for_section)
-
-    user_data = await state.get_data()
-    index_add_course = int(user_data.get("index_additional_course"))
-    crossed_topics = user_data.get("crossed_topics")
-
-    await callback_query.message.answer("Выберите раздел:", 
-                                        reply_markup=kb_onboarding.get_sections_keyboard(
-                                            MANAGER_ONB.get_info_course(index_add_course), 
-                                            from_add_course=True, 
-                                            crossed_topics=crossed_topics))
-
-    await callback_query.message.delete()
-
-
-#Информация о боте
-async def choice_onboarding(message: types.Message, state: FSMContext):
-    await state.set_state(Onboarding.QUE_START)
-
-    last_msg = await message.answer(t_onboarding.info_bot())
-    msg = await message.answer(t_onboarding.start(), reply_markup=kb_onboarding.start_choice())
-
-    await state.update_data(del_msgs_onboarding = [last_msg.message_id, msg.message_id])
 
 
 @router.callback_query(Onboarding.QUE_START, lambda c: c.data == "start_onboarding_start" or c.data == "onboarding_sections")
 async def menu_onboarding(callback_query: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
-    list_del_msg = user_data.get("del_msgs_onboarding")
-    await del_msg(callback_query.message, list_del_msg)
+    await del_all_msg(callback_query, state)
 
     crossed_topics = user_data.get("crossed_topics")
 
     await state.update_data(index_additional_course=MANAGER_ONB.get_index_onboarding())
 
     await state.set_state(FormStates.waiting_for_section)
-    await callback_query.message.answer("Выберите раздел:", 
+    msg = await callback_query.message.answer("Выберите раздел: start_onboarding_start", 
                                         reply_markup=kb_onboarding.get_sections_keyboard(
                                             MANAGER_ONB.onboarding, 
                                             crossed_topics=crossed_topics))
 
+    await add_msgs_in_dels(state, [msg])
+
 
 @router.callback_query(lambda c: c.data == "onboarding_sections")
 async def menu_onboarding(callback_query: types.CallbackQuery, state: FSMContext):
-    await callback_query.message.delete()
+    await del_all_msg(callback_query, state)
 
     user_data = await state.get_data()
     index_add_course = int(user_data.get("index_additional_course"))
     crossed_topics = user_data.get("crossed_topics")
 
     await state.set_state(FormStates.waiting_for_section)
-    await callback_query.message.answer("Выберите раздел:", 
+    msg = await callback_query.message.answer("Выберите раздел: onboarding_sections", 
                                         reply_markup=kb_onboarding.get_sections_keyboard(
                                             MANAGER_ONB.get_info_course(index_add_course), 
                                             crossed_topics=crossed_topics))
+    await add_msgs_in_dels(state, [msg])
 
 
-@router.callback_query(FormStates.waiting_for_section)
-async def section(callback_query: types.CallbackQuery, state: FSMContext):
+@router.callback_query(FormStates.waiting_for_section, lambda c: c.data == "end_onboarding")
+async def to_menu(callback_query: types.CallbackQuery, state: FSMContext):
+    await show_main_menu(callback_query.message, state)
+    await del_all_msg(callback_query, state)
+
+
+@router.callback_query(FormStates.waiting_for_section, lambda c: c.data.split("___")[0] == "to_section")
+async def section_topic(callback_query: types.CallbackQuery, state: FSMContext):
     await state.set_state(FormStates.waiting_for_topic)
-
     user_data = await state.get_data()
     index_add_course = int(user_data.get("index_additional_course"))
-    del_msg_add_course = user_data.get("del_msg_add_course")
-
-    if del_msg_add_course != None:
-        await del_msg(callback_query.message, del_msg_add_course)
-    
     crossed_topics = user_data.get("crossed_topics")
 
-    if callback_query.data == "end_onboarding" or callback_query.data == "to_section___end_onboarding":
-        await show_main_menu(callback_query.message, state)
-        await callback_query.message.delete()
-
-    elif callback_query.data.split("___")[0] == "to_section":
-        await callback_query.message.answer(f"Выберите тему: {callback_query.data}", 
+    msg = await callback_query.message.answer(f"Выберите тему: {callback_query.data}", 
                                             reply_markup=kb_onboarding.get_topics_keyboard(
                                                 MANAGER_ONB.get_info_course(index_add_course), 
                                                 "___".join(callback_query.data.split("___")[1:]), 
                                                 crossed_topics))
+    await add_msgs_in_dels(state, [msg])
     
+
+@router.callback_query(FormStates.waiting_for_topic, lambda c: c.data.split("___")[0] == "to_section")
+async def to_section(callback_query: types.CallbackQuery, state: FSMContext):
+    await state.set_state(FormStates.waiting_for_section)
+    await section(callback_query, state, True)
+
+
+@router.callback_query(FormStates.waiting_for_section)
+async def section(callback_query: types.CallbackQuery, state: FSMContext, from_section: bool = False):
+    await state.set_state(FormStates.waiting_for_topic)
+
+    user_data = await state.get_data()
+    index_add_course = int(user_data.get("index_additional_course"))
+
+    await del_all_msg(callback_query, state)
+    
+    crossed_topics = user_data.get("crossed_topics")
+    if from_section:
+        callback_query_data = "___".join(callback_query.data.split("___")[1:])
     else:
-        await callback_query.message.answer(f"Выберите тему: {callback_query.data}", 
-                                            reply_markup=kb_onboarding.get_topics_keyboard(
-                                                MANAGER_ONB.get_info_course(index_add_course), 
-                                                callback_query.data, 
-                                                crossed_topics))
-        await callback_query.message.delete()
+        callback_query_data = callback_query.data
+
+    msg = await callback_query.message.answer(f"Выберите тему: {callback_query.data}", 
+                                        reply_markup=kb_onboarding.get_topics_keyboard(
+                                            MANAGER_ONB.get_info_course(index_add_course), 
+                                            callback_query_data, 
+                                            crossed_topics))
+
+    await add_msgs_in_dels(state, [msg])
 
 
 @router.callback_query(FormStates.waiting_for_topic, lambda c: c.data.split("____")[-1] == "help")
@@ -185,16 +225,14 @@ async def topic_question(callback_query: types.CallbackQuery, state: FSMContext)
 
     await callback_query.message.edit_reply_markup()
 
-    if callback_query.data.split("___")[0] == "to_section":
-        await state.set_state(FormStates.waiting_for_section)
-        await section(callback_query, state)
-        await callback_query.message.delete()
-    else:
-        await callback_query.message.answer(callback_query.data, 
-                                            reply_markup=kb_onboarding.topic_keyboard(
-                                                info_course, 
-                                                callback_query.data.split("____")[0], 
-                                                is_help=True))
+    msg = await callback_query.message.answer(callback_query.data, 
+                                        reply_markup=kb_onboarding.topic_keyboard(
+                                            info_course, 
+                                            callback_query.data.split("____")[0], 
+                                            is_help=True))
+    
+    await add_msgs_in_dels(state, [msg])
+
 
 
 
@@ -206,63 +244,62 @@ async def topic(callback_query: types.CallbackQuery, state: FSMContext):
     info_course = MANAGER_ONB.get_info_course(index_add_course)
     await state.update_data(info_course = info_course)
 
-    if callback_query.data.split("___")[0] == "to_section":
-        await state.set_state(FormStates.waiting_for_section)
-        await section(callback_query, state)
-        await callback_query.message.delete()
+
+    info_topic = MANAGER_ONB.get_info_course_topic(index_add_course, callback_query.data)
+
+    await state.update_data(info_topic = info_topic)
+
+    crossed_topics = user_data.get("crossed_topics")
+    split_info_topic = callback_query.data.split("__")
+    dict_info = ("__".join(split_info_topic[:-1]), split_info_topic[-1], info_course["name_course"])
+
+
+    if crossed_topics == None:
+        await state.update_data(crossed_topics = {dict_info[2]: {dict_info[0]: [dict_info[1]]}})
     else:
-        info_topic = MANAGER_ONB.get_info_course_topic(index_add_course, callback_query.data)
-
-        await state.update_data(info_topic = info_topic)
-
-        crossed_topics = user_data.get("crossed_topics")
-        split_info_topic = callback_query.data.split("__")
-        dict_info = ("__".join(split_info_topic[:-1]), split_info_topic[-1], info_course["name_course"])
-
-
-        if crossed_topics == None:
-            await state.update_data(crossed_topics = {dict_info[2]: {dict_info[0]: [dict_info[1]]}})
-        else:
-            if dict_info[2] in crossed_topics.keys():
-                if dict_info[0] in crossed_topics[dict_info[2]]:
-                    if dict_info[1] not in crossed_topics[dict_info[2]][dict_info[0]]:
-                        crossed_topics[dict_info[2]][dict_info[0]].append(dict_info[1])
-                else:
-                    crossed_topics[dict_info[2]][dict_info[0]] = [dict_info[1]]
+        if dict_info[2] in crossed_topics.keys():
+            if dict_info[0] in crossed_topics[dict_info[2]]:
+                if dict_info[1] not in crossed_topics[dict_info[2]][dict_info[0]]:
+                    crossed_topics[dict_info[2]][dict_info[0]].append(dict_info[1])
             else:
-                crossed_topics[dict_info[2]] = {}
                 crossed_topics[dict_info[2]][dict_info[0]] = [dict_info[1]]
-
-            await state.update_data(crossed_topics = crossed_topics)      
-            
-
-        del_msg_add_course = user_data.get("del_msg_add_course")
-
-        if del_msg_add_course != None:
-            await del_msg(callback_query.message, del_msg_add_course)
-
-        if info_topic["question"] != None and info_topic["answer"] != None:
-            msg1 = await callback_query.message.answer(callback_query.data)
-            await callback_query.message.answer(callback_query.data, 
-                                                reply_markup=kb_onboarding.topic_keyboard(
-                                                    info_course, 
-                                                    callback_query.data))
-
-            await state.update_data(del_msg_add_course = [msg1.message_id])
-
-            await callback_query.message.delete()
-
         else:
-            await callback_query.message.answer(callback_query.data, 
-                                                reply_markup=kb_onboarding.topic_keyboard(
-                                                    info_course, 
-                                                    callback_query.data, 
-                                                    not_question=True))
+            crossed_topics[dict_info[2]] = {}
+            crossed_topics[dict_info[2]][dict_info[0]] = [dict_info[1]]
 
-            await callback_query.message.delete()
+        await state.update_data(crossed_topics = crossed_topics)      
+        
+
+    await del_all_msg(callback_query, state)
+
+    if info_topic["question"] != None and info_topic["answer"] != None:
+        msg1 = await callback_query.message.answer(callback_query.data + "text")
+        msg2 = await callback_query.message.answer(callback_query.data + "quest", 
+                                            reply_markup=kb_onboarding.topic_keyboard(
+                                                info_course, 
+                                                callback_query.data))
+
+        await add_msgs_in_dels(state, [msg1, msg2])
+    else:
+        msg = await callback_query.message.answer(callback_query.data, 
+                                            reply_markup=kb_onboarding.topic_keyboard(
+                                                info_course, 
+                                                callback_query.data, 
+                                                not_question=True))
+        await add_msgs_in_dels(state, [msg])
 
 
 
+@router.callback_query(lambda c: c.data == "end_onboarding")
+async def end(callback_query: types.CallbackQuery, state: FSMContext):
+    user_data = await state.get_data()
+    await del_all_msg(callback_query, state)
+
+    if user_data.get('user_id'):
+        await state.set_state(LKStates.MAIN_MENU)
+        await show_main_menu(callback_query.message, state)
+    else:
+        await callback_query.message.answer(Registration.no())
 
 
 
@@ -681,18 +718,4 @@ async def topic(callback_query: types.CallbackQuery, state: FSMContext):
 #     await end(callback_query, state)
 #     await callback_query.message.delete()
 
-@router.callback_query(lambda c: c.data == "end_onboarding")
-async def end(callback_query: types.CallbackQuery, state: FSMContext):
-    user_data = await state.get_data()
-    del_msgs_onboarding = user_data.get("del_msgs_onboarding")
 
-    for msg in del_msgs_onboarding:
-        await callback_query.message.bot.delete_message(callback_query.message.chat.id, msg)
-
-    await state.update_data(del_msgs_onboarding = [])
-
-    if user_data.get('user_id'):
-        await state.set_state(LKStates.MAIN_MENU)
-        await show_main_menu(callback_query.message, state)
-    else:
-        await callback_query.message.answer(Registration.no())
