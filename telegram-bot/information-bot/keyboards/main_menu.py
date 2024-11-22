@@ -12,10 +12,8 @@ def menu(is_active_course: bool) -> InlineKeyboardMarkup:
 
     return InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="Вводный курс", callback_data="start_onboarding")],
-            [InlineKeyboardButton(text="Предметы", callback_data="subjects")],
-            [InlineKeyboardButton(text="Онлайн курсы", callback_data="online_courses")],
-            [InlineKeyboardButton(text="Чат с куратором", url=URL_BOT_CHAT_CURATOR)],
-            [InlineKeyboardButton(text="FAQ", callback_data="faq")],
+            [InlineKeyboardButton(text="Предметы", callback_data="subjects"), InlineKeyboardButton(text="Онлайн курсы", callback_data="online_courses")],
+            [InlineKeyboardButton(text="Чат с куратором", url=URL_BOT_CHAT_CURATOR), InlineKeyboardButton(text="FAQ", callback_data="faq")],
         ])
 
 def back_to_main() -> InlineKeyboardMarkup:

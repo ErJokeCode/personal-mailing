@@ -64,7 +64,7 @@ async def start_onboarding(callback_query: types.CallbackQuery, state: FSMContex
 
     crossed_topics = user_data.get("crossed_topics")
 
-    msg = await callback_query.message.answer("Выберите раздел: start_onboarding", 
+    msg = await callback_query.message.answer("Выберите раздел:", 
                                         reply_markup=kb_onboarding.get_sections_keyboard(
                                             MANAGER_ONB.onboarding, 
                                             crossed_topics=crossed_topics))
@@ -82,7 +82,7 @@ async def additional_courses(callback_query: types.CallbackQuery, state: FSMCont
 
     add_course = MANAGER_ONB.get_additional_courses()
 
-    msg = await callback_query.message.answer("Выберите курс: additional_courses", 
+    msg = await callback_query.message.answer("Выберите курс:", 
                                         reply_markup=kb_onboarding.additional_courses_keyboard(
                                             add_course, crossed_topics=crossed_topics))
     
@@ -141,7 +141,7 @@ async def menu_onboarding(callback_query: types.CallbackQuery, state: FSMContext
     await state.update_data(index_additional_course=MANAGER_ONB.get_index_onboarding())
 
     await state.set_state(FormStates.waiting_for_section)
-    msg = await callback_query.message.answer("Выберите раздел: start_onboarding_start", 
+    msg = await callback_query.message.answer("Выберите раздел:", 
                                         reply_markup=kb_onboarding.get_sections_keyboard(
                                             MANAGER_ONB.onboarding, 
                                             crossed_topics=crossed_topics))
@@ -158,7 +158,7 @@ async def menu_onboarding(callback_query: types.CallbackQuery, state: FSMContext
     crossed_topics = user_data.get("crossed_topics")
 
     await state.set_state(FormStates.waiting_for_section)
-    msg = await callback_query.message.answer("Выберите раздел: onboarding_sections", 
+    msg = await callback_query.message.answer("Выберите раздел:", 
                                         reply_markup=kb_onboarding.get_sections_keyboard(
                                             MANAGER_ONB.get_info_course(index_add_course), 
                                             crossed_topics=crossed_topics))
@@ -178,7 +178,7 @@ async def section_topic(callback_query: types.CallbackQuery, state: FSMContext):
     index_add_course = int(user_data.get("index_additional_course"))
     crossed_topics = user_data.get("crossed_topics")
 
-    msg = await callback_query.message.answer(f"Выберите тему: {callback_query.data}", 
+    msg = await callback_query.message.answer(f"Выберите тему:", 
                                             reply_markup=kb_onboarding.get_topics_keyboard(
                                                 MANAGER_ONB.get_info_course(index_add_course), 
                                                 "___".join(callback_query.data.split("___")[1:]), 
@@ -207,7 +207,7 @@ async def section(callback_query: types.CallbackQuery, state: FSMContext, from_s
     else:
         callback_query_data = callback_query.data
 
-    msg = await callback_query.message.answer(f"Выберите тему: {callback_query.data}", 
+    msg = await callback_query.message.answer(f"Выберите тему:", 
                                         reply_markup=kb_onboarding.get_topics_keyboard(
                                             MANAGER_ONB.get_info_course(index_add_course), 
                                             callback_query_data, 
@@ -225,7 +225,7 @@ async def topic_question(callback_query: types.CallbackQuery, state: FSMContext)
 
     await callback_query.message.edit_reply_markup()
 
-    msg = await callback_query.message.answer(callback_query.data, 
+    msg = await callback_query.message.answer(info_topic["answer"], 
                                         reply_markup=kb_onboarding.topic_keyboard(
                                             info_course, 
                                             callback_query.data.split("____")[0], 
@@ -273,15 +273,15 @@ async def topic(callback_query: types.CallbackQuery, state: FSMContext):
     await del_all_msg(callback_query, state)
 
     if info_topic["question"] != None and info_topic["answer"] != None:
-        msg1 = await callback_query.message.answer(callback_query.data + "text")
-        msg2 = await callback_query.message.answer(callback_query.data + "quest", 
+        msg1 = await callback_query.message.answer(f"Тема: {info_topic["name"]}\n\n{info_topic["text"]}")
+        msg2 = await callback_query.message.answer(info_topic["question"], 
                                             reply_markup=kb_onboarding.topic_keyboard(
                                                 info_course, 
                                                 callback_query.data))
 
         await add_msgs_in_dels(state, [msg1, msg2])
     else:
-        msg = await callback_query.message.answer(callback_query.data, 
+        msg = await callback_query.message.answer(f"Тема: {info_topic["name"]}\n\n{info_topic["text"]}", 
                                             reply_markup=kb_onboarding.topic_keyboard(
                                                 info_course, 
                                                 callback_query.data, 
