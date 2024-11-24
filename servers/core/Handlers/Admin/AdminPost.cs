@@ -23,10 +23,10 @@ public static partial class AdminHandler
                                                UserManager<AdminUser> userManager, IUserStore<AdminUser> userStore,
                                                CoreDb db)
     {
+        var allClaims = Permissions.All.Select(p => p.Claim).ToList();
+
         foreach (var permission in details.Permissions)
         {
-            var allClaims = Permissions.All.Select(p => p.Claim).ToList();
-
             if (!allClaims.Contains(permission))
             {
                 return Results.BadRequest($"{permission} is not a valid permission");

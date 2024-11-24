@@ -9,9 +9,6 @@ using System;
 
 namespace Core.Handlers;
 
-// TODO ability to change admin's permissions, and to delete an admin
-// add more permission types for actions
-
 public static partial class AdminHandler
 {
     public static async Task<bool> CreateAdmin(string email, string password, List<string> permissons,
