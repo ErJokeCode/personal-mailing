@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace Core.Models.Dto;
 
@@ -72,5 +73,15 @@ public partial class MessageStatusDto : IMappable<MessageStatusDto, MessageStatu
     public static List<MessageStatusDto> Maps(List<MessageStatus> origs)
     {
         return origs.Select(o => MessageStatusDto.Map(o)).ToList();
+    }
+}
+
+public static class ChatExtensions
+{
+    public static void BuildChat(this ModelBuilder builder)
+    {
+        builder.Entity<Chat>().HasMany(e => e.Messages).WithOne(e => e.Chat).HasForeignKey(e => e.ChatId);
+
+        builder.Entity<Message>().HasOne(e => e.Status).WithOne(e => e.Message).HasForeignKey("MessageStatus");
     }
 }

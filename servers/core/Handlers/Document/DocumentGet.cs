@@ -22,7 +22,7 @@ public static partial class DocumentHandler
         return Results.Ok(dto);
     }
 
-    public static async Task<IResult> GetDocumentData(int id, CoreDb db)
+    public static async Task<IResult> DownloadDocument(int id, CoreDb db)
     {
         var document = await db.Documents.FindAsync(id);
 

@@ -73,7 +73,7 @@ public static partial class ChatHandler
 
         chat.Messages.Add(message);
 
-        var sent = await BotHandler.SendToBot(activeStudent.AdminChatId, details.Content, documents, false);
+        var sent = await BotHandler.SendToBot(activeStudent.ChatId, details.Content, documents, false);
 
         if (sent)
         {

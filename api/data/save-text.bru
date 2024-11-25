@@ -1,0 +1,17 @@
+meta {
+  name: save-text
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{base_api}}/core/data/text
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "content": "Content"
+  }
+}

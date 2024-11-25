@@ -12,6 +12,7 @@ public static class DataRoute
         var group = app.MapGroup("/core/data");
 
         MapGet(group);
+        MapPost(group);
     }
 
     public static void MapGet(RouteGroupBuilder group)
@@ -20,5 +21,11 @@ public static class DataRoute
 
         getGroup.MapGet("/permissions", DataHandler.GetAllPermissions);
         getGroup.MapGet("/templates", DataHandler.GetAllTemplates);
+        getGroup.MapGet("/text", DataHandler.GetText);
+    }
+
+    public static void MapPost(RouteGroupBuilder group)
+    {
+        group.MapPost("/text", DataHandler.SaveText).AddPermission(Permissions.View);
     }
 }
