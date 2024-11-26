@@ -131,4 +131,5 @@ def create_Subject(subject_db: SubjectInBD, course: InfoOnlineCourseInDB) -> Sub
                 name=subject_db.name,
                 form_education=subject_db.form_education,
                 info=subject_db.info,
-                online_course=course)
+                online_course=course, 
+                group_tg_link=subject_db.group_tg_link)
