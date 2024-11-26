@@ -1,11 +1,11 @@
 meta {
-  name: add-schedule
+  name: update-schedule
   type: http
-  seq: 4
+  seq: 5
 }
 
-post {
-  url: {{base_api}}/core/schedule
+put {
+  url: {{base_api}}/core/schedule/1
   body: json
   auth: none
 }

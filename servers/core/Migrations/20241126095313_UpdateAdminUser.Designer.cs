@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Core.Utility;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Core.Migrations
 {
     [DbContext(typeof(CoreDb))]
-    partial class CoreDbModelSnapshot : ModelSnapshot
+    [Migration("20241126095313_UpdateAdminUser")]
+    partial class UpdateAdminUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -38,21 +41,6 @@ namespace Core.Migrations
                     b.ToTable("ActiveStudentNotification");
                 });
 
-            modelBuilder.Entity("ActiveStudentNotificationTemplate", b =>
-                {
-                    b.Property<Guid>("ActiveStudentsId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("TemplatesId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("ActiveStudentsId", "TemplatesId");
-
-                    b.HasIndex("TemplatesId");
-
-                    b.ToTable("ActiveStudentNotificationTemplate");
-                });
-
             modelBuilder.Entity("Core.Models.ActiveStudent", b =>
                 {
                     b.Property<Guid>("Id")
@@ -71,10 +59,15 @@ namespace Core.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("text");
 
+                    b.Property<int?>("NotificationTemplateId")
+                        .HasColumnType("integer");
+
                     b.Property<List<string>>("OnboardStatus")
                         .HasColumnType("text[]");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("NotificationTemplateId");
 
                     b.ToTable("ActiveStudents");
                 });
@@ -546,19 +539,11 @@ namespace Core.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("ActiveStudentNotificationTemplate", b =>
+            modelBuilder.Entity("Core.Models.ActiveStudent", b =>
                 {
-                    b.HasOne("Core.Models.ActiveStudent", null)
-                        .WithMany()
-                        .HasForeignKey("ActiveStudentsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Core.Models.NotificationTemplate", null)
-                        .WithMany()
-                        .HasForeignKey("TemplatesId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .WithMany("ActiveStudents")
+                        .HasForeignKey("NotificationTemplateId");
                 });
 
             modelBuilder.Entity("Core.Models.Chat", b =>
@@ -749,6 +734,8 @@ namespace Core.Migrations
 
             modelBuilder.Entity("Core.Models.NotificationTemplate", b =>
                 {
+                    b.Navigation("ActiveStudents");
+
                     b.Navigation("Documents");
                 });
 #pragma warning restore 612, 618

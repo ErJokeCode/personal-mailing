@@ -1,8 +1,11 @@
 using System.Text.Json;
 using System.Threading.Tasks;
+using Core.Identity;
+using Core.Models;
 using Core.Models.Dto;
 using Core.Utility;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using static Core.Handlers.NotificationHandler;
@@ -12,7 +15,8 @@ namespace Core.Handlers;
 public static partial class TemplateHandler
 {
     public static async Task<IResult> UpdateTemplate(int id, [FromForm] string body,
-                                                     [FromForm] IFormFileCollection documents, CoreDb db)
+                                                     [FromForm] IFormFileCollection documents, CoreDb db,
+                                                     HttpContext context, UserManager<AdminUser> userManager)
     {
         var details = JsonSerializer.Deserialize<NotificationDetails>(
             body, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
@@ -22,9 +26,16 @@ public static partial class TemplateHandler
                            .Include(t => t.Admin)
                            .SingleOrDefaultAsync(n => n.Id == id);
 
+        var adminId = userManager.GetUserId(context.User);
+
         if (template == null)
         {
             return Results.NotFound("Template not found");
+        }
+
+        if (template.AdminId != adminId && !context.User.HasClaim(Permissions.ManipulateStudents.Claim, ""))
+        {
+            return Results.BadRequest("Template does not belong to you");
         }
 
         template.Content = details.Content;

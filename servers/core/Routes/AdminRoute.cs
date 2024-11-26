@@ -26,6 +26,8 @@ public static class AdminRoute
 
         getGroup.MapGet("/chats", AdminHandler.GetAdminChats);
         getGroup.MapGet("/notifications", AdminHandler.GetAdminNotifications);
+        getGroup.MapGet("/templates", AdminHandler.GetAdminTemplates);
+        getGroup.MapGet("/schedules", AdminHandler.GetAdminSchedules);
 
         getGroup.MapGet("/{id}", AdminHandler.GetAdmin);
     }
