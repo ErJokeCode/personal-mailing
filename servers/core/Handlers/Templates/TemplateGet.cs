@@ -9,14 +9,17 @@ namespace Core.Handlers;
 
 public static partial class TemplateHandler
 {
-    public static IResult GetAllTemplates(CoreDb db)
+    public static IResult GetAllTemplates(CoreDb db, int pageIndex = 0, int pageSize = -1)
     {
         var templates = db.NotificationTemplates.Include(n => n.Admin)
                             .Include(t => t.Documents)
                             .Include(t => t.ActiveStudents)
                             .ToList();
 
-        return Results.Ok(NotificationTemplateDto.Maps(templates.ToList()));
+        var dtos = NotificationTemplateDto.Maps(templates.ToList());
+        var paginated = PaginatedList.Create(dtos.ToList(), pageIndex, pageSize);
+
+        return Results.Ok(paginated);
     }
 
     public static async Task<IResult> GetTemplate(int id, CoreDb db)

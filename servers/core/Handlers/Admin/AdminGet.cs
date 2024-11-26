@@ -54,14 +54,17 @@ public static partial class AdminHandler
         return Results.Ok(AdminUserDto.Map(admin));
     }
 
-    public static IResult GetAllAdmins(CoreDb db)
+    public static IResult GetAllAdmins(CoreDb db, int pageIndex = 0, int pageSize = -1)
     {
         var dtos = AdminUserDto.Maps(db.Users.ToList());
 
-        return Results.Ok(dtos);
+        var paginated = PaginatedList.Create(dtos.ToList(), pageIndex, pageSize);
+
+        return Results.Ok(paginated);
     }
 
-    public static async Task<IResult> GetAdminChats(HttpContext context, UserManager<AdminUser> userManager, CoreDb db)
+    public static async Task<IResult> GetAdminChats(HttpContext context, UserManager<AdminUser> userManager, CoreDb db,
+                                                    int pageIndex = 0, int pageSize = -1)
     {
         var adminId = userManager.GetUserId(context.User);
 
@@ -81,12 +84,13 @@ public static partial class AdminHandler
                         .SingleOrDefaultAsync(a => a.Id == adminId);
 
         var dtos = ChatDto.Maps(admin.Chats.ToList());
+        var paginated = PaginatedList.Create(dtos.ToList(), pageIndex, pageSize);
 
-        return Results.Ok(dtos);
+        return Results.Ok(paginated);
     }
 
     public static async Task<IResult> GetAdminNotifications(HttpContext context, UserManager<AdminUser> userManager,
-                                                            CoreDb db)
+                                                            CoreDb db, int pageIndex = 0, int pageSize = -1)
     {
         var id = userManager.GetUserId(context.User);
         var admin = await db.Users.Include(a => a.Notifications)
@@ -103,12 +107,13 @@ public static partial class AdminHandler
         }
 
         var dtos = NotificationDto.Maps((List<Notification>)admin.Notifications);
+        var paginated = PaginatedList.Create(dtos.ToList(), pageIndex, pageSize);
 
-        return Results.Ok(dtos);
+        return Results.Ok(paginated);
     }
 
     public static async Task<IResult> GetAdminTemplates(HttpContext context, UserManager<AdminUser> userManager,
-                                                        CoreDb db)
+                                                        CoreDb db, int pageIndex = 0, int pageSize = -1)
     {
         var id = userManager.GetUserId(context.User);
 
@@ -124,12 +129,13 @@ public static partial class AdminHandler
         }
 
         var dtos = NotificationTemplateDto.Maps((List<NotificationTemplate>)admin.Templates);
+        var paginated = PaginatedList.Create(dtos.ToList(), pageIndex, pageSize);
 
-        return Results.Ok(dtos);
+        return Results.Ok(paginated);
     }
 
     public static async Task<IResult> GetAdminSchedules(HttpContext context, UserManager<AdminUser> userManager,
-                                                        CoreDb db)
+                                                        CoreDb db, int pageIndex = 0, int pageSize = -1)
     {
         var id = userManager.GetUserId(context.User);
 
@@ -142,7 +148,8 @@ public static partial class AdminHandler
         }
 
         var dtos = NotificationScheduleDto.Maps((List<NotificationSchedule>)admin.Schedules);
+        var paginated = PaginatedList.Create(dtos.ToList(), pageIndex, pageSize);
 
-        return Results.Ok(dtos);
+        return Results.Ok(paginated);
     }
 }

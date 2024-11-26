@@ -5,7 +5,12 @@ meta {
 }
 
 get {
-  url: {{base_api}}/core/student
+  url: {{base_api}}/core/student?pageIndex=0&pageSize=10
   body: none
   auth: none
+}
+
+params:query {
+  pageIndex: 0
+  pageSize: 10
 }

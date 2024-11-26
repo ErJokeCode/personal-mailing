@@ -5,7 +5,12 @@ meta {
 }
 
 get {
-  url: {{base_api}}/core/schedule
+  url: {{base_api}}/core/schedule?pageIndex=0&pageSize=10
   body: none
   auth: none
+}
+
+params:query {
+  pageIndex: 0
+  pageSize: 10
 }

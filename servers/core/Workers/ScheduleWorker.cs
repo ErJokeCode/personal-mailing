@@ -24,7 +24,7 @@ public class ScheduleWorker : BackgroundService, IDisposable
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         _timer =
-            new Timer(async (state) => await CheckSchedule(_services), null, TimeSpan.Zero, TimeSpan.FromSeconds(5));
+            new Timer(async (state) => await CheckSchedule(_services), null, TimeSpan.Zero, TimeSpan.FromMinutes(1));
 
         return Task.CompletedTask;
     }
@@ -46,7 +46,7 @@ public class ScheduleWorker : BackgroundService, IDisposable
 
                 scheduled.Next += intervals * scheduled.Interval;
 
-                await NotificationHandler.SendFromTemplate(scheduled.TemplateId, context);
+                await ScheduleHandler.SendFromTemplate(scheduled.TemplateId, context);
             }
         }
 

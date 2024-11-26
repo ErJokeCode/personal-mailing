@@ -27,14 +27,15 @@ public static partial class StudentHandler
         return Results.Ok(dto);
     }
 
-    public static async Task<IResult> GetAllStudents(CoreDb db)
+    public static async Task<IResult> GetAllStudents(CoreDb db, int pageIndex = 0, int pageSize = -1)
     {
         var activeStudents = db.ActiveStudents.ToList();
         await activeStudents.IncludeStudents();
 
         var dtos = ActiveStudentDto.Maps(activeStudents);
+        var paginated = PaginatedList.Create(dtos.ToList(), pageIndex, pageSize);
 
-        return Results.Ok(dtos);
+        return Results.Ok(paginated);
     }
 
     public static async Task<IResult> GetStudentCourses(Guid id, CoreDb db)
@@ -51,7 +52,7 @@ public static partial class StudentHandler
         return Results.Ok(activeStudent.Student.OnlineCourse);
     }
 
-    public static async Task<IResult> GetStudentChats(Guid id, CoreDb db)
+    public static async Task<IResult> GetStudentChats(Guid id, CoreDb db, int pageIndex = 0, int pageSize = -1)
     {
         var activeStudent = await db.ActiveStudents.Include(a => a.Chats)
                                 .Include(a => a.Chats)
@@ -63,10 +64,13 @@ public static partial class StudentHandler
             return Results.NotFound("Student not found");
         }
 
-        return Results.Ok(ChatDto.Maps(activeStudent.Chats.ToList()));
+        var dtos = ChatDto.Maps(activeStudent.Chats.ToList());
+        var paginated = PaginatedList.Create(dtos.ToList(), pageIndex, pageSize);
+
+        return Results.Ok(paginated);
     }
 
-    public static async Task<IResult> GetStudentNotifications(Guid id, CoreDb db)
+    public static async Task<IResult> GetStudentNotifications(Guid id, CoreDb db, int pageIndex = 0, int pageSize = -1)
     {
         var activeStudent = await db.ActiveStudents.Include(a => a.Notifications)
                                 .Include(a => a.Notifications)
@@ -83,7 +87,8 @@ public static partial class StudentHandler
         }
 
         var dtos = NotificationDto.Maps((List<Notification>)activeStudent.Notifications);
+        var paginated = PaginatedList.Create(dtos.ToList(), pageIndex, pageSize);
 
-        return Results.Ok(dtos);
+        return Results.Ok(paginated);
     }
 }

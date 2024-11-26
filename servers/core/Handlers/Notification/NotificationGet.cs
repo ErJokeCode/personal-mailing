@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using Core.Models.Dto;
 using Core.Utility;
@@ -24,7 +25,7 @@ public static partial class NotificationHandler
         return Results.Ok(NotificationDto.Map(notification));
     }
 
-    public static async Task<IResult> GetAllNotifications(CoreDb db)
+    public static async Task<IResult> GetAllNotifications(CoreDb db, int pageIndex = 0, int pageSize = -1)
     {
         var notifications = await db.Notifications.Include(n => n.ActiveStudents)
                                 .Include(n => n.Admin)
@@ -33,7 +34,8 @@ public static partial class NotificationHandler
                                 .ToListAsync();
 
         var dtos = NotificationDto.Maps(notifications);
+        var paginated = PaginatedList.Create(dtos.ToList(), pageIndex, pageSize);
 
-        return Results.Ok(dtos);
+        return Results.Ok(paginated);
     }
 }
