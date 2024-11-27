@@ -55,7 +55,7 @@
       <TableHeadCell class="px-8">Фамилия</TableHeadCell>
     </TableHead>
     <TableBody tableBodyClass="divide-y">
-        {#each students.slice(curPage * amountPage, curPage * amountPage + amountPage) as student}
+        {#each students as student}
         <TableBodyRow
                 slot="row"
                 on:click={() => fullInfo(student.email)}

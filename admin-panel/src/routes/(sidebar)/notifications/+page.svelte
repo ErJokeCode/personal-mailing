@@ -23,7 +23,9 @@
     let json = await response?.json();
     notifications = json;
   });
-  $: filtered = notifications.filter((item) => item.content.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1);
+  $: filtered = notifications.filter((item) => item.content.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
+                                            || item.date.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
+                                            || item.students.filter(student => student.email.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1).length !== 0);
 </script>
 
 <main class="relative h-full w-full overflow-y-auto bg-white dark:bg-gray-800">
