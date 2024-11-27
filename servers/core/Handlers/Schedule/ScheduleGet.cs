@@ -14,7 +14,7 @@ public static partial class ScheduleHandler
         var schedules = await db.NotificationSchedules.Include(s => s.Template).ThenInclude(t => t.Admin).ToListAsync();
 
         var dtos = NotificationScheduleDto.Maps(schedules);
-        var paginated = PaginatedList.Create(dtos.ToList(), pageIndex, pageSize);
+        var paginated = new PaginatedList<NotificationScheduleDto>(dtos.ToList(), pageIndex, pageSize);
 
         return Results.Ok(paginated);
     }

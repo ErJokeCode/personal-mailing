@@ -58,7 +58,7 @@ public static partial class AdminHandler
     {
         var dtos = AdminUserDto.Maps(db.Users.ToList());
 
-        var paginated = PaginatedList.Create(dtos.ToList(), pageIndex, pageSize);
+        var paginated = new PaginatedList<AdminUserDto>(dtos.ToList(), pageIndex, pageSize);
 
         return Results.Ok(paginated);
     }
@@ -84,7 +84,7 @@ public static partial class AdminHandler
                         .SingleOrDefaultAsync(a => a.Id == adminId);
 
         var dtos = ChatDto.Maps(admin.Chats.ToList());
-        var paginated = PaginatedList.Create(dtos.ToList(), pageIndex, pageSize);
+        var paginated = new PaginatedList<ChatDto>(dtos.ToList(), pageIndex, pageSize);
 
         return Results.Ok(paginated);
     }
@@ -107,7 +107,7 @@ public static partial class AdminHandler
         }
 
         var dtos = NotificationDto.Maps((List<Notification>)admin.Notifications);
-        var paginated = PaginatedList.Create(dtos.ToList(), pageIndex, pageSize);
+        var paginated = new PaginatedList<NotificationDto>(dtos.ToList(), pageIndex, pageSize);
 
         return Results.Ok(paginated);
     }
@@ -129,7 +129,7 @@ public static partial class AdminHandler
         }
 
         var dtos = NotificationTemplateDto.Maps((List<NotificationTemplate>)admin.Templates);
-        var paginated = PaginatedList.Create(dtos.ToList(), pageIndex, pageSize);
+        var paginated = new PaginatedList<NotificationTemplateDto>(dtos.ToList(), pageIndex, pageSize);
 
         return Results.Ok(paginated);
     }
@@ -148,7 +148,7 @@ public static partial class AdminHandler
         }
 
         var dtos = NotificationScheduleDto.Maps((List<NotificationSchedule>)admin.Schedules);
-        var paginated = PaginatedList.Create(dtos.ToList(), pageIndex, pageSize);
+        var paginated = new PaginatedList<NotificationScheduleDto>(dtos.ToList(), pageIndex, pageSize);
 
         return Results.Ok(paginated);
     }

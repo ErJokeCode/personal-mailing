@@ -33,7 +33,7 @@ public static partial class StudentHandler
         await activeStudents.IncludeStudents();
 
         var dtos = ActiveStudentDto.Maps(activeStudents);
-        var paginated = PaginatedList.Create(dtos.ToList(), pageIndex, pageSize);
+        var paginated = new PaginatedList<ActiveStudentDto>(dtos.ToList(), pageIndex, pageSize);
 
         return Results.Ok(paginated);
     }
@@ -65,7 +65,7 @@ public static partial class StudentHandler
         }
 
         var dtos = ChatDto.Maps(activeStudent.Chats.ToList());
-        var paginated = PaginatedList.Create(dtos.ToList(), pageIndex, pageSize);
+        var paginated = new PaginatedList<ChatDto>(dtos.ToList(), pageIndex, pageSize);
 
         return Results.Ok(paginated);
     }
@@ -87,7 +87,7 @@ public static partial class StudentHandler
         }
 
         var dtos = NotificationDto.Maps((List<Notification>)activeStudent.Notifications);
-        var paginated = PaginatedList.Create(dtos.ToList(), pageIndex, pageSize);
+        var paginated = new PaginatedList<NotificationDto>(dtos.ToList(), pageIndex, pageSize);
 
         return Results.Ok(paginated);
     }

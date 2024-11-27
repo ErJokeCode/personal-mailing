@@ -34,7 +34,7 @@ public static partial class NotificationHandler
                                 .ToListAsync();
 
         var dtos = NotificationDto.Maps(notifications);
-        var paginated = PaginatedList.Create(dtos.ToList(), pageIndex, pageSize);
+        var paginated = new PaginatedList<NotificationDto>(dtos.ToList(), pageIndex, pageSize);
 
         return Results.Ok(paginated);
     }

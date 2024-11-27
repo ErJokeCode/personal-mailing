@@ -17,7 +17,7 @@ public static partial class TemplateHandler
                             .ToList();
 
         var dtos = NotificationTemplateDto.Maps(templates.ToList());
-        var paginated = PaginatedList.Create(dtos.ToList(), pageIndex, pageSize);
+        var paginated = new PaginatedList<NotificationTemplateDto>(dtos.ToList(), pageIndex, pageSize);
 
         return Results.Ok(paginated);
     }
