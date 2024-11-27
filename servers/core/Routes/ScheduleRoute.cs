@@ -22,6 +22,7 @@ public static class ScheduleRoute
         var getGroup = group.MapGroup("/").AddPermission(Permissions.View);
 
         getGroup.MapGet("/", ScheduleHandler.GetAllSchedules);
+        getGroup.MapGet("/{id}", ScheduleHandler.GetSchedule);
     }
 
     public static void MapPost(RouteGroupBuilder group)
@@ -31,6 +32,7 @@ public static class ScheduleRoute
 
     public static void MapPut(RouteGroupBuilder group)
     {
+        group.MapPut("/{id}", ScheduleHandler.ChangeSchedule).AddPermission(Permissions.SendNotifications);
     }
 
     public static void MapDelete(RouteGroupBuilder group)

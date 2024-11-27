@@ -28,7 +28,7 @@ public class CourseInfo
     public string DateStart { get; set; }
     public string Deadline { get; set; }
     public string Info { get; set; }
-    public Dictionary<string, int> Scores { get; set; }
+    public Dictionary<string, object> Scores { get; set; }
 }
 
 [Keyless]

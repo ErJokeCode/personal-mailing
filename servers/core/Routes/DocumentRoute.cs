@@ -19,6 +19,6 @@ public static class DocumentRoute
         var getGroup = group.MapGroup("/").AddPermission(Permissions.View);
 
         getGroup.MapGet("/{id}", DocumentHandler.GetDocument);
-        getGroup.MapGet("/{id}/data", DocumentHandler.GetDocumentData);
+        getGroup.MapGet("/{id}/download", DocumentHandler.DownloadDocument);
     }
 }

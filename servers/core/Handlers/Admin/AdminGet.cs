@@ -106,4 +106,43 @@ public static partial class AdminHandler
 
         return Results.Ok(dtos);
     }
+
+    public static async Task<IResult> GetAdminTemplates(HttpContext context, UserManager<AdminUser> userManager,
+                                                        CoreDb db)
+    {
+        var id = userManager.GetUserId(context.User);
+
+        var admin = await db.Users.Include(a => a.Templates)
+                        .ThenInclude(n => n.ActiveStudents)
+                        .Include(a => a.Templates)
+                        .ThenInclude(n => n.Documents)
+                        .SingleOrDefaultAsync(a => a.Id == id);
+
+        if (admin == null)
+        {
+            return Results.NotFound("Could not find admin");
+        }
+
+        var dtos = NotificationTemplateDto.Maps((List<NotificationTemplate>)admin.Templates);
+
+        return Results.Ok(dtos);
+    }
+
+    public static async Task<IResult> GetAdminSchedules(HttpContext context, UserManager<AdminUser> userManager,
+                                                        CoreDb db)
+    {
+        var id = userManager.GetUserId(context.User);
+
+        var admin =
+            await db.Users.Include(a => a.Schedules).ThenInclude(s => s.Template).SingleOrDefaultAsync(a => a.Id == id);
+
+        if (admin == null)
+        {
+            return Results.NotFound("Could not find admin");
+        }
+
+        var dtos = NotificationScheduleDto.Maps((List<NotificationSchedule>)admin.Schedules);
+
+        return Results.Ok(dtos);
+    }
 }

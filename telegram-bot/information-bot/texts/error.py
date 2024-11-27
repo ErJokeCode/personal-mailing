@@ -5,3 +5,20 @@ class Registration():
 class Input():
     def incorrect() -> str:
         return "Мне непонятен текст))"
+    
+
+
+class UserAlreadyRegistered(Exception):
+    def __init__(self):
+        super().__init__("Пользователь уже зарегистрирован")
+
+
+class ErrorAuth(Exception):
+    def __init__(self):
+        super().__init__("Ошибка регистрации")
+
+    
+class NotValueForAuth(Exception):
+    def __init__(self):
+        super().__init__("Не хватает данных")
+    

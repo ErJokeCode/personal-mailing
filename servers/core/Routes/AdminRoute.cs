@@ -13,6 +13,7 @@ public static class AdminRoute
 
         MapGet(group);
         MapPost(group);
+        MapPut(group);
     }
 
     public static void MapGet(RouteGroupBuilder group)
@@ -25,6 +26,8 @@ public static class AdminRoute
 
         getGroup.MapGet("/chats", AdminHandler.GetAdminChats);
         getGroup.MapGet("/notifications", AdminHandler.GetAdminNotifications);
+        getGroup.MapGet("/templates", AdminHandler.GetAdminTemplates);
+        getGroup.MapGet("/schedules", AdminHandler.GetAdminSchedules);
 
         getGroup.MapGet("/{id}", AdminHandler.GetAdmin);
     }
@@ -32,5 +35,10 @@ public static class AdminRoute
     public static void MapPost(RouteGroupBuilder group)
     {
         group.MapPost("/create", AdminHandler.AddAdmin).AddPermission(Permissions.CreateAdmins);
+    }
+
+    public static void MapPut(RouteGroupBuilder group)
+    {
+        group.MapPut("/{adminId}/permissions", AdminHandler.UpdatePermissions).AddPermission(Permissions.CreateAdmins);
     }
 }

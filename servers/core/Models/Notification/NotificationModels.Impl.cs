@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 
 namespace Core.Models.Dto;
 
@@ -55,5 +56,16 @@ public partial class NotificationStatusDto : IMappable<NotificationStatusDto, No
     public static List<NotificationStatusDto> Maps(List<NotificationStatus> origs)
     {
         return origs.Select(o => NotificationStatusDto.Map(o)).ToList();
+    }
+}
+
+public static class NotificationExtensions
+{
+    public static void BuildNotification(this ModelBuilder builder)
+    {
+        builder.Entity<Notification>()
+            .HasMany(e => e.Statuses)
+            .WithOne(e => e.Notification)
+            .HasForeignKey(e => e.NotificationId);
     }
 }

@@ -38,6 +38,21 @@ namespace Core.Migrations
                     b.ToTable("ActiveStudentNotification");
                 });
 
+            modelBuilder.Entity("ActiveStudentNotificationTemplate", b =>
+                {
+                    b.Property<Guid>("ActiveStudentsId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("TemplatesId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("ActiveStudentsId", "TemplatesId");
+
+                    b.HasIndex("TemplatesId");
+
+                    b.ToTable("ActiveStudentNotificationTemplate");
+                });
+
             modelBuilder.Entity("Core.Models.ActiveStudent", b =>
                 {
                     b.Property<Guid>("Id")
@@ -56,15 +71,10 @@ namespace Core.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("text");
 
-                    b.Property<int?>("NotificationTemplateId")
-                        .HasColumnType("integer");
-
                     b.Property<List<string>>("OnboardStatus")
                         .HasColumnType("text[]");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("NotificationTemplateId");
 
                     b.ToTable("ActiveStudents");
                 });
@@ -295,6 +305,9 @@ namespace Core.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("AdminId")
+                        .HasColumnType("text");
+
                     b.Property<TimeSpan>("Interval")
                         .HasColumnType("interval");
 
@@ -308,6 +321,8 @@ namespace Core.Migrations
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AdminId");
 
                     b.HasIndex("TemplateId");
 
@@ -366,6 +381,22 @@ namespace Core.Migrations
                     b.HasIndex("AdminId");
 
                     b.ToTable("NotificationTemplates");
+                });
+
+            modelBuilder.Entity("Core.Models.Text", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Content")
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Texts");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -515,11 +546,19 @@ namespace Core.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Core.Models.ActiveStudent", b =>
+            modelBuilder.Entity("ActiveStudentNotificationTemplate", b =>
                 {
+                    b.HasOne("Core.Models.ActiveStudent", null)
+                        .WithMany()
+                        .HasForeignKey("ActiveStudentsId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Core.Models.NotificationTemplate", null)
-                        .WithMany("ActiveStudents")
-                        .HasForeignKey("NotificationTemplateId");
+                        .WithMany()
+                        .HasForeignKey("TemplatesId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Core.Models.Chat", b =>
@@ -587,11 +626,17 @@ namespace Core.Migrations
 
             modelBuilder.Entity("Core.Models.NotificationSchedule", b =>
                 {
+                    b.HasOne("Core.Models.AdminUser", "Admin")
+                        .WithMany("Schedules")
+                        .HasForeignKey("AdminId");
+
                     b.HasOne("Core.Models.NotificationTemplate", "Template")
                         .WithMany()
                         .HasForeignKey("TemplateId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Admin");
 
                     b.Navigation("Template");
                 });
@@ -610,7 +655,7 @@ namespace Core.Migrations
             modelBuilder.Entity("Core.Models.NotificationTemplate", b =>
                 {
                     b.HasOne("Core.Models.AdminUser", "Admin")
-                        .WithMany()
+                        .WithMany("Templates")
                         .HasForeignKey("AdminId");
 
                     b.Navigation("Admin");
@@ -677,6 +722,10 @@ namespace Core.Migrations
                     b.Navigation("Chats");
 
                     b.Navigation("Notifications");
+
+                    b.Navigation("Schedules");
+
+                    b.Navigation("Templates");
                 });
 
             modelBuilder.Entity("Core.Models.Chat", b =>
@@ -700,8 +749,6 @@ namespace Core.Migrations
 
             modelBuilder.Entity("Core.Models.NotificationTemplate", b =>
                 {
-                    b.Navigation("ActiveStudents");
-
                     b.Navigation("Documents");
                 });
 #pragma warning restore 612, 618

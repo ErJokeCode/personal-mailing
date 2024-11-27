@@ -11,6 +11,8 @@ public class AdminUser : IdentityUser
     public List<string> Permissions { get; set; } = [];
 
     public ICollection<Notification> Notifications { get; } = [];
+    public ICollection<NotificationTemplate> Templates { get; } = [];
+    public ICollection<NotificationSchedule> Schedules { get; } = [];
     public ICollection<Chat> Chats { get; } = [];
 }
 
@@ -30,4 +32,5 @@ public class ActiveStudent
 
     public ICollection<Notification> Notifications { get; } = [];
     public ICollection<Chat> Chats { get; } = [];
+    public ICollection<NotificationTemplate> Templates { get; } = [];
 }

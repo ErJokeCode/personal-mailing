@@ -35,6 +35,6 @@ public static class NotificationRoute
     public static void MapPut(RouteGroupBuilder group)
     {
         group.MapPut("/{id}/setStatus", NotificationHandler.SetNotificationStatus)
-            .AddPermission(Permissions.SendNotifications);
+            .AddPermission(Permissions.ManipulateStudents);
     }
 }

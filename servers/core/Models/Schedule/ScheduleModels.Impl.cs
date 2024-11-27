@@ -7,12 +7,12 @@ public partial class NotificationScheduleDto : IMappable<NotificationScheduleDto
 {
     public static NotificationScheduleDto Map(NotificationSchedule orig)
     {
-        return new NotificationScheduleDto()
-        {
+        return new NotificationScheduleDto() {
             Template = NotificationTemplateDto.Map(orig.Template),
             Start = orig.Start,
             Interval = orig.Interval,
             Next = orig.Next,
+            Admin = AdminUserDto.Map(orig.Admin),
         };
     }
 
