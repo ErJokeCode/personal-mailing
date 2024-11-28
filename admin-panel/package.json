@@ -56,19 +56,6 @@
 		"svelte-routing": "^2.13.0",
 		"tailwind-merge": "^2.5.2"
 	},
-	"keywords": [
-		"svelte",
-		"sveltekit",
-		"tailwindcss",
-		"flowbite",
-		"ui",
-		"admin dashboard",
-		"signup"
-	],
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/themesberg/flowbite-svelte-admin-dashboard"
-	},
 	"files": [
 		"dist",
 		"!dist/**/*.test.*",
