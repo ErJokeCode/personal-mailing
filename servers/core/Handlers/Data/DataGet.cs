@@ -13,11 +13,6 @@ public static partial class DataHandler
         return Results.Ok(Permissions.All.Select(p => p.Claim));
     }
 
-    public static IResult GetAllTemplates()
-    {
-        return Results.Ok(NotificationHandler.Passes.Keys);
-    }
-
     public static IResult GetText(CoreDb db)
     {
         var text = db.Texts.OrderBy(t => t.Id).LastOrDefault();
