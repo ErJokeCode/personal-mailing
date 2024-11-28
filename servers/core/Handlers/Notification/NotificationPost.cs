@@ -8,6 +8,7 @@ using Core.Utility;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace Core.Handlers;
 
@@ -94,9 +95,7 @@ public static partial class NotificationHandler
 
             notification.Statuses.Add(status);
 
-            var filled = await NotificationHandler.FillTemplate(notification.Content, activeStudent);
-
-            var sent = await BotHandler.SendToBot(activeStudent.ChatId, filled, fileCollection);
+            var sent = await BotHandler.SendToBot(activeStudent.ChatId, notification.Content, fileCollection);
 
             if (sent)
             {

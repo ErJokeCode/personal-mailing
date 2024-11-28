@@ -63,6 +63,25 @@ public static partial class AdminHandler
         return Results.Ok(paginated);
     }
 
+    public static async Task<IResult> GetAdminToStudents(HttpContext context, UserManager<AdminUser> userManager,
+                                                         CoreDb db, int pageIndex = 0, int pageSize = -1)
+    {
+        var adminId = userManager.GetUserId(context.User);
+
+        if (adminId == null)
+        {
+            return Results.NotFound("Admin not found");
+        }
+
+        var admin = await db.Users.Include(a => a.Students).SingleOrDefaultAsync(a => a.Id == adminId);
+        await admin.Students.IncludeStudents();
+
+        var dtos = ActiveStudentDto.Maps(admin.Students.ToList());
+        var paginated = new PaginatedList<ActiveStudentDto>(dtos.ToList(), pageIndex, pageSize);
+
+        return Results.Ok(paginated);
+    }
+
     public static async Task<IResult> GetAdminChats(HttpContext context, UserManager<AdminUser> userManager, CoreDb db,
                                                     int pageIndex = 0, int pageSize = -1)
     {

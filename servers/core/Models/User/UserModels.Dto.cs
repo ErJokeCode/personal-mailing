@@ -16,10 +16,10 @@ public partial class ActiveStudentDto
     public Guid Id { get; set; }
     public string Email { get; set; }
     public string ChatId { get; set; }
-    public string AdminChatId { get; set; } = null;
     public string Date { get; set; }
 
     public List<string> OnboardStatus { get; set; } = [];
 
+    public AdminUserDto Admin { get; set; }
     public Student Info { get; set; }
 }

@@ -44,12 +44,17 @@ public static partial class ChatHandler
         {
             return Results.NotFound("Student not found");
         }
+        else if (activeStudent.AdminId != adminId)
+        {
+            return Results.NotFound("Student is not linked to you");
+        }
 
         var chat = activeStudent.Chats.SingleOrDefault(ch => ch.ActiveStudentId == activeStudent.Id);
 
         if (chat == null)
         {
-            chat = new Chat() {
+            chat = new Chat()
+            {
                 ActiveStudentId = activeStudent.Id,
                 AdminId = adminId,
             };
@@ -57,8 +62,12 @@ public static partial class ChatHandler
             db.Chats.Add(chat);
         }
 
-        var message = new Message() {
-            Date = DateTime.Now.ToString(), Sender = "Admin", Receiver = "Student", Content = details.Content,
+        var message = new Message()
+        {
+            Date = DateTime.Now.ToString(),
+            Sender = "Admin",
+            Receiver = "Student",
+            Content = details.Content,
             Status = new MessageStatus(),
         };
 
@@ -66,7 +75,7 @@ public static partial class ChatHandler
 
         message.Documents.Clear();
         var docs = await DocumentHandler.StoreDocuments(documents, db);
-        foreach(var doc in docs)
+        foreach (var doc in docs)
         {
             message.Documents.Add(doc);
         }
@@ -89,7 +98,6 @@ public static partial class ChatHandler
     {
         public string Content { get; set; }
         public Guid StudentId { get; set; }
-        public string AdminId { get; set; }
     }
 
     public static async Task<IResult> StudentSendToAdmin([FromForm] string body,
@@ -99,13 +107,6 @@ public static partial class ChatHandler
         var details = JsonSerializer.Deserialize<StudentMessage>(
             body, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
-        var admin = db.Users.Find(details.AdminId);
-
-        if (admin == null)
-        {
-            return Results.NotFound("Admin not found");
-        }
-
         var activeStudent =
             await db.ActiveStudents.Include(a => a.Chats).SingleOrDefaultAsync(s => s.Id == details.StudentId);
 
@@ -114,28 +115,40 @@ public static partial class ChatHandler
             return Results.NotFound("Student not found");
         }
 
+        var admin = db.Users.Find(activeStudent.AdminId);
+
+        if (admin == null)
+        {
+            return Results.NotFound("Admin not found");
+        }
+
         var chat = activeStudent.Chats.SingleOrDefault(ch => ch.ActiveStudentId == activeStudent.Id);
 
         if (chat == null)
         {
-            chat = new Chat() {
+            chat = new Chat()
+            {
                 ActiveStudentId = activeStudent.Id,
-                AdminId = details.AdminId,
+                AdminId = admin.Id,
             };
 
             db.Chats.Add(chat);
         }
 
-        var message = new Message() {
-            Date = DateTime.Now.ToString(), Sender = "Student",           Receiver = "Admin",
-            Content = details.Content,      Status = new MessageStatus(),
+        var message = new Message()
+        {
+            Date = DateTime.Now.ToString(),
+            Sender = "Student",
+            Receiver = "Admin",
+            Content = details.Content,
+            Status = new MessageStatus(),
         };
 
         message.Status.SetSent();
 
         message.Documents.Clear();
         var docs = await DocumentHandler.StoreDocuments(documents, db);
-        foreach(var doc in docs)
+        foreach (var doc in docs)
         {
             message.Documents.Add(doc);
         }
@@ -145,9 +158,12 @@ public static partial class ChatHandler
 
         await db.SaveChangesAsync();
 
-        await endpoint.Publish(new StudentSentMessage() { Admin = AdminUserDto.Map(admin),
-                                                          Message = MessageDto.Map(message),
-                                                          Student = ActiveStudentDto.Map(activeStudent) });
+        await endpoint.Publish(new StudentSentMessage()
+        {
+            Admin = AdminUserDto.Map(admin),
+            Message = MessageDto.Map(message),
+            Student = ActiveStudentDto.Map(activeStudent)
+        });
 
         return Results.Ok();
     }

@@ -33,12 +33,12 @@ public static partial class StudentHandler
         return Results.Ok(activeStudent.OnboardStatus);
     }
 
-    public class ChatDetails
+    public class AdminDetails
     {
-        public string ChatId { get; set; }
+        public string AdminId { get; set; }
     }
 
-    public static async Task<IResult> AddCuratorChat(Guid id, ChatDetails details, CoreDb db)
+    public static async Task<IResult> ChangeAdmin(Guid id, AdminDetails details, CoreDb db)
     {
         var activeStudent = db.ActiveStudents.Find(id);
 
@@ -47,7 +47,14 @@ public static partial class StudentHandler
             return Results.NotFound("Student not found");
         }
 
-        activeStudent.AdminChatId = details.ChatId;
+        var admin = db.Users.Find(details.AdminId);
+
+        if (admin == null)
+        {
+            return Results.NotFound("Admin not found");
+        }
+
+        activeStudent.AdminId = details.AdminId;
 
         await db.SaveChangesAsync();
 

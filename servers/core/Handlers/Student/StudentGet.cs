@@ -14,7 +14,7 @@ public static partial class StudentHandler
 {
     public static async Task<IResult> GetStudent(Guid id, CoreDb db)
     {
-        var activeStudent = db.ActiveStudents.Find(id);
+        var activeStudent = db.ActiveStudents.Include(a => a.Admin).SingleOrDefault(a => a.Id == id);
 
         if (activeStudent == null)
         {
@@ -29,7 +29,7 @@ public static partial class StudentHandler
 
     public static async Task<IResult> GetAllStudents(CoreDb db, int pageIndex = 0, int pageSize = -1)
     {
-        var activeStudents = db.ActiveStudents.ToList();
+        var activeStudents = db.ActiveStudents.Include(a => a.Admin).ToList();
         await activeStudents.IncludeStudents();
 
         var dtos = ActiveStudentDto.Maps(activeStudents);
@@ -54,7 +54,7 @@ public static partial class StudentHandler
 
     public static async Task<IResult> GetStudentChats(Guid id, CoreDb db, int pageIndex = 0, int pageSize = -1)
     {
-        var activeStudent = await db.ActiveStudents.Include(a => a.Chats)
+        var activeStudent = await db.ActiveStudents.Include(a => a.Admin)
                                 .Include(a => a.Chats)
                                 .ThenInclude(ch => ch.Admin)
                                 .SingleOrDefaultAsync(a => a.Id == id);
@@ -72,7 +72,7 @@ public static partial class StudentHandler
 
     public static async Task<IResult> GetStudentNotifications(Guid id, CoreDb db, int pageIndex = 0, int pageSize = -1)
     {
-        var activeStudent = await db.ActiveStudents.Include(a => a.Notifications)
+        var activeStudent = await db.ActiveStudents.Include(a => a.Admin)
                                 .Include(a => a.Notifications)
                                 .ThenInclude(n => n.Admin)
                                 .Include(a => a.Notifications)

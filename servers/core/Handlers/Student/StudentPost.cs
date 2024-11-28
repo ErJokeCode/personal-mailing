@@ -28,8 +28,15 @@ public static partial class StudentHandler
             return Results.Ok(activeStudent);
         }
 
-        activeStudent =
-            new ActiveStudent() { Email = details.Email, ChatId = details.ChatId, Date = DateTime.Now.ToString() };
+        var admin = db.Users.FirstOrDefault();
+
+        activeStudent = new ActiveStudent()
+        {
+            Email = details.Email,
+            ChatId = details.ChatId,
+            Date = DateTime.Now.ToString(),
+            AdminId = admin.Id
+        };
 
         var found = await activeStudent.IncludeStudent();
 

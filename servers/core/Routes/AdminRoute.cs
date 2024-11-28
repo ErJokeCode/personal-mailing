@@ -24,6 +24,7 @@ public static class AdminRoute
         getGroup.MapGet("/me", AdminHandler.GetAdminMe);
         getGroup.MapGet("/byEmail/{email}", AdminHandler.GetAdminByEmail);
 
+        getGroup.MapGet("/students", AdminHandler.GetAdminToStudents);
         getGroup.MapGet("/chats", AdminHandler.GetAdminChats);
         getGroup.MapGet("/notifications", AdminHandler.GetAdminNotifications);
         getGroup.MapGet("/templates", AdminHandler.GetAdminTemplates);

@@ -42,10 +42,10 @@ public partial class ActiveStudentDto : IMappable<ActiveStudentDto, ActiveStuden
             Id = orig.Id,
             Email = orig.Email,
             ChatId = orig.ChatId,
-            AdminChatId = orig.AdminChatId,
             Info = orig.Student,
             Date = orig.Date,
             OnboardStatus = orig.OnboardStatus,
+            Admin = (orig.Admin == null) ? null : AdminUserDto.Map(orig.Admin),
         };
     }
 

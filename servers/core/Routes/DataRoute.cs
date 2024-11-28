@@ -20,7 +20,6 @@ public static class DataRoute
         var getGroup = group.MapGroup("/").AddPermission(Permissions.View);
 
         getGroup.MapGet("/permissions", DataHandler.GetAllPermissions);
-        getGroup.MapGet("/templates", DataHandler.GetAllTemplates);
         getGroup.MapGet("/text", DataHandler.GetText);
     }
 
