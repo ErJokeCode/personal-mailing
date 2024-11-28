@@ -43,6 +43,7 @@
     }
 
     async function send() {
+        if (ids.length === 0) return
         send_status = "Sending...";
 
         let response;
@@ -98,13 +99,14 @@
   const handleChange = (event) => {
     const files = event.target.files;
     if (files.length > 0) {
-      value.push(files[0].name);
-      value = value;
+        for (let file of files) {
+            value.push(file.name);
+        }
+        value = value;
     }
   };
 
   const showFiles = (files) => {
-    if (files.length === 1) return files[0];
     let concat = '';
     files.map((file: string) => {
       concat += file;
@@ -112,8 +114,10 @@
       concat += ' ';
     });
 
-    if (concat.length > 200) concat = concat.slice(0, 200);
-    concat += '...';
+    if (concat.length > 200) {
+        concat = concat.slice(0, 200);
+        concat += '...';
+    }
     return concat;
   };
 </script>

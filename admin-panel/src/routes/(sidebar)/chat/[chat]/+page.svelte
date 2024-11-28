@@ -1,5 +1,6 @@
-<script>
-	import { Breadcrumb, BreadcrumbItem, Textarea, ToolbarButton } from 'flowbite-svelte';
+<script lang="ts">
+	import { Breadcrumb, BreadcrumbItem, Helper, Textarea, ToolbarButton } from 'flowbite-svelte';
+    import { PaperClipOutline } from 'flowbite-svelte-icons'
     import { onDestroy, onMount } from "svelte";
     import http from "../../../../utility/http";
     import { signal } from "../../../../utility/signal";
@@ -14,6 +15,8 @@
     let student = {};
     let admin = {};
 
+    let files = [];
+
     async function get_messages() {
         let json =
             (await http.get(
@@ -26,16 +29,20 @@
     }
 
     async function send_message() {
+        if (content === '') return
         status = status.start_load();
 
         var data = new FormData();
         data.append("body", JSON.stringify({ studentId, content }));
-        // Can also add documents
+        for (let file of files) {
+            data.append("file", file);
+        }
 
         await http.post(`/core/chat/adminSend`, data, status);
 
         content = "";
         status = status.end_load();
+        value = [];
 
         await get_messages();
         chatArea.scrollTo(0, chatArea.scrollHeight);
@@ -66,6 +73,33 @@
             chatArea.scrollTo(0, chatArea.scrollHeight);
         }
     }
+
+	let value: any[] = [];
+
+    const handleChange = (event) => {
+    const files = event.target.files;
+    if (files.length > 0) {
+        for (let file of files) {
+            value.push(file.name);
+        }
+        value = value;
+    }
+  };
+
+  const showFiles = (files) => {
+    let concat = '';
+    files.map((file: string) => {
+      concat += file;
+      concat += ',';
+      concat += ' ';
+    });
+
+    if (concat.length > 100) {
+        concat = concat.slice(0, 100);
+        concat += '...';
+    }
+    return concat;
+  };
 </script>
 
 <main class="h-full w-full bg-white dark:bg-gray-800">
@@ -76,7 +110,7 @@
 			<BreadcrumbItem>Чат</BreadcrumbItem>
 		</Breadcrumb>
 	</div>
-    <div class="px-20 mb-10 py-10">
+    <div class="px-20 mb-10 py-8">
         <div class="bg-gray-50 dark:bg-gray-900 text-gray-500 dark:text-gray-400 rounded-lg border border-gray-200 dark:border-gray-700
                     divide-gray-200 dark:divide-gray-700 shadow-md flex w-full flex-col p-4 sm:p-6 overflow-auto mb-5"
                 bind:this={chatArea}>
@@ -90,6 +124,9 @@
                                     {admin.email}
                                 </p>
                                 <div class="flex space-y-2 text-gray-900 dark:text-white break-all">{message.content}</div>
+                                {#each message.documents as document}
+                                    <Helper>{document.name}</Helper>
+                                {/each}
                             </div>
                         </article>
                     {:else}
@@ -100,13 +137,23 @@
                                     {student.email}
                                 </p>
                                 <div class="flex space-y-2 text-gray-900 dark:text-white break-all">{message.content}</div>
+                                {#each message.documents as document}
+                                    <Helper>{document.name}</Helper>
+                                {/each}
                             </div>
                         </article>
                     {/if}
                 {/each}
             </div>
         </div>
-        <div class="flex items-center gap-5">
+        <div class="flex items-center gap-3">
+            <ToolbarButton name="Attach file" class="relative">
+                <PaperClipOutline class="w-6 h-6 rotate-45 dark:text-white"></PaperClipOutline>
+                <input class="absolute left-0 top-0 w-10 h-10 opacity-0 rounded-lg"
+                    type="file"
+                    multiple bind:files
+                    on:change={handleChange} />
+            </ToolbarButton>
             <Textarea
                 rows={1}
                 placeholder="Введите текст" 
@@ -131,6 +178,7 @@
                 <span class="sr-only">Send message</span>
             </ToolbarButton>
         </div>
+        <Helper class="mt-1">{showFiles(value)}</Helper>
     </div>
 </main>
 

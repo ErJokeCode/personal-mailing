@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Label, Input, Button, Helper } from 'flowbite-svelte';
+	import { Label, Input, Button, Helper, Checkbox } from 'flowbite-svelte';
 	import { Breadcrumb, BreadcrumbItem, Heading } from 'flowbite-svelte';
 
 	const labelClass = 'space-y-2 dark:text-white';
@@ -8,6 +8,8 @@
   let create_status = "";
   let email = "";
   let password = "";
+
+  let permissions = ["SendNotifications"];
 
   async function create() {
       create_status = "Creating...";
@@ -18,8 +20,9 @@
         response = await fetch('http://localhost:5000/core/admin/create', {
           method: "Post",
           body: JSON.stringify({
-            password: password,
             email: email,
+            password: password,
+            permissions: permissions
           }),
           credentials: "include",
           headers: {
@@ -34,6 +37,14 @@
       if (response?.ok) {
         create_status = "You successfully created an admin!";
       }
+    }
+
+    function add_id(checked: any, permission: any) {
+        if (checked) {
+            permissions.push(permission);
+        } else {
+            permissions = permissions.filter(p => p != permission);
+        }
     }
 </script>
 
@@ -73,7 +84,11 @@
           bind:value={password}
         />
       </Label>
-    </div>  
+    </div>
+    <div class="flex mb-6">
+        <Checkbox class="mx-1" on:click={(event) => add_id(event.target?.checked, "CreateAdmins")}/>
+        Создать суперадмина
+    </div>
     <Button class="mb-2" on:click={create}>Создать</Button>
     <Helper>{create_status}</Helper>
 	</div>

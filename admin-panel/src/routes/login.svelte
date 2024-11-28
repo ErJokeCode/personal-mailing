@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { Label, Input } from 'flowbite-svelte';
-	import SignIn from './utils/authentication/SignIn.svelte';
+	import { Label, Input, Button, Card } from 'flowbite-svelte';
     import http from "../utility/http";
     import { admin } from "../utility/store.js";
     import { goto } from '$app/navigation';
@@ -33,31 +32,39 @@
 	let loginTitle = 'Войти в аккаунт';
 </script>
 
-<SignIn
-	{title}
-	{loginTitle}
-	on:submit={login}
->
-	<div>
-		<Label for="email" class="mb-2 dark:text-white">Электронная почта</Label>
-		<Input
-			type="text"
-			name="email"
-			id="email"
-			placeholder="name@company.com"
-			required
-			class="border outline-none dark:border-gray-600 dark:bg-gray-700"
-		/>
+<main class='bg-gray-50 dark:bg-gray-900 w-full'>
+	<div class='flex flex-col items-center justify-center px-6 pt-8 mx-auto md:h-screen pt:mt-0 dark:bg-gray-900'>
+		<Card class="w-full" size="md" border={false}>
+			<h1 class='text-2xl font-bold text-gray-900 dark:text-white'>
+				{title}
+			</h1>
+            <form class="mt-8 space-y-6" on:submit={login}>
+	            <div>
+		            <Label for="email" class="mb-2 dark:text-white">Электронная почта</Label>
+		            <Input
+			            type="text"
+			            name="email"
+			            id="email"
+			            placeholder="name@company.com"
+			            required
+			            class="border outline-none dark:border-gray-600 dark:bg-gray-700"
+                        bind:value={email}
+		            />
+	            </div>
+	            <div>
+		            <Label for="password" class="mb-2 dark:text-white">Пароль</Label>
+		            <Input
+			            type="password"
+			            name="password"
+			            id="password"
+			            placeholder="••••••••"
+			            required
+			            class="border outline-none dark:border-gray-600 dark:bg-gray-700"
+                        bind:value={password}
+		            />
+	            </div>
+				<Button type="submit" size="lg">{status.value}{loginTitle}</Button>
+			</form>
+		</Card>
 	</div>
-	<div>
-		<Label for="password" class="mb-2 dark:text-white">Пароль</Label>
-		<Input
-			type="password"
-			name="password"
-			id="password"
-			placeholder="••••••••"
-			required
-			class="border outline-none dark:border-gray-600 dark:bg-gray-700"
-		/>
-	</div>
-</SignIn>
+</main>
