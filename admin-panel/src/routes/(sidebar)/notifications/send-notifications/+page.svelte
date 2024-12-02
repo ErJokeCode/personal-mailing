@@ -31,7 +31,7 @@
         }
 
         let json = await response?.json();
-        activeStudents = json;
+        activeStudents = json.items;
     });
 
     function add_id(checked: any, id: any) {

@@ -22,7 +22,7 @@
     }
 
     let json = await response?.json();
-    notifications = json;
+    notifications = json.items;
   });
   $: filtered = notifications.filter((item) => item.content.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
                                             || item.date.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1

@@ -18,7 +18,7 @@
       login_status = "Not Logged In";
     }
     let json = await response?.json();
-    admins = json;
+    admins = json.items;
   });
 </script>
 
