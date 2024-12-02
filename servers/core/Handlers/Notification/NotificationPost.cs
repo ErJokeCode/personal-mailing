@@ -17,7 +17,7 @@ public static partial class NotificationHandler
     public class NotificationDetails
     {
         public List<Guid> StudentIds { get; set; }
-        public List<int> DocumentIds { get; set; }
+        public List<int> DocumentIds { get; set; } = [];
 
         public string Content { get; set; }
     }
@@ -36,8 +36,7 @@ public static partial class NotificationHandler
             Results.NotFound("Could not get the admin");
         }
 
-        var notification = new Notification()
-        {
+        var notification = new Notification() {
             Content = details.Content,
             Date = DateTime.Now.ToString(),
             AdminId = adminId,
@@ -87,8 +86,7 @@ public static partial class NotificationHandler
 
             notification.ActiveStudents.Add(activeStudent);
 
-            var status = new NotificationStatus()
-            {
+            var status = new NotificationStatus() {
                 StudentId = guid,
             };
             status.SetLost();

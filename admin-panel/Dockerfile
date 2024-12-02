@@ -11,4 +11,4 @@ RUN pnpm install
 
 EXPOSE 5015
 
-CMD ["pnpm", "run", "dev"]
+CMD ["pnpm", "dev"]
