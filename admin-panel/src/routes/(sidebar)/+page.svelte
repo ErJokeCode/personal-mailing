@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { Breadcrumb, BreadcrumbItem, Button, Heading, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
-	import { ArrowRightOutline } from 'flowbite-svelte-icons';
+	import { Breadcrumb, BreadcrumbItem, Heading} from 'flowbite-svelte';
 </script>
 
 <main class="relative h-full w-full overflow-y-auto bg-white dark:bg-gray-800">

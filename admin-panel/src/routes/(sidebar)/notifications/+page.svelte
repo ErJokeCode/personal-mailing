@@ -4,6 +4,7 @@
   import { onMount } from "svelte";
   import { Button } from 'flowbite-svelte';
   import { ArrowRightOutline } from 'flowbite-svelte-icons';
+	import { goto } from '$app/navigation';
 
   let login_status = "";
   let notifications = [];
@@ -26,6 +27,9 @@
   $: filtered = notifications.filter((item) => item.content.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
                                             || item.date.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1
                                             || item.students.filter(student => student.email.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1).length !== 0);
+    async function fullInfo(id) {
+        goto(`/notifications/${id}`);
+    }
 </script>
 
 <main class="relative h-full w-full overflow-y-auto bg-white dark:bg-gray-800">
@@ -52,7 +56,8 @@
     </TableHead>
     <TableBody tableBodyClass="divide-y">
       {#each filtered as notification}
-        <TableBodyRow slot="row">
+        <TableBodyRow slot="row"
+            on:click={() => fullInfo(notification.id)}>
           <TableBodyCell class="px-8 break-all">{notification.content}</TableBodyCell>
           <TableBodyCell class="px-8">{notification.date}</TableBodyCell>
           <TableBodyCell class="px-8">
