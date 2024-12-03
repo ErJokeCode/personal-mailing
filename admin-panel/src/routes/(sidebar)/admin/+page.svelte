@@ -11,7 +11,7 @@
     let response;
 
     try {
-      response = await fetch('http://localhost:5000/core/admin', {
+      response = await fetch('http://193.160.209.55:5000/core/admin', {
           credentials: "include",
       });
     } catch (err) {

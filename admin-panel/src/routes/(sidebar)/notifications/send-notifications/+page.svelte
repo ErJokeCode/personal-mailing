@@ -23,7 +23,7 @@
         let response;
 
         try {
-            response = await fetch('http://localhost:5000/core/student', {
+            response = await fetch('http://193.160.209.55:5000/core/student', {
                 credentials: "include",
             });
         } catch (err) {
@@ -61,7 +61,7 @@
                 data.append("file", file);
             }
 
-            response = await fetch('http://localhost:5000/core/notification', {
+            response = await fetch('http://193.160.209.55:5000/core/notification', {
                 method: "Post",
                 body: data,
                 credentials: "include",

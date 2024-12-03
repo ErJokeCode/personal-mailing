@@ -75,10 +75,8 @@ async def all_message(message: types.Message, state: FSMContext):
 
             async with session.get(f"{URL_SERVER}/core/admin", headers=headers) as response_admins:
                 if response_admins.status == 200:
-                    admins = await response_admins.json()
-
                     with aiohttp.MultipartWriter('form-data') as mpwriter:
-                        part = mpwriter.append_json({"content": message.text, "studentId": user_id, "adminId": admins[0]["id"]})
+                        part = mpwriter.append_json({"content": message.text, "studentId": user_id})
                         part.set_content_disposition('form-data', name="body")
 
                         async with session.post(f"{URL_SERVER}/core/chat/studentSend", headers=headers, data=mpwriter) as resp:
