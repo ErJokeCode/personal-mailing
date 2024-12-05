@@ -35,7 +35,6 @@ def get_cookie():
 
 test_data_course = [{
     "name_course": "Вводный курс", 
-    "is_onboarding": True,
     "sections": [
     {
         "name": "ЛК УРФУ", 
@@ -178,9 +177,7 @@ class ManegerOnboarding():
     
 
     def get_index_onboarding(self) -> int:
-        for i in range(len(self.__data)):
-            if self.__data[i]["is_onboarding"]:
-                return i
+        return 0
     
 
     def get_info_course(self, index:int) -> dict:

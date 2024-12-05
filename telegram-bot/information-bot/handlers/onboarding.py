@@ -293,11 +293,11 @@ async def topic(callback_query: types.CallbackQuery, state: FSMContext):
 @router.callback_query(lambda c: c.data == "end_onboarding")
 async def end(callback_query: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
-    await del_all_msg(callback_query, state)
 
     if user_data.get('user_id'):
         await state.set_state(LKStates.MAIN_MENU)
         await show_main_menu(callback_query.message, state)
+        await del_all_msg(callback_query, state)
     else:
         await callback_query.message.answer(Registration.no())
 
