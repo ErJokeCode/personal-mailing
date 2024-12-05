@@ -45,8 +45,8 @@
 	});
 
 	let posts = [
-		{ name: 'Главная', icon: ChartPieOutline, href: '/chat' },
-		{ name: 'Войти', icon: LockSolid, href: '/login' },
+		{ name: 'Главная', icon: ChartPieOutline, href: '/' },
+		{ name: 'Чаты', icon: RectangleListSolid, href: '/chat' },
 		{ name: 'Загрузить файлы', icon: FileChartBarSolid, href: '/upload' },
 		{ name: 'Рассылки', icon: ClipboardListSolid, href: '/notifications' },
 		{
@@ -58,16 +58,7 @@
 			}
 		},
 		{ name: 'Администраторы', icon: UserSettingsOutline, href: '/admin' },
-		{ name: 'Профиль', icon: CogOutline, href: '/settings' },
-		{
-			name: 'tests',
-			icon: RectangleListSolid,
-			children: {
-                Table: '/crud/table',
-				Products: '/crud/products',
-				Users: '/crud/users'
-			}
-		}
+		{ name: 'Профиль', icon: CogOutline, href: '/profile' }
 	];
 	let dropdowns = Object.fromEntries(Object.keys(posts).map((x) => [x, false]));
 </script>

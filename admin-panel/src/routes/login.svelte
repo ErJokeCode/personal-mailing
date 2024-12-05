@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Label, Input, Button, Card } from 'flowbite-svelte';
-    import http from "../utility/http";
-    import { admin } from "../utility/store.js";
+    import http from "./utils/http";
+    import { admin } from "./utils/store.js";
     import { goto } from '$app/navigation';
 
     let email = "";
@@ -63,7 +63,7 @@
                         bind:value={password}
 		            />
 	            </div>
-				<Button type="submit" size="lg">{status.value}{loginTitle}</Button>
+				<Button type="submit" size="lg">{status.value} {loginTitle}</Button>
 			</form>
 		</Card>
 	</div>

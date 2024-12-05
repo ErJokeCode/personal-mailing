@@ -3,6 +3,7 @@
 	import { TableHeadCell, Table, TableBody, TableBodyCell, TableBodyRow, TableHead } from 'flowbite-svelte';
   import { onMount } from "svelte";
   import { ArrowRightOutline } from 'flowbite-svelte-icons';
+	import { goto } from '$app/navigation';
 
   let login_status = "";
   let admins = [];
@@ -20,6 +21,10 @@
     let json = await response?.json();
     admins = json.items;
   });
+
+  async function fullInfo(id) {
+        goto(`/admin/${id}`);
+    }
 </script>
 
 <main class="relative h-full w-full overflow-y-auto bg-white dark:bg-gray-800">
@@ -40,11 +45,13 @@
   <Table hoverable={true}>
     <TableHead>
       <TableHeadCell class="px-8">Электронная почта</TableHeadCell>
+      <TableHeadCell class="px-8">Дата</TableHeadCell>
     </TableHead>
     <TableBody tableBodyClass="divide-y">
 			{#each admins as admin}
-				<TableBodyRow slot="row">
+				<TableBodyRow slot="row" on:click={() => fullInfo(admin.id)}>
 					<TableBodyCell class="px-8">{admin.email}</TableBodyCell>
+					<TableBodyCell class="px-8">{admin.date}</TableBodyCell>
 				</TableBodyRow>
 			{/each}
     </TableBody>
