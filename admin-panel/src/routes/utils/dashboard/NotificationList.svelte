@@ -9,7 +9,6 @@
 		HeartSolid,
 		UsersGroupSolid
 	} from 'flowbite-svelte-icons';
-	import Users from '../../data/users.json';
 	import Notification from './Notification.svelte';
 </script>
 
@@ -21,7 +20,7 @@
 	<div class="bg-50 dark:bg-gray-700">
 		<Notification
 			href="#"
-			src={Users[0].avatar}
+			src={''}
 			icon={DownloadSolid}
 			when="a few moments ago"
 			color="purple"
@@ -31,7 +30,7 @@
 		</Notification>
 		<Notification
 			href="#"
-			src={Users[1].avatar}
+			src={''}
 			icon={UsersGroupSolid}
 			when="10 minutes ago"
 			color="dark"
@@ -42,7 +41,7 @@
 
 		<Notification
 			href="#"
-			src={Users[3].avatar}
+			src={''}
 			icon={HeartSolid}
 			when="44 minutes ago"
 			color="red"
@@ -54,7 +53,7 @@
 
 		<Notification
 			href="#"
-			src={Users[4].avatar}
+			src={''}
 			icon={AnnotationSolid}
 			when="1 hour ago"
 			color="green"
@@ -67,7 +66,7 @@
 
 		<Notification
 			href="#"
-			src={Users[5].avatar}
+			src={''}
 			icon={CameraPhotoOutline}
 			when="3 hours ago"
 			color="purple"

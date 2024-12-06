@@ -58,7 +58,7 @@
       {#each filtered as notification}
         <TableBodyRow slot="row"
             on:click={() => fullInfo(notification.id)}>
-          <TableBodyCell class="px-8 break-all">{notification.content}</TableBodyCell>
+          <TableBodyCell class="px-8 break-all">{notification.content.length > 50 ? notification.content.slice(0, 50) : notification.content}</TableBodyCell>
           <TableBodyCell class="px-8">{notification.date}</TableBodyCell>
           <TableBodyCell class="px-8">
             {#each notification.students as student}

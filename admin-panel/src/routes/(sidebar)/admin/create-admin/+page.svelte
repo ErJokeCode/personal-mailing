@@ -2,8 +2,6 @@
 	import { Label, Input, Button, Helper, Checkbox } from 'flowbite-svelte';
 	import { Breadcrumb, BreadcrumbItem, Heading } from 'flowbite-svelte';
 
-	const labelClass = 'space-y-2 dark:text-white';
-
   let login_status = "";
   let create_status = "";
   let email = "";
@@ -60,7 +58,7 @@
       {login_status}
 		</Heading>
     <div class="mb-4">
-      <Label class={labelClass}>
+      <Label class='space-y-2 dark:text-white'>
       <span>Электронная почта</span>
         <Input
           type="text"
@@ -73,7 +71,7 @@
       </Label>
     </div>
     <div class="mb-6">
-      <Label class={labelClass}>
+      <Label class='space-y-2 dark:text-white'>
        <span>Пароль</span>
        <Input
           type="password"
@@ -85,7 +83,7 @@
         />
       </Label>
     </div>
-    <div class="flex mb-6">
+    <div class="flex mb-6 dark:text-white">
         <Checkbox class="mx-1" on:click={(event) => add_id(event.target?.checked, "CreateAdmins")}/>
         Создать суперадмина
     </div>

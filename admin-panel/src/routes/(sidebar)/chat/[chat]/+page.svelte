@@ -1,9 +1,9 @@
 <script lang="ts">
-	import { Breadcrumb, BreadcrumbItem, Helper, Textarea, ToolbarButton } from 'flowbite-svelte';
+	import { A, Breadcrumb, BreadcrumbItem, Button, Helper, Textarea, ToolbarButton } from 'flowbite-svelte';
     import { PaperClipOutline } from 'flowbite-svelte-icons'
     import { onDestroy, onMount } from "svelte";
-    import http from "../../../../utility/http";
-    import { signal } from "../../../../utility/signal";
+    import http from "../../../utils/http";
+    import { signal } from "../../../utils/signal";
     import { page } from '$app/stores';
 
     let studentId = $page.params.chat;
@@ -29,7 +29,7 @@
     }
 
     async function send_message() {
-        if (content === '') return
+        if (content === '' && files.length === 0) return
         status = status.start_load();
 
         var data = new FormData();
@@ -104,7 +104,7 @@
 
 <main class="h-full w-full bg-white dark:bg-gray-800">
 	<div class="p-4 px-6">
-		<Breadcrumb class="mb-5">
+		<Breadcrumb>
 			<BreadcrumbItem home>Главная</BreadcrumbItem>
 			<BreadcrumbItem href="/chat">Все чаты</BreadcrumbItem>
 			<BreadcrumbItem>Чат</BreadcrumbItem>
@@ -123,9 +123,16 @@
                                 <p class="text-sm font-semibold text-gray-900 dark:text-white">
                                     {admin.email}
                                 </p>
-                                <div class="flex space-y-2 text-gray-900 dark:text-white break-all">{message.content}</div>
+                                <div class="flex space-y-2 text-gray-900 dark:text-white break-all mt-1">{message.content}</div>
                                 {#each message.documents as document}
-                                    <Helper>{document.name}</Helper>
+                                    <hr class="h-px my-1 bg-gray-200 border-0 dark:bg-gray-700">
+                                    {#if document.mimeType.includes('image')}
+                                        <img class="mb-1" src={`http://localhost:5000/core/document/${document.id}/download`} alt=''/>
+                                    {/if}
+                                    <div class="flex items-center">
+                                        <Helper>{document.name}</Helper>
+                                        <a class="ml-3" href={`http://localhost:5000/core/document/${document.id}/download`}>Скачать</a>
+                                    </div>
                                 {/each}
                             </div>
                         </article>
@@ -136,9 +143,16 @@
                                 <p class="text-sm font-semibold text-gray-900 dark:text-white">
                                     {student.email}
                                 </p>
-                                <div class="flex space-y-2 text-gray-900 dark:text-white break-all">{message.content}</div>
+                                <div class="flex space-y-2 text-gray-900 dark:text-white break-all mt-1">{message.content}</div>
                                 {#each message.documents as document}
-                                    <Helper>{document.name}</Helper>
+                                    <hr class="h-px my-1 bg-gray-200 border-0 dark:bg-gray-700">
+                                    {#if document.mimeType.includes('image')}
+                                        <img class="mb-1" src={`http://localhost:5000/core/document/${document.id}/download`} alt=''/>
+                                    {/if}
+                                    <div class="flex items-center">
+                                        <Helper>{document.name}</Helper>
+                                        <a class="ml-3" href={`http://localhost:5000/core/document/${document.id}/download`}>Скачать</a>
+                                    </div>
                                 {/each}
                             </div>
                         </article>
