@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Core.Models;
 
@@ -6,6 +7,12 @@ namespace Core.Handlers;
 
 public static partial class StudentHandler
 {
+    public static bool AnyLowScore(CourseInfo course) => course.Scores.Any(s => int.TryParse(s.Value.ToString(),
+                                                                                             out int score) &&
+                                                                                score < 40);
+
+    public static bool AnyNotOnCourse(CourseInfo course) => course.Scores.Any(s => s.Value.ToString() ==
+                                                                                   "Нет на курсе");
 }
 
 public static class ActiveStudentExtensions

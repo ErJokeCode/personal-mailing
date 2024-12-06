@@ -27,10 +27,26 @@ public static partial class StudentHandler
         return Results.Ok(dto);
     }
 
-    public static async Task<IResult> GetAllStudents(CoreDb db, int pageIndex = 0, int pageSize = -1)
+    public static async Task<IResult> GetAllStudents(CoreDb db, bool notOnCourse = false, bool lowScore = false,
+                                                     int pageIndex = 0, int pageSize = -1)
     {
         var activeStudents = db.ActiveStudents.Include(a => a.Admin).ToList();
         await activeStudents.IncludeStudents();
+
+        if (lowScore && notOnCourse)
+        {
+            return Results.BadRequest($"Can not filter by both {nameof(notOnCourse)} and {nameof(lowScore)}");
+        }
+
+        if (notOnCourse)
+        {
+            activeStudents =
+                activeStudents.Where(a => a.Student.OnlineCourse.Any(StudentHandler.AnyNotOnCourse)).ToList();
+        }
+        else if (lowScore)
+        {
+            activeStudents = activeStudents.Where(a => a.Student.OnlineCourse.Any(StudentHandler.AnyLowScore)).ToList();
+        }
 
         var dtos = ActiveStudentDto.Maps(activeStudents);
         var paginated = new PaginatedList<ActiveStudentDto>(dtos.ToList(), pageIndex, pageSize);
