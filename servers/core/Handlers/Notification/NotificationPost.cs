@@ -33,6 +33,11 @@ public static partial class NotificationHandler
         var details = JsonSerializer.Deserialize<NotificationDetails>(
             body, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
+        if (string.IsNullOrEmpty(details.Content) && (documents is null || documents.Count <= 0))
+        {
+            return Results.BadRequest("Can not send empty notification");
+        }
+
         if (details.NotOnCourse && details.LowScore)
         {
             return Results.BadRequest($"Can not filter by both notOnCourse and lowScore");
@@ -45,8 +50,7 @@ public static partial class NotificationHandler
             Results.NotFound("Could not get the admin");
         }
 
-        var notification = new Notification()
-        {
+        var notification = new Notification() {
             Content = details.Content,
             Date = DateTime.Now.ToString(),
             AdminId = adminId,
@@ -96,8 +100,7 @@ public static partial class NotificationHandler
 
             notification.ActiveStudents.Add(activeStudent);
 
-            var status = new NotificationStatus()
-            {
+            var status = new NotificationStatus() {
                 StudentId = guid,
             };
             status.SetLost();
