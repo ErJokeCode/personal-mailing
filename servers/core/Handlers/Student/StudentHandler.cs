@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Core.Models;
 
@@ -7,20 +9,30 @@ namespace Core.Handlers;
 
 public static partial class StudentHandler
 {
-    public static bool AnyLowScore(CourseInfo course) => course.Scores.Any(s => int.TryParse(s.Value.ToString(),
-                                                                                             out int score) &&
-                                                                                score < 40);
+    private static int FindLowEnd(string value)
+    {
+        var match = Regex.Match(value, @"\(проходной балл (\d+)\)");
+        int.TryParse(match.Groups[1].Value, out int score);
+        return score;
+    }
 
-    public static bool AnyNotOnCourse(CourseInfo course) => course.Scores.Any(s => s.Value.ToString() ==
-                                                                                   "Нет на курсе");
+    public static bool AnyLowScore(CourseInfo course)
+    {
+        return course.Scores.Any(s => int.TryParse(s.Value.ToString(), out int score) &&
+                                      score < FindLowEnd(s.Key.ToString()));
+    }
+
+    public static bool AnyNotOnCourse(CourseInfo course)
+    {
+        return course.Scores.Any(s => s.Value.ToString() == "Нет на курсе");
+    }
 }
 
 public static class ActiveStudentExtensions
 {
     public static async Task<bool> IncludeStudent(this ActiveStudent active)
     {
-        var query = new Dictionary<string, string>
-        {
+        var query = new Dictionary<string, string> {
             ["email"] = active.Email,
         };
 

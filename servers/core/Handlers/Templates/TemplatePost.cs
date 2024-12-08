@@ -20,6 +20,11 @@ public static partial class TemplateHandler
         var details = JsonSerializer.Deserialize<NotificationDetails>(
             body, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
+        if (string.IsNullOrEmpty(details.Content) && (documents is null || documents.Count <= 0))
+        {
+            return Results.BadRequest("Can not save empty template");
+        }
+
         var adminId = userManager.GetUserId(context.User);
 
         if (adminId == null)
@@ -27,8 +32,7 @@ public static partial class TemplateHandler
             Results.NotFound("Could not get the admin");
         }
 
-        var notification = new NotificationTemplate()
-        {
+        var notification = new NotificationTemplate() {
             Content = details.Content,
             Date = DateTime.Now.ToString(),
             AdminId = adminId,
