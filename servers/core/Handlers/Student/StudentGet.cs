@@ -28,7 +28,9 @@ public static partial class StudentHandler
     }
 
     public static async Task<IResult> GetAllStudents(CoreDb db, bool notOnCourse = false, bool lowScore = false,
-                                                     int pageIndex = 0, int pageSize = -1)
+                                                     string group = null, int course = 0, string typeOfCost = null,
+                                                     string typeOfEducation = null, int pageIndex = 0,
+                                                     int pageSize = -1)
     {
         var activeStudents = db.ActiveStudents.Include(a => a.Admin).ToList();
         await activeStudents.IncludeStudents();
@@ -37,8 +39,7 @@ public static partial class StudentHandler
         {
             return Results.BadRequest($"Can not filter by both {nameof(notOnCourse)} and {nameof(lowScore)}");
         }
-
-        if (notOnCourse)
+        else if (notOnCourse)
         {
             activeStudents =
                 activeStudents.Where(a => a.Student.OnlineCourse.Any(StudentHandler.AnyNotOnCourse)).ToList();
@@ -46,6 +47,30 @@ public static partial class StudentHandler
         else if (lowScore)
         {
             activeStudents = activeStudents.Where(a => a.Student.OnlineCourse.Any(StudentHandler.AnyLowScore)).ToList();
+        }
+
+        if (!string.IsNullOrEmpty(group))
+        {
+            activeStudents =
+                activeStudents.Where(a => a.Student.Group.Number.ToLower().Contains(group.ToLower())).ToList();
+        }
+
+        if (course > 0)
+        {
+            activeStudents = activeStudents.Where(a => a.Student.Group.NumberCourse == course).ToList();
+        }
+
+        if (!string.IsNullOrEmpty(typeOfCost))
+        {
+            activeStudents =
+                activeStudents.Where(a => a.Student.TypeOfCost.ToLower().Contains(typeOfCost.ToLower())).ToList();
+        }
+
+        if (!string.IsNullOrEmpty(typeOfEducation))
+        {
+            activeStudents =
+                activeStudents.Where(a => a.Student.TypeOfEducation.ToLower().Contains(typeOfEducation.ToLower()))
+                    .ToList();
         }
 
         var dtos = ActiveStudentDto.Maps(activeStudents);
