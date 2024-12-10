@@ -33,7 +33,8 @@ public static partial class NotificationHandler
         var details = JsonSerializer.Deserialize<NotificationDetails>(
             body, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
 
-        if (string.IsNullOrEmpty(details.Content) && (documents is null || documents.Count <= 0))
+        if ((string.IsNullOrEmpty(details.Content) && (documents is null || documents.Count <= 0)) ||
+            (details.StudentIds is null || details.StudentIds.Count <= 0))
         {
             return Results.BadRequest("Can not send empty notification");
         }
