@@ -30,8 +30,8 @@ services:
     depends_on:
       redis:
         condition: service_started
-      core:
-        condition: service_healthy
+      # core:
+      #   condition: service_healthy
     volumes:
       - ./telegram-bot:/opt/bot
 
@@ -72,11 +72,11 @@ services:
         condition: service_started
       rabbitmq:
         condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://core:5000/ping" ]
-      interval: 10s
-      timeout: 30s
-      retries: 10
+    # healthcheck:
+    #   test: [ "CMD", "curl", "-f", "http://core:5000/ping" ]
+    #   interval: 10s
+    #   timeout: 30s
+    #   retries: 10
     volumes:
       - ./servers/core:/opt/core
 
