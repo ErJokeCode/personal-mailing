@@ -77,7 +77,7 @@ def get_sections_keyboard(data_course: dict, from_add_course: bool = False, cros
 
     list_btn = []
     for section in data_course["sections"]:
-        if data_course["name_course"] in crossed_topics.keys() and section["callback_data"] in crossed_topics[data_course["name_course"]].keys() and len(crossed_topics[data_course["name_course"]][section["callback_data"]]) == len(section["topics"]):
+        if data_course["name"] in crossed_topics.keys() and section["callback_data"] in crossed_topics[data_course["name"]].keys() and len(crossed_topics[data_course["name"]][section["callback_data"]]) == len(section["topics"]):
             btn = [InlineKeyboardButton(text=f"✅ {section["name"]}", callback_data=f"{section["callback_data"]}")]
         else:
             btn = [InlineKeyboardButton(text=f"☑️ {section["name"]}", callback_data=f"{section["callback_data"]}")]
@@ -102,7 +102,7 @@ def get_topics_keyboard(data_course: dict, callback_data_section: str, crossed_t
             for i in range(len(section["topics"])):
                 topic = section["topics"][i]
 
-                if data_course["name_course"] in crossed_topics.keys() and callback_data_section in crossed_topics[data_course["name_course"]].keys() and str(i) in crossed_topics[data_course["name_course"]][callback_data_section]:
+                if data_course["name"] in crossed_topics.keys() and callback_data_section in crossed_topics[data_course["name"]].keys() and str(i) in crossed_topics[data_course["name"]][callback_data_section]:
                     btn = [InlineKeyboardButton(text=f"✅ {topic["name"]}", callback_data=f"{callback_data_section}__{i}")]
                 else:
                     btn = [InlineKeyboardButton(text=f"☑️ {topic["name"]}", callback_data=f"{callback_data_section}__{i}")]
