@@ -1,15 +1,8 @@
 import dotenv
 import requests
 import os
-import logging
-
-from worker import Worker, ManegerOnboarding
 
 dotenv.load_dotenv()
-
-logging.basicConfig(filename='bot_log.log', format='%(asctime)s - %(name)s - %(levelname)s - %(message)s', level=logging.INFO)
-
-LOGGER = logging.getLogger(__name__)
 
 TOKEN = os.getenv("TOKEN")
 TOKEN_CHAT_CURATOR = os.getenv("TOKEN_CHAT_CURATOR")
@@ -41,7 +34,7 @@ def get_cookie():
 
 
 test_data_course = [{
-    "name": "Вводный курс", 
+    "name_course": "Вводный курс", 
     "sections": [
     {
         "name": "ЛК УРФУ", 
@@ -156,7 +149,51 @@ test_data_course = [{
 ]
 
 
-MANAGER_ONB = ManegerOnboarding(test_data_course)
+class ManegerOnboarding():
+    def __init__(self, data: list[dict]):
+        self.__data = data
 
-WORKER = Worker(5, LOGGER)
-WORKER.add_manager_onboarding(MANAGER_ONB, URL_SERVER + "/parser/bot/onboard/", get_cookie())
+        if len(data) > 1:
+            self.__is_active_add_course = True
+        else:
+            self.__is_active_add_course = False
+
+    
+    @property
+    def onboarding(self) -> dict:
+        return self.__data[self.get_index_onboarding()]
+    
+
+    def is_active_add_course(self) -> bool:
+        return self.__is_active_add_course
+    
+
+    def get_additional_courses(self) -> list[tuple[int, str, int]]:
+        list = []
+        for i in range(len(self.__data)):
+            if i != 0:
+                list.append((i, self.__data[i]["name_course"], len(self.__data[i]["sections"])))
+        return list
+    
+
+    def get_index_onboarding(self) -> int:
+        return 0
+    
+
+    def get_info_course(self, index:int) -> dict:
+        return self.__data[index]
+    
+
+    def get_info_course_topic(self, index, callback_data_topic) -> dict | None:
+        course = self.get_info_course(index)
+        split_callback = callback_data_topic.split("__")
+        index = int(split_callback[-1])
+        callback_data_section = "__".join(split_callback[:-1])
+
+        for section in course["sections"]:
+            if section["callback_data"] == callback_data_section:
+                return section["topics"][index]
+        return None
+    
+
+MANAGER_ONB = ManegerOnboarding(test_data_course)
