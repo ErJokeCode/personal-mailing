@@ -220,7 +220,7 @@
                     <form class="max-w-sm mx-auto mb-3">
                         <Label class="space-y-2 mb-1">Номер курса</Label>
                         <select bind:value={course} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500">
-                            <option disabled selected>Выберите курс</option>
+                            <option selected>Выберите курс</option>
                             <option value=1>1</option>
                             <option value=2>2</option>
                             <option value=3>3</option>
@@ -236,7 +236,7 @@
                     <form class="max-w-sm mx-auto mb-3">
                         <Label class="space-y-2 mb-1">Форма обучения</Label>
                         <select bind:value={typeOfEducation} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500">
-                            <option disabled selected>Выберите форму</option>
+                            <option selected>Выберите форму</option>
                             <option value='Очная'>Очная</option>
                             <option value='Очно-заочная'>Очно-заочная</option>
                             <option value='Заочная'>Заочная</option>
@@ -245,7 +245,7 @@
                     <form class="max-w-sm mx-auto mb-6">
                         <Label class="space-y-2 mb-1">Тип затрат</Label>
                         <select bind:value={typeOfCost} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500">
-                            <option disabled selected>Выберите тип</option>
+                            <option selected>Выберите тип</option>
                             <option value='бюджет'>Бюджет</option>
                             <option value='контракт'>Контракт</option>
                         </select>

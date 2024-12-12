@@ -3,6 +3,7 @@ using Core.Messages;
 using Core.Routes;
 using Core.Utility;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -30,6 +31,8 @@ public static class Program
         app.MapDocumentRoutes();
         app.MapDataRoutes();
         app.MapScheduleRoutes();
+
+        app.MapGet("ping", () => Results.Ok()); 
 
         app.Run();
     }
