@@ -5,7 +5,7 @@
 
 	import { onMount } from "svelte";
     import { goto } from '$app/navigation';
-    import http from "../../../../utility/http";
+    import http from "../../../utils/http";
 
     let activeStudents = [];
 

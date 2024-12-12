@@ -1,6 +1,5 @@
 <script>
 	import Notifications from '../utils/dashboard/NotificationList.svelte';
-	import AppsMenu from '../utils/widgets/AppsMenu.svelte';
 	import {
 		DarkMode,
 		Dropdown,
@@ -9,10 +8,12 @@
 		NavHamburger,
 		NavLi,
 		NavUl,
-		Navbar
+		Navbar,
+        ToolbarButton
 	} from 'flowbite-svelte';
-	import { ChevronDownOutline } from 'flowbite-svelte-icons';
+	import { ChevronDownOutline, ArrowRightToBracketOutline } from 'flowbite-svelte-icons';
 	import '../../app.pcss';
+	import { goto } from '$app/navigation';
 
 	export let fluid = true;
 	export let drawerHidden = false;
@@ -57,7 +58,9 @@
 	</div>
 	<div class="ms-auto flex items-center text-gray-500 dark:text-gray-400 sm:order-2">
 		<Notifications />
-		<AppsMenu />
+		<ToolbarButton size="lg" class="-mx-0.5 hover:text-gray-900 dark:hover:text-white" on:click={() => goto('login')}>
+            <ArrowRightToBracketOutline size="lg" />
+        </ToolbarButton>
 		<DarkMode />
 	</div>
 </Navbar>

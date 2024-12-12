@@ -38,7 +38,7 @@
 			<BreadcrumbItem home href="/">Главная</BreadcrumbItem>
 			<BreadcrumbItem>Рассылки</BreadcrumbItem>
 		</Breadcrumb>
-    <Button href="/notifications/send-notifications" class="mb-3">
+    <Button href="/notifications/send-notification" class="mb-3">
       Создать рассылки
       <ArrowRightOutline class="w-6 h-6 ms-2" />
     </Button>
@@ -58,7 +58,7 @@
       {#each filtered as notification}
         <TableBodyRow slot="row"
             on:click={() => fullInfo(notification.id)}>
-          <TableBodyCell class="px-8 break-all">{notification.content}</TableBodyCell>
+          <TableBodyCell class="px-8 break-all">{notification.content.length > 50 ? notification.content.slice(0, 50) : notification.content}</TableBodyCell>
           <TableBodyCell class="px-8">{notification.date}</TableBodyCell>
           <TableBodyCell class="px-8">
             {#each notification.students as student}

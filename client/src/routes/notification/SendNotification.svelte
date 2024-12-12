@@ -1,7 +1,6 @@
 <script>
     import { onMount } from "svelte";
     import http from "src/utility/http.js";
-    import { navigate } from "svelte-routing";
 
     let content = "";
     let files = [];

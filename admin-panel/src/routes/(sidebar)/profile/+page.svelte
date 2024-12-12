@@ -10,7 +10,7 @@
         TableBodyRow,
         TableBodyCell
     } from 'flowbite-svelte';
-    import { admin } from "../../../utility/store";
+    import { admin } from "../../utils/store";
 </script>
 
 <main class="relative h-full w-full overflow-y-auto bg-white dark:bg-gray-800">

@@ -12,8 +12,10 @@ import asyncio
 import json
 import requests
 
-from config import URL_REDIS, TOKEN
+from config import URL_REDIS, TOKEN, WORKER, LOGGER
 from handlers import start, main_menu, information_teaching, faq, onboarding
+
+
 
 
 storage = RedisStorage.from_url(URL_REDIS)
@@ -23,6 +25,10 @@ dp = Dispatcher(storage=storage)
 dp.include_routers(start.router, main_menu.router, information_teaching.router, faq.router, onboarding.router)
 
 async def main():
+    # loop = asyncio.get_event_loop()
+    # loop.create_task(WORKER.work())
+    
+    LOGGER.info("Bot started")
     await dp.start_polling(bot)
 
 if __name__ == "__main__":

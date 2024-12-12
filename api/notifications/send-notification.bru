@@ -22,13 +22,13 @@ body:json {
 body:multipart-form {
   body: '''
     {
-      "content": "Важное сообщение!",
+      "content": "У вас низкие баллы по:",
       "documentIds": [
-        1, 2
+      
       ],
       "studentIds": [
-        "d9940584-f32f-4b11-8d52-e20b58110116"
-      ]
+        "d7ef1c66-9dc8-458c-8299-ba4b35dca397"
+      ], "lowScore": true
     }
   '''
   ~documents: @file(/home/nick/Documents/StudentSamples (12).xls)

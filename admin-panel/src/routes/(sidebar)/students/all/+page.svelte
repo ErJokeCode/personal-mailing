@@ -3,7 +3,7 @@
 	import { TableHeadCell, Table, TableBody, TableBodyCell, TableBodyRow, TableHead } from 'flowbite-svelte';
   
     import { onMount } from "svelte";
-    import http from "../../../../utility/http";
+    import http from "../../../utils/http";
     import { goto } from '$app/navigation';
 
     let status = http.status();

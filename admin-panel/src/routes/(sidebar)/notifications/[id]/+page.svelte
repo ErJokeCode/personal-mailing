@@ -1,9 +1,9 @@
 <script lang="ts">
 	import { Breadcrumb, BreadcrumbItem, Heading, List } from 'flowbite-svelte';
 
-    import http from "../../../../utility/http";
+    import http from "../../../utils/http";
     import { onMount } from "svelte";
-    import { traverseObject } from "../../../../utility/helper";
+    import { traverseObject } from "../../../utils/helper";
     import { page } from '$app/stores';
 
     let id = $page.params.id;
@@ -30,8 +30,6 @@
 		<Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl mb-3">
 			{notification.date}
 		</Heading>
-        <List class="text-gray-900 dark:text-white">
-            <div bind:this={article}></div>
-        </List>
+        <div class="text-gray-900 dark:text-white" bind:this={article}></div>
 	</div>
 </main>

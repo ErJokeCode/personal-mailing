@@ -3,6 +3,16 @@
 	import Navbar from './Navbar.svelte';
 	import Sidebar from './Sidebar.svelte';
 	let drawerHidden = false;
+	import {_hasAdmin} from "./+page.js"
+	import { onMount } from 'svelte';
+
+	onMount(() => {
+		_hasAdmin().then((res) => {
+		if (res === false) {
+			window.location.href = "/login";
+		}
+	});
+	});
 </script>
 
 <header

@@ -115,3 +115,27 @@ class DictNames(BaseModel):
     modeus: str
     site_inf: str | None = None
     file_course: str | None = None
+
+
+
+class OnboardTopic(BaseModel):
+    name: str
+    text: str | None = None
+    question: str | None = None
+    answer: str | None = None
+
+class OnboardSection(BaseModel):
+    name: str
+    callback_data: str
+    topics: List[OnboardTopic]
+
+class OnboardCourseInDB(BaseModel):
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    name: str
+    is_active: bool
+    sections: List[OnboardSection]
+
+class OnboardCourse(BaseModel):
+    name: str
+    is_active: bool
+    sections: List[OnboardSection]

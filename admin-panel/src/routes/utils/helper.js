@@ -8,6 +8,9 @@ export function isObject(obj) {
 
 export function traverseObject(obj) {
     let ul = document.createElement("ul");
+    ul.style.listStyleType = 'disc';
+    ul.style.listStylePosition = 'inside';
+    ul.style.marginLeft = '30px';
 
     for (let key of Object.keys(obj)) {
         if (isObject(obj[key])) {
@@ -25,6 +28,7 @@ export function traverseObject(obj) {
             ul.appendChild(li);
 
             let arr = document.createElement("ul");
+            arr.style.marginBottom = '10px';
 
             for (let item of obj[key]) {
                 let el = traverseObject(item);

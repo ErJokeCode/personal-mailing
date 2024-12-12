@@ -3,7 +3,7 @@
 	import { ArrowRightOutline } from 'flowbite-svelte-icons';
     import { onMount } from "svelte";
     import { goto } from '$app/navigation';
-    import http from "../../../utility/http";
+    import http from "../../utils/http";
 
     let chats = [];
     let status = http.status();

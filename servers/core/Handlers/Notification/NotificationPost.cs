@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Core.Models;
@@ -20,6 +21,9 @@ public static partial class NotificationHandler
         public List<int> DocumentIds { get; set; } = [];
 
         public string Content { get; set; }
+
+        public bool NotOnCourse { get; set; } = false;
+        public bool LowScore { get; set; } = false;
     }
 
     public static async Task<IResult> SendNotification([FromForm] IFormFileCollection documents, [FromForm] string body,
@@ -28,6 +32,17 @@ public static partial class NotificationHandler
     {
         var details = JsonSerializer.Deserialize<NotificationDetails>(
             body, new JsonSerializerOptions() { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+
+        if ((string.IsNullOrEmpty(details.Content) && (documents is null || documents.Count <= 0)) ||
+            (details.StudentIds is null || details.StudentIds.Count <= 0))
+        {
+            return Results.BadRequest("Can not send empty notification");
+        }
+
+        if (details.NotOnCourse && details.LowScore)
+        {
+            return Results.BadRequest($"Can not filter by both notOnCourse and lowScore");
+        }
 
         var adminId = userManager.GetUserId(context.User);
 
@@ -90,10 +105,28 @@ public static partial class NotificationHandler
                 StudentId = guid,
             };
             status.SetLost();
-
             notification.Statuses.Add(status);
 
-            var sent = await BotHandler.SendToBot(activeStudent.ChatId, notification.Content, fileCollection);
+            var message = notification.Content;
+            List<CourseInfo> courses = new();
+
+            if (details.NotOnCourse)
+            {
+                await activeStudent.IncludeStudent();
+                courses = activeStudent.Student.OnlineCourse.Where(StudentHandler.AnyNotOnCourse).ToList();
+            }
+            else if (details.LowScore)
+            {
+                await activeStudent.IncludeStudent();
+                courses = activeStudent.Student.OnlineCourse.Where(StudentHandler.AnyLowScore).ToList();
+            }
+
+            foreach (var course in courses)
+            {
+                message += $"\n{course.Name}";
+            }
+
+            var sent = await BotHandler.SendToBot(activeStudent.ChatId, message, fileCollection);
 
             if (sent)
             {
