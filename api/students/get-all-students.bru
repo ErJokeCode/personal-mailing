@@ -5,18 +5,18 @@ meta {
 }
 
 get {
-  url: {{base_api}}/core/student?pageIndex=0&pageSize=10&notOnCourse=false&lowScore=true&group&course=0&typeOfCost&typeOfEducation
+  url: {{base_api}}/core/student
   body: none
   auth: none
 }
 
 params:query {
-  pageIndex: 0
-  pageSize: 10
-  notOnCourse: false
-  lowScore: true
-  group: 
-  course: 0
-  typeOfCost: 
-  typeOfEducation: 
+  ~pageIndex: 0
+  ~pageSize: 10
+  ~notOnCourse: true
+  ~lowScore: false
+  ~group: 
+  ~course: 0
+  ~typeOfCost: 
+  ~typeOfEducation: 
 }

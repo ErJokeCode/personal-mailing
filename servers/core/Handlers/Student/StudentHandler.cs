@@ -32,8 +32,7 @@ public static class ActiveStudentExtensions
 {
     public static async Task<bool> IncludeStudent(this ActiveStudent active)
     {
-        var query = new Dictionary<string, string>
-        {
+        var query = new Dictionary<string, string> {
             ["email"] = active.Email,
         };
 
@@ -48,18 +47,11 @@ public static class ActiveStudentExtensions
         return true;
     }
 
-    public static async Task<bool> IncludeStudents(this ICollection<ActiveStudent> actives)
+    public static async Task IncludeStudents(this ICollection<ActiveStudent> actives)
     {
         foreach (var active in actives)
         {
-            var added = await active.IncludeStudent();
-
-            if (!added)
-            {
-                throw new Exception("The info on the student was not found !!!!!! VERY IMPORTTNAT LOOK HERE");
-            }
+            await active.IncludeStudent();
         }
-
-        return true;
     }
 }

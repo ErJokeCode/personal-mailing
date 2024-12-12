@@ -38,7 +38,7 @@
 			<BreadcrumbItem home href="/">Главная</BreadcrumbItem>
 			<BreadcrumbItem>Рассылки</BreadcrumbItem>
 		</Breadcrumb>
-    <Button href="/notifications/send-notifications" class="mb-3">
+    <Button href="/notifications/send-notification" class="mb-3">
       Создать рассылки
       <ArrowRightOutline class="w-6 h-6 ms-2" />
     </Button>
