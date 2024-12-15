@@ -4,7 +4,6 @@
 		DarkMode,
 		Dropdown,
 		DropdownItem,
-		NavBrand,
 		NavHamburger,
 		NavLi,
 		NavUl,
@@ -12,7 +11,7 @@
         ToolbarButton
 	} from 'flowbite-svelte';
 	import { ChevronDownOutline, ArrowRightToBracketOutline } from 'flowbite-svelte-icons';
-	import { navigate, useLocation } from 'svelte-routing';
+	import { Link, navigate, useLocation } from 'svelte-routing';
 
 	export let fluid = true;
 	export let drawerHidden = false;
@@ -28,13 +27,13 @@
             onClick={() => (drawerHidden = !drawerHidden)}
             class="m-0 me-3 md:block lg:hidden"
         />
-        <NavBrand href="/" class={list ? 'w-40' : 'lg:w-60'}>
+        <Link to="/" class={list ? 'w-40' : 'lg:w-60'}>
             <span
                 class="ml-px self-center whitespace-nowrap text-xl font-semibold dark:text-white sm:text-2xl px-5"
             >
                 Админ панель
             </span>
-        </NavBrand>
+        </Link>
         <div class="hidden lg:block lg:ps-3">
             {#if list}
                 <NavUl class="ml-2" activeUrl="/" activeClass="text-primary-600 dark:text-primary-500">
