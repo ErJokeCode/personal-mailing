@@ -251,7 +251,7 @@ async def topic(callback_query: types.CallbackQuery, state: FSMContext):
 
     crossed_topics = user_data.get("crossed_topics")
     split_info_topic = callback_query.data.split("__")
-    dict_info = ("__".join(split_info_topic[:-1]), split_info_topic[-1], info_course["name_course"])
+    dict_info = ("__".join(split_info_topic[:-1]), split_info_topic[-1], info_course["name"])
 
 
     if crossed_topics == None:
