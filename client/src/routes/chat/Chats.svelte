@@ -8,7 +8,7 @@
 
     onMount(async () => {
         status = status.start_load();
-        chats = (await http.get("/core/admin/chats", status)) ?? [];
+        chats = (await http.get("/core/admin/chats", status)).items ?? [];
         status = status.end_load();
     });
 

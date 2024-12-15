@@ -9,7 +9,7 @@
     onMount(async () => {
         status = status.start_load();
         notifications =
-            (await http.get("/core/admin/notifications", status)) ?? [];
+            (await http.get("/core/admin/notifications", status)).items ?? [];
         status = status.end_load();
     });
 
@@ -20,7 +20,7 @@
 
 <h2>Мои рассылки</h2>
 
-<table aria-busy={status.load}>
+<table>
     <thead>
         <tr>
             <th>Содержание</th>

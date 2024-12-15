@@ -12,7 +12,7 @@
 
     onMount(async () => {
         studentStatus = studentStatus.start_load();
-        activeStudents = (await http.get("/core/student", studentStatus)) ?? [];
+        activeStudents = (await http.get("/core/student", studentStatus)).items ?? [];
         studentStatus = studentStatus.end_load();
     });
 
