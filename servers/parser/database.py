@@ -3,8 +3,14 @@ from pymongo.collection import Collection
 
 
 class Database:
-    def __init__(self, host: str, port: int, database: str, course_info_collection: str, 
-                student_collection: str, student_not_found_modeus: str, subject : str, dict_names:str, bot_onboard: str):
+    def __init__(self, host: str, port: int, database: str, 
+                 course_info_collection: str, 
+                 student_collection: str, 
+                 student_not_found_modeus: str, 
+                 subject : str, 
+                 dict_names:str, 
+                 bot_onboard: str, 
+                 bot_faq: str):
         self.host = host
         self.port = port
         self.database = database
@@ -17,6 +23,7 @@ class Database:
         self.dict_names = dict_names
         self.student_not_found_modeus = student_not_found_modeus
         self.bot_onboard = bot_onboard
+        self.bot_faq = bot_faq
 
 
         
@@ -38,6 +45,9 @@ class Database:
     
     def get_bot_onboard(self) -> Collection:
         return self.db[self.bot_onboard]
+    
+    def get_bot_faq(self) -> Collection:
+        return self.db[self.bot_faq]
 
     
 

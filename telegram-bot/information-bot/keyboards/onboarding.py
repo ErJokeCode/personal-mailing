@@ -1,5 +1,6 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from config import URL_BOT_CHAT_CURATOR
+from schemas import OnboardCourse
 
 def start_choice() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
@@ -71,12 +72,12 @@ def end() -> InlineKeyboardMarkup:
 
 
 
-def get_sections_keyboard(data_course: dict, from_add_course: bool = False, crossed_topics:dict = None) -> InlineKeyboardMarkup:
+def get_sections_keyboard(data_course: OnboardCourse, from_add_course: bool = False, crossed_topics:dict = None) -> InlineKeyboardMarkup:
     if crossed_topics == None:
         crossed_topics = {}
 
     list_btn = []
-    for section in data_course["sections"]:
+    for section in data_course.sections:
         if data_course["name"] in crossed_topics.keys() and section["callback_data"] in crossed_topics[data_course["name"]].keys() and len(crossed_topics[data_course["name"]][section["callback_data"]]) == len(section["topics"]):
             btn = [InlineKeyboardButton(text=f"✅ {section["name"]}", callback_data=f"{section["callback_data"]}")]
         else:

@@ -21,7 +21,7 @@ async def add_course(course: OnboardCourse) -> OnboardCourseInDB:
         print(e)
         raise HTTPException(status_code=500, detail="Error DB")
     try:
-        collection_bot.insert_one(course.model_dump())
+        id = collection_bot.insert_one(course.model_dump()).inserted_id
         return OnboardCourseInDB(**collection_bot.find_one({"_id" : ObjectId(id)}))
     except Exception as e:
         print(e)
