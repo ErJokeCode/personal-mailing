@@ -2,7 +2,7 @@ import asyncio
 from logging import Logger
 import aiohttp
 import requests
-from schemas import FAQ, FAQTopic, OnboardCourse
+from schemas import FAQ, FAQTopic, OnboardCourse, OnboardTopic
             
             
 class ManegerOnboarding():
@@ -39,7 +39,7 @@ class ManegerOnboarding():
     def get_info_course(self, index:int) -> OnboardCourse:
         return self.__data[index]
 
-    def get_info_course_topic(self, index, callback_data_topic) -> dict | None:
+    def get_info_course_topic(self, index, callback_data_topic) -> OnboardTopic | None:
         course = self.get_info_course(index)
         split_callback = callback_data_topic.split("__")
         index = int(split_callback[-1])
