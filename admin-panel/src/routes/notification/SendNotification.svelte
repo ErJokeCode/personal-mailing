@@ -41,6 +41,12 @@
         if (typeOfCost !== 'Выберите тип') {
             url.searchParams.append('typeOfCost', typeOfCost);
         }
+        if (onlineCourse !== '') {
+            url.searchParams.append('onlineCourse', onlineCourse);
+        }
+        if (subject !== '') {
+            url.searchParams.append('subject', subject);
+        }
 
         try {
             response = await fetch(url, {
@@ -179,6 +185,8 @@
     let group = '';
     let typeOfEducation = 'Выберите форму';
     let typeOfCost = 'Выберите тип';
+    let onlineCourse = '';
+    let subject = '';
 </script>
 
 <div class="overflow-hidden lg:flex">
@@ -196,8 +204,8 @@
                     <Link class="ml-0 ms-1 text-sm font-medium text-gray-700 hover:text-gray-900 md:ms-2 dark:text-gray-400 dark:hover:text-white" to="/notifications">Рассылки</Link></li>
                     <BreadcrumbItem>Отправить рассылку</BreadcrumbItem>
                 </Breadcrumb>
-                <div class="flex">
-                    <form class="mb-4 w-full">
+                <div class="mb-4 flex">
+                    <form class="w-full">
                         <div class="items-center px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700">
                             <Dropzone
                                 class="mb-4"
@@ -221,48 +229,62 @@
                             <Helper>{send_status}</Helper>
                         </div>
                     </form>
-                    <div class="w-1/3 pl-6">
-                        <Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl mb-4">
+                    <div class="w-1/2 ml-6">
+                        <Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl mb-6">
                             Фильтры
                         </Heading>
-                        <div class="pl-1">
-                            <Checkbox class="mb-3" bind:checked={notOnCourse}>Нет на курсе</Checkbox>
-                            <Checkbox class="mb-4" bind:checked={lowScore}>Низкий балл</Checkbox>
-                            <form class="mb-3">
-                                <Label class="space-y-2 mb-1">Номер курса</Label>
-                                <select bind:value={course} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500">
-                                    <option selected>Выберите курс</option>
-                                    <option value=1>1</option>
-                                    <option value=2>2</option>
-                                    <option value=3>3</option>
-                                    <option value=4>4</option>
-                                    <option value=5>5</option>
-                                    <option value=6>6</option>
-                                </select>
-                            </form>
-                            <Label class="space-y-1 mb-3">
-                                <span>Группа</span>
-                                <Input bind:value={group} type="text" placeholder="РИ-123456" size="md" />
-                            </Label>
-                            <form class="mb-3">
-                                <Label class="space-y-2 mb-1">Форма обучения</Label>
-                                <select bind:value={typeOfEducation} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500">
-                                    <option selected>Выберите форму</option>
-                                    <option value='Очная'>Очная</option>
-                                    <option value='Очно-заочная'>Очно-заочная</option>
-                                    <option value='Заочная'>Заочная</option>
-                                </select>
-                            </form>
-                            <form class="mb-6">
-                                <Label class="space-y-2 mb-1">Тип затрат</Label>
-                                <select bind:value={typeOfCost} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500">
-                                    <option selected>Выберите тип</option>
-                                    <option value='бюджет'>Бюджет</option>
-                                    <option value='контракт'>Контракт</option>
-                                </select>
-                            </form>
-                            <Button class='flex justify-end' on:click={load_students}>Применить</Button>
+                        <div class="ml-2">
+                            <Checkbox class="mb-4 w-fit" bind:checked={notOnCourse}>Нет на курсе</Checkbox>
+                            <Checkbox class='mb-4 w-fit' bind:checked={lowScore}>Низкий балл</Checkbox>
                         </div>
+                        <div class="ml-2 mb-8 flex">
+                            <div class="mr-6 w-full space-y-4">
+                                <form>
+                                    <Label class="space-y-2 mb-2">Номер курса</Label>
+                                    <select bind:value={course} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500">
+                                        <option selected>Выберите курс</option>
+                                        <option value=1>1</option>
+                                        <option value=2>2</option>
+                                        <option value=3>3</option>
+                                        <option value=4>4</option>
+                                        <option value=5>5</option>
+                                        <option value=6>6</option>
+                                    </select>
+                                </form>
+                                <form>
+                                    <Label class="space-y-2 mb-2">Тип затрат</Label>
+                                    <select bind:value={typeOfCost} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500">
+                                        <option selected>Выберите тип</option>
+                                        <option value='бюджет'>Бюджет</option>
+                                        <option value='контракт'>Контракт</option>
+                                    </select>
+                                </form>
+                                <form>
+                                    <Label class="space-y-2 mb-2">Форма обучения</Label>
+                                    <select bind:value={typeOfEducation} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500">
+                                        <option selected>Выберите форму</option>
+                                        <option value='Очная'>Очная</option>
+                                        <option value='Очно-заочная'>Очно-заочная</option>
+                                        <option value='Заочная'>Заочная</option>
+                                    </select>
+                                </form>
+                            </div>
+                            <div class="w-full space-y-4">
+                                <Label class="space-y-2">
+                                    <span>Группа</span>
+                                    <Input bind:value={group} type="text" placeholder="РИ-123456" size="md" />
+                                </Label>
+                                <Label class="space-y-2">
+                                    <span>Онлайн курс</span>
+                                    <Input bind:value={onlineCourse} type="text" placeholder="Введите название курса" size="md" />
+                                </Label>
+                                <Label class="space-y-2">
+                                    <span>Предмет</span>
+                                    <Input bind:value={subject} type="text" placeholder="Введите название предмета" size="md" />
+                                </Label>
+                            </div>
+                        </div>
+                        <Button class='flex ml-2' on:click={load_students}>Применить</Button>
                     </div>
                 </div>
                 <Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
@@ -271,7 +293,7 @@
             </div>
             <Table id='table'>
                 <TableHead class="border-y border-gray-200 bg-gray-100 dark:border-gray-700">
-                    <TableHeadCell class="w-4 p-4 px-8 font-medium"><Checkbox on:click={(e) => toggle(e.target)} /></TableHeadCell>
+                    <TableHeadCell class="w-4 p-4 pl-8 font-medium"><Checkbox on:click={(e) => toggle(e.target)} /></TableHeadCell>
                     <TableHeadCell class="w-4 p-4 font-medium">Курс</TableHeadCell>
                     <TableHeadCell class="w-4 p-4 font-medium">Имя</TableHeadCell>
                     <TableHeadCell class="w-4 p-4 font-medium">Фамилия</TableHeadCell>
@@ -285,7 +307,7 @@
                 <TableBody>
                     {#each activeStudents as student}
                         <TableBodyRow class="text-base">
-                            <TableBodyCell class="p-4 px-8"><Checkbox value={student.id} on:click={remove} /></TableBodyCell>
+                            <TableBodyCell class="p-4 pl-8"><Checkbox value={student.id} on:click={remove} /></TableBodyCell>
                             <TableBodyCell class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
                                 {student.info.group.numberCourse}
                             </TableBodyCell>
