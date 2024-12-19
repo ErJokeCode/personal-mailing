@@ -4,13 +4,14 @@ import App from './App.svelte'
 import { admin } from "./utils/store";
 import http from "./utils/http";
 
-let the_admin = await http.get("/core/admin/me", http.status());
-if (the_admin) {
-    admin.update((_) => the_admin);
-}
+http.get("/core/admin/me", http.status()).then((the_admin) => {
+    if (the_admin) {
+        admin.update((_) => the_admin);
+    }
+});
 
 const app = mount(App, {
-  target: document.getElementById('app'),
+    target: document.getElementById('app'),
 })
 
 export default app
