@@ -44,18 +44,24 @@ async def add_section(id: str, section: OnboardSection) -> OnboardCourseInDB:
         raise HTTPException(status_code=404, detail="Error add")
     
 
-@router_bot_onboard.post("/{id}/{section_name}/topic")
-async def add_topic(id: str, section_name: str, topic: OnboardTopic) -> OnboardCourseInDB:
+@router_bot_onboard.post("/{id}/{section_index}/topic")
+async def add_topic(id: str, section_index: int, topic: OnboardTopic) -> OnboardCourseInDB:
     try:
         collection_bot = DB.get_bot_onboard()
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Error DB")
     try:
+        course_db = OnboardCourseInDB(**collection_bot.find_one({"_id" : ObjectId(id)}))
+        section_topics = course_db.sections[section_index].topics
+        section_topics.append(topic)
         collection_bot.update_one({"_id" : ObjectId(id)}, 
-                                  {"$push" : {"sections.$[i].topics" : topic.model_dump()}}, 
-                                  array_filters=[{"i.name": section_name}])
-        return OnboardCourseInDB(**collection_bot.find_one({"_id" : ObjectId(id)}))
+                                  {"$set" : course_db.model_dump()})
+        
+        return course_db
+    except IndexError as index_error:
+        print(index_error)
+        raise HTTPException(status_code=404, detail="Index section error")
     except Exception as e:
         print(e)
         raise HTTPException(status_code=404, detail="Error add")
@@ -77,35 +83,46 @@ async def put_course(id: str, course: OnboardCourse) -> OnboardCourseInDB:
         raise HTTPException(status_code=404, detail="Error update")
     
     
-@router_bot_onboard.put("/{id}/{section_name}")
-async def put_section(id: str, section_name: str, section: OnboardSection) -> OnboardCourseInDB:
+@router_bot_onboard.put("/{id}/{section_index}")
+async def put_section(id: str, section_index: int, section: OnboardSection) -> OnboardCourseInDB:
     try:
         collection_bot = DB.get_bot_onboard()
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Error DB")
     try:
+        course_db = OnboardCourseInDB(**collection_bot.find_one({"_id" : ObjectId(id)}))
+        course_db.sections[section_index] = section
+        
         collection_bot.update_one({"_id" : ObjectId(id)}, 
-                                  {"$set" : {"sections.$[i]" : section.model_dump()}}, 
-                                  array_filters=[{"i.name": section_name}])
-        return OnboardCourseInDB(**collection_bot.find_one({"_id" : ObjectId(id)}))
+                                  {"$set" : course_db.model_dump()})
+        return course_db
+    except IndexError as index_error:
+        print(index_error)
+        raise HTTPException(status_code=404, detail="Index section error")
     except Exception as e:
         print(e)
         raise HTTPException(status_code=404, detail="Error update")
     
 
-@router_bot_onboard.put("/{id}/{section_name}/{topic_name}")
-async def put_topic(id: str, section_name: str, topic_name: str, topic: OnboardTopic) -> OnboardCourseInDB:
+@router_bot_onboard.put("/{id}/{section_index}/{topic_index}")
+async def put_topic(id: str, section_index: int, topic_index: int, topic: OnboardTopic) -> OnboardCourseInDB:
     try:
         collection_bot = DB.get_bot_onboard()
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Error DB")
     try:
+        course_db = OnboardCourseInDB(**collection_bot.find_one({"_id" : ObjectId(id)}))
+        section = course_db.sections[section_index]
+        section.topics[topic_index] = topic
+        
         collection_bot.update_one({"_id" : ObjectId(id)}, 
-                                  {"$set" : {"sections.$[i].topics.$[j]" : topic.model_dump()}}, 
-                                  array_filters = [{"i.name": section_name}, {"j.name": topic_name}])
-        return OnboardCourseInDB(**collection_bot.find_one({"_id" : ObjectId(id)}))
+                                  {"$set" : course_db.model_dump()})
+        return course_db
+    except IndexError as index_error:
+        print(index_error)
+        raise HTTPException(status_code=404, detail="Index error")
     except Exception as e:
         print(e)
         raise HTTPException(status_code=404, detail="Error update")
@@ -126,35 +143,45 @@ async def delete_course(id: str) -> dict:
         raise HTTPException(status_code=404, detail="Error delete")    
 
     
-@router_bot_onboard.delete("/{id}/{section_name}")
-async def delete_section(id: str, section_name: str) -> OnboardCourseInDB:
+@router_bot_onboard.delete("/{id}/{section_index}")
+async def delete_section(id: str, section_index: int) -> OnboardCourseInDB:
     try:
         collection_bot = DB.get_bot_onboard()
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Error DB")
     try:
+        course_db = OnboardCourseInDB(**collection_bot.find_one({"_id" : ObjectId(id)}))
+        course_db.sections.pop(section_index)
         collection_bot.update_one({"_id" : ObjectId(id)}, 
-                                  {"$pull" : {"sections" : {"name" : section_name}}})
-        return OnboardCourseInDB(**collection_bot.find_one({"_id" : ObjectId(id)}))
+                                  {"$set" : course_db.model_dump()})
+        return course_db
+    except IndexError as index_error:
+        print(index_error)
+        raise HTTPException(status_code=404, detail="Index section error")
     except Exception as e:
         print(e)
         raise HTTPException(status_code=404, detail="Error delete")
     
 
-@router_bot_onboard.delete("/{id}/{section_name}/{topic_name}")
-async def delete_topic(id: str, section_name: str, topic_name: str) -> OnboardCourseInDB:
+@router_bot_onboard.delete("/{id}/{section_index}/{topic_index}")
+async def delete_topic(id: str, section_index: int, topic_index: int) -> OnboardCourseInDB:
     try:
         collection_bot = DB.get_bot_onboard()
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Error DB")
     try:
+        course_db = OnboardCourseInDB(**collection_bot.find_one({"_id" : ObjectId(id)}))
+        section = course_db.sections[section_index]
+        section.topics.pop(topic_index)
+        
         collection_bot.update_one({"_id" : ObjectId(id)}, 
-                                  {"$pull" : {"sections.$[i].topics" : {"name" : topic_name}}}, 
-                                  array_filters = [{"i.name": section_name}])
-                                  
-        return OnboardCourseInDB(**collection_bot.find_one({"_id" : ObjectId(id)}))
+                                  {"$set" : course_db.model_dump()})                       
+        return course_db
+    except IndexError as index_error:
+        print(index_error)
+        raise HTTPException(status_code=404, detail="Index error")
     except Exception as e:
         print(e)
         raise HTTPException(status_code=404, detail="Error delete")
