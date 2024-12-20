@@ -13,7 +13,8 @@ public partial class AdminUserDto : IMappable<AdminUserDto, AdminUser>
             Id = orig.Id,
             Email = orig.Email,
             Date = orig.Date,
-            Permissions = orig.Permissions
+            Permissions = orig.Permissions,
+            Groups = orig.Groups,
         };
     }
 
@@ -45,7 +46,6 @@ public partial class ActiveStudentDto : IMappable<ActiveStudentDto, ActiveStuden
             Info = orig.Student,
             Date = orig.Date,
             OnboardStatus = orig.OnboardStatus,
-            Admin = (orig.Admin == null) ? null : AdminUserDto.Map(orig.Admin),
         };
     }
 

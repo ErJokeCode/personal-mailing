@@ -9,8 +9,8 @@ public class AdminUser : IdentityUser
 {
     public string Date { get; set; }
     public List<string> Permissions { get; set; } = [];
+    public List<string> Groups { get; set; } = [];
 
-    public ICollection<ActiveStudent> Students { get; } = [];
     public ICollection<Notification> Notifications { get; } = [];
     public ICollection<NotificationTemplate> Templates { get; } = [];
     public ICollection<NotificationSchedule> Schedules { get; } = [];
@@ -29,9 +29,6 @@ public class ActiveStudent
     public string ChatId { get; set; }
 
     public List<string> OnboardStatus { get; set; } = [];
-
-    public string AdminId { get; set; }
-    public AdminUser Admin { get; set; }
 
     public ICollection<Notification> Notifications { get; } = [];
     public ICollection<Chat> Chats { get; } = [];

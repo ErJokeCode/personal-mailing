@@ -44,7 +44,14 @@ public static partial class ChatHandler
         {
             return Results.NotFound("Student not found");
         }
-        else if (activeStudent.AdminId != adminId)
+
+        var found = await activeStudent.IncludeStudent();
+
+        if (!found)
+        {
+            return Results.NotFound("Student not found");
+        }
+        else if (!admin.Groups.Contains(activeStudent.Student.Group.Number))
         {
             return Results.NotFound("Student is not linked to you");
         }
@@ -115,7 +122,14 @@ public static partial class ChatHandler
             return Results.NotFound("Student not found");
         }
 
-        var admin = db.Users.Find(activeStudent.AdminId);
+        var found = await activeStudent.IncludeStudent();
+
+        if (!found)
+        {
+            return Results.NotFound("Student not found");
+        }
+
+        var admin = db.Users.SingleOrDefault(a => a.Groups.Contains(activeStudent.Student.Group.Number));
 
         if (admin == null)
         {

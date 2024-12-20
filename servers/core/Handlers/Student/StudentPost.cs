@@ -28,14 +28,11 @@ public static partial class StudentHandler
             return Results.Ok(activeStudent);
         }
 
-        var admin = db.Users.FirstOrDefault();
-
         activeStudent = new ActiveStudent()
         {
             Email = details.Email,
             ChatId = details.ChatId,
             Date = DateTime.Now.ToString(),
-            AdminId = admin.Id
         };
 
         var found = await activeStudent.IncludeStudent();
@@ -43,6 +40,14 @@ public static partial class StudentHandler
         if (!found || activeStudent.Student.PersonalNumber != details.PersonalNumber)
         {
             return Results.NotFound("Could not find the student");
+        }
+
+        var admin = db.Users.SingleOrDefault(a => a.Groups.Contains(activeStudent.Student.Group.Number));
+
+        if (admin == null)
+        {
+            admin = db.Users.ToList().MinBy(a => a.Groups.Count);
+            admin.Groups.Add(activeStudent.Student.Group.Number);
         }
 
         db.ActiveStudents.Add(activeStudent);
