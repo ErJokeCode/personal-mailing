@@ -69,8 +69,8 @@ async def put_course(id: str, course: OnboardCourse) -> OnboardCourseInDB:
         print(e)
         raise HTTPException(status_code=500, detail="Error DB")
     try:
-        collection_bot.update_one({"_id" : ObjectId(id)}, 
-                                  course.model_dump())
+        collection_bot.update_one({"_id" : ObjectId(id)},
+                                  {"$set": course.model_dump()}) 
         return OnboardCourseInDB(**collection_bot.find_one({"_id" : ObjectId(id)}))
     except Exception as e:
         print(e)
