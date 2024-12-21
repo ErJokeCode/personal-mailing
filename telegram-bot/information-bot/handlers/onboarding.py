@@ -220,12 +220,14 @@ async def section(callback_query: types.CallbackQuery, state: FSMContext, from_s
 async def topic_question(callback_query: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
 
-    info_course = user_data.get("info_course")
-    info_topic = user_data.get("info_topic")
+    index_add_course = int(user_data.get("index_add_course"))
+    callback_topic_data = user_data.get("callback_topic_data")
+    info_course = MANAGER_ONB.get_info_course(index_add_course)
+    info_topic = MANAGER_ONB.get_info_course_topic(index_add_course, callback_topic_data)
 
     await callback_query.message.edit_reply_markup()
 
-    msg = await callback_query.message.answer(info_topic["answer"], 
+    msg = await callback_query.message.answer(info_topic.answer, 
                                         reply_markup=kb_onboarding.topic_keyboard(
                                             info_course, 
                                             callback_query.data.split("____")[0], 
@@ -241,17 +243,15 @@ async def topic(callback_query: types.CallbackQuery, state: FSMContext):
     user_data = await state.get_data()
     index_add_course = int(user_data.get("index_additional_course"))
 
+    await state.update_data(index_add_course = index_add_course)
     info_course = MANAGER_ONB.get_info_course(index_add_course)
-    await state.update_data(info_course = info_course)
-
-
     info_topic = MANAGER_ONB.get_info_course_topic(index_add_course, callback_query.data)
+    await state.update_data(callback_topic_data = callback_query.data)
 
-    await state.update_data(info_topic = info_topic)
 
     crossed_topics = user_data.get("crossed_topics")
     split_info_topic = callback_query.data.split("__")
-    dict_info = ("__".join(split_info_topic[:-1]), split_info_topic[-1], info_course["name"])
+    dict_info = ("__".join(split_info_topic[:-1]), split_info_topic[-1], info_course.name)
 
 
     if crossed_topics == None:
@@ -272,16 +272,16 @@ async def topic(callback_query: types.CallbackQuery, state: FSMContext):
 
     await del_all_msg(callback_query, state)
 
-    if info_topic["question"] != None and info_topic["answer"] != None:
-        msg1 = await callback_query.message.answer(f"Тема: {info_topic["name"]}\n\n{info_topic["text"]}")
-        msg2 = await callback_query.message.answer(info_topic["question"], 
+    if info_topic.question != None and info_topic.answer != None:
+        msg1 = await callback_query.message.answer(f"Тема: {info_topic.name}\n\n{info_topic.text}")
+        msg2 = await callback_query.message.answer(info_topic.question, 
                                             reply_markup=kb_onboarding.topic_keyboard(
                                                 info_course, 
                                                 callback_query.data))
 
         await add_msgs_in_dels(state, [msg1, msg2])
     else:
-        msg = await callback_query.message.answer(f"Тема: {info_topic["name"]}\n\n{info_topic["text"]}", 
+        msg = await callback_query.message.answer(f"Тема: {info_topic.name}\n\n{info_topic.text}", 
                                             reply_markup=kb_onboarding.topic_keyboard(
                                                 info_course, 
                                                 callback_query.data, 

@@ -10,8 +10,6 @@ from src.bot.router_onboard import router_bot_onboard
 from src.bot.router_faq import router_bot_faq
 
 
-from database import Database
-
 app = FastAPI(
     openapi_url=f"/openapi.json",
     docs_url=f"/docs",
@@ -25,6 +23,7 @@ app.include_router(router=router_course)
 app.include_router(router=router_subject)
 app.include_router(router=router_bot_onboard)
 app.include_router(router=router_bot_faq)
+
 
 
 if __name__ == "__main__":

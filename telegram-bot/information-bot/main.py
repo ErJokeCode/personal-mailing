@@ -25,8 +25,8 @@ dp = Dispatcher(storage=storage)
 dp.include_routers(start.router, main_menu.router, information_teaching.router, faq.router, onboarding.router)
 
 async def main():
-    # loop = asyncio.get_event_loop()
-    # loop.create_task(WORKER.work())
+    loop = asyncio.get_event_loop()
+    loop.create_task(WORKER.work())
     
     LOGGER.info("Bot started")
     await dp.start_polling(bot)
