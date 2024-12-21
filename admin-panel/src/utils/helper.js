@@ -12,40 +12,46 @@ export function traverseObject(obj) {
     ul.style.listStylePosition = 'inside';
     ul.style.marginLeft = '30px';
 
-    for (let key of Object.keys(obj)) {
-        if (isObject(obj[key])) {
-            let li = document.createElement("li");
-            li.textContent = `${key}: `;
-            ul.appendChild(li);
+    if (!(typeof obj == "object")) {
+        let li = document.createElement("li");
+        li.textContent = obj;
+        ul.appendChild(li);
+    }
+    else {
 
-            let sub = traverseObject(obj[key])
-            ul.appendChild(sub);
-        }
+        for (let key of Object.keys(obj)) {
+            if (isObject(obj[key])) {
+                let li = document.createElement("li");
+                li.textContent = `${key}: `;
+                ul.appendChild(li);
 
-        else if (Array.isArray(obj[key])) {
-            let li = document.createElement("li");
-            li.textContent = `${key}: `;
-            ul.appendChild(li);
-
-            let arr = document.createElement("ul");
-            arr.style.marginBottom = '10px';
-
-            for (let item of obj[key]) {
-                let el = traverseObject(item);
-                arr.appendChild(el);
+                let sub = traverseObject(obj[key])
+                ul.appendChild(sub);
             }
 
-            ul.appendChild(arr);
-        }
+            else if (Array.isArray(obj[key])) {
+                let li = document.createElement("li");
+                li.textContent = `${key}: `;
+                ul.appendChild(li);
 
-        else {
-            let li = document.createElement("li");
-            li.textContent = `${key}: ${obj[key]}`;
-            ul.appendChild(li);
+                let arr = document.createElement("ul");
+                arr.style.marginBottom = '10px';
+
+                for (let item of obj[key]) {
+                    let el = traverseObject(item);
+                    arr.appendChild(el);
+                }
+
+                ul.appendChild(arr);
+            }
+
+            else {
+                let li = document.createElement("li");
+                li.textContent = `${key}: ${obj[key]}`;
+                ul.appendChild(li);
+            }
         }
     }
-
-    console.log(ul);
 
     return ul;
 }
