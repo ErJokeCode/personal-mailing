@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Core.Utility;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Core.Migrations
 {
     [DbContext(typeof(CoreDb))]
-    partial class CoreDbModelSnapshot : ModelSnapshot
+    [Migration("20241220072952_LinkStudentAdminByGroup")]
+    partial class LinkStudentAdminByGroup
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -97,9 +100,6 @@ namespace Core.Migrations
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
-
-                    b.Property<List<string>>("Groups")
-                        .HasColumnType("text[]");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");

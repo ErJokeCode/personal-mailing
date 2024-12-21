@@ -9,6 +9,7 @@ public partial class AdminUserDto
     public string Email { get; set; }
     public string Date { get; set; }
     public List<string> Permissions { get; set; } = [];
+    public List<string> Groups {get; set;} = [];
 }
 
 public partial class ActiveStudentDto
@@ -20,6 +21,5 @@ public partial class ActiveStudentDto
 
     public List<string> OnboardStatus { get; set; } = [];
 
-    public AdminUserDto Admin { get; set; }
     public Student Info { get; set; }
 }

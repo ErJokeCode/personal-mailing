@@ -129,13 +129,26 @@ class OnboardSection(BaseModel):
     callback_data: str
     topics: List[OnboardTopic]
 
-class OnboardCourseInDB(BaseModel):
-    id: Optional[PyObjectId] = Field(alias="_id", default=None)
-    name: str
-    is_active: bool
-    sections: List[OnboardSection]
-
 class OnboardCourse(BaseModel):
     name: str
-    is_active: bool
+    is_main: bool = False
+    is_active: bool = True
     sections: List[OnboardSection]
+    
+class OnboardCourseInDB(OnboardCourse):
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    
+    
+class FAQ(BaseModel):
+    topic: str
+    callback_data: str
+    question: str
+    answer: str
+    
+    
+class FAQInDB(FAQ):
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    
+class FAQTopic(BaseModel):
+    topic: str
+    callback_data: str

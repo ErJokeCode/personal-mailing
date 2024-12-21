@@ -1,5 +1,6 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from config import URL_BOT_CHAT_CURATOR
+from schemas import OnboardCourse
 
 def start_choice() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
@@ -71,16 +72,16 @@ def end() -> InlineKeyboardMarkup:
 
 
 
-def get_sections_keyboard(data_course: dict, from_add_course: bool = False, crossed_topics:dict = None) -> InlineKeyboardMarkup:
+def get_sections_keyboard(data_course: OnboardCourse, from_add_course: bool = False, crossed_topics:dict = None) -> InlineKeyboardMarkup:
     if crossed_topics == None:
         crossed_topics = {}
 
     list_btn = []
-    for section in data_course["sections"]:
-        if data_course["name"] in crossed_topics.keys() and section["callback_data"] in crossed_topics[data_course["name"]].keys() and len(crossed_topics[data_course["name"]][section["callback_data"]]) == len(section["topics"]):
-            btn = [InlineKeyboardButton(text=f"✅ {section["name"]}", callback_data=f"{section["callback_data"]}")]
+    for section in data_course.sections:
+        if data_course.name in crossed_topics.keys() and section.callback_data in crossed_topics[data_course.name].keys() and len(crossed_topics[data_course.name][section.callback_data]) == len(section.topics):
+            btn = [InlineKeyboardButton(text=f"✅ {section.name}", callback_data=f"{section.callback_data}")]
         else:
-            btn = [InlineKeyboardButton(text=f"☑️ {section["name"]}", callback_data=f"{section["callback_data"]}")]
+            btn = [InlineKeyboardButton(text=f"☑️ {section.name}", callback_data=f"{section.callback_data}")]
         list_btn.append(btn)
     
     if from_add_course:
@@ -91,21 +92,21 @@ def get_sections_keyboard(data_course: dict, from_add_course: bool = False, cros
     return InlineKeyboardMarkup(inline_keyboard=list_btn)
 
 
-def get_topics_keyboard(data_course: dict, callback_data_section: str, crossed_topics:dict = None) -> InlineKeyboardMarkup:
+def get_topics_keyboard(data_course: OnboardCourse, callback_data_section: str, crossed_topics:dict = None) -> InlineKeyboardMarkup:
     if crossed_topics == None:
         crossed_topics = {}
 
     list_btn = []
-    for section in data_course["sections"]:
+    for section in data_course.sections:
 
-        if section["callback_data"] == callback_data_section:
-            for i in range(len(section["topics"])):
-                topic = section["topics"][i]
+        if section.callback_data == callback_data_section:
+            for i in range(len(section.topics)):
+                topic = section.topics[i]
 
-                if data_course["name"] in crossed_topics.keys() and callback_data_section in crossed_topics[data_course["name"]].keys() and str(i) in crossed_topics[data_course["name"]][callback_data_section]:
-                    btn = [InlineKeyboardButton(text=f"✅ {topic["name"]}", callback_data=f"{callback_data_section}__{i}")]
+                if data_course.name in crossed_topics.keys() and callback_data_section in crossed_topics[data_course.name].keys() and str(i) in crossed_topics[data_course.name][callback_data_section]:
+                    btn = [InlineKeyboardButton(text=f"✅ {topic.name}", callback_data=f"{callback_data_section}__{i}")]
                 else:
-                    btn = [InlineKeyboardButton(text=f"☑️ {topic["name"]}", callback_data=f"{callback_data_section}__{i}")]
+                    btn = [InlineKeyboardButton(text=f"☑️ {topic.name}", callback_data=f"{callback_data_section}__{i}")]
                 list_btn.append(btn)
             break
         
@@ -114,17 +115,17 @@ def get_topics_keyboard(data_course: dict, callback_data_section: str, crossed_t
     return InlineKeyboardMarkup(inline_keyboard=list_btn)
 
 
-def topic_keyboard(data_course: dict, callback_data_topic: str, is_help=False, not_question=False):
+def topic_keyboard(data_course: OnboardCourse, callback_data_topic: str, is_help=False, not_question=False):
     split_callback = callback_data_topic.split("____")[0].split("__")
     index = int(split_callback[-1])
     callback_data_section = "__".join(split_callback[:-1])
 
     list_btn1 = []
     list_btn1.append(InlineKeyboardButton(text="↩️", callback_data=f"to_section___{callback_data_section}"))
-    for section in data_course["sections"]:
+    for section in data_course.sections:
 
-        if section["callback_data"] == callback_data_section:
-            topics = section["topics"]
+        if section.callback_data == callback_data_section:
+            topics = section.topics
 
             if index > 0:
                 btn = InlineKeyboardButton(text="⬅️", callback_data=f"{callback_data_section}__{index - 1}")

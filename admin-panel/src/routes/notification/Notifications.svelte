@@ -1,12 +1,10 @@
 <script lang='ts'>
 	import { Breadcrumb, BreadcrumbItem, Heading, Button } from 'flowbite-svelte';
-	import { TableHeadCell, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableSearch } from 'flowbite-svelte';
+	import { TableHeadCell, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, Search } from 'flowbite-svelte';
     import { ArrowRightOutline } from 'flowbite-svelte-icons';
     import { onMount } from "svelte";
-    import http from "../../utils/http";
     import { Link, navigate } from "svelte-routing";
 
-    let status = http.status();
     let notifications = [];
     let searchTerm = "";
 
@@ -41,15 +39,15 @@
                         1 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>Главная</Link>
                     <BreadcrumbItem>Рассылки</BreadcrumbItem>
                 </Breadcrumb>
-            <Button on:click={() => navigate('/notifications/send')} class="mb-3">
-              Создать рассылки
-              <ArrowRightOutline class="w-6 h-6 ms-2" />
-            </Button>
-                <Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
+                <Button on:click={() => navigate('/notifications/send')} class="mb-3">
+                    Создать рассылки
+                    <ArrowRightOutline class="w-6 h-6 ms-2" />
+                </Button>
+                <Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl mb-4">
                     Ваши рассылки
                 </Heading>
+                <Search size='md' class='block w-80 p-2.5 ps-10 text-sm mb-4' placeholder="Поиск" bind:value={searchTerm} />
             </div>
-            <TableSearch placeholder="Поиск" hoverable={true} bind:inputValue={searchTerm} />
           <Table hoverable={true}>
             <TableHead>
               <TableHeadCell class="px-8">Содержание</TableHeadCell>

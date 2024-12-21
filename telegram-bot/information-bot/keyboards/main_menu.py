@@ -1,20 +1,21 @@
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
-from config import URL_BOT_CHAT_CURATOR
+from config import URL_BOT_CHAT_CURATOR, MANAGER_FAQ
 
-def menu(is_active_course: bool) -> InlineKeyboardMarkup:
-    if is_active_course:
-        return InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="Вводный курс", callback_data="start_onboarding")],
-            [InlineKeyboardButton(text="Дополнительные курсы", callback_data="additional_courses")],
+def menu(is_active_add_course: bool, is_active_onboarding: bool) -> InlineKeyboardMarkup:
+    btns = [
             [InlineKeyboardButton(text="Предметы", callback_data="subjects"), InlineKeyboardButton(text="Онлайн курсы", callback_data="online_courses")],
             [InlineKeyboardButton(text="Чат с куратором", url=URL_BOT_CHAT_CURATOR), InlineKeyboardButton(text="FAQ", callback_data="faq")],
-        ])
+        ]
+    
+    if is_active_add_course and is_active_onboarding:
+        btns.insert(0, [InlineKeyboardButton(text="Вводный курс", callback_data="start_onboarding")])
+        btns.insert(1, [InlineKeyboardButton(text="Дополнительные курсы", callback_data="additional_courses")])
+    elif is_active_onboarding:
+        btns.insert(0, [InlineKeyboardButton(text="Вводный курс", callback_data="start_onboarding")])
+    elif is_active_add_course:
+        btns.insert(0, [InlineKeyboardButton(text="Дополнительные курсы", callback_data="additional_courses")])
 
-    return InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="Вводный курс", callback_data="start_onboarding")],
-            [InlineKeyboardButton(text="Предметы", callback_data="subjects"), InlineKeyboardButton(text="Онлайн курсы", callback_data="online_courses")],
-            [InlineKeyboardButton(text="Чат с куратором", url=URL_BOT_CHAT_CURATOR), InlineKeyboardButton(text="FAQ", callback_data="faq")],
-        ])
+    return InlineKeyboardMarkup(inline_keyboard=btns)
 
 def back_to_main() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
@@ -31,11 +32,9 @@ def courses(courses_data) -> InlineKeyboardMarkup:
 
 def FAQ() -> InlineKeyboardMarkup:
     #Создание разделов вопросов
-    return InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="Онлайн курсы", callback_data="faq_online_course")],
-            [InlineKeyboardButton(text="ВУЦ", callback_data="faq_vuc")],
-            [InlineKeyboardButton(text="Назад", callback_data="main_menu")]
-        ])
+    btns = [ [InlineKeyboardButton(text=topic.topic, callback_data="faq_" + topic.callback_data)] for topic in MANAGER_FAQ.get_list_topics()]
+    btns.append([InlineKeyboardButton(text="Назад", callback_data="main_menu")])
+    return InlineKeyboardMarkup(inline_keyboard=btns)
 
 def back_to_FAQ() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[

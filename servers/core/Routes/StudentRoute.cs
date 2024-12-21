@@ -37,6 +37,6 @@ public static class StudentRoute
     {
         group.MapPut("/{id}/onboard/", StudentHandler.AddOnboardStatus).AddPermission(Permissions.ManipulateStudents);
 
-        group.MapPut("/{id}/admin/", StudentHandler.ChangeAdmin).AddPermission(Permissions.CreateAdmins);
+        // group.MapPut("/{id}/admin/", StudentHandler.ChangeAdmin).AddPermission(Permissions.CreateAdmins);
     }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -49,5 +50,34 @@ public static partial class AdminHandler
         await db.SaveChangesAsync();
 
         return Results.Ok<AdminUserDto>(AdminUserDto.Map(admin));
+    }
+
+    public class GroupDetails
+    {
+        public string Group { get; set; }
+        public string AdminId { get; set; }
+    }
+
+    public static async Task<IResult> AssignGroup(GroupDetails details, CoreDb db)
+    {
+        var admin = db.Users.SingleOrDefault(a => a.Id == details.AdminId);
+
+        if (admin == null)
+        {
+            return Results.NotFound("Admin not found");
+        }
+
+        var existAdmin = db.Users.SingleOrDefault(a => a.Groups.Contains(details.Group));
+
+        if (existAdmin != null)
+        {
+            existAdmin.Groups.Remove(details.Group);
+        }
+
+        admin.Groups.Add(details.Group);
+
+        await db.SaveChangesAsync();
+
+        return Results.Ok();
     }
 }

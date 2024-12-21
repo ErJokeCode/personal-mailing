@@ -3,7 +3,7 @@ import requests
 import os
 import logging
 
-from worker import Worker, ManegerOnboarding
+from worker import Worker, ManegerOnboarding, ManagerFaq
 
 dotenv.load_dotenv()
 
@@ -156,7 +156,9 @@ test_data_course = [{
 ]
 
 
-MANAGER_ONB = ManegerOnboarding(test_data_course)
+MANAGER_ONB = ManegerOnboarding()
+MANAGER_FAQ = ManagerFaq()
 
-WORKER = Worker(5, LOGGER)
-WORKER.add_manager_onboarding(MANAGER_ONB, URL_SERVER + "/parser/bot/onboard/", get_cookie())
+WORKER = Worker(10, LOGGER, get_cookie())
+WORKER.add_manager_onboarding(MANAGER_ONB, URL_SERVER + "/parser/bot/onboard/")
+WORKER.add_manager_faq(MANAGER_FAQ, URL_SERVER + "/parser/bot/faq/", URL_SERVER + "/parser/bot/faq/topic")

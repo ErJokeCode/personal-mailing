@@ -1,0 +1,18 @@
+meta {
+  name: assign-group
+  type: http
+  seq: 8
+}
+
+put {
+  url: {{base_api}}/core/admin/group
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "group": "РИ-130943",
+    "adminId": "d68671e8-53a4-469b-b206-bdb2bdd81c76"
+  }
+}

@@ -1,5 +1,5 @@
 <script>
-	import { Breadcrumb, BreadcrumbItem, Heading} from 'flowbite-svelte';
+	import { Breadcrumb, BreadcrumbItem, Heading, P} from 'flowbite-svelte';
 </script>
 
 <div class="overflow-hidden lg:flex">
@@ -9,9 +9,10 @@
                 <Breadcrumb class="mb-5">
                     <BreadcrumbItem home>Главная</BreadcrumbItem>
                 </Breadcrumb>
-                <Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
+                <Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl mb-5">
                     Главная
                 </Heading>
+                <P>Это Главная страница.</P>
             </div>
         </div>
     </div>
