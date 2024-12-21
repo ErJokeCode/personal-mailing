@@ -12,7 +12,7 @@ services:
     build: ./admin-panel
     command: bash deploy.sh
     ports:
-      - 193.160.209.55:5015:5015
+      - 193.160.209.55:80:5015
     volumes:
       - ./admin-panel:/opt/admin-panel
       - admin-panel_node_modules:/opt/admin-panel/node_modules

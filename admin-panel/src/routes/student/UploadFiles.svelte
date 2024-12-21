@@ -18,7 +18,7 @@
       var data = new FormData();
       data.append("file", file);
   
-      let result = await fetch('http://localhost:5000/parser/upload/student', {
+      let result = await fetch('http://193.160.209.55:5000/parser/upload/student', {
         method: "POST",
         body: data,
         credentials: "include",
@@ -42,7 +42,7 @@
           data.append("file", file);
   
           let result = await fetch(
-              'http://localhost:5000/parser/upload/choice_in_modeus',
+              'http://193.160.209.55:5000/parser/upload/choice_in_modeus',
               {
                   method: "POST",
                   body: data,
@@ -68,7 +68,7 @@
           data.append("file", file);
   
           let result = await fetch(
-              'http://localhost:5000/parser/upload/report_online_course',
+              'http://193.160.209.55:5000/parser/upload/report_online_course',
               {
                   method: "POST",
                   body: data,

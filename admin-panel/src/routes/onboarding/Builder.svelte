@@ -14,7 +14,7 @@
     const load = async () => {
         let response;
         try {
-            response = await fetch("http://localhost:5000/parser/bot/onboard/", {
+            response = await fetch("http://193.160.209.55:5000/parser/bot/onboard/", {
                 credentials: "include",
             });
         } catch (err) {
@@ -37,7 +37,7 @@
 
         let body = JSON.stringify(res);
   
-        let result = await fetch(`http://localhost:5000/parser/bot/onboard/${id}`, {
+        let result = await fetch(`http://193.160.209.55:5000/parser/bot/onboard/${id}`, {
             method: "PUT",
             headers: {
                 'Accept': 'application/json, */*',
@@ -75,7 +75,7 @@
         };
         let body = JSON.stringify(new_course);
   
-        let result = await fetch(`http://localhost:5000/parser/bot/onboard/one_course`, {
+        let result = await fetch(`http://193.160.209.55:5000/parser/bot/onboard/one_course`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json, */*',
@@ -88,7 +88,7 @@
     }
 
     const delete_course = async (id) => {
-        let result = await fetch(`http://localhost:5000/parser/bot/onboard/${id}`, {
+        let result = await fetch(`http://193.160.209.55:5000/parser/bot/onboard/${id}`, {
             method: "DELETE",
             credentials: "include",
         });
@@ -110,7 +110,7 @@
         }
         let body = JSON.stringify(new_section);
   
-        let result = await fetch(`http://localhost:5000/parser/bot/onboard/${id}/section`, {
+        let result = await fetch(`http://193.160.209.55:5000/parser/bot/onboard/${id}/section`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json, */*',
@@ -123,7 +123,7 @@
     }
 
     const delete_section = async (id, section_name) => {
-        let result = await fetch(`http://localhost:5000/parser/bot/onboard/${id}/${section_name}`, {
+        let result = await fetch(`http://193.160.209.55:5000/parser/bot/onboard/${id}/${section_name}`, {
             method: "DELETE",
             credentials: "include",
         });
@@ -138,7 +138,7 @@
         }
         let body = JSON.stringify(new_topic);
   
-        let result = await fetch(`http://localhost:5000/parser/bot/onboard/${id}/${section_name}/topic`, {
+        let result = await fetch(`http://193.160.209.55:5000/parser/bot/onboard/${id}/${section_name}/topic`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json, */*',
@@ -151,7 +151,7 @@
     }
 
     const delete_topic = async (id, section_name, topic_name) => {
-        let result = await fetch(`http://localhost:5000/parser/bot/onboard/${id}/${section_name}/${topic_name}`, {
+        let result = await fetch(`http://193.160.209.55:5000/parser/bot/onboard/${id}/${section_name}/${topic_name}`, {
             method: "DELETE",
             credentials: "include",
         });
@@ -161,7 +161,7 @@
     const put_course = async (id, res) => {
         let body = JSON.stringify(res);
   
-        let result = await fetch(`http://localhost:5000/parser/bot/onboard/${id}`, {
+        let result = await fetch(`http://193.160.209.55:5000/parser/bot/onboard/${id}`, {
             method: "PUT",
             headers: {
                 'Accept': 'application/json, */*',
