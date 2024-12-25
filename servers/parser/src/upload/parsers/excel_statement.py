@@ -8,9 +8,9 @@ from config import DB
 from src.schemas import Course, InfoOnlineCourseInDB, StudentForDict, OnlineCourseStudent
 
 
-def update_report(file: UploadFile):
+def update_report(file_read):
     try:
-        excel = pd.ExcelFile(BytesIO(file.file.read()))
+        excel = pd.ExcelFile(BytesIO(file_read))
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="File read error")

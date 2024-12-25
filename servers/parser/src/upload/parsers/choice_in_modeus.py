@@ -8,9 +8,9 @@ from pymongo.collection import Collection
 from config import DB
 from src.schemas import DictNames, InfoOnlineCourseInDB, StudentMoseus, Subject, SubjectInBD
 
-def choice_in_modeus(file: UploadFile):
+def choice_in_modeus(file_read):
     try:
-        excel = pd.ExcelFile(BytesIO(file.file.read()))
+        excel = pd.ExcelFile(BytesIO(file_read))
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="File read error")

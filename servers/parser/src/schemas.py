@@ -1,3 +1,5 @@
+from datetime import datetime
+from enum import Enum
 from typing import Annotated, List, Optional
 from pydantic import AfterValidator, BaseModel, BeforeValidator, Field
 
@@ -152,3 +154,19 @@ class FAQInDB(FAQ):
 class FAQTopic(BaseModel):
     topic: str
     callback_data: str
+    
+    
+class TypeFile(str, Enum):
+    student = "student"
+    modeus = "modeus"
+    online_course = "online_course"
+    
+    
+class HistoryUploadFile(BaseModel):
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    name_file: str
+    key: str
+    date: datetime
+    type: TypeFile
+    link: str
+        

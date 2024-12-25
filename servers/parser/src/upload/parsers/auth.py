@@ -6,9 +6,9 @@ from config import DB
 from src.schemas import Student
 
 
-def upload_student(file: UploadFile):
+def upload_student(file_read):
     try:
-        excel = pd.ExcelFile(BytesIO(file.file.read()))
+        excel = pd.ExcelFile(BytesIO(file_read))
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="File read error")
