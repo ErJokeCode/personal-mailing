@@ -95,7 +95,7 @@
         load();
     }
 
-    const add_section = async (id) => {
+    const add_section = async (index) => {
         let new_section =  {
             "name": "Новый раздел",
             "callback_data": "data",
@@ -108,163 +108,86 @@
                 }
             ]
         }
-        let body = JSON.stringify(new_section);
-  
-        let result = await fetch(`http://localhost:5000/parser/bot/onboard/${id}/section`, {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json, */*',
-                'Content-Type': 'application/json'
-            },
-            body: body,
-            credentials: "include",
-        });
-        load();
+        courses[index] = courses[index];
+        courses[index].sections.push(new_section);
     }
 
-    const delete_section = async (id, section_name) => {
-        let result = await fetch(`http://localhost:5000/parser/bot/onboard/${id}/${section_name}`, {
-            method: "DELETE",
-            credentials: "include",
-        });
-        load();
+    const delete_section = async (index, section_index) => {
+        courses[index] = courses[index];
+        courses[index].sections.splice(section_index, 1);
     }
-    const add_topic = async (id, section_name) => {
+    
+    const add_topic = async (index, section_index) => {
         let new_topic =  {
             "name": "Новая тема",
             "text": "Текст",
             "question": null,
             "answer": null
         }
-        let body = JSON.stringify(new_topic);
-  
-        let result = await fetch(`http://localhost:5000/parser/bot/onboard/${id}/${section_name}/topic`, {
-            method: "POST",
-            headers: {
-                'Accept': 'application/json, */*',
-                'Content-Type': 'application/json'
-            },
-            body: body,
-            credentials: "include",
-        });
-        load();
+        courses[index] = courses[index];
+        courses[index].sections[section_index].topics.push(new_topic);
     }
 
-    const delete_topic = async (id, section_name, topic_name) => {
-        let result = await fetch(`http://localhost:5000/parser/bot/onboard/${id}/${section_name}/${topic_name}`, {
-            method: "DELETE",
-            credentials: "include",
-        });
-        load();
+    const delete_topic = async (index, section_index, topic_index) => {
+        courses[index] = courses[index];
+        courses[index].sections[section_index].topics.splice(topic_index, 1);
     }
 
-    const put_course = async (id, res) => {
-        let body = JSON.stringify(res);
-  
-        let result = await fetch(`http://localhost:5000/parser/bot/onboard/${id}`, {
-            method: "PUT",
-            headers: {
-                'Accept': 'application/json, */*',
-                'Content-Type': 'application/json'
-            },
-            body: body,
-            credentials: "include",
-        });
-    }
-
-    const course_up = async (id, j = 0, m = -1) => {
-        let index;
-        for (let i = 0; i < courses.length; i++) {
-            if (courses[i]._id === id) {
-                if (i === j) return;
-                index = i;
-                break;
-            }
-        }
-
-        let curr = courses[index]
-        let current_course = {
-            "name": curr.name,
-            "is_active": true,
-            "sections": curr.sections
-        };
-        put_course(courses[index + m]._id, current_course);
-
-        let up = courses[index + m]
-        let up_course = {
-            "name": up.name,
-            "is_active": true,
-            "sections": up.sections
-        }
-        put_course(courses[index]._id, up_course);
-        load();
-    }
-
-    const course_down = async (id) => {
-        course_up(id, courses.length - 1, 1)
-    }
-
-    const section_up = async (id, section_name, k = 0, m = -1) => {
-        let index;
+    const section_up = async (course_index, section_index, k = 0, m = -1) => {
         let isec;
         let sections;
         for (let i = 0; i < courses.length; i++) {
-            if (courses[i]._id === id) {
+            if (i === course_index) {
                 let tsec = courses[i].sections;
                 for (let j = 0; j < tsec.length; j++) {
-                    if (tsec[j].name === section_name) {
+                    if (j === section_index) {
                         k = k == 0 ? 0 : tsec.length - 1
                         if (j == k) return;
-                        index = i;
                         isec = j;
                         sections = tsec;
                     }
                 }
             }
         }
+        courses[course_index] = courses[course_index];
         let tsec = sections[isec];
         sections[isec] = sections[isec + m];
         sections[isec + m] = tsec;
-
-        put_course(courses[index]._id, courses[index]);
-        load();
     }
 
-    const section_down = async (id, section_name) => {
-        section_up(id, section_name, 1, 1)
+    const section_down = async (course_index, section_name) => {
+        section_up(course_index, section_name, 1, 1)
     }
 
-    const topic_up = async (id, topic_name, n = 0, m = -1) => {
-        let index;
+    const topic_up = async (course_index, section_index, topic_index, n = 0, m = -1) => {
         let itop;
         let topics;
         for (let i = 0; i < courses.length; i++) {
-            if (courses[i]._id === id) {
+            if (i === course_index) {
                 let tsec = courses[i].sections;
                 for (let j = 0; j < tsec.length; j++) {
-                    let ttop = tsec[j].topics
-                    for (let k = 0; k < ttop.length; k++) {
-                        if (ttop[k].name === topic_name) {
-                            n = n == 0 ? 0 : ttop.length - 1
-                            if (k == n) return;
-                            index = i;
-                            itop = k;
-                            topics = ttop;
+                    if (j === section_index) {
+                        let ttop = tsec[j].topics
+                        for (let k = 0; k < ttop.length; k++) {
+                            if (k === topic_index) {
+                                n = n == 0 ? 0 : ttop.length - 1
+                                if (k == n) return;
+                                itop = k;
+                                topics = ttop;
+                            }
                         }
                     }
                 }
             }
         }
+        courses[course_index] = courses[course_index];
         let ttop = topics[itop];
         topics[itop] = topics[itop + m];
         topics[itop + m] = ttop;
-
-        put_course(courses[index]._id, courses[index]);
-        load();
     }
 
-    const topic_down = async (id, topic_name) => {
-        topic_up(id, topic_name, 1, 1)
+    const topic_down = async (course_index, section_name, topic_index) => {
+        topic_up(course_index, section_name, topic_index, 1, 1)
     }
 </script>
 
@@ -286,7 +209,8 @@
                     Добавить курс
                 </Button>
                 <Helper class="mb-4 mt-1"></Helper>
-                {#each courses as course}
+                {#each courses as course, course_index}
+                    {console.log(course)}
                     <Accordion class='mb-5'>
                         <AccordionItem>
                             <span slot="header">{course.name}</span>
@@ -295,12 +219,10 @@
                                 <Input bind:value={course.name} class='border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700' placeholder={course.name} size="md" />
                             </Label>
                             <div class="mb-5 space-x-4">
-                                <Button on:click={() => add_section(course._id)}>Добавить раздел</Button>
-                                <Button on:click={() => course_up(course._id)}>Курс вверх</Button>
-                                <Button on:click={() => course_down(course._id)}>Курс вниз</Button>
+                                <Button on:click={() => add_section(course_index)}>Добавить раздел</Button>
                                 <Button on:click={() => delete_course(course._id)}>Удалить курс</Button>
                             </div>
-                            {#each course.sections as section}
+                            {#each course.sections as section, section_index}
                                 <Accordion class='mb-3'>
                                     <AccordionItem>
                                         <span slot="header">{section.name}</span>
@@ -313,12 +235,12 @@
                                             <Input bind:value={section.callback_data} class='border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700' placeholder={section.callback_data} size="md" />
                                         </Label>
                                         <div class="mb-5 space-x-4">
-                                            <Button on:click={() => add_topic(course._id, section.name)}>Добавить тему</Button>
-                                            <Button on:click={() => section_up(course._id, section.name)}>Раздел вверх</Button>
-                                            <Button on:click={() => section_down(course._id, section.name)}>Раздел вниз</Button>
-                                            <Button on:click={() => delete_section(course._id, section.name)}>Удалить раздел</Button>
+                                            <Button on:click={() => add_topic(course_index, section_index)}>Добавить тему</Button>
+                                            <Button on:click={() => section_up(course_index, section_index)}>Раздел вверх</Button>
+                                            <Button on:click={() => section_down(course_index, section_index)}>Раздел вниз</Button>
+                                            <Button on:click={() => delete_section(course_index, section_index)}>Удалить раздел</Button>
                                         </div>
-                                        {#each section.topics as topic}
+                                        {#each section.topics as topic, topic_index}
                                             <Accordion class='mb-3'>
                                                 <AccordionItem>
                                                     <span slot="header">{topic.name}</span>
@@ -327,9 +249,9 @@
                                                         <Input bind:value={topic.name} class='border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700' placeholder={topic.name} size="md" />
                                                     </Label>
                                                     <div class="mb-3 space-x-4">
-                                                        <Button on:click={() => topic_up(course._id, topic.name)}>Тема вверх</Button>
-                                                        <Button on:click={() => topic_down(course._id, topic.name)}>Тема вниз</Button>
-                                                        <Button on:click={() => delete_topic(course._id, section.name, topic.name)}>Удалить тему</Button>
+                                                        <Button on:click={() => topic_up(course_index, section_index, topic_index)}>Тема вверх</Button>
+                                                        <Button on:click={() => topic_down(course_index, section_index, topic_index)}>Тема вниз</Button>
+                                                        <Button on:click={() => delete_topic(course_index, section_index, topic_index)}>Удалить тему</Button>
                                                     </div>
                                                     <Label class="space-y-2 mb-3 w-full">
                                                         <span>Текст</span>
