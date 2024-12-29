@@ -1,24 +1,23 @@
 <script lang="ts">
-	import { Breadcrumb, BreadcrumbItem, Heading } from 'flowbite-svelte';
+	import { Breadcrumb, BreadcrumbItem, GradientButton, Heading, Input } from 'flowbite-svelte';
 	import { Table, TableBody, TableBodyCell, TableBodyRow, TableHead } from 'flowbite-svelte';
 	import { TableHeadCell } from 'flowbite-svelte';
 
 	import { onMount } from "svelte";
-    import { Link, navigate } from "svelte-routing";
+    import { Link } from "svelte-routing";
     import http from "../../utils/http";
 
-    let activeStudents = [];
+    // onMount(async () => {
+    //     studentStatus = studentStatus.start_load();
+    //     activeStudents = (await http.get("/core/student", studentStatus)).items ?? [];
+    //     studentStatus = studentStatus.end_load();
+    // });
 
-    let studentStatus = http.status();
+    let rows = [0, 0, 0];
 
-    onMount(async () => {
-        studentStatus = studentStatus.start_load();
-        activeStudents = (await http.get("/core/student", studentStatus)).items ?? [];
-        studentStatus = studentStatus.end_load();
-    });
-
-    async function fullInfo(id) {
-        navigate(`/students/active/${id}`);
+    function add() {
+        rows.push(0);
+        rows = rows;
     }
 </script>
 
@@ -31,26 +30,31 @@
                         to="/"><svg class="w-4 h-4 me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                         <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 01
                         1 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>Главная</Link>
-                    <BreadcrumbItem>Активные студенты</BreadcrumbItem>
+                    <BreadcrumbItem>Редактор соотношений</BreadcrumbItem>
                 </Breadcrumb>
                 <Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
-                    Активные студенты
+                    Соотношения
                 </Heading>
             </div>
             <Table hoverable={true}>
                 <TableHead>
-                    <TableHeadCell class="px-8">ID</TableHeadCell>
-                    <TableHeadCell class="px-8">Почта</TableHeadCell>
+                    <TableHeadCell class="px-8">Название в файле</TableHeadCell>
+                    <TableHeadCell class="px-8">Название на сайте</TableHeadCell>
+                    <TableHeadCell class="px-8">Название в модеусе</TableHeadCell>
                 </TableHead>
                 <TableBody>
-                    {#each activeStudents as student}
-                        <TableBodyRow on:click={() => fullInfo(student.id)}>
-                            <TableBodyCell class="px-8">{student.id}</TableBodyCell>
-                            <TableBodyCell class="px-8">{student.email}</TableBodyCell>
+                    {#each rows as row}
+                        <TableBodyRow>
+                            <TableBodyCell class="px-8"><Input></Input></TableBodyCell>
+                            <TableBodyCell class="px-8"><Input></Input></TableBodyCell>
+                            <TableBodyCell class="px-8"><Input></Input></TableBodyCell>
                         </TableBodyRow>
                     {/each}
                 </TableBody>
             </Table>
+            <div class='flex justify-center'>
+                <GradientButton size='xl' class='mb-5 mt-2' outline shadow pill color="purpleToPink" on:click={() => add()}>Добавить</GradientButton>
+            </div>
         </div>
     </div>
 </div>
