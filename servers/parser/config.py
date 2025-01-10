@@ -16,7 +16,7 @@ class WorkerDataBase(MongoDataBase):
         self.info_online_course = WorkerCollection[InfoOnlineCourse, InfoOnlineCourseInDB](self.db["info_online_course"], InfoOnlineCourse, InfoOnlineCourseInDB)
         self.dict_names = WorkerCollection[DictNames, DictNamesInDB](self.db["dict_names"], DictNames, DictNamesInDB)
         self.bot_faq = WorkerCollection[FAQ, FAQInDB](self.db["bot_faq"], FAQ, FAQInDB)
-        self.bot_onboard = WorkerCollection[OnboardCourse, OnboardCourseInDB](self.db["bot_faq"], OnboardCourse, OnboardCourseInDB)
+        self.bot_onboard = WorkerCollection[OnboardCourse, OnboardCourseInDB](self.db["bot_onboard"], OnboardCourse, OnboardCourseInDB)
 
 dotenv.load_dotenv()
 
