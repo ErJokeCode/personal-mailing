@@ -1,7 +1,7 @@
 from bson import ObjectId
 from fastapi import APIRouter, HTTPException
 
-from config import DB
+from config import worker_db
 from src.schemas import OnboardCourse, OnboardCourseInDB, OnboardSection, OnboardTopic
 
 
@@ -12,11 +12,10 @@ router_bot_onboard = APIRouter(
 )
 
 
-
 @router_bot_onboard.post("/one_course")
 async def add_course(course: OnboardCourse) -> OnboardCourseInDB:
     try:
-        collection_bot = DB.get_bot_onboard()
+        collection_bot = worker_db.bot_onboard.get_collect()
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Error DB")
@@ -31,7 +30,7 @@ async def add_course(course: OnboardCourse) -> OnboardCourseInDB:
 @router_bot_onboard.post("/{id}/section")
 async def add_section(id: str, section: OnboardSection) -> OnboardCourseInDB:
     try:
-        collection_bot = DB.get_bot_onboard()
+        collection_bot = worker_db.bot_onboard.get_collect()
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Error DB")
@@ -47,7 +46,7 @@ async def add_section(id: str, section: OnboardSection) -> OnboardCourseInDB:
 @router_bot_onboard.post("/{id}/{section_index}/topic")
 async def add_topic(id: str, section_index: int, topic: OnboardTopic) -> OnboardCourseInDB:
     try:
-        collection_bot = DB.get_bot_onboard()
+        collection_bot = worker_db.bot_onboard.get_collect()
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Error DB")
@@ -70,7 +69,7 @@ async def add_topic(id: str, section_index: int, topic: OnboardTopic) -> Onboard
 @router_bot_onboard.put("/{id}")
 async def put_course(id: str, course: OnboardCourse) -> OnboardCourseInDB:
     try:
-        collection_bot = DB.get_bot_onboard()
+        collection_bot = worker_db.bot_onboard.get_collect()
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Error DB")
@@ -86,7 +85,7 @@ async def put_course(id: str, course: OnboardCourse) -> OnboardCourseInDB:
 @router_bot_onboard.put("/{id}/{section_index}")
 async def put_section(id: str, section_index: int, section: OnboardSection) -> OnboardCourseInDB:
     try:
-        collection_bot = DB.get_bot_onboard()
+        collection_bot = worker_db.bot_onboard.get_collect()
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Error DB")
@@ -108,7 +107,7 @@ async def put_section(id: str, section_index: int, section: OnboardSection) -> O
 @router_bot_onboard.put("/{id}/{section_index}/{topic_index}")
 async def put_topic(id: str, section_index: int, topic_index: int, topic: OnboardTopic) -> OnboardCourseInDB:
     try:
-        collection_bot = DB.get_bot_onboard()
+        collection_bot = worker_db.bot_onboard.get_collect()
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Error DB")
@@ -131,7 +130,7 @@ async def put_topic(id: str, section_index: int, topic_index: int, topic: Onboar
 @router_bot_onboard.delete("/{id}")
 async def delete_course(id: str) -> dict:
     try:
-        collection_bot = DB.get_bot_onboard()
+        collection_bot = worker_db.bot_onboard.get_collect()
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Error DB")
@@ -146,7 +145,7 @@ async def delete_course(id: str) -> dict:
 @router_bot_onboard.delete("/{id}/{section_index}")
 async def delete_section(id: str, section_index: int) -> OnboardCourseInDB:
     try:
-        collection_bot = DB.get_bot_onboard()
+        collection_bot = worker_db.bot_onboard.get_collect()
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Error DB")
@@ -167,7 +166,7 @@ async def delete_section(id: str, section_index: int) -> OnboardCourseInDB:
 @router_bot_onboard.delete("/{id}/{section_index}/{topic_index}")
 async def delete_topic(id: str, section_index: int, topic_index: int) -> OnboardCourseInDB:
     try:
-        collection_bot = DB.get_bot_onboard()
+        collection_bot = worker_db.bot_onboard.get_collect()
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Error DB")
@@ -190,7 +189,7 @@ async def delete_topic(id: str, section_index: int, topic_index: int) -> Onboard
 @router_bot_onboard.get("/{id}")
 async def get_course(id: str) -> OnboardCourseInDB:
     try:
-        collection_bot = DB.get_bot_onboard()
+        collection_bot = worker_db.bot_onboard.get_collect()
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Error DB")
@@ -205,7 +204,7 @@ async def get_course(id: str) -> OnboardCourseInDB:
 @router_bot_onboard.get("/")
 async def get_courses() -> list[OnboardCourseInDB]:
     try:
-        collection_bot = DB.get_bot_onboard()
+        collection_bot = worker_db.bot_onboard.get_collect()
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500, detail="Error DB")
