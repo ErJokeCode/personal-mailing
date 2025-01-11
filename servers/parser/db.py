@@ -188,11 +188,14 @@ class S3Client:
         except ClientError as e:
             raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"Error downloading file from S3: {e}")
             
-    async def create_hist_file(self, file: UploadFile, type: TypeFile) -> HistoryUploadFile:
+    async def create_hist_file(self, file: UploadFile, type: TypeFile, is_upload: bool = True) -> HistoryUploadFile:
         time = datetime.now()
         hash = hashlib.sha256(file.filename.encode("utf-8") + str(time).encode("utf-8")).hexdigest()
         key = hash + "." + file.filename.split(".")[-1]
-        link = await self.upload_file(file, key)
+        if is_upload:
+            link = await self.upload_file(file, key)
+        else:
+            link = None
         
         hist_file = HistoryUploadFile(
             name_file=file.filename,

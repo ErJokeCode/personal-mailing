@@ -1,5 +1,6 @@
 from datetime import datetime
-from fastapi import APIRouter, HTTPException, UploadFile
+import asyncio 
+from fastapi import APIRouter, BackgroundTasks, HTTPException, UploadFile
 from config import s3_client, worker_db
 from src.upload.dict_names import upload_dict_names
 from src.upload.online_course import parse_info_online_courses, upload_report
@@ -15,45 +16,64 @@ router_data = APIRouter(
 )
 
 @router_data.post("/student")
-async def upload_data_student(file: UploadFile) -> HistoryUploadFileInDB:
-    hist_info = await s3_client.create_hist_file(file, TypeFile.student)
+async def upload_data_student(file: UploadFile) -> dict[str, str]:
+    hist = await get_history()
+    if hist and hist[0].status_upload is None:
+        raise HTTPException(status_code=400, detail=f"Wait for the {hist[0].name_file} file to be processed")
     
-    res = worker_db.history.insert_one(hist_info)
+    hist_info = await s3_client.create_hist_file(file, TypeFile.student, is_upload=False)
+    hist_info_db = worker_db.history.insert_one(hist_info)
     
-    upload_student(hist_info.link, worker_db)
+    asyncio.create_task(background_student(file.file.read(), file.filename, file.size, file.headers, hist_info_db))
     
-    return res
+    return {"status": "success"}
 
 @router_data.post("/choice_in_modeus")
-async def post_choice_in_modeus(file: UploadFile):
-    hist_info = await s3_client.create_hist_file(file, TypeFile.modeus)
+async def post_choice_in_modeus(file: UploadFile) -> dict[str, str]:
+    hist = await get_history(type=TypeFile.student)
+    if len(hist) == 0:
+        raise HTTPException(status_code=400, detail=f"First upload the file with students")
     
-    res = worker_db.history.insert_one(hist_info)
+    hist = await get_history()
+    if len(hist) == 1 and hist[0].status_upload is None:
+        raise HTTPException(status_code=400, detail=f"Wait for the {hist[0].name_file} file to be processed")
     
-    upload_modeus(hist_info.link, worker_db)
+    
+    
+    hist_info = await s3_client.create_hist_file(file, TypeFile.modeus, is_upload=False)
+    hist_info_db = worker_db.history.insert_one(hist_info)
+    
+    asyncio.create_task(background_modeus(file.file.read(), file.filename, file.size, file.headers, hist_info_db))
    
-    return res
+    return {"status": "success"}
 
 @router_data.post("/report_online_course")
-async def post_online_course_report(file: UploadFile):
-    hist_info = await s3_client.create_hist_file(file, TypeFile.online_course)
+async def post_online_course_report(file: UploadFile) -> dict[str, str]:
+    hist = await get_history(type=TypeFile.student)
+    if len(hist) == 0:
+        raise HTTPException(status_code=400, detail=f"First upload the file with students")
     
-    res = worker_db.history.insert_one(hist_info)
+    hist = await get_history(type=TypeFile.modeus)
+    if len(hist) == 0:
+        raise HTTPException(status_code=400, detail=f"First upload the file with modeus")
     
-    res = parse_info_online_courses(worker_db)
-    if res["status"] == "success":
-        res_upload = upload_report(hist_info.link, worker_db)
-
-        return res
-    else:
-        return res
+    hist = await get_history()
+    if len(hist) == 1 and hist[0].status_upload is None:
+        raise HTTPException(status_code=400, detail=f"Wait for the {hist[0].name_file} file to be processed")
+    
+    hist_info = await s3_client.create_hist_file(file, TypeFile.online_course, is_upload=False)
+    hist_info_db = worker_db.history.insert_one(hist_info)
+    
+    asyncio.create_task(background_online_course(file.file.read(), file.filename, file.size, file.headers, hist_info_db))
+   
+    return {"status": "success"}
     
 @router_data.post("/dict_names")
 async def post_dict_modeus_inf(modeus:str = None, site_inf: str = None, file_course: str = None):
     return upload_dict_names(modeus, site_inf, file_course, worker_db)
 
 @router_data.get("/history")
-async def get_history(limit: int = 1, type: TypeFile = None):
+async def get_history(limit: int = 1, type: TypeFile = None) -> list[HistoryUploadFileInDB]:
     
     try: 
         collect = worker_db.history.get_collect()
@@ -67,9 +87,66 @@ async def get_history(limit: int = 1, type: TypeFile = None):
     history = []
     i = 0
     for hist in collect.find(query).sort("date", -1):
-        history.append(HistoryUploadFile(**hist))
+        history.append(HistoryUploadFileInDB(**hist))
         i += 1
         if i == limit:
             break
     
     return history
+
+
+
+async def background_student(file, filename, size, headers, hist_info_db: HistoryUploadFileInDB):
+    try:
+        file_upload = UploadFile(file=file, filename=filename, size=size, headers=headers)
+        
+        link = await s3_client.upload_file(file_upload, hist_info_db.key)
+        
+        hist_info_db.link = link
+        worker_db.history.update_one(hist_info_db, get_item=False)
+        
+        upload_student(hist_info_db.link, worker_db)
+        
+        hist_info_db.status_upload = "success"
+        worker_db.history.update_one(hist_info_db, get_item=False)
+    except Exception as e:
+        print(e)
+        hist_info_db.status_upload = "error"
+        worker_db.history.update_one(hist_info_db, get_item=False)
+
+async def background_modeus(file, filename, size, headers, hist_info_db: HistoryUploadFileInDB):
+    try:
+        file_upload = UploadFile(file=file, filename=filename, size=size, headers=headers)
+        
+        link = await s3_client.upload_file(file_upload, hist_info_db.key)
+        
+        hist_info_db.link = link
+        worker_db.history.update_one(hist_info_db, get_item=False)
+            
+        upload_modeus(hist_info_db.link, worker_db)
+        
+        hist_info_db.status_upload = "success"
+        worker_db.history.update_one(hist_info_db, get_item=False)
+    except Exception as e:
+        print(e)
+        hist_info_db.status_upload = "error"
+        worker_db.history.update_one(hist_info_db, get_item=False)
+        
+async def background_online_course(file, filename, size, headers, hist_info_db: HistoryUploadFileInDB):
+    try:
+        file_upload = UploadFile(file=file, filename=filename, size=size, headers=headers)
+        
+        link = await s3_client.upload_file(file_upload, hist_info_db.key)
+        
+        hist_info_db.link = link
+        worker_db.history.update_one(hist_info_db, get_item=False)
+            
+        parse_info_online_courses(worker_db)
+        upload_report(hist_info_db.link, worker_db)
+
+        hist_info_db.status_upload = "success"
+        worker_db.history.update_one(hist_info_db, get_item=False)
+    except Exception as e:
+        print(e)
+        hist_info_db.status_upload = "error"
+        worker_db.history.update_one(hist_info_db, get_item=False)

@@ -26,7 +26,8 @@ class HistoryUploadFile(BaseModel):
     key: str
     date: datetime
     type: TypeFile
-    link: str
+    link: str | None = None
+    status_upload: str | None = None
     
 class HistoryUploadFileInDB(HistoryUploadFile, BaseModelInDB):
     pass

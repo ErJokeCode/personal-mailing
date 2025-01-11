@@ -13,6 +13,10 @@ router_subject = APIRouter(
 async def get_subjects(limit: int = None) -> list[SubjectInDB]:
     return worker_db.subject.get_all(limit=limit)
 
+@router_subject.get("/names")
+async def get_subject_names() -> list[str]:
+    return worker_db.subject.get_collect().distinct("full_name")
+
 @router_subject.get("/")
 async def get_subject_by_full_name(full_name: str, team: str = None) -> SubjectInDB:
     subject = worker_db.subject.get_one(find_dict={"full_name": full_name})
@@ -29,6 +33,8 @@ async def get_subject_by_full_name(full_name: str, team: str = None) -> SubjectI
 @router_subject.get("/{id}")
 async def get_subject_by_id(id: str) -> SubjectInDB:
     return worker_db.subject.get_one(id = id)
+
+
 
 
 # @router_subject.post("/add_group_tg")
