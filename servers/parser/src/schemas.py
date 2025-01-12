@@ -1,141 +1,111 @@
-from typing import Annotated, List, Optional
-from pydantic import AfterValidator, BaseModel, BeforeValidator, Field
-
-from bson import DBRef, ObjectId
+from datetime import datetime
+from enum import Enum
+from typing import Annotated, Optional
+from pydantic import BaseModel, BeforeValidator, Field
 
 
 PyObjectId = Annotated[str, BeforeValidator(str)]
 
-
-class InfoOnlineCourseInDB(BaseModel):
+class TypeFile(str, Enum):
+    student = "student"
+    modeus = "modeus"
+    online_course = "online_course"
+    
+class TypeFormSubject(str, Enum):
+    online = "online"
+    mixed = "mixed"
+    traditional = "traditional"
+    other = "other"
+    
+class BaseModelInDB(BaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    
+    
+class HistoryUploadFile(BaseModel):
+    name_file: str
+    key: str
+    date: datetime
+    type: TypeFile
+    link: str | None = None
+    status_upload: str | None = None
+    
+class HistoryUploadFileInDB(HistoryUploadFile, BaseModelInDB):
+    pass
+
+class InfoGroupInStudent(BaseModel):
+    number: str
+    number_course: int
+    direction_code: str | None = None
+    name_speciality: str | None = None
+    
+class StudentInTeam(BaseModel):
+    sername: str
+    name: str
+    patronymic: str
+    id: PyObjectId | None = None
+
+class Team(BaseModel):
+    name: str
+    teachers: list[str]
+    students: list[StudentInTeam]
+
+class TeamInSubjectInStudent(BaseModel):
+    name: str
+    teachers: list[str]
+
+class SubjectInStudent(BaseModel):
+    full_name: str
+    name: str
+    teams: list[TeamInSubjectInStudent]
+    form_education: str
+    online_course_id: PyObjectId | None = None
+    group_tg_link: str | None = None 
+    
+class Subject(BaseModel):
+    full_name: str
+    name: str
+    teams: list[Team]
+    form_education: str
+    
+class SubjectInDB(Subject, BaseModelInDB):
+    pass
+
+class InfoOnlineCourse(BaseModel):
     name: str
     university: str | None = None
     date_start: str | None = None
     deadline: list[str] | None = None
     info: str | None = None
+    
+class InfoOnlineCourseInDB(InfoOnlineCourse, BaseModelInDB):
+    pass
 
-
-class Subject(BaseModel):
-    id: Optional[PyObjectId] = Field(alias="_id", default=None)
-    full_name: str
-    name: str
-    form_education: str
-    info: str | None = None
-    online_course: InfoOnlineCourseInDB | None = None
-    group_tg_link: str | None = None
-
-
-class SubjectInBD(BaseModel):
-    id: Optional[PyObjectId] = Field(alias="_id", default=None)
-    full_name: str
-    name: str
-    form_education: str
-    info: str | None = None
-    online_course_id: PyObjectId | None = None
-    group_tg_link: str | None = None
-
-
-class OnlineCourseStudent(InfoOnlineCourseInDB):
+class InfoOnlineCourseInStudent(InfoOnlineCourse): 
     scores: dict | None = None
-
-
+    
 class Student(BaseModel):
-    id: Optional[PyObjectId] = Field(alias="_id", default=None)
     personal_number: str
     name: str
     surname: str
     patronymic: str | None = None
     email: str | None = None
     date_of_birth: str
-    group: dict
+    group: InfoGroupInStudent
     status: bool | None = False
     type_of_cost: str | None = None
     type_of_education: str | None = None
-    subjects: list[Subject]
-    online_course: list[OnlineCourseStudent]
-
-class StudentInBD(BaseModel):
-    id: Optional[PyObjectId] = Field(alias="_id", default=None)
-    personal_number: str
-    name: str
-    surname: str
-    patronymic: str | None = None
-    email: str | None = None
-    date_of_birth: str
-    group: dict
-    status: bool | None = False
-    type_of_cost: str | None = None
-    type_of_education: str | None = None
-    subjects: list[PyObjectId]
-    online_course: list[OnlineCourseStudent]
-
-
-class Course(BaseModel):
-    name: str | None = None
-    university: str | None = None
-    score: str | None = None
-
-
-class StudentForDict(BaseModel):
-    id: Optional[PyObjectId] = Field(alias="_id", default=None)
-    surname: str | None = None
-    name: str | None = None
-    patronymic: str | None = None
-    email: str
-    group: str | None = None
-    courses: list[dict]
-
-
-class UserAuth(BaseModel):
-    id: Optional[PyObjectId] = Field(alias="_id", default=None)
-    email: str
-    personal_number: str
-    chat_id: str
-    id_user: str | None = None
-    id_user_course: str | None = None
-
-
-class GetUserAuth(BaseModel):
-    email: str
-    personal_number: str
-    chat_id: str
-
-
-class StudentMoseus(BaseModel):
-    id: Optional[PyObjectId] = Field(alias="_id", default=None)
-    fio: str
-    flow: str
-    code: str
-    speciality: str
-    subjects: list[str]
+    subjects: list[SubjectInStudent]
+    online_course: list[InfoOnlineCourseInStudent]
+    
+class StudentInDB(Student, BaseModelInDB):
+    pass
 
 class DictNames(BaseModel):
-    id: Optional[PyObjectId] = Field(alias="_id", default=None)
     modeus: str
     site_inf: str | None = None
     file_course: str | None = None
-
-
-
-class OnboardTopic(BaseModel):
-    name: str
-    text: str | None = None
-    question: str | None = None
-    answer: str | None = None
-
-class OnboardSection(BaseModel):
-    name: str
-    callback_data: str
-    topics: List[OnboardTopic]
-
-class OnboardCourse(BaseModel):
-    name: str
-    is_main: bool = False
-    is_active: bool = True
-    sections: List[OnboardSection]
     
-class OnboardCourseInDB(OnboardCourse):
+class DictNamesInDB(DictNames, BaseModelInDB):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
     
     
@@ -145,10 +115,29 @@ class FAQ(BaseModel):
     question: str
     answer: str
     
-    
-class FAQInDB(FAQ):
-    id: Optional[PyObjectId] = Field(alias="_id", default=None)
-    
+class FAQInDB(FAQ, BaseModelInDB):
+    pass
+
 class FAQTopic(BaseModel):
     topic: str
     callback_data: str
+    
+class OnboardTopic(BaseModel):
+    name: str
+    text: str | None = None
+    question: str | None = None
+    answer: str | None = None    
+
+class OnboardSection(BaseModel):
+    name: str
+    callback_data: str
+    topics: list[OnboardTopic]
+    
+class OnboardCourse(BaseModel):
+    name: str
+    is_main: bool = False
+    is_active: bool = True
+    sections: list[OnboardSection]
+    
+class OnboardCourseInDB(OnboardCourse, BaseModelInDB):
+    pass

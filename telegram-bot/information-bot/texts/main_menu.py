@@ -62,14 +62,19 @@ def create_text_subjects(data: list):
     dict_edu = get_dict_form_edu(data)
     for form_edu in dict_edu.keys():
         i = 1
+        if dict_edu[form_edu] == []:
+            continue
         text += get_text_form_edu(form_edu)
         for item in dict_edu[form_edu]:
 
+            full_name = item.get("full_name")
             name = item.get("name")
-            link = item.get("groupTgLink")
-            online_course = item.get("onlineCourse")
+            link = item.get("group_tg_link")
+            online_course = item.get("online_course_id")
+            teams = item.get("teams")
 
             text += f"{i}. {name}\n"
+            text += get_text_teams(teams)
             text += get_text_online_course(online_course)
             text += get_text_link(link)
             text += "\n"
@@ -81,11 +86,19 @@ def create_text_subjects(data: list):
 
     return text
 
+def get_text_teams(teams):
+    text = ""
+    if teams != None:
+        for team in teams:
+            text += f"Команда: {team['name']}\n"
+            teachers = ", ".join(team['teachers'])
+            text += f"Преподаватели: {teachers}\n"
+    return text
 
 def get_dict_form_edu(data):
     dict = {"traditional" : [], "mixed": [], "online": [], "other": []}
     for item in data:
-        dict[item.get("formEducation")].append(item)
+        dict[item.get("form_education")].append(item)
     return dict
     
 
@@ -96,11 +109,13 @@ def get_text_form_edu(name):
         return "Курсы проводятся в смешанной форме. Придется ходить и на очный пары в универ, и решать онлайн курс\n\n"
     elif name == "online":
         return "Курсы проводятся онлайн. Не забудь пройти его!\n\n"
-    return "Курсы от партнеров вуза\n\n"
+    return "Остальные курсы\n\n"
 
 
 def get_text_online_course(online_course):
+    return ""
     if online_course != None:
+        #Надо подучить данные с бека по id курса и вывести
         return f"Курс включает в себя прохождение онлайн курса {online_course["name"]}, его проводит {online_course["university"]}. Оснонвая информация по курсу: {online_course["info"]}. Более подробную информацию можешь узнать в разделе \"Онлайн курсы\"\n"
     return ""
 

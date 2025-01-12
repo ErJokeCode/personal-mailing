@@ -4,7 +4,7 @@ from schemas import OnboardCourse
 
 def start_choice() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
-            [InlineKeyboardButton(text="Да, расскажи", callback_data="start_onboarding_start")], 
+            [InlineKeyboardButton(text="Да, расскажи", callback_data="start_onboarding")], 
             [InlineKeyboardButton(text="Нее, давай позже", callback_data="end_onboarding")]
         ])
 
