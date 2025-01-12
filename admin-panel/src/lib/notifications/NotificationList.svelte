@@ -1,5 +1,5 @@
 <script>
-	import { Popover, ToolbarButton, Indicator } from 'flowbite-svelte';
+	import { ToolbarButton, Indicator } from 'flowbite-svelte';
 	import { BellSolid } from 'flowbite-svelte-icons';
 	import Notification from './Notification.svelte';
 	import { onDestroy, onMount } from 'svelte';
@@ -9,15 +9,14 @@
     let notificationList = notifications;
     let count = 0;
 
-    onMount(async () => {
-		signal.on('StudentSentMessage', handle_notification);
-	});
+    signal.on('StudentSentMessage', handle_notification);
 
 	onDestroy(async () => {
 		signal.off('StudentSentMessage', handle_notification);
 	});
 
 	async function handle_notification(message) {
+        console.log(message)
 		notifications.push(message);
         notificationList = notifications
         count++;
@@ -44,22 +43,29 @@
 </ToolbarButton>
 <div id='pop' role="tooltip" tabindex="-1" class="bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 rounded-
     lg border-gray-200 dark:border-gray-700 divide-gray-200 dark:divide-gray-700 shadow-md dark:!border-gray-6
-    00 max-w-sm border-0" style="position: absolute; right: 0; top: 67px; display: none;">
+    00 max-w-sm border-0" style="position: absolute; right: 0; top: 67px; display: none; min-width: 236px">
     <div class="py-2 px-3 bg-gray-100 rounded-t-md border-b border-gray-200 dark:border-gray-600 dark:bg-gray-700">
-        <div class="rounded text-center">Уведомления</div>
+        <div class="rounded text-center ">Уведомления</div>
     </div>
-    <div class="p-0 overflow-y-scroll" style='height: 50dvh;'>
+    <div class="p-0" style='max-height: 50dvh; overflow-y: auto'>
         <div class="bg-50 dark:bg-gray-700">
-            {#each notificationList.toReversed() as notification}
-                {console.log(notification)}
-                <Notification
-                    when={notification.message.date}
-                >
-                    Новое сообщение от <span class="font-semibold text-gray-900 dark:text-white">
-                        {notification.student.info.surname} {notification.student.info.name} {notification.student.info.patronymic}</span>
-                    : "{notification.message.content}"
-                </Notification>
-            {/each}
+            {#if notificationList.length !== 0}
+                {#each notificationList.toReversed() as notification}
+                    <Notification
+                        when={notification.message.date}
+                    >
+                        Новое сообщение от <span class="font-semibold text-gray-900 dark:text-white">
+                            {notification.student.info.surname} {notification.student.info.name} {notification.student.info.patronymic}</span>
+                        : "{notification.message.content}"
+                    </Notification>
+                {/each}
+            {:else}
+                <div class="flex gap-2 border-b px-4 py-3 dark:border-gray-600">
+                    <div class="w-full pl-3">
+                        <div class="mb-1.5 text-sm font-normal text-gray-500 dark:text-gray-400">Нет уведомлений</div>
+                    </div>
+                </div>
+            {/if}
         </div>
     </div>
 </div>
