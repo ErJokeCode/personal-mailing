@@ -15,7 +15,7 @@
       let response;
 
       try {
-        response = await fetch('http://193.160.209.55:5000/core/admin/create', {
+        response = await fetch('http://193.168.3.39:5000/core/admin/create', {
           method: "Post",
           body: JSON.stringify({
             email: email,

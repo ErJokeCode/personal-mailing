@@ -26,7 +26,7 @@
 
     const load_students = async () => {
         let response;
-        let url = new URL('http://193.160.209.55:5000/core/student?')
+        let url = new URL('http://193.168.3.39:5000/core/student?')
         url.searchParams.append('notOnCourse', notOnCourse);
         url.searchParams.append('lowScore', lowScore);
         if (course !== 'Выберите курс') {
@@ -98,7 +98,7 @@
                 }
             }
 
-            response = await fetch('http://193.160.209.55:5000/core/notification', {
+            response = await fetch('http://193.168.3.39:5000/core/notification', {
                 method: "Post",
                 body: data,
                 credentials: "include",

@@ -70,8 +70,8 @@ public static class Startup
             {
                 policy
                     .WithOrigins(new string[] { "http://localhost:5010", "http://localhost:5015",
-                                                "http://193.160.209.55:5010", "http://193.160.209.55:5015",
-                                                "http://193.160.209.55:80", "http://193.160.209.55" })
+                                                "http://193.168.3.39:5010", "http://193.168.3.39:5015",
+                                                "http://193.168.3.39:80", "http://193.168.3.39" })
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials();

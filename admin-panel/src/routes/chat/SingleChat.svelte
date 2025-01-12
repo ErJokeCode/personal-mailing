@@ -141,7 +141,7 @@
                                             {#if document.mimeType.includes('image')}
                                                 <img
                                                     class="mb-1"
-                                                    src={`http://193.160.209.55:5000/core/document/${document.id}/download`}
+                                                    src={`http://193.168.3.39:5000/core/document/${document.id}/download`}
                                                     alt=""
                                                 />
                                             {/if}
@@ -149,7 +149,7 @@
                                                 <Helper>{document.name}</Helper>
                                                 <a
                                                     class="ml-3"
-                                                    href={`http://193.160.209.55:5000/core/document/${document.id}/download`}
+                                                    href={`http://193.168.3.39:5000/core/document/${document.id}/download`}
                                                     >Скачать</a
                                                 >
                                             </div>
@@ -173,7 +173,7 @@
                                             {#if document.mimeType.includes('image')}
                                                 <img
                                                     class="mb-1"
-                                                    src={`http://193.160.209.55:5000/core/document/${document.id}/download`}
+                                                    src={`http://193.168.3.39:5000/core/document/${document.id}/download`}
                                                     alt=""
                                                 />
                                             {/if}
@@ -181,7 +181,7 @@
                                                 <Helper>{document.name}</Helper>
                                                 <a
                                                     class="ml-3"
-                                                    href={`http://193.160.209.55:5000/core/document/${document.id}/download`}
+                                                    href={`http://193.168.3.39:5000/core/document/${document.id}/download`}
                                                     >Скачать</a
                                                 >
                                             </div>

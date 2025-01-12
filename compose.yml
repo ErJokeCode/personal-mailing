@@ -3,7 +3,7 @@ services:
     build: ./client
     command: npm run dev
     ports:
-      - 193.160.209.55:5010:5010
+      - 193.168.3.39:5010:5010
     volumes:
       - ./client:/opt/client
       - client_node_modules:/opt/client/node_modules
@@ -12,7 +12,7 @@ services:
     build: ./admin-panel
     command: bash deploy.sh
     ports:
-      - 193.160.209.55:80:5015
+      - 193.168.3.39:80:5015
     volumes:
       - ./admin-panel:/opt/admin-panel
       - admin-panel_node_modules:/opt/admin-panel/node_modules
@@ -66,7 +66,7 @@ services:
       dockerfile: ./core/Dockerfile
     command: dotnet run
     ports:
-      - 193.160.209.55:5000:5000
+      - 193.168.3.39:5000:5000
     depends_on:
       coredb:
         condition: service_started

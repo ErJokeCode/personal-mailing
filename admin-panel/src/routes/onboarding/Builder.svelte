@@ -14,7 +14,7 @@
     const load = async () => {
         let response;
         try {
-            response = await fetch("http://193.160.209.55:5000/parser/bot/onboard/", {
+            response = await fetch("http://193.168.3.39:5000/parser/bot/onboard/", {
                 credentials: "include",
             });
         } catch (err) {
@@ -37,7 +37,7 @@
 
         let body = JSON.stringify(res);
   
-        let result = await fetch(`http://193.160.209.55:5000/parser/bot/onboard/${id}`, {
+        let result = await fetch(`http://193.168.3.39:5000/parser/bot/onboard/${id}`, {
             method: "PUT",
             headers: {
                 'Accept': 'application/json, */*',
@@ -75,7 +75,7 @@
         };
         let body = JSON.stringify(new_course);
   
-        let result = await fetch(`http://193.160.209.55:5000/parser/bot/onboard/one_course`, {
+        let result = await fetch(`http://193.168.3.39:5000/parser/bot/onboard/one_course`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json, */*',
@@ -88,7 +88,7 @@
     }
 
     const delete_course = async (id) => {
-        let result = await fetch(`http://193.160.209.55:5000/parser/bot/onboard/${id}`, {
+        let result = await fetch(`http://193.168.3.39:5000/parser/bot/onboard/${id}`, {
             method: "DELETE",
             credentials: "include",
         });
