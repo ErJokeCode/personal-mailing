@@ -6,6 +6,13 @@ using System.Text.Json.Serialization;
 namespace Core.Models;
 
 [Keyless]
+public class Team
+{
+    public string Name { get; set; }
+    public List<string> Teachers { get; set; }
+}
+
+[Keyless]
 public class Subject
 {
     [JsonPropertyName("_id")]
@@ -16,6 +23,7 @@ public class Subject
     public string Info { get; set; }
     public CourseInfo OnlineCourse { get; set; }
     public string GroupTgLink { get; set; }
+    public List<Team> Teams { get; set; }
 }
 
 [Keyless]

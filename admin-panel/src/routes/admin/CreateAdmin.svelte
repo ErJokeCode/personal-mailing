@@ -77,12 +77,11 @@
                 />
               </Label>
             </div>
-            <div class="flex mb-6 dark:text-white">
+            <!-- <div class="flex mb-6 dark:text-white">
                 <Checkbox class="mx-1" on:click={(event) => add_id(event.target?.checked, "CreateAdmins")}/>
                 Создать суперадмина
-            </div>
-            <Button class="mb-2" on:click={create}>Создать</Button>
-            <Helper>{status.value}</Helper>
+            </div> -->
+            <Button class="mb-2" on:click={create}>{status.value} Создать</Button>
             </div>
         </div>
     </div>

@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: {{base_api}}/core/student?pageIndex=0&pageSize=10&notOnCourse=false&lowScore=true&group&course=0&typeOfCost&typeOfEducation&onlineCourse&subject
+  url: {{base_api}}/core/student?pageIndex=0&pageSize=10&notOnCourse=false&lowScore=false&group&course=0&typeOfCost&typeOfEducation&onlineCourse&subject&team
   body: none
   auth: none
 }
@@ -14,11 +14,12 @@ params:query {
   pageIndex: 0
   pageSize: 10
   notOnCourse: false
-  lowScore: true
+  lowScore: false
   group: 
   course: 0
   typeOfCost: 
   typeOfEducation: 
   onlineCourse: 
   subject: 
+  team: 
 }

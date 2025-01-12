@@ -23,6 +23,7 @@
     import SingleChat from "./routes/chat/SingleChat.svelte";
 
     import Builder from "./routes/onboarding/Builder.svelte";
+    import Edit from "./routes/subjects/Edit.svelte";
 </script>
 
 <main>
@@ -48,6 +49,8 @@
     <Route path="/chat/:studentId" component={SingleChat} />
 
     <Route path="/builder" component={Builder} />
+    
+    <Route path="/names" component={Edit} />
 </main>
 
 <style>

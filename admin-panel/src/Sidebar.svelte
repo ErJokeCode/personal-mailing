@@ -15,7 +15,8 @@
 		UsersGroupOutline,
 		ChartPieOutline,
 		RectangleListSolid,
-        EditOutline
+        EditOutline,
+        TableRowOutline
 	} from 'flowbite-svelte-icons';
     import { Link } from 'svelte-routing';
     import { useLocation } from "svelte-routing";
@@ -46,6 +47,7 @@
 			}
 		},
 		{ name: 'Конструктор онбординга', icon: EditOutline, href: '/builder' },
+		{ name: 'Соотношения', icon: TableRowOutline, href: '/names' },
 		{ name: 'Администраторы', icon: UserSettingsOutline, href: '/admin' },
 		{ name: 'Профиль', icon: CogOutline, href: '/profile' }
 	];
