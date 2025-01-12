@@ -47,6 +47,9 @@
         if (subject !== '') {
             url.searchParams.append('subject', subject);
         }
+        if (team !== '') {
+            url.searchParams.append('team', team);
+        }
 
         try {
             response = await fetch(url, {
@@ -187,6 +190,7 @@
     let typeOfCost = 'Выберите тип';
     let onlineCourse = '';
     let subject = '';
+    let team = '';
 </script>
 
 <div class="overflow-hidden lg:flex">
@@ -281,6 +285,10 @@
                                 <Label class="space-y-2">
                                     <span>Предмет</span>
                                     <Input bind:value={subject} type="text" placeholder="Введите название предмета" size="md" />
+                                </Label>
+                                <Label class="space-y-2">
+                                    <span>Команда</span>
+                                    <Input bind:value={team} type="text" placeholder="Введите название команды" size="md" />
                                 </Label>
                             </div>
                         </div>

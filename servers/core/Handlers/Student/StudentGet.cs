@@ -30,7 +30,8 @@ public static partial class StudentHandler
     public static async Task<IResult> GetAllStudents(CoreDb db, bool notOnCourse = false, bool lowScore = false,
                                                      string group = null, int course = 0, string typeOfCost = null,
                                                      string typeOfEducation = null, string onlineCourse = null,
-                                                     string subject = null, int pageIndex = 0, int pageSize = -1)
+                                                     string subject = null, string team = null, int pageIndex = 0,
+                                                     int pageSize = -1)
     {
         var activeStudents = db.ActiveStudents.ToList();
         await activeStudents.IncludeStudents();
@@ -86,6 +87,14 @@ public static partial class StudentHandler
             activeStudents =
                 activeStudents.Where(a => a.Student.Subjects.Any(s => s.FullName.ToLower().Contains(subject.ToLower())))
                     .ToList();
+        }
+
+        if (!string.IsNullOrEmpty(team))
+        {
+            activeStudents = activeStudents
+                                 .Where(a => a.Student.Subjects.Any(
+                                            s => s.Teams.Any(t => t.Name.ToLower().Contains(team.ToLower()))))
+                                 .ToList();
         }
 
         var dtos = ActiveStudentDto.Maps(activeStudents);
