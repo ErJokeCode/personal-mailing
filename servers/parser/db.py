@@ -67,7 +67,7 @@ class WorkerCollection(Generic[V, T]):
         i = 1
         items = []
         for item in self.__collection.find(kwargs):
-            if i <= limit:
+            if i <= limit or limit == -1:
                 i+=1
                 items.append(self.__cls_db(**item))
             else:
@@ -99,6 +99,10 @@ class WorkerCollection(Generic[V, T]):
                 keys = keys_find
             elif dict_keys != None:
                 keys = dict_keys
+            else:
+                self.__collection.insert_one(item.model_dump())
+                item = self.__collection.find_one(keys)
+                return self.__cls_db(**item)
         else:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Bad request for update item")
         
