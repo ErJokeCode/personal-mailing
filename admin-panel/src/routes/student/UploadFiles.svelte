@@ -1,5 +1,9 @@
 <script lang="ts">
-    import { Breadcrumb, BreadcrumbItem, Fileupload, Label, Button, Helper } from 'flowbite-svelte';
+    import { Breadcrumb, BreadcrumbItem, Fileupload, Label, Button, Helper, Heading } from 'flowbite-svelte';
+    import { TableHeadCell, Table, TableBody, TableBodyCell, TableBodyRow, TableHead } from 'flowbite-svelte';
+    import { onMount } from "svelte";
+    import http from "../../utils/http";
+    import { navigate } from "svelte-routing";
   
     let student_files;
     let student_success = "";
@@ -7,6 +11,20 @@
     let modeus_success = "";
     let courses_files;
     let courses_success = "";
+
+    let status = http.status();
+    let history = [];
+    let limit = 10;
+
+    onMount(async () => {
+        status = status.start_load();
+        history = (await http.get("/parser/upload/history?limit=" + limit.toString(), status)) ?? [];
+        status = status.end_load();
+    });
+
+    async function download_file(link) {
+        navigate(link);
+    }
   
       async function send_students() {
       if (student_files.length <= 0) return;
@@ -113,6 +131,33 @@
                 <Helper>{courses_success}</Helper>
                 <Button on:click={send_courses}>Загрузить</Button>
             </div>
+            <Heading tag="h2" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
+                История
+            </Heading>
         </div>
+        <Table hoverable={true}>
+            <TableHead>
+              <TableHeadCell class="px-8">Название файла</TableHeadCell>
+              <TableHeadCell class="px-8 w-1/6" defaultSort>Дата загрузки</TableHeadCell>
+              <TableHeadCell class="px-8">Тип</TableHeadCell>
+              <TableHeadCell class="px-8">Статус загрузки</TableHeadCell>
+              <TableHeadCell class="px-8">Скачать</TableHeadCell>
+            </TableHead>
+            <TableBody>
+                {#each history as history_item}
+                    <TableBodyRow
+                        role="link"
+                        class="contrast">
+                        <TableBodyCell class="px-8">{history_item.name_file}</TableBodyCell>
+                        <TableBodyCell class="px-8">{history_item.date.slice(0, 10) + " " + history_item.date.slice(11, 19)}</TableBodyCell>
+                        <TableBodyCell class="px-8">{history_item.type == "student" ? "Загрузка студентов" : history_item.type == "modeus" ? "Выгрузка модеус" : "Онлайн курс"}</TableBodyCell>
+                        <TableBodyCell class="px-8">{history_item.status_upload == null ? "Загружается" : history_item.status_upload == "success" ? "Успешно" : "Ошибка"}</TableBodyCell>
+                        <TableBodyCell class="px-8">
+                            <Button class='flex ml-2' on:click={() => download_file(history_item.link)}>Скачать</Button>
+                        </TableBodyCell>
+                    </TableBodyRow>
+              {/each}
+            </TableBody>
+        </Table>
     </div>
 </div>

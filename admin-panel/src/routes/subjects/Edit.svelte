@@ -1,11 +1,12 @@
 <script lang="ts">
-	import { Breadcrumb, BreadcrumbItem, GradientButton, Heading, Input } from 'flowbite-svelte';
+	import { Breadcrumb, BreadcrumbItem, Button, Heading, Input } from 'flowbite-svelte';
 	import { Table, TableBody, TableBodyCell, TableBodyRow, TableHead } from 'flowbite-svelte';
 	import { TableHeadCell } from 'flowbite-svelte';
 
 	import { onMount } from "svelte";
     import { Link } from "svelte-routing";
     import http from "../../utils/http";
+    import { CirclePlusOutline } from 'flowbite-svelte-icons';
 
     // onMount(async () => {
     //     studentStatus = studentStatus.start_load();
@@ -53,7 +54,8 @@
                 </TableBody>
             </Table>
             <div class='flex justify-center'>
-                <GradientButton size='xl' class='mb-5 mt-2' outline shadow pill color="purpleToPink" on:click={() => add()}>Добавить</GradientButton>
+                <Button class='p-3 mt-2 mb-5' pill size='sm' on:click={add}><CirclePlusOutline size='xl'/></Button>
+                <!-- <GradientButton size='xl' class='mb-5 mt-2' outline shadow pill color="purpleToPink" on:click={() => add()}>Добавить</GradientButton> -->
             </div>
         </div>
     </div>

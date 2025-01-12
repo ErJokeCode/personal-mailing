@@ -22,7 +22,7 @@
 
 {#if $location.pathname !== '/login'}
 <header class="fixed top-0 z-40 mx-auto w-full flex-none border-b border-gray-200 bg-white dark:border-gray-600 dark:bg-gray-800">
-    <Navbar {fluid} class="text-black" color="default" let:NavContainer>
+    <Navbar {fluid} class="text-black" color="default">
         <NavHamburger
             onClick={() => (drawerHidden = !drawerHidden)}
             class="m-0 me-3 md:block lg:hidden"
@@ -54,7 +54,7 @@
             {/if}
         </div>
         <div class="ms-auto flex items-center text-gray-500 dark:text-gray-400 sm:order-2">
-            <!-- <Notifications /> -->
+            <Notifications />
             <ToolbarButton size="lg" class="-mx-0.5 hover:text-gray-900 dark:hover:text-white" on:click={() => navigate('/login')}>
                 <ArrowRightToBracketOutline size="lg" />
             </ToolbarButton>
