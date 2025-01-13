@@ -49,7 +49,8 @@
 		{ name: 'Конструктор онбординга', icon: EditOutline, href: '/builder' },
 		{ name: 'Соотношения', icon: TableRowOutline, href: '/names' },
 		{ name: 'Администраторы', icon: UserSettingsOutline, href: '/admin' },
-		{ name: 'Профиль', icon: CogOutline, href: '/profile' }
+		{ name: 'Профиль', icon: CogOutline, href: '/profile' },
+		{ name: 'Группы', icon: UsersGroupOutline, href: '/groups' },
 	];
 	let dropdowns = Object.fromEntries(Object.keys(posts).map((x) => [x, false]));
 

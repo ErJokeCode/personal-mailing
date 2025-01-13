@@ -54,9 +54,16 @@ public static partial class AdminHandler
         return Results.Ok(AdminUserDto.Map(admin));
     }
 
-    public static IResult GetAllAdmins(CoreDb db, int pageIndex = 0, int pageSize = -1)
+    public static IResult GetAllAdmins(CoreDb db, string search = null, int pageIndex = 0, int pageSize = -1)
     {
-        var dtos = AdminUserDto.Maps(db.Users.ToList());
+        var admins = db.Users.ToList();
+
+        if (!string.IsNullOrEmpty(search))
+        {
+            admins = admins.Where(a => a.Email.ToLower().Contains(search.ToLower())).ToList();
+        }
+
+        var dtos = AdminUserDto.Maps(admins);
 
         var paginated = new PaginatedList<AdminUserDto>(dtos.ToList(), pageIndex, pageSize);
 

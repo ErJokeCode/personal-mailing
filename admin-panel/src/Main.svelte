@@ -24,6 +24,8 @@
 
     import Builder from "./routes/onboarding/Builder.svelte";
     import Edit from "./routes/subjects/Edit.svelte";
+
+    import AssignGroup from "./routes/groups/AssignGroup.svelte";
 </script>
 
 <main>
@@ -51,6 +53,8 @@
     <Route path="/builder" component={Builder} />
     
     <Route path="/names" component={Edit} />
+
+    <Route path="/groups" component={AssignGroup} />
 </main>
 
 <style>

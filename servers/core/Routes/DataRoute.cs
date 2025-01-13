@@ -21,6 +21,7 @@ public static class DataRoute
 
         getGroup.MapGet("/permissions", DataHandler.GetAllPermissions);
         getGroup.MapGet("/text", DataHandler.GetText);
+        getGroup.MapGet("/groups", DataHandler.GetGroups);
     }
 
     public static void MapPost(RouteGroupBuilder group)

@@ -101,6 +101,16 @@ async function post_json(url, body, status) {
     }
 }
 
+async function put_json(url, body, status) {
+    let resp = await http_json(url, "Put", body, status);
+    try {
+        return await resp?.json();
+    }
+    catch {
+        return;
+    }
+}
+
 export default {
-    status, post, get, post_json,
+    status, post, get, post_json, put_json,
 }
