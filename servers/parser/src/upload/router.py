@@ -2,7 +2,6 @@ from datetime import datetime
 import asyncio 
 from fastapi import APIRouter, BackgroundTasks, HTTPException, UploadFile
 from config import s3_client, worker_db
-from src.upload.dict_names import upload_dict_names
 from src.upload.online_course import parse_info_online_courses, upload_report
 from src.schemas import HistoryUploadFile, HistoryUploadFileInDB, TypeFile
 
@@ -67,10 +66,6 @@ async def post_online_course_report(file: UploadFile) -> dict[str, str]:
     asyncio.create_task(background_online_course(file.file.read(), file.filename, file.size, file.headers, hist_info_db))
    
     return {"status": "success"}
-    
-@router_data.post("/dict_names")
-async def post_dict_modeus_inf(modeus:str = None, site_inf: str = None, file_course: str = None):
-    return upload_dict_names(modeus, site_inf, file_course, worker_db)
 
 @router_data.get("/history")
 async def get_history(limit: int = 1, type: TypeFile = None) -> list[HistoryUploadFileInDB]:

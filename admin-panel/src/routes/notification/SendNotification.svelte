@@ -234,14 +234,14 @@
                         </div>
                     </form>
                     <div class="w-1/2 ml-6">
-                        <Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl mb-6">
+                        <Heading tag="h1" class="mb-4 text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
                             Фильтры
                         </Heading>
-                        <div class="ml-2">
-                            <Checkbox class="mb-4 w-fit" bind:checked={notOnCourse}>Нет на курсе</Checkbox>
+                        <div class="ml-2 flex">
+                            <Checkbox class="mb-4 mr-5 w-fit" bind:checked={notOnCourse}>Нет на курсе</Checkbox>
                             <Checkbox class='mb-4 w-fit' bind:checked={lowScore}>Низкий балл</Checkbox>
                         </div>
-                        <div class="ml-2 mb-8 flex">
+                        <div class="ml-2 mb-4 flex">
                             <div class="mr-6 w-full space-y-4">
                                 <form>
                                     <Label class="space-y-2 mb-2">Номер курса</Label>
@@ -286,12 +286,12 @@
                                     <span>Предмет</span>
                                     <Input bind:value={subject} type="text" placeholder="Введите название предмета" size="md" />
                                 </Label>
-                                <Label class="space-y-2">
-                                    <span>Команда</span>
-                                    <Input bind:value={team} type="text" placeholder="Введите название команды" size="md" />
-                                </Label>
                             </div>
                         </div>
+                        <Label class="space-y-2 ml-2 mb-6">
+                            <span>Команда</span>
+                            <Input bind:value={team} type="text" placeholder="Введите название команды" size="md" />
+                        </Label>
                         <Button class='flex ml-2' on:click={load_students}>Применить</Button>
                     </div>
                 </div>
