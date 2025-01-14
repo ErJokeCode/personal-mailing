@@ -3,7 +3,7 @@ import asyncio
 from fastapi import APIRouter, BackgroundTasks, HTTPException, UploadFile
 from fastapi.responses import FileResponse
 from config import s3_client, worker_db
-from src.upload.online_course import parse_info_online_courses, upload_report
+from src.upload.online_course import parse_info_online_courses, update_info_from_inf, upload_report
 from src.schemas import HistoryUploadFile, HistoryUploadFileInDB, TypeFile
 
 from src.upload.student import upload_student
@@ -83,11 +83,19 @@ async def post_online_course_report(file: UploadFile) -> dict[str, str]:
     return {"status": "success"}
 
 @router_data.get("/report_online_course/example")
-async def get_example_file_online_course():
+async def get_example_file_online_course() -> dict[str, str]:
     return FileResponse(
         path="src/upload/example/example_online_course.xlsx", 
         filename="ОнлайнКурсы.xlsx", 
         media_type="multipart/form-data")
+    
+@router_data.post("/report_online_course/site_inf")
+async def update_online_course_inf():
+    asyncio.create_task(background_site_inf())
+    
+    return {"status": "success"}
+    
+    
 
 @router_data.get("/history")
 async def get_history(limit: int = 1, type: TypeFile = None) -> list[HistoryUploadFileInDB]:
@@ -167,3 +175,10 @@ async def background_online_course(file, filename, size, headers, hist_info_db: 
         print(e)
         hist_info_db.status_upload = "error"
         worker_db.history.update_one(hist_info_db, get_item=False)
+        
+async def background_site_inf():
+    try:
+        parse_info_online_courses(worker_db)
+        update_info_from_inf(worker_db)
+    except Exception as e:
+        print(e)

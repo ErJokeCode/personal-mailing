@@ -168,3 +168,21 @@ def update_collection(students: list, worker_db: WorkerDataBase):
                 "online_course" : student["courses"]}
         }, 
         get_item=False)
+
+
+def update_info_from_inf(worked_db: WorkerDataBase):
+    cl_st = worked_db.student.get_collect()
+    courses = worked_db.info_online_course.get_all(limit=-1)
+    
+    for course in courses:
+        cl_st.update_many({
+            "online_course.name" : course.name, 
+            "online_course.university" : course.university
+            }, 
+            {
+                "$set": {
+                    "online_course.$.date_start": course.date_start, 
+                    "online_course.$.deadline": course.deadline, 
+                    "online_course.$.info": course.info
+                }
+            })
