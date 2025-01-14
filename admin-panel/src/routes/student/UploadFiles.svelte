@@ -1,6 +1,7 @@
 <script lang="ts">
     import { Breadcrumb, BreadcrumbItem, Fileupload, Label, Button, Helper, Heading, A, Pagination } from 'flowbite-svelte';
     import { TableHeadCell, Table, TableBody, TableBodyCell, TableBodyRow, TableHead } from 'flowbite-svelte';
+    import { ChevronLeftOutline, ChevronRightOutline } from 'flowbite-svelte-icons';
     import { onMount } from "svelte";
     import http from "../../utils/http";
     import { navigate } from "svelte-routing";
@@ -16,10 +17,16 @@
     let history = [];
     let limit = -1;
 
+    let maxPage = 0;
+    let curPage = 0;
+    let amountPage = 10;
+    let select;
+
     onMount(async () => {
         status = status.start_load();
         history = (await http.get("/parser/upload/history?limit=" + limit.toString(), status)) ?? [];
         status = status.end_load();
+        maxPage = Math.floor(history.length / amountPage);
     });
 
     async function download_file(link) {
@@ -102,17 +109,31 @@
       }
 
 
+      const toPage = (page) => {
+        if (page < 0) {
+            page = 0;
+        } else if (page > maxPage) {
+            page = maxPage;
+        }
+        select.value = page;
+        curPage = page;
+      }
 
-let helper = { start: 1, end: 10, total: 100 };
+      async function update_inf() {
+        let result = await fetch(
+              'http://localhost:5000/parser/upload/report_online_course/site_inf',
+              {
+                  method: "POST",
+                  credentials: "include",
+              },
+          );
 
-const previous = () => {
-    if (helper.start == 1) return
-    helper.start -= 10
-};
-const next = () => {
-    if (helper.end == helper.total) return
-    helper.start += 10
-};
+          if (result.ok) {
+              courses_success = "Загружено";
+          } else {
+              courses_success = "Ошибка";
+          }
+      }
   </script>
 
 <div class="overflow-hidden lg:flex">
@@ -148,14 +169,24 @@ const next = () => {
                 <div style="display: flex; flex-direction: row; gap: 30px; align-items: baseline; margin-bottom: 20px">
                     <Heading tag="h3" class="w-100 text-xl font-semibold text-gray-900 dark:text-gray-100 sm:text-l">Курсы</Heading>
                     <A class="font-medium hover:underline text-sm" for="larg_size" href="http://localhost:5000/parser/upload/report_online_course/example">Скачать пример</A>
+                    <A class="font-medium hover:underline text-sm" for="larg_size" on:click={update_inf}>Обновить информацию с сайта inf-urfu</A>
                 </div>
                 <Fileupload value="" bind:files={courses_files} id="larg_size" size="lg" />
                 <Helper>{courses_success}</Helper>
                 <Button on:click={send_courses}>Загрузить</Button>
             </div>
-            <Heading tag="h2" class="text-xl font-semibold text-gray-900 dark:text-gray-100 sm:text-2xl">
+            <Heading tag="h2" class="text-xl font-semibold text-gray-900 dark:text-gray-100 sm:text-2xl mb-5">
                 История
             </Heading>
+            <div class="flex space-x-2">
+                <Button on:click={() => toPage(curPage - 1)}><ChevronLeftOutline size='lg' /></Button>
+                <select name="select" aria-label="Select" on:change={() => toPage(select.value)} bind:this={select} class="w-auto bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500">
+                    {#each [...Array(maxPage + 1).keys()] as page}
+                        <option value={page}>{page}</option>
+                    {/each}
+                </select>
+                <Button on:click={() => toPage(curPage + 1)}><ChevronRightOutline size='lg' /></Button>
+            </div>
         </div>
         <Table hoverable={true} class="mb-5">
             <TableHead>
@@ -166,7 +197,7 @@ const next = () => {
               <TableHeadCell class="px-8">Скачать</TableHeadCell>
             </TableHead>
             <TableBody>
-                {#each history as history_item}
+                {#each history.slice(curPage * amountPage, curPage * amountPage + amountPage) as history_item}
                     <TableBodyRow
                         role="link"
                         class="contrast">
@@ -181,19 +212,5 @@ const next = () => {
               {/each}
             </TableBody>
         </Table>
-        <!-- <div class="flex flex-col items-center justify-center gap-2">
-            <div class="text-sm text-gray-700 dark:text-gray-400">
-              Showing <span class="font-semibold text-gray-900 dark:text-white">{helper.start}</span>
-              to
-              <span class="font-semibold text-gray-900 dark:text-white">{helper.end}</span>
-              of
-              <span class="font-semibold text-gray-900 dark:text-white">{helper.total}</span>
-              Entries
-            </div>
-          
-            <Pagination table large>
-              <span slot="prev">Prev</span>
-            </Pagination>
-        </div> -->
     </div>
 </div>
