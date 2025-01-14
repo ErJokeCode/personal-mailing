@@ -80,6 +80,7 @@ public static class Startup
         Action<IBusRegistrationConfigurator> busOptions = options =>
         {
             options.AddConsumer<ChatConsumer.StudentSentMessageConsumer>();
+            options.AddConsumer<ChatConsumer.ChatReadConsumer>();
 
             Action<IBusRegistrationContext, IRabbitMqBusFactoryConfigurator> busContext = (context, cfg) =>
             {

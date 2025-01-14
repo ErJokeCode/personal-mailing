@@ -1,8 +1,10 @@
 using System.Threading.Tasks;
 using Core.Identity;
+using Core.Messages;
 using Core.Models;
 using Core.Models.Dto;
 using Core.Utility;
+using MassTransit;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -49,5 +51,30 @@ public static partial class ChatHandler
         await db.SaveChangesAsync();
 
         return Results.Ok(MessageDto.Map(message));
+    }
+
+    public static async Task<IResult> MakeChatRead(int id, CoreDb db, IPublishEndpoint endpoint)
+    {
+        var chat = await db.Chats.Include(ch => ch.Messages)
+                       .ThenInclude(m => m.Status)
+                       .Include(ch => ch.Admin)
+                       .SingleOrDefaultAsync(ch => ch.Id == id);
+
+        foreach (var message in chat.Messages)
+        {
+            message.Status.SetRead();
+        }
+
+        chat.UnreadCount = 0;
+
+        await endpoint.Publish(new ChatRead()
+        {
+            ChatId = chat.Id,
+            AdminId = chat.Admin.Id,
+        });
+
+        await db.SaveChangesAsync();
+
+        return Results.Ok();
     }
 }

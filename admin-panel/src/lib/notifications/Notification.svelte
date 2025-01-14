@@ -2,7 +2,7 @@
 	export let when: string = '';
 </script>
 
-<div
+<div on:click
 	class="flex gap-2 border-b px-4 py-3 hover:bg-gray-100 dark:border-gray-600 dark:hover:bg-gray-600"
 >
 	<div class="w-full pl-3">

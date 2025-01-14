@@ -38,5 +38,7 @@ public static class ChatRoute
     {
         group.MapPut("/message/{id}/setStatus/{code}", ChatHandler.SetMessageStatus)
             .AddPermission(Permissions.SendNotifications);
+
+        group.MapPut("/{id}/read", ChatHandler.MakeChatRead).AddPermission(Permissions.SendNotifications);
     }
 }

@@ -1,19 +1,33 @@
 <script>
 	import { Breadcrumb, BreadcrumbItem, Button, Heading, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
 	import { ArrowRightOutline } from 'flowbite-svelte-icons';
-    import { onMount } from "svelte";
+    import { onMount, onDestroy } from "svelte";
     import { Link, navigate } from "svelte-routing";
     import http from "../../utils/http";
+	import { signal } from '../../utils/signal';
 
     let chats = [];
     let status = http.status();
 
     onMount(async () => {
+        await getChats();
+
+		signal.on('StudentSentMessage', handleMessage);
+    });
+
+	onDestroy(async () => {
+		signal.off('StudentSentMessage', handleMessage);
+	});
+
+    async function getChats() {
         status = status.start_load();
         chats = (await http.get("/core/admin/chats", status)).items ?? [];
         status = status.end_load();
-    });
+    }
 
+    async function handleMessage(message) {
+        await getChats();
+    }
     async function open_chat(id, studentId) {
         navigate(`/chat/${studentId}`);
     }
@@ -36,7 +50,7 @@
             </div>
             <Table>
                 <TableHead>
-                    {#each ['Электронная почта', 'Чат'] as title}
+                    {#each ['Электронная почта', 'Чат', 'Непрочитанных'] as title}
                         <TableHeadCell class="ps-8">{title}</TableHeadCell>
                     {/each}
                 </TableHead>
@@ -51,6 +65,7 @@
                                     <ArrowRightOutline size="sm" />
                                 </Button>
                             </TableBodyCell>
+                            <TableBodyCell class="px-8">{chat.unreadCount}</TableBodyCell>
                         </TableBodyRow>
                     {/each}
                 </TableBody>

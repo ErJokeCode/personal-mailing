@@ -14,4 +14,13 @@ public static class ChatConsumer
             await user.SendAsync("StudentSentMessage", context.Message);
         }
     }
+
+    public class ChatReadConsumer : IConsumer<ChatRead>
+    {
+        public async Task Consume(ConsumeContext<ChatRead> context)
+        {
+            var user = BaseConsumer.Hub.Clients.User(context.Message.AdminId);
+            await user.SendAsync("StudentSentMessage", context.Message);
+        }
+    }
 }
