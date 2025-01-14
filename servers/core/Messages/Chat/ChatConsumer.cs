@@ -20,7 +20,7 @@ public static class ChatConsumer
         public async Task Consume(ConsumeContext<ChatRead> context)
         {
             var user = BaseConsumer.Hub.Clients.User(context.Message.AdminId);
-            await user.SendAsync("StudentSentMessage", context.Message);
+            await user.SendAsync("ChatRead", context.Message);
         }
     }
 }
