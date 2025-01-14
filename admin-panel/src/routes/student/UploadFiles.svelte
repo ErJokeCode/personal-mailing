@@ -137,18 +137,18 @@
         </div>
         <Table hoverable={true}>
             <TableHead>
-              <TableHeadCell class="px-8">Название файла</TableHeadCell>
-              <TableHeadCell class="px-8 w-1/6" defaultSort>Дата загрузки</TableHeadCell>
-              <TableHeadCell class="px-8">Тип</TableHeadCell>
-              <TableHeadCell class="px-8">Статус загрузки</TableHeadCell>
-              <TableHeadCell class="px-8">Скачать</TableHeadCell>
+                <TableHeadCell class="px-8">Название файла</TableHeadCell>
+                <TableHeadCell class="px-8 w-1/6" defaultSort>Дата загрузки</TableHeadCell>
+                <TableHeadCell class="px-8">Тип</TableHeadCell>
+                <TableHeadCell class="px-8">Статус загрузки</TableHeadCell>
+                <TableHeadCell class="px-8">Скачать</TableHeadCell>
             </TableHead>
             <TableBody>
                 {#each history as history_item}
                     <TableBodyRow
                         role="link"
                         class="contrast">
-                        <TableBodyCell class="px-8">{history_item.name_file}</TableBodyCell>
+                        <TableBodyCell class="px-8 overflow-hidden text-ellipsis" style='width-60dvh; max-width: 50dvw'>{history_item.name_file}</TableBodyCell>
                         <TableBodyCell class="px-8">{history_item.date.slice(0, 10) + " " + history_item.date.slice(11, 19)}</TableBodyCell>
                         <TableBodyCell class="px-8">{history_item.type == "student" ? "Загрузка студентов" : history_item.type == "modeus" ? "Выгрузка модеус" : "Онлайн курс"}</TableBodyCell>
                         <TableBodyCell class="px-8">{history_item.status_upload == null ? "Загружается" : history_item.status_upload == "success" ? "Успешно" : "Ошибка"}</TableBodyCell>

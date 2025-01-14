@@ -1,5 +1,5 @@
 <script>
-	import { Label, Input, Button, Helper, Checkbox } from 'flowbite-svelte';
+	import { Label, Input, Button } from 'flowbite-svelte';
 	import { Breadcrumb, BreadcrumbItem, Heading } from 'flowbite-svelte';
     import { Link } from "svelte-routing";
     import http from "../../utils/http.js";

@@ -5,14 +5,55 @@
 
 	import { onMount } from "svelte";
     import { Link } from "svelte-routing";
-    import http from "../../utils/http";
     import { CirclePlusOutline } from 'flowbite-svelte-icons';
 
-    // onMount(async () => {
-    //     studentStatus = studentStatus.start_load();
-    //     activeStudents = (await http.get("/core/student", studentStatus)).items ?? [];
-    //     studentStatus = studentStatus.end_load();
-    // });
+    let allsubjectNames = []
+    let allCourseNames = []
+
+    onMount(async () => load());
+    
+    const load = async () => {
+        let response;
+        try {
+            response = await fetch("http://localhost:5000/parser/bot/onboard/", {
+                credentials: "include",
+            });
+        } catch (err) {
+            console.log(err)
+        }
+        let json = await response?.json();
+        allCourseNames = json;
+    }
+  
+    async function save(id) {
+        let res = null;
+        for (let course of allCourseNames) {
+            if (course._id === id) {
+                res = course;
+            }
+        }
+        if (res === null) return;
+
+        console.log("Сохранение...");
+
+        let body = JSON.stringify(res);
+  
+        let result = await fetch(`http://localhost:5000/parser/bot/onboard/${id}`, {
+            method: "PUT",
+            headers: {
+                'Accept': 'application/json, */*',
+                'Content-Type': 'application/json'
+            },
+            body: body,
+            credentials: "include",
+        });
+  
+        if (result.ok) {
+            console.log("Сохранено");
+        } else {
+            console.log("Ошибка");
+        }
+    }
 
     let rows = [0, 0, 0];
 
@@ -33,9 +74,12 @@
                         1 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>Главная</Link>
                     <BreadcrumbItem>Редактор соотношений</BreadcrumbItem>
                 </Breadcrumb>
-                <Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
+                <Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl mb-4">
                     Соотношения
                 </Heading>
+                <Button>
+                    Сохранить всё
+                </Button>
             </div>
             <Table hoverable={true}>
                 <TableHead>

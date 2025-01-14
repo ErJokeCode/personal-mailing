@@ -39,14 +39,27 @@
             </div>
             <Table hoverable={true}>
                 <TableHead>
-                    <TableHeadCell class="px-8">ID</TableHeadCell>
                     <TableHeadCell class="px-8">Почта</TableHeadCell>
+                    <TableHeadCell class="px-8">Курс</TableHeadCell>
+                    <TableHeadCell class="px-8">Группа</TableHeadCell>
+                    <TableHeadCell class="px-8">Фамилия</TableHeadCell>
+                    <TableHeadCell class="px-8">Имя</TableHeadCell>
+                    <TableHeadCell class="px-8">Отчество</TableHeadCell>
+                    <TableHeadCell class="px-8">Тип</TableHeadCell>
+                    <TableHeadCell class="px-8">Номер студенческого</TableHeadCell>
                 </TableHead>
                 <TableBody>
                     {#each activeStudents as student}
+                        {console.log(student)}
                         <TableBodyRow on:click={() => fullInfo(student.id)}>
-                            <TableBodyCell class="px-8">{student.id}</TableBodyCell>
-                            <TableBodyCell class="px-8">{student.email}</TableBodyCell>
+                            <TableBodyCell class="px-8">{student.info.email}</TableBodyCell>
+                            <TableBodyCell class="px-8">{student.info.group.numberCourse}</TableBodyCell>
+                            <TableBodyCell class="px-8">{student.info.group.number}</TableBodyCell>
+                            <TableBodyCell class="px-8">{student.info.surname}</TableBodyCell>
+                            <TableBodyCell class="px-8">{student.info.name}</TableBodyCell>
+                            <TableBodyCell class="px-8">{student.info.patronymic}</TableBodyCell>
+                            <TableBodyCell class="px-8">{student.info.typeOfCost}</TableBodyCell>
+                            <TableBodyCell class="px-8">{student.info.personalNumber}</TableBodyCell>
                         </TableBodyRow>
                     {/each}
                 </TableBody>

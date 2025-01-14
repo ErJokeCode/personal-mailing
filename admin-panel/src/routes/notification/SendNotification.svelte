@@ -303,8 +303,8 @@
                 <TableHead class="border-y border-gray-200 bg-gray-100 dark:border-gray-700">
                     <TableHeadCell class="w-4 p-4 pl-8 font-medium"><Checkbox on:click={(e) => toggle(e.target)} /></TableHeadCell>
                     <TableHeadCell class="w-4 p-4 font-medium">Курс</TableHeadCell>
-                    <TableHeadCell class="w-4 p-4 font-medium">Имя</TableHeadCell>
                     <TableHeadCell class="w-4 p-4 font-medium">Фамилия</TableHeadCell>
+                    <TableHeadCell class="w-4 p-4 font-medium">Имя</TableHeadCell>
                     <TableHeadCell class="w-4 p-4 font-medium">Отчество</TableHeadCell>
                     <TableHeadCell class="w-1/12 p-4 font-medium">Группа</TableHeadCell>
                     <TableHeadCell class="w-1/6 p-4 font-medium">Направление</TableHeadCell>
@@ -320,10 +320,10 @@
                                 {student.info.group.numberCourse}
                             </TableBodyCell>
                             <TableBodyCell class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
-                                {student.info.name}
+                                {student.info.surname}
                             </TableBodyCell>
                             <TableBodyCell class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
-                                {student.info.surname}
+                                {student.info.name}
                             </TableBodyCell>
                             <TableBodyCell class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
                                 {student.info.patronymic}
@@ -334,7 +334,7 @@
                             <TableBodyCell class="max-w-sm flex items-center space-x-6 whitespace-nowrap p-4">
                                 <div class="text-sm font-normal text-gray-500 dark:text-gray-400">
                                     <div class="text-base font-semibold text-gray-900 dark:text-white">{student.info.group.directionCode}</div>
-                                    <div class="text-sm font-normal text-gray-500 dark:text-gray-400">{student.info.group.nameSpeciality}</div>
+                                    <div class="text-sm font-normal text-gray-500 dark:text-gray-400 overflow-hidden text-ellipsis" style='width-60dvh; max-width: 15dvw'>{student.info.group.nameSpeciality}</div>
                                 </div>
                             </TableBodyCell>
                             <TableBodyCell class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">

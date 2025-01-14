@@ -6,11 +6,20 @@
 		Breadcrumb,
 		BreadcrumbItem,
 		Button,
-		Checkbox,
-		Heading,
-        Label,
-        Input
+        Input,
+        Table,
+        TableHead,
+        TableHeadCell,
+        TableBody,
+        TableBodyRow,
+        TableBodyCell,
+        Heading,
+
+        Helper
+
 	} from 'flowbite-svelte';
+
+    import { Link } from 'svelte-routing'
 
     let groups = {};
     let searchGroup = "";
@@ -63,7 +72,11 @@
     }
 
     async function handleGroupChoose(group) {
-        chosenGroup = group;
+        if (chosenGroup === group) {
+            chosenGroup = '';
+        } else {
+            chosenGroup = group;
+        }
     }
 
     async function handleAdminChoose(adminId) {
@@ -90,63 +103,82 @@
 </script>
 
 <div class="overflow-hidden lg:flex">
-    <div class="relative h-full w-full overflow-y-auto lg:ml-64 pt-[70px]">
-        <div
-            class="flex relative h-full w-full overflow-y-auto bg-white dark:bg-gray-800"
-        >
-            <div class="p-4 px-6">
-                <input
-                    bind:value={searchGroup}
-                    on:keypress={handleGroupInput}
-                    type="text"
-                    placeholder="Поиск"
-                />
-                <table>
-                    <thead>
-                        <tr>
-                            <td>Группа</td>
-                            <td>Админ</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {#each Object.entries(groups) as [group, admin]}
-                            <tr>
-                                <td>{group}</td>
-                                <td
-                                    ><Button
-                                        on:click={() =>
-                                            handleGroupChoose(group)}
-                                        >{admin.email}</Button
-                                    ></td
-                                >
-                            </tr>
-                        {/each}
-                    </tbody>
-                </table>
-            </div>
-            <div class="">
-                <div>{chosenGroup}</div>
-                <input
-                    bind:value={searchAdmin}
-                    type="text"
-                    on:keypress={handleAdminInput}
-                    placeholder="Поиск"
-                />
-                <table class="">
-                    <tbody>
-                        {#each admins as admin}
-                            <tr>
-                                <td
-                                    ><Button
-                                        on:click={() =>
-                                            handleAdminChoose(admin.id)}
-                                        >{admin.email}</Button
-                                    ></td
-                                >
-                            </tr>
-                        {/each}
-                    </tbody>
-                </table>
+    <div class="relative h-full w-full overflow-y-auto lg:ml-64 pt-[70px] dark:text-white">
+        <div class="relative h-full w-full overflow-y-auto bg-white dark:bg-gray-800 p-4 px-6">
+            <Breadcrumb class="mb-5">
+                <Link class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                    to="/"><svg class="w-4 h-4 me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 01
+                    1 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>Главная</Link>
+                <BreadcrumbItem>Группы</BreadcrumbItem>
+            </Breadcrumb>
+            <Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl flex justify-between items-end mb-5">
+                Группы
+            </Heading>
+            <div class="flex">
+                <div class="mr-6 w-full">
+                    <Input
+                        bind:value={searchGroup}
+                        on:keypress={handleGroupInput}
+                        type="text"
+                        placeholder="Поиск по группам"
+                        class='mb-1 w-1/2'
+                    />
+                    <Helper class='mb-6'>Выберите группу:</Helper>
+                    <Table>
+                        <TableHead>
+                            <TableHeadCell>Группа</TableHeadCell>
+                            <TableHeadCell>Админ</TableHeadCell>
+                            <TableHeadCell class='w-1/4'></TableHeadCell>
+                        </TableHead>
+                        <TableBody>
+                            {#each Object.entries(groups).sort() as [group, admin]}
+                                <TableBodyRow>
+                                    <TableBodyCell class='py-2'>{group}</TableBodyCell>
+                                    <TableBodyCell class='py-2'>{admin.email}</TableBodyCell>
+                                    <TableBodyCell class='py-2'>
+                                        <Button
+                                            on:click={() =>
+                                                handleGroupChoose(group)}
+                                            >Изменить
+                                        </Button>
+                                    </TableBodyCell>
+                                </TableBodyRow>
+                            {/each}
+                        </TableBody>
+                    </Table>
+                </div>
+                <div class="w-full">
+                    <div class="absolute" style="top: 5.25rem;">{chosenGroup}</div>
+                    <Input
+                        bind:value={searchAdmin}
+                        type="text"
+                        on:keypress={handleAdminInput}
+                        placeholder="Поиск по админам"
+                        class='mb-1 w-1/2'
+                    />
+                    <Helper class='mb-6'>Выберите админа:</Helper>
+                    <Table>
+                        <TableHead>
+                            <TableHeadCell>Админ</TableHeadCell>
+                            <TableHeadCell class='w-1/2'></TableHeadCell>
+                        </TableHead>
+                        <TableBody>
+                            {#each admins as admin}
+                                <TableBodyRow>
+                                    <TableBodyCell class='py-2'>{admin.email}</TableBodyCell>
+                                    <TableBodyCell class='py-2'>
+                                        <Button
+                                            on:click={() =>
+                                                handleAdminChoose(admin.id)}
+                                            >Выбрать
+                                        </Button>
+                                    </TableBodyCell>
+                                </TableBodyRow>
+                            {/each}
+                        </TableBody>
+                    </Table>
+                </div>
             </div>
         </div>
     </div>
