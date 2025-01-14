@@ -1,6 +1,7 @@
 from datetime import datetime
 import asyncio 
 from fastapi import APIRouter, BackgroundTasks, HTTPException, UploadFile
+from fastapi.responses import FileResponse
 from config import s3_client, worker_db
 from src.upload.online_course import parse_info_online_courses, upload_report
 from src.schemas import HistoryUploadFile, HistoryUploadFileInDB, TypeFile
@@ -27,6 +28,14 @@ async def upload_data_student(file: UploadFile) -> dict[str, str]:
     
     return {"status": "success"}
 
+@router_data.get("/student/example")
+async def get_example_file_student():
+    return FileResponse(
+        path="src/upload/example/example_students.xls", 
+        filename="Студенты.xls", 
+        media_type="multipart/form-data")
+    
+
 @router_data.post("/choice_in_modeus")
 async def post_choice_in_modeus(file: UploadFile) -> dict[str, str]:
     hist = await get_history(type=TypeFile.student)
@@ -38,13 +47,19 @@ async def post_choice_in_modeus(file: UploadFile) -> dict[str, str]:
         raise HTTPException(status_code=400, detail=f"Wait for the {hist[0].name_file} file to be processed")
     
     
-    
     hist_info = await s3_client.create_hist_file(file, TypeFile.modeus, is_upload=False)
     hist_info_db = worker_db.history.insert_one(hist_info)
     
     asyncio.create_task(background_modeus(file.file.read(), file.filename, file.size, file.headers, hist_info_db))
    
     return {"status": "success"}
+
+@router_data.get("/choice_in_modeus/example")
+async def get_example_file_modeus():
+    return FileResponse(
+        path="src/upload/example/example_modeus.xlsx", 
+        filename="Модеус.xlsx", 
+        media_type="multipart/form-data")
 
 @router_data.post("/report_online_course")
 async def post_online_course_report(file: UploadFile) -> dict[str, str]:
@@ -66,6 +81,13 @@ async def post_online_course_report(file: UploadFile) -> dict[str, str]:
     asyncio.create_task(background_online_course(file.file.read(), file.filename, file.size, file.headers, hist_info_db))
    
     return {"status": "success"}
+
+@router_data.get("/report_online_course/example")
+async def get_example_file_online_course():
+    return FileResponse(
+        path="src/upload/example/example_online_course.xlsx", 
+        filename="ОнлайнКурсы.xlsx", 
+        media_type="multipart/form-data")
 
 @router_data.get("/history")
 async def get_history(limit: int = 1, type: TypeFile = None) -> list[HistoryUploadFileInDB]:
