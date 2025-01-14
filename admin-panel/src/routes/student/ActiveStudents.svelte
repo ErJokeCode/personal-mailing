@@ -3,9 +3,10 @@
 	import { Table, TableBody, TableBodyCell, TableBodyRow, TableHead } from 'flowbite-svelte';
 	import { TableHeadCell } from 'flowbite-svelte';
 
-	import { onMount } from "svelte";
+	import { onDestroy, onMount } from "svelte";
     import { Link, navigate } from "svelte-routing";
     import http from "../../utils/http";
+    import {signal} from "../../utils/signal";
 
     let activeStudents = [];
 
@@ -15,7 +16,17 @@
         studentStatus = studentStatus.start_load();
         activeStudents = (await http.get("/core/student", studentStatus)).items ?? [];
         studentStatus = studentStatus.end_load();
+
+        signal.on("NewActiveStudent", handleNewStudent);
     });
+
+    onDestroy(async () => {
+        signal.off("NewActiveStudent", handleNewStudent);
+    })
+
+    async function handleNewStudent(message) {
+        activeStudents.push(message.activeStudent);
+    }
 
     async function fullInfo(id) {
         navigate(`/students/active/${id}`);
