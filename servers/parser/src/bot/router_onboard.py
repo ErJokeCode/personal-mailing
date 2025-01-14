@@ -202,7 +202,12 @@ async def get_course(id: str) -> OnboardCourseInDB:
     
     
 @router_bot_onboard.get("/")
-async def get_courses() -> list[OnboardCourseInDB]:
+async def get_courses(is_active: bool = None, is_main: bool = None) -> list[OnboardCourseInDB]:
+    keys = {}
+    if is_active is not None:
+        keys["is_active"] = is_active
+    if is_main is not None:
+        keys["is_main"] = is_main
     try:
         collection_bot = worker_db.bot_onboard.get_collect()
     except Exception as e:
@@ -210,7 +215,7 @@ async def get_courses() -> list[OnboardCourseInDB]:
         raise HTTPException(status_code=500, detail="Error DB")
     try:
         courses = []
-        for course in collection_bot.find({}):
+        for course in collection_bot.find(keys):
             courses.append(OnboardCourseInDB(**course))
         return courses
     except Exception as e:
