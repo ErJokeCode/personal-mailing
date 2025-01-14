@@ -51,6 +51,10 @@
   
       if (result.ok) {
         student_success = "Загружено";
+        status = status.start_load();
+        history = (await http.get("/parser/upload/history?limit=" + limit.toString(), status)) ?? [];
+        status = status.end_load();
+        maxPage = Math.floor(history.length / amountPage);
       } else {
         student_success = "Ошибка";
       }
@@ -76,7 +80,11 @@
           );
   
           if (result.ok) {
-              modeus_success = "Загружено";
+                modeus_success = "Загружено";
+                status = status.start_load();
+                history = (await http.get("/parser/upload/history?limit=" + limit.toString(), status)) ?? [];
+                status = status.end_load();
+                maxPage = Math.floor(history.length / amountPage);
           } else {
               modeus_success = "Ошибка";
           }
@@ -102,7 +110,11 @@
           );
   
           if (result.ok) {
-              courses_success = "Загружено";
+                courses_success = "Загружено";
+                status = status.start_load();
+                history = (await http.get("/parser/upload/history?limit=" + limit.toString(), status)) ?? [];
+                status = status.end_load();
+                maxPage = Math.floor(history.length / amountPage);
           } else {
               courses_success = "Ошибка";
           }
@@ -190,11 +202,11 @@
         </div>
         <Table hoverable={true} class="mb-5">
             <TableHead>
-              <TableHeadCell class="px-8">Название файла</TableHeadCell>
-              <TableHeadCell class="px-8 w-1/6" defaultSort>Дата загрузки</TableHeadCell>
-              <TableHeadCell class="px-8">Тип</TableHeadCell>
-              <TableHeadCell class="px-8">Статус загрузки</TableHeadCell>
-              <TableHeadCell class="px-8">Скачать</TableHeadCell>
+                <TableHeadCell class="px-8">Название файла</TableHeadCell>
+                <TableHeadCell class="px-8 w-1/6" defaultSort>Дата загрузки</TableHeadCell>
+                <TableHeadCell class="px-8">Тип</TableHeadCell>
+                <TableHeadCell class="px-8">Статус загрузки</TableHeadCell>
+                <TableHeadCell class="px-8">Скачать</TableHeadCell>
             </TableHead>
             <TableBody>
                 {#each history.slice(curPage * amountPage, curPage * amountPage + amountPage) as history_item}
@@ -209,7 +221,7 @@
                             <A class='flex ml-2' href={history_item.link}>Скачать</A>
                         </TableBodyCell>
                     </TableBodyRow>
-              {/each}
+                {/each}
             </TableBody>
         </Table>
     </div>
