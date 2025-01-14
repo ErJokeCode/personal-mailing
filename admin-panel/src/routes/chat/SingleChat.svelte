@@ -8,6 +8,7 @@
 
 	export let studentId;
 
+    let chatId = 0;
 	let content = '';
 	let status = http.status();
 	let messages = [];
@@ -22,6 +23,8 @@
 		student = json?.student ?? {};
 		admin = json?.admin ?? {};
 		messages = json?.messages ?? [];
+        chatId = json?.id ?? 0;
+        await http.put_json("/core/chat/" + chatId + "/read", {}, http.status());
 	}
 
 	async function send_message() {

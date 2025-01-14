@@ -3,6 +3,7 @@
     import http from "../../utils/http";
     import { admin } from "../../utils/store.js";
     import { navigate } from 'svelte-routing';
+    import { signal } from "../../utils/signal.js";
 
     let email = "";
     let password = "";
@@ -24,6 +25,9 @@
 
         let the_admin = await http.get("/core/admin/me", http.status());
         admin.update((_) => the_admin);
+
+        await signal.stop();
+        await signal.start();
         
         if (status.value === "✓") navigate("/profile");
     }
