@@ -2,31 +2,32 @@ from fastapi import HTTPException
 import numpy as np
 import pandas as pd
 from config import WorkerDataBase
-from src.schemas import StudentInDB, StudentInTeam, Subject, SubjectInStudent, Team, TeamInSubjectInStudent, TypeFormSubject
+from src.schemas import StudentInDB, StudentInTeam, Subject, SubjectInStudent, Team, TeamInSubjectInStudent, TypeFormSubject, HistoryUploadFileInDB
 
 
-def upload_modeus(link: str, worker_db: WorkerDataBase) -> dict[str, str]:
+def upload_modeus(hist: HistoryUploadFileInDB, worker_db: WorkerDataBase) -> dict[str, str]:
     try:
+        link = hist.link
         df = pd.read_excel(link, sheet_name=0)
     except Exception as e:
         print(e)
+        hist.status_upload = "Error file read"
+        worker_db.history.update_one(hist, get_item=False)
         raise HTTPException(status_code=500, detail="File read error")
 
-    fill_subjects(df, worker_db)
-    fill_students(df, worker_db)
-            
-    try:
-        pass
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=500, detail="Error insert data")
+    fill_subjects(df, worker_db, hist)
+    fill_students(df, worker_db, hist)
     
     return {"status": "success"}
 
-def fill_subjects(df: pd.DataFrame, worker_db: WorkerDataBase):
+def fill_subjects(df: pd.DataFrame, worker_db: WorkerDataBase, hist: HistoryUploadFileInDB):
     worker_db.subject.delete_many()
-    
-    data = df.groupby(["РМУП название", "МУП или УК", "Частный план название"])[["Студент", "Специальность", "Сотрудники", "Группа название"]]
+    try:
+        data = df.groupby(["РМУП название", "МУП или УК", "Частный план название"])[["Студент", "Специальность", "Сотрудники", "Группа название"]]
+    except Exception as e:
+        print(e)
+        hist.status_upload = f"Error work with file. Use stucture file example"
+        worker_db.history.update_one(hist, get_item=False)        
     
     for key, info in data:
         teams: list[Team] = []
@@ -70,8 +71,13 @@ def fill_subjects(df: pd.DataFrame, worker_db: WorkerDataBase):
         
         worker_db.subject.insert_one(subject)
 
-def fill_students(df: pd.DataFrame, worker_db: WorkerDataBase):
-    data = df.groupby(["Студент", "Поток", "Специальность", "Профиль"])[["РМУП название", "Частный план название", "Группа название", "МУП или УК"]]
+def fill_students(df: pd.DataFrame, worker_db: WorkerDataBase, hist: HistoryUploadFileInDB):
+    try:
+        data = df.groupby(["Студент", "Поток", "Специальность", "Профиль"])[["РМУП название", "Частный план название", "Группа название", "МУП или УК"]]
+    except Exception as e:
+        print(e)
+        hist.status_upload = f"Error work with file. Use stucture file example"
+        worker_db.history.update_one(hist, get_item=False)    
     
     for key, value in data:
         surname, name, patronymic = get_split_fio(key[0])
