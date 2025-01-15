@@ -32,7 +32,7 @@ def courses(courses_data) -> InlineKeyboardMarkup:
 
 def FAQ() -> InlineKeyboardMarkup:
     #Создание разделов вопросов
-    btns = [ [InlineKeyboardButton(text=topic.topic, callback_data="faq_" + topic.callback_data)] for topic in MANAGER_FAQ.get_list_topics()]
+    btns = [ [InlineKeyboardButton(text=topic.name, callback_data="faq_" + topic.id)] for topic in MANAGER_FAQ.get_list_topics()]
     btns.append([InlineKeyboardButton(text="Назад", callback_data="main_menu")])
     return InlineKeyboardMarkup(inline_keyboard=btns)
 

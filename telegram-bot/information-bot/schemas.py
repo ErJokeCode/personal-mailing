@@ -1,6 +1,7 @@
-from typing import List, Optional
-from pydantic import BaseModel, Field
+from typing import List, Optional, Annotated
+from pydantic import BaseModel, Field, BeforeValidator
 
+PyObjectId = Annotated[str, BeforeValidator(str)]
 
 
 class OnboardTopic(BaseModel):
@@ -20,15 +21,12 @@ class OnboardCourse(BaseModel):
     is_active: bool = True
     sections: List[OnboardSection]
     
-
-
+    
 class FAQ(BaseModel):
-    topic: str
-    callback_data: str
     question: str
     answer: str
-    
-    
+
 class FAQTopic(BaseModel):
-    topic: str
-    callback_data: str
+    id: Optional[PyObjectId] = Field(alias="_id", default=None)
+    name: str
+    faqs: list[FAQ] = []

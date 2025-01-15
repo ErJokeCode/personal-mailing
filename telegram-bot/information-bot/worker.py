@@ -63,23 +63,21 @@ class ManegerOnboarding():
         
 class ManagerFaq():
     def __init__(self):
-        self.__data = []
-        self.__list_topics = []
+        self.__data: list[FAQTopic] = []
         
     def update_data(self, data: list[dict]):
-        self.__data = data
+        self.__data: list[FAQTopic] = []
+        for t in data:
+            self.__data.append(FAQTopic(**t))
         
-    def update_list_topics(self, data: list[dict]):
-        self.__list_topics = []
-        for topic in data:
-            topic = FAQTopic(**topic)
-            self.__list_topics.append(topic)
-        
-    def get_all(self, callback_data: str) -> list[FAQ]:
-        return [FAQ(**i) for i in self.__data if i["callback_data"] == callback_data]
+    def get_all(self, id: str) -> FAQTopic | None:
+        for t in self.__data:
+            if t.id == id:
+                return t
+        return None
     
     def get_list_topics(self) -> list[FAQTopic]:
-        return self.__list_topics
+        return self.__data
     
 
 
@@ -94,10 +92,9 @@ class Worker:
         self.manager_onboarding = manager
         self.url_update_onb = url_update
         
-    def add_manager_faq(self, manager: ManagerFaq, url_update_data: str, url_update_topic: str):
+    def add_manager_faq(self, manager: ManagerFaq, url_update_data: str):
         self.manager_faq = manager
         self.url_update_faq = url_update_data
-        self.url_update_faq_topic = url_update_topic
 
     async def work(self):
         if self.manager_onboarding == None:
@@ -134,12 +131,6 @@ class Worker:
                     self.manager_faq.update_data(data)
                 else:
                     self.logger.error(f"Error update faq data {response.status}")
-                    
-            async with session.get(f"{self.url_update_faq_topic}", headers=headers) as response:
-                if response.status == 200:
-                    data = await response.json()
-                    self.manager_faq.update_list_topics(data)
-                else:
-                    self.logger.error(f"Error update faq topic data {response.status}")
+                
                         
                 
