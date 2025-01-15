@@ -59,9 +59,9 @@
                         <TableBodyRow on:click={() => fullInfo(notification.id)}>
                             <TableBodyCell class="px-8 break-all">{notification.content.length > 50 ? notification.content.slice(0, 50) : notification.content}</TableBodyCell>
                             <TableBodyCell class="px-8">{notification.date}</TableBodyCell>
-                            <TableBodyCell class="px-8 overflow-hidden text-ellipsis" style='width-60dvh; max-width: 50dvw'>
+                            <TableBodyCell class="px-8 overflow-hidden text-ellipsis" style='max-width: 50dvw'>
                                 {#each notification.students as student}
-                                    {student.email},
+                                    {student.email},&nbsp;
                                 {/each}
                             </TableBodyCell>
                         </TableBodyRow>

@@ -222,8 +222,8 @@
                                 multiple bind:files>
                                 <svg aria-hidden="true" class="mb-3 w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
                                 {#if value.length === 0}
-                                    <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
+                                    <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Перетащите сюда файлы</span> </p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Либо нажмите, чтобы загрузить</p>
                                 {:else}
                                     <p class="text-xs text-gray-500 dark:text-gray-400">{showFiles(value)}</p>
                                 {/if}
@@ -334,7 +334,7 @@
                             <TableBodyCell class="max-w-sm flex items-center space-x-6 whitespace-nowrap p-4">
                                 <div class="text-sm font-normal text-gray-500 dark:text-gray-400">
                                     <div class="text-base font-semibold text-gray-900 dark:text-white">{student.info.group.directionCode}</div>
-                                    <div class="text-sm font-normal text-gray-500 dark:text-gray-400 overflow-hidden text-ellipsis" style='width-60dvh; max-width: 15dvw'>{student.info.group.nameSpeciality}</div>
+                                    <div class="text-sm font-normal text-gray-500 dark:text-gray-400 overflow-hidden text-ellipsis" style='max-width: 15dvw'>{student.info.group.nameSpeciality}</div>
                                 </div>
                             </TableBodyCell>
                             <TableBodyCell class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">

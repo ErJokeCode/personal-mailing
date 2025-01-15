@@ -27,7 +27,10 @@
         status = status.start_load();
         history = (await http.get("/parser/upload/history?limit=" + limit.toString(), status)) ?? [];
         status = status.end_load();
-        maxPage = Math.floor(history.length / amountPage);
+        if (history.length !== 0) {
+            curPage = 1;
+        }
+        maxPage = Math.ceil(history.length / amountPage);
 
         signal.on("UploadDone", handleUploadDone);
     });
@@ -40,7 +43,10 @@
         status = status.start_load();
         history = (await http.get("/parser/upload/history?limit=" + limit.toString(), status)) ?? [];
         status = status.end_load();
-        maxPage = Math.floor(history.length / amountPage);
+        if (history.length !== 0) {
+            curPage = 1;
+        }
+        maxPage = Math.ceil(history.length / amountPage);
     }
 
     async function download_file(link) {
@@ -68,7 +74,10 @@
         status = status.start_load();
         history = (await http.get("/parser/upload/history?limit=" + limit.toString(), status)) ?? [];
         status = status.end_load();
-        maxPage = Math.floor(history.length / amountPage);
+        if (history.length !== 0) {
+            curPage = 1;
+        }
+        maxPage = Math.ceil(history.length / amountPage);
       } else {
         student_success = "Ошибка";
       }
@@ -98,7 +107,10 @@
                 status = status.start_load();
                 history = (await http.get("/parser/upload/history?limit=" + limit.toString(), status)) ?? [];
                 status = status.end_load();
-                maxPage = Math.floor(history.length / amountPage);
+                if (history.length !== 0) {
+                    curPage = 1;
+                }
+                maxPage = Math.ceil(history.length / amountPage);
           } else {
               modeus_success = "Ошибка";
           }
@@ -128,22 +140,28 @@
                 status = status.start_load();
                 history = (await http.get("/parser/upload/history?limit=" + limit.toString(), status)) ?? [];
                 status = status.end_load();
-                maxPage = Math.floor(history.length / amountPage);
+                if (history.length !== 0) {
+                    curPage = 1;
+                }
+                maxPage = Math.ceil(history.length / amountPage);
           } else {
               courses_success = "Ошибка";
           }
       }
 
 
-      const toPage = (page) => {
+      async function toPage(page) {
         if (page < 0) {
             page = 0;
+        } else if (page < 1) {
+            page = 1;
         } else if (page > maxPage) {
             page = maxPage;
         }
+
         select.value = page;
         curPage = page;
-      }
+    }
 
       async function update_inf() {
         let result = await fetch(
@@ -208,7 +226,9 @@
                 <Button on:click={() => toPage(curPage - 1)}><ChevronLeftOutline size='lg' /></Button>
                 <select name="select" aria-label="Select" on:change={() => toPage(select.value)} bind:this={select} class="w-auto bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 p-3 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500">
                     {#each [...Array(maxPage + 1).keys()] as page}
-                        <option value={page}>{page}</option>
+                        {#if page !== 0 || history.length === 0}
+                            <option value={page}>{page}</option>
+                        {/if}
                     {/each}
                 </select>
                 <Button on:click={() => toPage(curPage + 1)}><ChevronRightOutline size='lg' /></Button>
@@ -217,22 +237,22 @@
         <Table hoverable={true} class="mb-5">
             <TableHead>
                 <TableHeadCell class="px-8">Название файла</TableHeadCell>
-                <TableHeadCell class="px-8 w-1/6" defaultSort>Дата загрузки</TableHeadCell>
+                <TableHeadCell class="px-8">Дата загрузки</TableHeadCell>
                 <TableHeadCell class="px-8">Тип</TableHeadCell>
                 <TableHeadCell class="px-8">Статус загрузки</TableHeadCell>
                 <TableHeadCell class="px-8">Скачать</TableHeadCell>
             </TableHead>
             <TableBody>
-                {#each history.slice(curPage * amountPage, curPage * amountPage + amountPage) as history_item}
+                {#each history.slice((curPage - 1) * amountPage, curPage * amountPage + amountPage - 1) as history_item}
                     <TableBodyRow
                         role="link"
                         class="contrast">
-                        <TableBodyCell class="px-8">{history_item.name_file}</TableBodyCell>
+                        <TableBodyCell class="px-8 overflow-hidden text-ellipsis" style='max-width: 15dvw'>{history_item.name_file}</TableBodyCell>
                         <TableBodyCell class="px-8">{history_item.date.slice(0, 10) + " " + history_item.date.slice(11, 19)}</TableBodyCell>
                         <TableBodyCell class="px-8">{history_item.type == "student" ? "Загрузка студентов" : history_item.type == "modeus" ? "Выгрузка модеус" : "Онлайн курс"}</TableBodyCell>
                         <TableBodyCell class="px-8">{history_item.status_upload == null ? "Загружается" : history_item.status_upload}</TableBodyCell>
                         <TableBodyCell class="px-8">
-                            <A class='flex ml-2' href={history_item.link}>Скачать</A>
+                            <A class='flex' href={history_item.link}>Скачать</A>
                         </TableBodyCell>
                     </TableBodyRow>
                 {/each}
