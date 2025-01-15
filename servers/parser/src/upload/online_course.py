@@ -170,13 +170,13 @@ def get_info_online_course(row, col_name_course: str, col_university: str, cols_
     return course
 
     
-def create_default_info_course_in_db(name: str, university: str, worker_db: WorkerDataBase) -> InfoOnlineCourseInDB:
+def create_default_info_course_in_db(name: str, university: str, worker_db: WorkerDataBase) -> InfoOnlineCourse:
     online_course = InfoOnlineCourse(name=name, university=university)
-    res = worker_db.info_online_course.insert_one(online_course)
-    return res
+    # res = worker_db.info_online_course.insert_one(online_course)
+    return online_course
 
 
-def create_course_in_student(info_course: InfoOnlineCourseInDB, scores: dict) -> InfoOnlineCourseInStudent:
+def create_course_in_student(info_course: InfoOnlineCourse, scores: dict) -> InfoOnlineCourseInStudent:
     dict = info_course.model_dump(by_alias=True, exclude="_id")
     return InfoOnlineCourseInStudent(**dict, scores=scores)
 
