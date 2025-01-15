@@ -2,13 +2,23 @@ from fastapi import APIRouter
 
 from config import worker_db
 from src.online_course.dict_names import upload_dict_names
-from src.schemas import DictNames, DictNamesInDB, InfoOnlineCourseInDB
+from src.schemas import DictNames, DictNamesInDB, InfoOCInFile, InfoOCInFileInDB, InfoOnlineCourseInDB
 
 
 router_course = APIRouter(
     prefix="/course",
     tags=["Course"],
 )
+
+@router_course.get("/in_file")
+async def get_courses_in_file() -> list[InfoOCInFileInDB]:
+    return worker_db.onl_cr_in_file.get_all(limit=-1)
+
+@router_course.get("/in_file/names")
+async def get_courses_in_file() -> list[str]:
+    cl_oc = worker_db.onl_cr_in_file.get_collect()
+    
+    return cl_oc.find().distinct("name")
 
 @router_course.get("/search")
 async def get_courses(name: str, university: str | None = None) -> InfoOnlineCourseInDB:

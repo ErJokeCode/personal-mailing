@@ -5,7 +5,7 @@ import os
 import requests
 
 from db import MongoDataBase, S3Client, WorkerCollection
-from src.schemas import FAQ, DictNames, DictNamesInDB, FAQTopic, FAQTopicInDB, HistoryUploadFile, HistoryUploadFileInDB, OnboardCourse, OnboardCourseInDB, Student, StudentInDB, Subject, SubjectInDB, InfoOnlineCourse, InfoOnlineCourseInDB
+from src.schemas import FAQ, DictNames, DictNamesInDB, FAQTopic, FAQTopicInDB, HistoryUploadFile, HistoryUploadFileInDB, InfoOCInFile, InfoOCInFileInDB, OnboardCourse, OnboardCourseInDB, Student, StudentInDB, Subject, SubjectInDB, InfoOnlineCourse, InfoOnlineCourseInDB
 
 
 class WorkerDataBase(MongoDataBase):
@@ -19,6 +19,7 @@ class WorkerDataBase(MongoDataBase):
         self.dict_names = WorkerCollection[DictNames, DictNamesInDB](self.db["dict_names"], DictNames, DictNamesInDB)
         self.bot_faq = WorkerCollection[FAQTopic, FAQTopicInDB](self.db["bot_faq"], FAQTopic, FAQTopicInDB)
         self.bot_onboard = WorkerCollection[OnboardCourse, OnboardCourseInDB](self.db["bot_onboard"], OnboardCourse, OnboardCourseInDB)
+        self.onl_cr_in_file = WorkerCollection[InfoOCInFile, InfoOCInFileInDB](self.db["onl_cr_in_file"], InfoOCInFile, InfoOCInFileInDB)
 
 dotenv.load_dotenv()
 

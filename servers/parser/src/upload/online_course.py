@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 
 from config import WorkerDataBase
 from worker import update_status_history
-from src.schemas import HistoryUploadFileInDB, InfoOnlineCourse, InfoOnlineCourseInDB, InfoOnlineCourseInStudent
+from src.schemas import HistoryUploadFileInDB, InfoOCInFile, InfoOnlineCourse, InfoOnlineCourseInDB, InfoOnlineCourseInStudent
 
 def parse_info_online_courses(worker_db: WorkerDataBase, hist: HistoryUploadFileInDB):
 
@@ -97,14 +97,41 @@ def upload_report(link: str, worker_db: WorkerDataBase, hist: HistoryUploadFileI
 def parse_students(excel: pd.ExcelFile, worker_db: WorkerDataBase):
     all_students = {}
     
+    worker_db.onl_cr_in_file.delete_many()
+    
     for sheet_name in excel.sheet_names[1:]:
         df = excel.parse(sheet_name)
-
+        
         df = df[df["Группа"].apply(lambda x: "РИ-" in x)]
-
+        
+        fill_file_online_course_info(df, worker_db)
+        
         fill_in_students_from_one_sheet(df, all_students, worker_db)
 
     return all_students.values()
+
+def fill_file_online_course_info(df: pd.DataFrame, worker_db: WorkerDataBase):
+    cols_course = df.columns[5:11]
+    file_course_info = df[cols_course].drop_duplicates()
+    
+    cols = file_course_info.columns
+
+    for index, row in file_course_info.iterrows():
+        platform = row[cols[0]]
+        university = row[cols[1]]
+        name_subject = row[cols[2]]
+        form_edu = row[cols[4]]
+        name = row[cols[5]]
+        
+        onl_course = InfoOCInFile(
+            name=name, 
+            name_subject=name_subject, 
+            platform=platform, 
+            university=university, 
+            form_edu=form_edu
+            )
+        
+        res = worker_db.onl_cr_in_file.insert_one(onl_course)       
 
 def fill_in_students_from_one_sheet(df: pd.DataFrame, all_students: dict, worker_db: WorkerDataBase):
     cols_fill_name = df.columns[:3]

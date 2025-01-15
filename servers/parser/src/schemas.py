@@ -80,6 +80,16 @@ class InfoOnlineCourse(BaseModel):
 class InfoOnlineCourseInDB(InfoOnlineCourse, BaseModelInDB):
     pass
 
+class InfoOCInFile(BaseModel):
+    name: str
+    name_subject: str
+    platform: str
+    university: str
+    form_edu: str
+
+class InfoOCInFileInDB(InfoOCInFile, BaseModelInDB):
+    pass
+
 class InfoOnlineCourseInStudent(InfoOnlineCourse): 
     scores: dict | None = None
     
