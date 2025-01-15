@@ -67,4 +67,10 @@ public class Student
     public List<Subject> Subjects { get; set; }
     [NotMapped]
     public List<CourseInfo> OnlineCourse { get; set; }
+
+    public string GetFIO()
+    {
+        return $"{Surname ?? ""} {Name ?? ""} {Patronymic ?? ""}";
+
+    }
 }
