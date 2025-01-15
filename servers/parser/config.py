@@ -3,7 +3,7 @@ import dotenv
 import os
 
 from db import MongoDataBase, S3Client, WorkerCollection
-from src.schemas import FAQ, DictNames, DictNamesInDB, FAQInDB, HistoryUploadFile, HistoryUploadFileInDB, OnboardCourse, OnboardCourseInDB, Student, StudentInDB, Subject, SubjectInDB, InfoOnlineCourse, InfoOnlineCourseInDB
+from src.schemas import FAQ, DictNames, DictNamesInDB, FAQTopic, FAQTopicInDB, HistoryUploadFile, HistoryUploadFileInDB, OnboardCourse, OnboardCourseInDB, Student, StudentInDB, Subject, SubjectInDB, InfoOnlineCourse, InfoOnlineCourseInDB
 
 
 class WorkerDataBase(MongoDataBase):
@@ -15,7 +15,7 @@ class WorkerDataBase(MongoDataBase):
         self.subject = WorkerCollection[Subject, SubjectInDB](self.db["subject"], Subject, SubjectInDB)
         self.info_online_course = WorkerCollection[InfoOnlineCourse, InfoOnlineCourseInDB](self.db["info_online_course"], InfoOnlineCourse, InfoOnlineCourseInDB)
         self.dict_names = WorkerCollection[DictNames, DictNamesInDB](self.db["dict_names"], DictNames, DictNamesInDB)
-        self.bot_faq = WorkerCollection[FAQ, FAQInDB](self.db["bot_faq"], FAQ, FAQInDB)
+        self.bot_faq = WorkerCollection[FAQTopic, FAQTopicInDB](self.db["bot_faq"], FAQTopic, FAQTopicInDB)
         self.bot_onboard = WorkerCollection[OnboardCourse, OnboardCourseInDB](self.db["bot_onboard"], OnboardCourse, OnboardCourseInDB)
 
 dotenv.load_dotenv()

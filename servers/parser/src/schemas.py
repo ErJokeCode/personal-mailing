@@ -110,17 +110,15 @@ class DictNamesInDB(DictNames, BaseModelInDB):
     
     
 class FAQ(BaseModel):
-    topic: str
-    callback_data: str
     question: str
     answer: str
-    
-class FAQInDB(FAQ, BaseModelInDB):
-    pass
 
 class FAQTopic(BaseModel):
-    topic: str
-    callback_data: str
+    name: str
+    faqs: list[FAQ] = []
+
+class FAQTopicInDB(FAQTopic, BaseModelInDB):
+    pass
     
 class OnboardTopic(BaseModel):
     name: str
