@@ -317,31 +317,31 @@
                         <TableBodyRow class="text-base">
                             <TableBodyCell class="p-4 pl-8"><Checkbox value={student.id} on:click={remove} /></TableBodyCell>
                             <TableBodyCell class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
-                                {student.info.group.numberCourse}
+                                {student.info !== null ? student.info.group.numberCourse : ''}
                             </TableBodyCell>
                             <TableBodyCell class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
-                                {student.info.surname}
+                                {student.info !== null ? student.info.surname : ""}
                             </TableBodyCell>
                             <TableBodyCell class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
-                                {student.info.name}
+                                {student.info !== null ? student.info.name: ""}
                             </TableBodyCell>
                             <TableBodyCell class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
-                                {student.info.patronymic}
+                                {student.info !== null ? student.info.patronymic : ""}
                             </TableBodyCell>
                             <TableBodyCell class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
-                                {student.info.group.number}
+                                {student.info !== null ? student.info.group.number : ""}
                             </TableBodyCell>
                             <TableBodyCell class="max-w-sm flex items-center space-x-6 whitespace-nowrap p-4">
                                 <div class="text-sm font-normal text-gray-500 dark:text-gray-400">
-                                    <div class="text-base font-semibold text-gray-900 dark:text-white">{student.info.group.directionCode}</div>
-                                    <div class="text-sm font-normal text-gray-500 dark:text-gray-400 overflow-hidden text-ellipsis" style='max-width: 15dvw'>{student.info.group.nameSpeciality}</div>
+                                    <div class="text-base font-semibold text-gray-900 dark:text-white">{student.info !== null ? student.info.group.directionCode : ""}</div>
+                                    <div class="text-sm font-normal text-gray-500 dark:text-gray-400 overflow-hidden text-ellipsis" style='max-width: 15dvw'>{student.info !== null ? student.info.group.nameSpeciality : ""}</div>
                                 </div>
                             </TableBodyCell>
                             <TableBodyCell class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
-                                {student.info.typeOfEducation}
+                                {student.info !== null ? student.info.typeOfEducation : ""}
                             </TableBodyCell>
                             <TableBodyCell class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
-                                {student.info.typeOfCost}
+                                {student.info !== null ? student.info.typeOfCost : ""}
                             </TableBodyCell>
                             <TableBodyCell class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
                                 {student.email}

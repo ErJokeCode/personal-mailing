@@ -249,10 +249,14 @@
                         class="contrast">
                         <TableBodyCell class="px-8 overflow-hidden text-ellipsis" style='max-width: 15dvw'>{history_item.name_file}</TableBodyCell>
                         <TableBodyCell class="px-8">{history_item.date.slice(0, 10) + " " + history_item.date.slice(11, 19)}</TableBodyCell>
-                        <TableBodyCell class="px-8">{history_item.type == "student" ? "Загрузка студентов" : history_item.type == "modeus" ? "Выгрузка модеус" : "Онлайн курс"}</TableBodyCell>
+                        <TableBodyCell class="px-8">{history_item.type == "student" ? "Загрузка студентов" : history_item.type == "modeus" ? "Выгрузка модеус" : history_item.type == "site_inf" ? "Cписок курсов с сайта inf-urfu" : "Онлайн курс"}</TableBodyCell>
                         <TableBodyCell class="px-8">{history_item.status_upload == null ? "Загружается" : history_item.status_upload}</TableBodyCell>
                         <TableBodyCell class="px-8">
-                            <A class='flex' href={history_item.link}>Скачать</A>
+                            {#if history_item.type === "site_inf"}
+                                <A class='flex ml-2' href="https://inf-online.urfu.ru/ru/onlain-kursy/">Сайт</A>
+                            {:else}
+                                <A class='flex ml-2' href={history_item.link}>Скачать</A>
+                            {/if}
                         </TableBodyCell>
                     </TableBodyRow>
                 {/each}
