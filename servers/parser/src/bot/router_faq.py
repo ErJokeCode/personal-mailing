@@ -39,9 +39,11 @@ async def update_topic(id_topic: str, topic: FAQTopic | FAQTopicInDB) -> FAQTopi
     if isinstance(topic, FAQTopic):
         topic_db = FAQTopicInDB(**topic.model_dump(), _id=ObjectId(id_topic))
         topic = topic_db
+    if worker_db.bot_faq.get_one(name=topic.name, get_none=True) != None:
+        raise HTTPException(status_code=404, detail="Topic already exists")
     return worker_db.bot_faq.update_one(topic)
 
 @router_bot_faq.delete("/{id_topic}")
-async def delete_topic(id_topic: str) -> FAQTopicInDB:
+async def delete_topic(id_topic: str) -> dict[str, str]:
     return worker_db.bot_faq.delete_one(id=id_topic)
 
