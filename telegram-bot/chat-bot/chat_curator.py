@@ -58,10 +58,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
             headers = {"cookie": f"{get_cookie()}"}
 
             async with session.put(f"{URL_SERVER}/core/student/addChat/{user_id}", headers=headers, json={"chatId": str(message.chat.id)}) as resp:
-                if resp.status == 200:
-                    await message.answer("Какой вопрос вас интенресует")
-                else:
-                    await message.answer("Пожалуйста нажми ещё раз /start")
+                await message.answer("Какой вопрос вас интенресует")
 
 @dp.message(F.chat.type.in_({"private"}))
 async def all_message(message: types.Message, state: FSMContext):

@@ -61,17 +61,19 @@
                 </TableHead>
                 <TableBody>
                     {#each activeStudents as student}
-                        {console.log(student)}
-                        <TableBodyRow on:click={() => fullInfo(student.id)}>
-                            <TableBodyCell class="px-8">{student.info.email}</TableBodyCell>
-                            <TableBodyCell class="px-8">{student.info.group.numberCourse}</TableBodyCell>
-                            <TableBodyCell class="px-8">{student.info.group.number}</TableBodyCell>
-                            <TableBodyCell class="px-8">{student.info.surname}</TableBodyCell>
-                            <TableBodyCell class="px-8">{student.info.name}</TableBodyCell>
-                            <TableBodyCell class="px-8">{student.info.patronymic}</TableBodyCell>
-                            <TableBodyCell class="px-8">{student.info.typeOfCost}</TableBodyCell>
-                            <TableBodyCell class="px-8">{student.info.personalNumber}</TableBodyCell>
-                        </TableBodyRow>
+                        {#if student.info !== null}
+                            {console.log(student)}
+                            <TableBodyRow on:click={() => fullInfo(student.id)}>
+                                <TableBodyCell class="px-8">{student.info.email}</TableBodyCell>
+                                <TableBodyCell class="px-8">{student.info.group.numberCourse}</TableBodyCell>
+                                <TableBodyCell class="px-8">{student.info.group.number}</TableBodyCell>
+                                <TableBodyCell class="px-8">{student.info.surname}</TableBodyCell>
+                                <TableBodyCell class="px-8">{student.info.name}</TableBodyCell>
+                                <TableBodyCell class="px-8">{student.info.patronymic}</TableBodyCell>
+                                <TableBodyCell class="px-8">{student.info.typeOfCost}</TableBodyCell>
+                                <TableBodyCell class="px-8">{student.info.personalNumber}</TableBodyCell>
+                            </TableBodyRow>
+                        {/if}
                     {/each}
                 </TableBody>
             </Table>
