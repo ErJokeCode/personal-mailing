@@ -1,5 +1,5 @@
 <script>
-	import { Breadcrumb, BreadcrumbItem, Button, Heading, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
+	import { Input, Breadcrumb, BreadcrumbItem, Button, Heading, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
 	import { ArrowRightOutline } from 'flowbite-svelte-icons';
     import { onMount, onDestroy } from "svelte";
     import { Link, navigate } from "svelte-routing";
@@ -7,7 +7,9 @@
 	import { signal } from '../../utils/signal';
 
     let chats = [];
+    let newChats = [];
     let status = http.status();
+    let searchChat = "";
 
     onMount(async () => {
         await getChats();
@@ -18,6 +20,18 @@
 	onDestroy(async () => {
 		signal.off('StudentSentMessage', handleMessage);
 	});
+
+    async function handleSearchChat(event) {
+        if(event.key == "Enter") {
+            if(searchChat != "") {
+                let result = (await http.get("/core/student?searchNoChat=" + searchChat, status)).items ?? [];
+                newChats = result;
+            }
+            else {
+                newChats = [];
+            }
+        }
+    }
 
     async function getChats() {
         status = status.start_load();
@@ -47,6 +61,13 @@
                 <Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
                     Чаты
                 </Heading>
+                <Input
+                    bind:value={searchChat}
+                    on:keypress={handleSearchChat}
+                    type="text"
+                    placeholder="Поиск нового чата"
+                    class='mb-1 w-1/2'
+                />
             </div>
             <Table>
                 <TableHead>
@@ -55,6 +76,19 @@
                     {/each}
                 </TableHead>
                 <TableBody>
+                    {#each newChats as student}
+                        <TableBodyRow class="text-base">
+                            <TableBodyCell class="px-8">{student.email}</TableBodyCell>
+                            <TableBodyCell>
+                                <Button size="sm" class="gap-2 px-3"
+                                    on:click={() => open_chat(0, student.id)}>
+                                    Начать чат
+                                    <ArrowRightOutline size="sm" />
+                                </Button>
+                            </TableBodyCell>
+                            <TableBodyCell class="px-8">{0}</TableBodyCell>
+                        </TableBodyRow>
+                    {/each}
                     {#each chats as chat}
                         <TableBodyRow class="text-base">
                             <TableBodyCell class="px-8">{chat.student.email}</TableBodyCell>

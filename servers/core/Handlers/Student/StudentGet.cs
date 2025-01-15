@@ -6,6 +6,7 @@ using Core.Models;
 using Core.Models.Dto;
 using Core.Utility;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Core.Handlers;
@@ -27,13 +28,21 @@ public static partial class StudentHandler
         return Results.Ok(dto);
     }
 
-    public static async Task<IResult> GetAllStudents(CoreDb db, bool notOnCourse = false, bool lowScore = false,
+    public static async Task<IResult> GetAllStudents(CoreDb db, UserManager<AdminUser> userManager, HttpContext context,
+                                                     bool notOnCourse = false, bool lowScore = false,
                                                      string group = null, int course = 0, string typeOfCost = null,
                                                      string typeOfEducation = null, string onlineCourse = null,
-                                                     string subject = null, string team = null, int pageIndex = 0,
-                                                     int pageSize = -1)
+                                                     string subject = null, string team = null,
+                                                     string searchNoChat = null, int pageIndex = 0, int pageSize = -1)
     {
-        var activeStudents = db.ActiveStudents.ToList();
+        var adminId = userManager.GetUserId(context.User);
+
+        if (adminId == null)
+        {
+            return Results.NotFound("Admin not found");
+        }
+
+        var activeStudents = db.ActiveStudents.Include(a => a.Chats).ThenInclude(ch => ch.Admin).ToList();
         await activeStudents.IncludeStudents();
 
         if (lowScore && notOnCourse)
@@ -48,6 +57,16 @@ public static partial class StudentHandler
         else if (lowScore)
         {
             activeStudents = activeStudents.Where(a => a.Student.OnlineCourse.Any(StudentHandler.AnyLowScore)).ToList();
+        }
+
+        if (!string.IsNullOrEmpty(searchNoChat))
+        {
+            activeStudents = activeStudents.Where(a => a.Chats.All(ch => ch.Admin.Id != adminId)).ToList();
+
+            activeStudents = activeStudents
+                                 .Where(a => a.Email.ToLower().Contains(searchNoChat.ToLower()) ||
+                                             a.Student.GetFIO().ToLower().Contains(searchNoChat.ToLower()))
+                                 .ToList();
         }
 
         if (!string.IsNullOrEmpty(group))
