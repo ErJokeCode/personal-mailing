@@ -75,7 +75,7 @@ def upload_report(link: str, worker_db: WorkerDataBase, hist: HistoryUploadFileI
         excel = pd.ExcelFile(link)
     except Exception as e:
         print(e)
-        update_status_history(hist, text_status="File read error") 
+        update_status_history(hist, text_status="File read error. Please upload again") 
         raise HTTPException(status_code=500, detail="File read error")
     
     try:
@@ -94,19 +94,11 @@ def upload_report(link: str, worker_db: WorkerDataBase, hist: HistoryUploadFileI
     
     return {"status": "success"}
 
-def parse_students(excel: pd.ExcelFile, worker_db: WorkerDataBase, hist: HistoryUploadFileInDB):
+def parse_students(excel: pd.ExcelFile, worker_db: WorkerDataBase):
     all_students = {}
     
     for sheet_name in excel.sheet_names[1:]:
         df = excel.parse(sheet_name)
-        
-        try:
-            df["Фамилия"]
-        except Exception as e:
-            print(e)
-            update_status_history(hist, text_status="Use template file") 
-            raise HTTPException(status_code=500, detail="Use template file") 
-            
 
         df = df[df["Группа"].apply(lambda x: "РИ-" in x)]
 
