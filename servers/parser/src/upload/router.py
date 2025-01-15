@@ -2,7 +2,9 @@ from datetime import datetime
 import asyncio 
 from fastapi import APIRouter, BackgroundTasks, HTTPException, UploadFile
 from fastapi.responses import FileResponse
-from config import s3_client, worker_db
+import requests
+from config import URL_CORE, s3_client, worker_db
+from worker import update_status_history
 from src.upload.online_course import parse_info_online_courses, update_info_from_inf, upload_report
 from src.schemas import HistoryUploadFile, HistoryUploadFileInDB, TypeFile
 
@@ -128,16 +130,14 @@ async def background_student(file, filename, size, headers, hist_info_db: Histor
         link = await s3_client.upload_file(file_upload, hist_info_db.key)
     except Exception as e:
         print(e)
-        hist_info_db.status_upload = "Error save file to S3"
-        worker_db.history.update_one(hist_info_db, get_item=False)
+        update_status_history(hist_info_db, text_status="Error save file to S3")
         
     hist_info_db.link = link
     worker_db.history.update_one(hist_info_db, get_item=False)
     
     upload_student(hist_info_db.link, worker_db, hist_info_db)
     
-    hist_info_db.status_upload = "Success"
-    worker_db.history.update_one(hist_info_db, get_item=False)
+    update_status_history(hist_info_db, text_status="Success")
 
 async def background_modeus(file, filename, size, headers, hist_info_db: HistoryUploadFileInDB):
     try:
@@ -146,16 +146,14 @@ async def background_modeus(file, filename, size, headers, hist_info_db: History
         link = await s3_client.upload_file(file_upload, hist_info_db.key)
     except Exception as e:
         print(e)
-        hist_info_db.status_upload = "Error save file to S3"
-        worker_db.history.update_one(hist_info_db, get_item=False)
+        update_status_history(hist_info_db, text_status="Error save file to S3")
     
     hist_info_db.link = link
     worker_db.history.update_one(hist_info_db, get_item=False)
         
     upload_modeus(hist_info_db, worker_db)
     
-    hist_info_db.status_upload = "Success"
-    worker_db.history.update_one(hist_info_db, get_item=False)
+    update_status_history(hist_info_db, text_status="Success")
         
 async def background_online_course(file, filename, size, headers, hist_info_db: HistoryUploadFileInDB):
     try: 
@@ -164,8 +162,7 @@ async def background_online_course(file, filename, size, headers, hist_info_db: 
         link = await s3_client.upload_file(file_upload, hist_info_db.key)
     except Exception as e:
         print(e)
-        hist_info_db.status_upload = "Error save file to S3"
-        worker_db.history.update_one(hist_info_db, get_item=False)
+        update_status_history(hist_info_db, text_status="Error save file to S3")
         
     hist_info_db.link = link
     worker_db.history.update_one(hist_info_db, get_item=False)
@@ -173,8 +170,7 @@ async def background_online_course(file, filename, size, headers, hist_info_db: 
     parse_info_online_courses(worker_db, hist_info_db)
     upload_report(hist_info_db.link, worker_db, hist_info_db)
 
-    hist_info_db.status_upload = "Success"
-    worker_db.history.update_one(hist_info_db, get_item=False)
+    update_status_history(hist_info_db, text_status="Success")
         
 async def background_site_inf():
     try:

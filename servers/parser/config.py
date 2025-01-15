@@ -2,6 +2,8 @@ import enum
 import dotenv
 import os
 
+import requests
+
 from db import MongoDataBase, S3Client, WorkerCollection
 from src.schemas import FAQ, DictNames, DictNamesInDB, FAQTopic, FAQTopicInDB, HistoryUploadFile, HistoryUploadFileInDB, OnboardCourse, OnboardCourseInDB, Student, StudentInDB, Subject, SubjectInDB, InfoOnlineCourse, InfoOnlineCourseInDB
 
@@ -31,6 +33,10 @@ AWS_SECRET_ACCESS_KEY = os.getenv('AWS_SECRET_ACCESS_KEY')
 BUCKET_NAME = os.getenv('BUCKET_NAME')
 URL_S3_GET = os.getenv('URL_S3_GET')
 
+URL_CORE = os.getenv('URL_CORE')
+ADMIN_EMAIL_CORE = os.getenv('ADMIN_EMAIL_CORE')
+ADMIN_PASSWORD_CORE = os.getenv('ADMIN_PASSWORD_CORE')
+
 worker_db = WorkerDataBase(
     host=MGO_HOST, 
     port=int(MGO_PORT), 
@@ -44,4 +50,3 @@ s3_client = S3Client(
         bucket_name=BUCKET_NAME,
         url_files=URL_S3_GET
     )
-

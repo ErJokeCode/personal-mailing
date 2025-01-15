@@ -2,6 +2,7 @@ from fastapi import HTTPException
 import numpy as np
 import pandas as pd
 from config import WorkerDataBase
+from worker import update_status_history
 from src.schemas import StudentInDB, StudentInTeam, Subject, SubjectInStudent, Team, TeamInSubjectInStudent, TypeFormSubject, HistoryUploadFileInDB
 
 
@@ -11,8 +12,7 @@ def upload_modeus(hist: HistoryUploadFileInDB, worker_db: WorkerDataBase) -> dic
         df = pd.read_excel(link, sheet_name=0)
     except Exception as e:
         print(e)
-        hist.status_upload = "Error file read"
-        worker_db.history.update_one(hist, get_item=False)
+        update_status_history(hist, text_status="Error file read")
         raise HTTPException(status_code=500, detail="File read error")
 
     fill_subjects(df, worker_db, hist)
@@ -25,9 +25,8 @@ def fill_subjects(df: pd.DataFrame, worker_db: WorkerDataBase, hist: HistoryUplo
     try:
         data = df.groupby(["РМУП название", "МУП или УК", "Частный план название"])[["Студент", "Специальность", "Сотрудники", "Группа название"]]
     except Exception as e:
-        print(e)
-        hist.status_upload = f"Error work with file. Use stucture file example"
-        worker_db.history.update_one(hist, get_item=False)        
+        print(e) 
+        update_status_history(hist, text_status=f"Error work with file. Use stucture file example")      
     
     for key, info in data:
         teams: list[Team] = []
@@ -75,9 +74,8 @@ def fill_students(df: pd.DataFrame, worker_db: WorkerDataBase, hist: HistoryUplo
     try:
         data = df.groupby(["Студент", "Поток", "Специальность", "Профиль"])[["РМУП название", "Частный план название", "Группа название", "МУП или УК"]]
     except Exception as e:
-        print(e)
-        hist.status_upload = f"Error work with file. Use stucture file example"
-        worker_db.history.update_one(hist, get_item=False)    
+        print(e)   
+        update_status_history(hist, text_status=f"Error work with file. Use stucture file example")
     
     for key, value in data:
         surname, name, patronymic = get_split_fio(key[0])

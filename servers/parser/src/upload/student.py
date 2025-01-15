@@ -3,6 +3,7 @@ from fastapi import HTTPException
 import pandas as pd
 
 from db import WorkerCollection
+from worker import update_status_history
 from src.schemas import HistoryUploadFileInDB, InfoGroupInStudent, Student
 from config import WorkerDataBase
 
@@ -12,8 +13,7 @@ def upload_student(link: str, worker_db: WorkerDataBase, hist: HistoryUploadFile
         df = pd.read_excel(link, sheet_name=0)
     except Exception as e:
         print(e)
-        hist.status_upload = "Error file read"
-        worker_db.history.update_one(hist, get_item=False)
+        update_status_history(hist, text_status="Error file read")
         raise HTTPException(status_code=500, detail="File read error")
     
     try:
@@ -23,8 +23,7 @@ def upload_student(link: str, worker_db: WorkerDataBase, hist: HistoryUploadFile
             students.append(student)
     except Exception as e:
         print(e)
-        hist.status_upload = "Error parse file"
-        worker_db.history.update_one(hist, get_item=False)
+        update_status_history(hist, text_status="Error parse file")
         raise HTTPException(status_code=500, detail="Error parse file")
             
     try:
@@ -33,8 +32,7 @@ def upload_student(link: str, worker_db: WorkerDataBase, hist: HistoryUploadFile
         
     except Exception as e:
         print(e)
-        hist.status_upload = "Error insert data"
-        worker_db.history.update_one(hist, get_item=False)
+        update_status_history(hist, text_status="Error insert data")
         raise HTTPException(status_code=500, detail="Error insert data")
     
     return {"status": "success"}

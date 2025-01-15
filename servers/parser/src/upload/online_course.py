@@ -4,6 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 
 from config import WorkerDataBase
+from worker import update_status_history
 from src.schemas import HistoryUploadFileInDB, InfoOnlineCourse, InfoOnlineCourseInDB, InfoOnlineCourseInStudent
 
 def parse_info_online_courses(worker_db: WorkerDataBase, hist: HistoryUploadFileInDB):
@@ -65,8 +66,7 @@ def parse_info_online_courses(worker_db: WorkerDataBase, hist: HistoryUploadFile
                             )
         except Exception as e:
             print(e)
-            hist.status_upload = "Error parse site urfu"
-            worker_db.history.update_one(hist, get_item=False)    
+            update_status_history(hist, text_status="Error parse site urfu")   
         return {"status" : "success"}
     
 
@@ -75,33 +75,38 @@ def upload_report(link: str, worker_db: WorkerDataBase, hist: HistoryUploadFileI
         excel = pd.ExcelFile(link)
     except Exception as e:
         print(e)
-        hist.status_upload = "File read error"
-        worker_db.history.update_one(hist, get_item=False)
+        update_status_history(hist, text_status="File read error") 
         raise HTTPException(status_code=500, detail="File read error")
     
     try:
         students = parse_students(excel, worker_db)
     except Exception as e:
         print(e)
-        hist.status_upload = "Error parse data file"
-        worker_db.history.update_one(hist, get_item=False)
+        update_status_history(hist, text_status="Error parse data file. Use template file") 
         raise HTTPException(status_code=500, detail="Error parse data file")
     
     try:
         update_collection(students, worker_db)
     except Exception as e:
         print(e)
-        hist.status_upload = "Error update data"
-        worker_db.history.update_one(hist, get_item=False)
+        update_status_history(hist, text_status="Error update data")
         raise HTTPException(status_code=500, detail="Error update data")
     
     return {"status": "success"}
 
-def parse_students(excel: pd.ExcelFile, worker_db: WorkerDataBase):
+def parse_students(excel: pd.ExcelFile, worker_db: WorkerDataBase, hist: HistoryUploadFileInDB):
     all_students = {}
     
     for sheet_name in excel.sheet_names[1:]:
         df = excel.parse(sheet_name)
+        
+        try:
+            df["Фамилия"]
+        except Exception as e:
+            print(e)
+            update_status_history(hist, text_status="Use template file") 
+            raise HTTPException(status_code=500, detail="Use template file") 
+            
 
         df = df[df["Группа"].apply(lambda x: "РИ-" in x)]
 
