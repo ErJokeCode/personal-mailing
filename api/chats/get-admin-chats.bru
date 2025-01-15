@@ -5,7 +5,7 @@ meta {
 }
 
 get {
-  url: {{base_api}}/core/admin/chats?pageIndex=0&pageSize=10&onlyUnread=true
+  url: {{base_api}}/core/admin/chats?pageIndex=0&pageSize=10&onlyUnread=false
   body: none
   auth: none
 }
@@ -13,5 +13,5 @@ get {
 params:query {
   pageIndex: 0
   pageSize: 10
-  onlyUnread: true
+  onlyUnread: false
 }
