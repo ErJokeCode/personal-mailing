@@ -2,7 +2,7 @@ from bson import ObjectId
 from fastapi import APIRouter, HTTPException
 
 from config import worker_db
-from src.schemas import FAQ, FAQInDB, FAQTopic
+from src.schemas import FAQ, FAQTopic, FAQTopicInDB
 
 
 
@@ -10,72 +10,38 @@ router_bot_faq = APIRouter(
     prefix="/bot/faq",
     tags=["Bot FAQ"],
 )
-
+    
 @router_bot_faq.post("/")
-async def add_faq(faq: FAQ) -> FAQInDB:
-    return worker_db.bot_faq.insert_one(faq)
-    
+async def add_new_topic(name_topic: str) -> FAQTopicInDB:
+    if worker_db.bot_faq.get_one(name=name_topic, get_none=True) != None:
+        raise HTTPException(status_code=404, detail="Topic already exists")
+    return worker_db.bot_faq.insert_one(FAQTopic(name=name_topic))
+
 @router_bot_faq.get("/")
-async def get_faqs(callback_data: str = None) -> list[FAQInDB]:
-    try:
-        collection_faq = worker_db.bot_faq.get_collect()
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=500, detail="Error DB. No connection to DB")
+async def get_all_topics() -> list[FAQTopicInDB]:
+    return worker_db.bot_faq.get_all(limit=-1)
+
+@router_bot_faq.get("/{id_topic}")
+async def get_faq(id_topic: str) -> FAQTopicInDB:
+    return worker_db.bot_faq.get_one(id=id_topic)
+
+@router_bot_faq.post("/{id_topic}")
+async def add_faq(id_topic: str, faq: FAQ) -> FAQTopicInDB:
+    cl_faq = worker_db.bot_faq.get_collect()
     
-    try:
-        faqs = []
-        for faq in collection_faq.find({'callback_data': callback_data} if callback_data else {}):
-            faqs.append(FAQInDB(**faq))
-        return faqs
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=404, detail="Error get")
+    cl_faq.update_one({"_id": ObjectId(id_topic)}, {"$push": {"faqs": faq.model_dump()}})
+    res = cl_faq.find_one({"_id": ObjectId(id_topic)})
     
-    
-@router_bot_faq.get("/topic")
-async def get_topics() -> list[FAQTopic]:
-    try:
-        collection_faq = worker_db.bot_faq.get_collect()
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=500, detail="Error DB. No connection to DB")
-    
-    try:
-        faqs = []
-        topics = []
-        for topic in collection_faq.distinct("callback_data"):
-            topics.append(topic)
-            
-        for topic in topics:
-            faq = collection_faq.find_one({"callback_data": topic})
-            faqs.append(FAQTopic(**faq))
-        return faqs
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=404, detail="Error get")
-    
-    
-@router_bot_faq.get("/{id}")
-async def get_faq(id: str) -> FAQInDB:
-    return worker_db.bot_faq.get_one(id=id)
-    
-@router_bot_faq.put("/{id}")
-async def put_faq(id: str, faq: FAQ) -> FAQInDB:
-    try:
-        collection_faq = worker_db.bot_faq.get_collect()
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=500, detail="Error DB. No connection to DB")
-    
-    try:
-        collection_faq.update_one({"_id" : ObjectId(id)}, 
-                                  faq.model_dump())
-        return FAQInDB(**collection_faq.find_one({"_id" : ObjectId(id)}))
-    except Exception as e:
-        print(e)
-        raise HTTPException(status_code=404, detail="Error update") 
-    
-@router_bot_faq.delete("/{id}")
-async def delete_faq(id: str) -> dict:
-    return worker_db.bot_faq.delete_one(id)
+    return FAQTopicInDB(**res)
+
+@router_bot_faq.put("/{id_topic}")
+async def update_topic(id_topic: str, topic: FAQTopic | FAQTopicInDB) -> FAQTopicInDB:
+    if isinstance(topic, FAQTopic):
+        topic_db = FAQTopicInDB(**topic.model_dump(), _id=ObjectId(id_topic))
+        topic = topic_db
+    return worker_db.bot_faq.update_one(topic)
+
+@router_bot_faq.delete("/{id_topic}")
+async def delete_topic(id_topic: str) -> FAQTopicInDB:
+    return worker_db.bot_faq.delete_one(id=id_topic)
+
