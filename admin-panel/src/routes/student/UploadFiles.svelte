@@ -2,9 +2,10 @@
     import { Breadcrumb, BreadcrumbItem, Fileupload, Label, Button, Helper, Heading, A, Pagination } from 'flowbite-svelte';
     import { TableHeadCell, Table, TableBody, TableBodyCell, TableBodyRow, TableHead } from 'flowbite-svelte';
     import { ChevronLeftOutline, ChevronRightOutline } from 'flowbite-svelte-icons';
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import http from "../../utils/http";
     import { navigate } from "svelte-routing";
+    import { signal } from "../../utils/signal";
   
     let student_files;
     let student_success = "";
@@ -27,7 +28,20 @@
         history = (await http.get("/parser/upload/history?limit=" + limit.toString(), status)) ?? [];
         status = status.end_load();
         maxPage = Math.floor(history.length / amountPage);
+
+        signal.on("UploadDone", handleUploadDone);
     });
+
+    onDestroy(async () => {
+        signal.off("UploadDone", handleUploadDone);
+    });
+
+    async function handleUploadDone(message) {
+        status = status.start_load();
+        history = (await http.get("/parser/upload/history?limit=" + limit.toString(), status)) ?? [];
+        status = status.end_load();
+        maxPage = Math.floor(history.length / amountPage);
+    }
 
     async function download_file(link) {
         navigate(link);

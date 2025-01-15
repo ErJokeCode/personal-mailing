@@ -1,6 +1,8 @@
 using System.Threading.Tasks;
+using Core.Messages;
 using Core.Models;
 using Core.Utility;
+using MassTransit;
 using Microsoft.AspNetCore.Http;
 
 namespace Core.Handlers;
@@ -23,5 +25,14 @@ public static partial class DataHandler
         await db.SaveChangesAsync();
 
         return Results.Created("", text);
+    }
+
+    public static async Task<IResult> EventUploadDone(IPublishEndpoint endpoint)
+    {
+        await endpoint.Publish(new UploadDone()
+        {
+            Context = "",
+        });
+        return Results.Ok();
     }
 }

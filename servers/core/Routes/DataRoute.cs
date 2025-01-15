@@ -27,5 +27,6 @@ public static class DataRoute
     public static void MapPost(RouteGroupBuilder group)
     {
         group.MapPost("/text", DataHandler.SaveText).AddPermission(Permissions.View);
+        group.MapPost("/uploadEvent", DataHandler.EventUploadDone).AddPermission(Permissions.View);
     }
 }
