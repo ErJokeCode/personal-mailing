@@ -12,6 +12,7 @@
 		CogOutline,
 		FileChartBarSolid,
 		UserSettingsOutline,
+        UsersOutline,
 		UsersGroupOutline,
 		ChartPieOutline,
 		RectangleListSolid,
@@ -40,17 +41,17 @@
 		{ name: 'Рассылки', icon: ClipboardListSolid, href: '/notifications' },
 		{
 			name: 'Студенты',
-			icon: UsersGroupOutline,
+			icon: UsersOutline,
 			children: {
 				'Все студенты': '/students/all',
                 'Активные студенты': '/students/active'
 			}
 		},
+		{ name: 'Группы', icon: UsersGroupOutline, href: '/groups' },
 		{ name: 'Конструктор онбординга', icon: EditOutline, href: '/builder' },
 		{ name: 'Соотношения', icon: TableRowOutline, href: '/names' },
 		{ name: 'Администраторы', icon: UserSettingsOutline, href: '/admin' },
 		{ name: 'Профиль', icon: CogOutline, href: '/profile' },
-		{ name: 'Группы', icon: UsersGroupOutline, href: '/groups' },
 	];
 	let dropdowns = Object.fromEntries(Object.keys(posts).map((x) => [x, false]));
 

@@ -1,5 +1,5 @@
 <script lang='ts'>
-	import { Breadcrumb, BreadcrumbItem, Heading, Accordion, AccordionItem, Input, Label, Button, Helper } from 'flowbite-svelte';
+	import { Breadcrumb, BreadcrumbItem, Heading, Accordion, AccordionItem, Input, Label, Button, Helper, Checkbox } from 'flowbite-svelte';
     import { onMount } from 'svelte';
     import { Link } from "svelte-routing";
 
@@ -55,9 +55,19 @@
     }
 
     const add_course = async () => {
+        let is_active = true;
+        let is_main = false;
+        if (group.indexOf('active') === -1) {
+            is_active = false;
+        }
+        if (group.indexOf('main') !== -1) {
+            is_main = true;
+        }
+
         let new_course = {
             "name": "Новый курс",
-            "is_active": true,
+            "is_main": is_main,
+            "is_active": is_active,
             "sections": [
                 {
                     "name": "Новый раздел",
@@ -189,6 +199,9 @@
     const topic_down = async (course_index, section_name, topic_index) => {
         topic_up(course_index, section_name, topic_index, 1, 1)
     }
+
+    
+    
 </script>
 
 <div class="overflow-hidden lg:flex">
@@ -218,6 +231,10 @@
                                 <span>Название</span>
                                 <Input bind:value={course.name} class='border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700' placeholder={course.name} size="md" />
                             </Label>
+                            <div class="mb-5 flex space-x-4">
+                                <Checkbox checked={course.is_main} groupInputClass='ms-2' on:click={() => course.is_main = !course.is_main}>Главный курс</Checkbox>
+                                <Checkbox checked={course.is_active} groupInputClass='ms-2' on:click={() => course.is_active = !course.is_active}>Активный курс</Checkbox>
+                            </div>
                             <div class="mb-5 space-x-4">
                                 <Button on:click={() => add_section(course_index)}>Добавить раздел</Button>
                                 <Button on:click={() => delete_course(course._id)}>Удалить курс</Button>

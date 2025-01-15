@@ -31,6 +31,12 @@
         
         if (status.value === "✓") navigate("/profile");
     }
+
+    async function handle_keypress(event) {
+        if (event.key == 'Enter') {
+            login();
+        }
+    }
 </script>
 
 <main class='bg-gray-50 dark:bg-gray-900 w-full'>
@@ -48,6 +54,7 @@
 			            required
 			            class="border outline-none dark:border-gray-600 dark:bg-gray-700"
                         bind:value={email}
+                        on:keypress={handle_keypress}
 		            />
 	            </div>
 	            <div>
@@ -60,6 +67,7 @@
 			            required
 			            class="border outline-none dark:border-gray-600 dark:bg-gray-700"
                         bind:value={password}
+                        on:keypress={handle_keypress}
 		            />
 	            </div>
 				<Button onclick={login} size="lg">{status.value} Войти в аккаунт</Button>
