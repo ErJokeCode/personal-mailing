@@ -1,65 +1,78 @@
 <script lang="ts">
-	import { Breadcrumb, BreadcrumbItem, Button, Heading, Input } from 'flowbite-svelte';
+	import { Breadcrumb, BreadcrumbItem, Button, Heading, Select } from 'flowbite-svelte';
 	import { Table, TableBody, TableBodyCell, TableBodyRow, TableHead } from 'flowbite-svelte';
 	import { TableHeadCell } from 'flowbite-svelte';
 
 	import { onMount } from "svelte";
     import { Link } from "svelte-routing";
     import { CirclePlusOutline } from 'flowbite-svelte-icons';
+    import http from "../../utils/http";
+    import { server_url } from "../../utils/store.js"
 
     let allsubjectNames = []
     let allCourseNames = []
 
+    let dictNames = $state([])
+    let allCourseNamesInFile = $state([])
+    let allCourseNamesInSite = $state([])
+    let allSubjectNamesInModeus = $state([])
+
+    let studentStatus = http.status();
+
     onMount(async () => load());
     
     const load = async () => {
-        let response;
-        try {
-            response = await fetch("http://localhost:5000/parser/bot/onboard/", {
-                credentials: "include",
-            });
-        } catch (err) {
-            console.log(err)
-        }
-        let json = await response?.json();
-        allCourseNames = json;
+        studentStatus = studentStatus.start_load();
+        dictNames = (await http.get("/parser/course/dict_names", studentStatus)) ?? [];
+        allCourseNamesInFile = (await http.get("/parser/course/in_file/names", studentStatus)) ?? [];
+        allSubjectNamesInModeus = (await http.get("/parser/subject/names", studentStatus)) ?? [];
+        allCourseNamesInSite = (await http.get("/parser/course/names", studentStatus)) ?? [];
+        studentStatus = studentStatus.end_load();
     }
   
-    async function save(id) {
-        let res = null;
-        for (let course of allCourseNames) {
+    async function save(id, value, type) {
+        let name = value
+
+        for (let course of dictNames) {
+            console.log(course)
             if (course._id === id) {
-                res = course;
+                if (type === "f") {
+                    course.file_course = name;
+                } 
+                else if (type === "s") {
+                    course.site_inf = name;
+                }
+                else if (type === "m") {
+                    course.modeus = name;
+                }
+
+                studentStatus = studentStatus.start_load();
+                await http.put_json(`/parser/course/dict_names/one`, course, studentStatus);
+                studentStatus = studentStatus.end_load();
+                break;
             }
         }
-        if (res === null) return;
-
-        console.log("Сохранение...");
-
-        let body = JSON.stringify(res);
-  
-        let result = await fetch(`http://localhost:5000/parser/bot/onboard/${id}`, {
-            method: "PUT",
-            headers: {
-                'Accept': 'application/json, */*',
-                'Content-Type': 'application/json'
-            },
-            body: body,
-            credentials: "include",
-        });
-  
-        if (result.ok) {
-            console.log("Сохранено");
-        } else {
-            console.log("Ошибка");
-        }
     }
 
-    let rows = [0, 0, 0];
+    async function add() {
+        let dict = {
+            modeus: allSubjectNamesInModeus[0],
+            site_inf: allCourseNamesInSite[0],
+            file_course: allCourseNamesInFile[0]
+        }
 
-    function add() {
-        rows.push(0);
-        rows = rows;
+        studentStatus = studentStatus.start_load();
+        let res = await http.post(`/parser/course/dict_names?modeus=${dict.modeus}&site_inf=${dict.site_inf}&file_course=${dict.file_course}`, {}, studentStatus);
+        dictNames = (await http.get("/parser/course/dict_names", studentStatus)) ?? [];
+        studentStatus = studentStatus.end_load();
+    }
+
+    async function deleteOne(id) {
+        await fetch(`${server_url}/parser/course/dict_names/${id}`, {
+            method: "DELETE",
+            credentials: "include",
+        });
+        dictNames = (await http.get("/parser/course/dict_names", studentStatus)) ?? [];
     }
 </script>
 
@@ -77,22 +90,53 @@
                 <Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl mb-4">
                     Соотношения
                 </Heading>
-                <Button>
-                    Сохранить всё
-                </Button>
             </div>
             <Table hoverable={true}>
                 <TableHead>
                     <TableHeadCell class="px-8">Название в файле</TableHeadCell>
                     <TableHeadCell class="px-8">Название на сайте</TableHeadCell>
                     <TableHeadCell class="px-8">Название в модеусе</TableHeadCell>
+                    <TableHeadCell class="px-8">Удалить</TableHeadCell>
                 </TableHead>
                 <TableBody>
-                    {#each rows as row}
+                    {#each dictNames as dict}
                         <TableBodyRow>
-                            <TableBodyCell class="px-8"><Input></Input></TableBodyCell>
-                            <TableBodyCell class="px-8"><Input></Input></TableBodyCell>
-                            <TableBodyCell class="px-8"><Input></Input></TableBodyCell>
+                            <TableBodyCell class="px-8">
+                                <select on:change={(event) => save(dict._id, event.target.value, "f")} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500">
+                                    {#each allCourseNamesInFile as course}
+                                        {#if course === dict.file_course}
+                                            <option value={course} selected>{course}</option>
+                                        {:else}
+                                            <option value={course}>{course}</option>
+                                        {/if}
+                                    {/each}
+                                </select>
+                            </TableBodyCell>
+                            <TableBodyCell class="px-8">
+                                <select on:change={(event) => save(dict._id, event.target.value, "s")} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500">
+                                    {#each allCourseNamesInSite as course}
+                                        {#if course === dict.site_inf}
+                                            <option value={course} selected>{course}</option>
+                                        {:else}
+                                            <option value={course}>{course}</option>
+                                        {/if}
+                                    {/each}
+                                </select>
+                            </TableBodyCell>
+                            <TableBodyCell class="px-8">
+                                <select on:change={(event) => save(dict._id, event.target.value, "m")} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500">
+                                    {#each allSubjectNamesInModeus as course}
+                                        {#if course === dict.modeus}
+                                            <option value={course} selected>{course}</option>
+                                        {:else}
+                                            <option value={course}>{course}</option>
+                                        {/if}
+                                    {/each}
+                                </select>
+                            </TableBodyCell>
+                            <TableBodyCell class="px-8">
+                                <Button on:click={() => deleteOne(dict._id)}>Удалить</Button>
+                            </TableBodyCell>
                         </TableBodyRow>
                     {/each}
                 </TableBody>
