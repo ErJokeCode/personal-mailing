@@ -21,12 +21,14 @@
 
     import { Link } from 'svelte-routing'
 
-    let groups = {};
+    let groups = $state({});
     let searchGroup = "";
     let searchAdmin = "";
-    let admins = [];
+    let admins = $state([]);
 
     let chosenGroup = "";
+
+    let is_active_btn = $state(false);
 
     onMount(async () => {
         await getGroups();
@@ -72,6 +74,7 @@
     }
 
     async function handleGroupChoose(group) {
+        is_active_btn = true;
         if (chosenGroup === group) {
             chosenGroup = '';
         } else {
@@ -80,6 +83,7 @@
     }
 
     async function handleAdminChoose(adminId) {
+        is_active_btn = false;
         if(chosenGroup == "") {
             return;
         }
@@ -168,11 +172,20 @@
                                 <TableBodyRow>
                                     <TableBodyCell class='py-2'>{admin.email}</TableBodyCell>
                                     <TableBodyCell class='py-2'>
-                                        <Button
-                                            on:click={() =>
-                                                handleAdminChoose(admin.id)}
-                                            >Выбрать
-                                        </Button>
+                                        {#if is_active_btn}
+                                            <Button
+                                                on:click={() =>
+                                                    handleAdminChoose(admin.id)}
+                                                >Выбрать
+                                            </Button>
+                                        {:else}
+                                            <Button
+                                                on:click={() =>
+                                                    handleAdminChoose(admin.id)}
+                                                disabled
+                                                >Выбрать
+                                            </Button>
+                                        {/if}
                                     </TableBodyCell>
                                 </TableBodyRow>
                             {/each}
