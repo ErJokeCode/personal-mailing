@@ -5,7 +5,8 @@ export const signal = new signalR.HubConnectionBuilder()
         transport: signalR.HttpTransportType.ServerSentEvents,
         withCredentials: true,
     })
+    .withAutomaticReconnect()
     .build();
 
-signal.start();
+signal.start().catch(err => console.log(err));
 
