@@ -56,7 +56,7 @@ public static partial class ChatHandler
             return Results.NotFound("Student is not linked to you");
         }
 
-        var chat = activeStudent.Chats.SingleOrDefault(ch => ch.ActiveStudentId == activeStudent.Id);
+        var chat = activeStudent.Chats.SingleOrDefault(ch => ch.AdminId == admin.Id);
 
         if (chat == null)
         {
@@ -136,7 +136,7 @@ public static partial class ChatHandler
             return Results.NotFound("Admin not found");
         }
 
-        var chat = activeStudent.Chats.SingleOrDefault(ch => ch.ActiveStudentId == activeStudent.Id);
+        var chat = activeStudent.Chats.SingleOrDefault(ch => ch.AdminId == admin.Id);
 
         if (chat == null)
         {
