@@ -33,7 +33,10 @@ public static partial class AdminHandler
             }
         }
 
-        details.Permissions.Add(Permissions.View.Claim);
+        if (!details.Permissions.Contains(Permissions.View.Claim))
+        {
+            details.Permissions.Add(Permissions.View.Claim);
+        }
 
         var created =
             await CreateAdmin(details.Email, details.Password, details.Permissions, userManager, userStore, db);

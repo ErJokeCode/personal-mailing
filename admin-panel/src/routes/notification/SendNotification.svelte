@@ -12,6 +12,7 @@
 	import { TableHeadCell, Textarea, Helper } from 'flowbite-svelte';
     import { Link } from "svelte-routing";
 	import { onMount } from "svelte";
+    import { server_url } from "../../utils/store";
 
     let send_status = "";
     let content = "";
@@ -26,7 +27,7 @@
 
     const load_students = async () => {
         let response;
-        let url = new URL('http://193.168.3.39:5000/core/student?')
+        let url = new URL(`${server_url}/core/student?`)
         url.searchParams.append('notOnCourse', notOnCourse);
         url.searchParams.append('lowScore', lowScore);
         if (course !== 'Выберите курс') {
@@ -79,7 +80,7 @@
             add_id(checkboxes[i].checked, checkboxes[i].value);
         }
         if (ids.length === 0) return;
-        send_status = "Sending...";
+        send_status = "Отправка...";
 
         let response;
 
@@ -98,17 +99,20 @@
                 }
             }
 
-            response = await fetch('http://193.168.3.39:5000/core/notification', {
+            response = await fetch(`${server_url}/core/notification`, {
                 method: "Post",
                 body: data,
                 credentials: "include",
             });
         } catch (err) {
-            send_status = "Something went wrong! " + err;
+            send_status = "Что-то пошло не так! " + err;
         }
 
         if (response?.ok) {
-            send_status = "You successfully sent a notification!";
+            send_status = "Вы успешно отправили рассылку!";
+            content = "";
+            files = undefined;
+            value = [];
         }
     }
 	
@@ -180,6 +184,24 @@
         if (counter === checkboxes.length - 1) checkboxes[0].checked = true;
     }
 
+    async function handle_keypress(event) {
+        if (event.key == 'Enter') {
+            load_students();
+        }
+    }
+    const cancel = () => {
+        notOnCourse = false;
+        lowScore = false;
+        course = 'Выберите курс';
+        group = '';
+        typeOfEducation = 'Выберите форму';
+        typeOfCost = 'Выберите тип';
+        onlineCourse = '';
+        subject = '';
+        team = '';
+        load_students()
+    };
+
     let pageIndex = 0;
     let pageSize = 10;
     let notOnCourse = false;
@@ -222,8 +244,8 @@
                                 multiple bind:files>
                                 <svg aria-hidden="true" class="mb-3 w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
                                 {#if value.length === 0}
-                                    <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Click to upload</span> or drag and drop</p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
+                                    <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Перетащите сюда файлы</span> </p>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400">Либо нажмите, чтобы загрузить</p>
                                 {:else}
                                     <p class="text-xs text-gray-500 dark:text-gray-400">{showFiles(value)}</p>
                                 {/if}
@@ -276,23 +298,26 @@
                             <div class="w-full space-y-4">
                                 <Label class="space-y-2">
                                     <span>Группа</span>
-                                    <Input bind:value={group} type="text" placeholder="РИ-123456" size="md" />
+                                    <Input bind:value={group} type="text" placeholder="РИ-123456" size="md" on:keypress={handle_keypress} />
                                 </Label>
                                 <Label class="space-y-2">
                                     <span>Онлайн курс</span>
-                                    <Input bind:value={onlineCourse} type="text" placeholder="Введите название курса" size="md" />
+                                    <Input bind:value={onlineCourse} type="text" placeholder="Введите название курса" size="md" on:keypress={handle_keypress} />
                                 </Label>
                                 <Label class="space-y-2">
                                     <span>Предмет</span>
-                                    <Input bind:value={subject} type="text" placeholder="Введите название предмета" size="md" />
+                                    <Input bind:value={subject} type="text" placeholder="Введите название предмета" size="md" on:keypress={handle_keypress} />
                                 </Label>
                             </div>
                         </div>
                         <Label class="space-y-2 ml-2 mb-6">
                             <span>Команда</span>
-                            <Input bind:value={team} type="text" placeholder="Введите название команды" size="md" />
+                            <Input bind:value={team} type="text" placeholder="Введите название команды" size="md" on:keypress={handle_keypress} />
                         </Label>
-                        <Button class='flex ml-2' on:click={load_students}>Применить</Button>
+                        <div class="flex">
+                            <Button class='ml-2' on:click={load_students}>Применить</Button>
+                            <Button class='ml-4' on:click={cancel}>Сбросить</Button>
+                        </div>
                     </div>
                 </div>
                 <Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
@@ -303,8 +328,8 @@
                 <TableHead class="border-y border-gray-200 bg-gray-100 dark:border-gray-700">
                     <TableHeadCell class="w-4 p-4 pl-8 font-medium"><Checkbox on:click={(e) => toggle(e.target)} /></TableHeadCell>
                     <TableHeadCell class="w-4 p-4 font-medium">Курс</TableHeadCell>
-                    <TableHeadCell class="w-4 p-4 font-medium">Имя</TableHeadCell>
                     <TableHeadCell class="w-4 p-4 font-medium">Фамилия</TableHeadCell>
+                    <TableHeadCell class="w-4 p-4 font-medium">Имя</TableHeadCell>
                     <TableHeadCell class="w-4 p-4 font-medium">Отчество</TableHeadCell>
                     <TableHeadCell class="w-1/12 p-4 font-medium">Группа</TableHeadCell>
                     <TableHeadCell class="w-1/6 p-4 font-medium">Направление</TableHeadCell>
@@ -317,31 +342,31 @@
                         <TableBodyRow class="text-base">
                             <TableBodyCell class="p-4 pl-8"><Checkbox value={student.id} on:click={remove} /></TableBodyCell>
                             <TableBodyCell class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
-                                {student.info.group.numberCourse}
+                                {student.info !== null ? student.info.group.numberCourse : ''}
                             </TableBodyCell>
                             <TableBodyCell class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
-                                {student.info.name}
+                                {student.info !== null ? student.info.surname : ""}
                             </TableBodyCell>
                             <TableBodyCell class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
-                                {student.info.surname}
+                                {student.info !== null ? student.info.name: ""}
                             </TableBodyCell>
                             <TableBodyCell class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
-                                {student.info.patronymic}
+                                {student.info !== null ? student.info.patronymic : ""}
                             </TableBodyCell>
                             <TableBodyCell class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
-                                {student.info.group.number}
+                                {student.info !== null ? student.info.group.number : ""}
                             </TableBodyCell>
                             <TableBodyCell class="max-w-sm flex items-center space-x-6 whitespace-nowrap p-4">
                                 <div class="text-sm font-normal text-gray-500 dark:text-gray-400">
-                                    <div class="text-base font-semibold text-gray-900 dark:text-white">{student.info.group.directionCode}</div>
-                                    <div class="text-sm font-normal text-gray-500 dark:text-gray-400">{student.info.group.nameSpeciality}</div>
+                                    <div class="text-base font-semibold text-gray-900 dark:text-white">{student.info !== null ? student.info.group.directionCode : ""}</div>
+                                    <div class="text-sm font-normal text-gray-500 dark:text-gray-400 overflow-hidden text-ellipsis" style='max-width: 15dvw'>{student.info !== null ? student.info.group.nameSpeciality : ""}</div>
                                 </div>
                             </TableBodyCell>
                             <TableBodyCell class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
-                                {student.info.typeOfEducation}
+                                {student.info !== null ? student.info.typeOfEducation : ""}
                             </TableBodyCell>
                             <TableBodyCell class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
-                                {student.info.typeOfCost}
+                                {student.info !== null ? student.info.typeOfCost : ""}
                             </TableBodyCell>
                             <TableBodyCell class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
                                 {student.email}

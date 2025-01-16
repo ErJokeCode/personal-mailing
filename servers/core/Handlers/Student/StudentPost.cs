@@ -2,9 +2,11 @@ using System;
 using System.Linq;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Core.Messages;
 using Core.Models;
 using Core.Models.Dto;
 using Core.Utility;
+using MassTransit;
 using Microsoft.AspNetCore.Http;
 
 namespace Core.Handlers;
@@ -18,7 +20,7 @@ public static partial class StudentHandler
         public string ChatId { get; set; }
     }
 
-    public static async Task<IResult> AuthStudent(AuthDetails details, CoreDb db)
+    public static async Task<IResult> AuthStudent(AuthDetails details, CoreDb db, IPublishEndpoint endpoint)
     {
         var activeStudent = db.ActiveStudents.SingleOrDefault(a => a.Email == details.Email);
 
@@ -52,6 +54,11 @@ public static partial class StudentHandler
 
         db.ActiveStudents.Add(activeStudent);
         await db.SaveChangesAsync();
+
+        await endpoint.Publish(new NewActiveStudent()
+        {
+            ActiveStudent = ActiveStudentDto.Map(activeStudent),
+        });
 
         var dto = ActiveStudentDto.Map(activeStudent);
         return Results.Created("", dto);

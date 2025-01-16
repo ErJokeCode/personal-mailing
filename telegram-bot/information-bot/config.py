@@ -161,4 +161,4 @@ MANAGER_FAQ = ManagerFaq()
 
 WORKER = Worker(10, LOGGER, get_cookie())
 WORKER.add_manager_onboarding(MANAGER_ONB, URL_SERVER + "/parser/bot/onboard/")
-WORKER.add_manager_faq(MANAGER_FAQ, URL_SERVER + "/parser/bot/faq/", URL_SERVER + "/parser/bot/faq/topic")
+WORKER.add_manager_faq(MANAGER_FAQ, URL_SERVER + "/parser/bot/faq/")

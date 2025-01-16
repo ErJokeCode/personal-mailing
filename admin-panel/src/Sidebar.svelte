@@ -12,11 +12,13 @@
 		CogOutline,
 		FileChartBarSolid,
 		UserSettingsOutline,
+        UsersOutline,
 		UsersGroupOutline,
 		ChartPieOutline,
 		RectangleListSolid,
         EditOutline,
-        TableRowOutline
+        TableRowOutline,
+        QuestionCircleOutline,
 	} from 'flowbite-svelte-icons';
     import { Link } from 'svelte-routing';
     import { useLocation } from "svelte-routing";
@@ -34,22 +36,24 @@
     $: location = useLocation();
 
 	let posts = [
-		{ name: 'Главная', icon: ChartPieOutline, href: '/' },
-		{ name: 'Чаты', icon: RectangleListSolid, href: '/chats' },
+		// { name: 'Главная', icon: ChartPieOutline, href: '/' },
+		{ name: 'Чаты', icon: RectangleListSolid, href: '/' },
 		{ name: 'Загрузить файлы', icon: FileChartBarSolid, href: '/upload' },
 		{ name: 'Рассылки', icon: ClipboardListSolid, href: '/notifications' },
 		{
 			name: 'Студенты',
-			icon: UsersGroupOutline,
+			icon: UsersOutline,
 			children: {
 				'Все студенты': '/students/all',
                 'Активные студенты': '/students/active'
 			}
 		},
+		{ name: 'Группы', icon: UsersGroupOutline, href: '/groups' },
 		{ name: 'Конструктор онбординга', icon: EditOutline, href: '/builder' },
+		{ name: 'Редактор FAQ', icon: QuestionCircleOutline, href: '/faq' },
 		{ name: 'Соотношения', icon: TableRowOutline, href: '/names' },
 		{ name: 'Администраторы', icon: UserSettingsOutline, href: '/admin' },
-		{ name: 'Профиль', icon: CogOutline, href: '/profile' }
+		{ name: 'Профиль', icon: CogOutline, href: '/profile' },
 	];
 	let dropdowns = Object.fromEntries(Object.keys(posts).map((x) => [x, false]));
 

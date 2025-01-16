@@ -9,3 +9,9 @@ public class StudentSentMessage
     public AdminUserDto Admin { get; set; }
     public ActiveStudentDto Student { get; set; }
 }
+
+public class ChatRead
+{
+    public string AdminId { get; set; }
+    public int ChatId { get; set; }
+}

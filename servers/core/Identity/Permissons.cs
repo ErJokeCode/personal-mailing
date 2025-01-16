@@ -11,10 +11,12 @@ public class Permission
 {
     public string Claim { get; private set; }
     public string Policy => Claim + "Policy";
+    public string Name { get; private set; }
 
-    public Permission(string name)
+    public Permission(string claim, string name)
     {
-        Claim = name;
+        Claim = claim;
+        Name = name;
     }
 }
 
@@ -38,12 +40,12 @@ public static class RouteGroupBuilderExtensions
 
 public static class Permissions
 {
-    public static Permission View => new Permission("View");
-    public static Permission CreateAdmins => new Permission("CreateAdmins");
-    public static Permission SendMessages => new Permission("SendMessages");
-    public static Permission SendNotifications => new Permission("SendNotifications");
-    public static Permission ManipulateStudents => new Permission("ManipulateStudents");
-    public static Permission UploadFiles => new Permission("UploadFiles");
+    public static Permission View => new Permission("View", "Просмотр");
+    public static Permission CreateAdmins => new Permission("CreateAdmins", "Создание админов");
+    public static Permission SendMessages => new Permission("SendMessages", "Отправка сообщений");
+    public static Permission SendNotifications => new Permission("SendNotifications", "Отправка рассылок");
+    public static Permission ManipulateStudents => new Permission("ManipulateStudents", "Редактирование студентов");
+    public static Permission UploadFiles => new Permission("UploadFiles", "Загрузка файлов");
 
     public static List<Permission>
         All => [View, CreateAdmins, SendMessages, SendNotifications, ManipulateStudents, UploadFiles];

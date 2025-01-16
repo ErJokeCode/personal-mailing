@@ -3,15 +3,17 @@ from fastapi import HTTPException
 import pandas as pd
 
 from db import WorkerCollection
-from src.schemas import InfoGroupInStudent, Student
+from worker import update_status_history
+from src.schemas import HistoryUploadFileInDB, InfoGroupInStudent, Student
 from config import WorkerDataBase
 
 
-def upload_student(link: str, worker_db: WorkerDataBase) -> dict[str, str]:
+def upload_student(link: str, worker_db: WorkerDataBase, hist: HistoryUploadFileInDB) -> dict[str, str]:
     try:
         df = pd.read_excel(link, sheet_name=0)
     except Exception as e:
         print(e)
+        update_status_history(hist, text_status="Error file read")
         raise HTTPException(status_code=500, detail="File read error")
     
     try:
@@ -21,6 +23,7 @@ def upload_student(link: str, worker_db: WorkerDataBase) -> dict[str, str]:
             students.append(student)
     except Exception as e:
         print(e)
+        update_status_history(hist, text_status="Error parse file")
         raise HTTPException(status_code=500, detail="Error parse file")
             
     try:
@@ -29,6 +32,7 @@ def upload_student(link: str, worker_db: WorkerDataBase) -> dict[str, str]:
         
     except Exception as e:
         print(e)
+        update_status_history(hist, text_status="Error insert data")
         raise HTTPException(status_code=500, detail="Error insert data")
     
     return {"status": "success"}
@@ -36,10 +40,11 @@ def upload_student(link: str, worker_db: WorkerDataBase) -> dict[str, str]:
         
 def create_student(item) -> Student:
     FIO = item["Фамилия, имя, отчество"].split()
+    personal_number = "0" * (8 - len(str(item["Личный №"]))) + str(item["Личный №"])
     student = Student(
         surname=FIO[0] if len(FIO) > 0 else "",
         name=FIO[1] if len(FIO) > 1 else "",
-        patronymic=FIO[2] if len(FIO) > 2 else "",
+        patronymic="".join(FIO[2:]) if len(FIO) > 2 else "",
         faculty = item["Форм. факультет"],
         city = item["Территориальное подразделение"],
         department = item["Кафедра"],
@@ -48,7 +53,7 @@ def create_student(item) -> Student:
         type_of_cost = item["Вид возм. затрат"],
         type_of_education = item["Форма освоения"],
         date_of_birth = item["Дата рождения"],
-        personal_number = str(item["Личный №"]), 
+        personal_number = personal_number, 
         subjects=[],
         online_course=[]
     )

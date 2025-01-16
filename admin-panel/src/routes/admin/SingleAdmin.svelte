@@ -1,5 +1,5 @@
 <script>
-	import { Breadcrumb, BreadcrumbItem, Heading } from 'flowbite-svelte';
+	import { Breadcrumb, BreadcrumbItem, Heading, Tabs, TabItem, Accordion, AccordionItem } from 'flowbite-svelte';
     import http from "../../utils/http";
     import { onMount } from "svelte";
     import { Link } from "svelte-routing";
@@ -9,12 +9,12 @@
 
     let admin = {};
     let status = http.status();
-    let article;
+    let student;
 
     onMount(async () => {
         admin = (await http.get(`/core/admin/${id}`, status)) ?? {};
+        student = []
         console.log(admin)
-        article.appendChild(traverseObject(admin));
     });
 </script>
 
@@ -34,9 +34,61 @@
                     <BreadcrumbItem>Детали</BreadcrumbItem>
                 </Breadcrumb>
                 <Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl mb-3">
-                    Email: {admin.email}
+                    {admin.email}
                 </Heading>
-                <div class="text-gray-900 dark:text-white" bind:this={article}></div>
+                <div class="text-gray-900 dark:text-white">
+                    <Tabs>
+                        <TabItem open title="Основная информация">
+                            <ul>
+                                <li>
+                                    <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
+                                        <b>ID:</b>
+                                        {admin.id}
+                                    </p>
+                                </li>
+    
+                                <li>
+                                    <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
+                                        <b>Электронная почта:</b>
+                                        {admin.email}
+                                    </p>
+                                </li>
+    
+                                <li>
+                                    <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
+                                        <b>Дата создания:</b>
+                                        {admin.date}
+                                    </p>
+                                </li>
+                            </ul>
+                        </TabItem>
+                        <TabItem title="Группы">
+                            <ul>
+                                {#each admin.groups.sort() as group}
+                                    <li>
+                                        <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
+                                            <b>{group}</b>
+                                        </p>
+                                    </li>
+                                {/each}
+                                {#if admin.groups.length === 0}
+                                    Нет прикреплённых групп
+                                {/if}
+                            </ul>
+                        </TabItem>
+                        <TabItem title="Разрешения">
+                            {#each admin.permissions as permission}
+                                <ul>
+                                    <li>
+                                        <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
+                                            <b>{permission}</b>
+                                        </p>
+                                    </li>
+                                </ul>
+                            {/each}
+                        </TabItem>
+                    </Tabs>
+                </div>
             </div>
         </div>
     </div>

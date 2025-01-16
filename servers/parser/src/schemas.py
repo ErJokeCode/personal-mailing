@@ -10,6 +10,7 @@ class TypeFile(str, Enum):
     student = "student"
     modeus = "modeus"
     online_course = "online_course"
+    site_inf = "site_inf"
     
 class TypeFormSubject(str, Enum):
     online = "online"
@@ -80,6 +81,16 @@ class InfoOnlineCourse(BaseModel):
 class InfoOnlineCourseInDB(InfoOnlineCourse, BaseModelInDB):
     pass
 
+class InfoOCInFile(BaseModel):
+    name: str
+    name_subject: str
+    platform: str
+    university: str
+    form_edu: str
+
+class InfoOCInFileInDB(InfoOCInFile, BaseModelInDB):
+    pass
+
 class InfoOnlineCourseInStudent(InfoOnlineCourse): 
     scores: dict | None = None
     
@@ -110,17 +121,15 @@ class DictNamesInDB(DictNames, BaseModelInDB):
     
     
 class FAQ(BaseModel):
-    topic: str
-    callback_data: str
     question: str
     answer: str
-    
-class FAQInDB(FAQ, BaseModelInDB):
-    pass
 
 class FAQTopic(BaseModel):
-    topic: str
-    callback_data: str
+    name: str
+    faqs: list[FAQ] = []
+
+class FAQTopicInDB(FAQTopic, BaseModelInDB):
+    pass
     
 class OnboardTopic(BaseModel):
     name: str

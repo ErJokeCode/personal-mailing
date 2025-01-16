@@ -1,7 +1,8 @@
 <script lang='ts'>
-	import { Breadcrumb, BreadcrumbItem, Heading, Accordion, AccordionItem, Input, Label, Button, Helper } from 'flowbite-svelte';
+	import { Breadcrumb, BreadcrumbItem, Heading, Accordion, AccordionItem, Input, Label, Button, Helper, Checkbox } from 'flowbite-svelte';
     import { onMount } from 'svelte';
     import { Link } from "svelte-routing";
+    import { server_url } from "../../utils/store";
 
     let courses;
 
@@ -14,7 +15,7 @@
     const load = async () => {
         let response;
         try {
-            response = await fetch("http://193.168.3.39:5000/parser/bot/onboard/", {
+            response = await fetch(`${server_url}/parser/bot/onboard/`, {
                 credentials: "include",
             });
         } catch (err) {
@@ -37,7 +38,7 @@
 
         let body = JSON.stringify(res);
   
-        let result = await fetch(`http://193.168.3.39:5000/parser/bot/onboard/${id}`, {
+        let result = await fetch(`${server_url}/parser/bot/onboard/${id}`, {
             method: "PUT",
             headers: {
                 'Accept': 'application/json, */*',
@@ -48,16 +49,26 @@
         });
   
         if (result.ok) {
-            console.log("Сохранено");
+            success = "Сохранено";
         } else {
-            console.log("Ошибка");
+            success = "Ошибка";
         }
     }
 
     const add_course = async () => {
+        let is_active = true;
+        let is_main = false;
+        if (group.indexOf('active') === -1) {
+            is_active = false;
+        }
+        if (group.indexOf('main') !== -1) {
+            is_main = true;
+        }
+
         let new_course = {
             "name": "Новый курс",
-            "is_active": true,
+            "is_main": is_main,
+            "is_active": is_active,
             "sections": [
                 {
                     "name": "Новый раздел",
@@ -75,7 +86,7 @@
         };
         let body = JSON.stringify(new_course);
   
-        let result = await fetch(`http://193.168.3.39:5000/parser/bot/onboard/one_course`, {
+        let result = await fetch(`${server_url}/parser/bot/onboard/one_course`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json, */*',
@@ -88,7 +99,7 @@
     }
 
     const delete_course = async (id) => {
-        let result = await fetch(`http://193.168.3.39:5000/parser/bot/onboard/${id}`, {
+        let result = await fetch(`${server_url}/parser/bot/onboard/${id}`, {
             method: "DELETE",
             credentials: "include",
         });
@@ -189,6 +200,9 @@
     const topic_down = async (course_index, section_name, topic_index) => {
         topic_up(course_index, section_name, topic_index, 1, 1)
     }
+
+    
+    
 </script>
 
 <div class="overflow-hidden lg:flex">
@@ -210,7 +224,6 @@
                 </Button>
                 <Helper class="mb-4 mt-1"></Helper>
                 {#each courses as course, course_index}
-                    {console.log(course)}
                     <Accordion class='mb-5'>
                         <AccordionItem>
                             <span slot="header">{course.name}</span>
@@ -218,6 +231,10 @@
                                 <span>Название</span>
                                 <Input bind:value={course.name} class='border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700' placeholder={course.name} size="md" />
                             </Label>
+                            <div class="mb-5 flex space-x-4">
+                                <Checkbox checked={course.is_main} groupInputClass='ms-2' on:click={() => course.is_main = !course.is_main}>Главный курс</Checkbox>
+                                <Checkbox checked={course.is_active} groupInputClass='ms-2' on:click={() => course.is_active = !course.is_active}>Активный курс</Checkbox>
+                            </div>
                             <div class="mb-5 space-x-4">
                                 <Button on:click={() => add_section(course_index)}>Добавить раздел</Button>
                                 <Button on:click={() => delete_course(course._id)}>Удалить курс</Button>

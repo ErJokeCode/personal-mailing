@@ -2,10 +2,10 @@
 	import { Breadcrumb, BreadcrumbItem, Heading } from 'flowbite-svelte';
 	import { Table, TableBody, TableBodyCell, TableBodyRow, TableHead } from 'flowbite-svelte';
 	import { TableHeadCell } from 'flowbite-svelte';
-
-	import { onMount } from "svelte";
+	import { onDestroy, onMount } from "svelte";
     import { Link, navigate } from "svelte-routing";
     import http from "../../utils/http";
+    import {signal} from "../../utils/signal";
 
     let activeStudents = [];
 
@@ -15,7 +15,17 @@
         studentStatus = studentStatus.start_load();
         activeStudents = (await http.get("/core/student", studentStatus)).items ?? [];
         studentStatus = studentStatus.end_load();
+
+        signal.on("NewActiveStudent", handleNewStudent);
     });
+
+    onDestroy(async () => {
+        signal.off("NewActiveStudent", handleNewStudent);
+    })
+
+    async function handleNewStudent(message) {
+        activeStudents.push(message.activeStudent);
+    }
 
     async function fullInfo(id) {
         navigate(`/students/active/${id}`);
@@ -39,15 +49,30 @@
             </div>
             <Table hoverable={true}>
                 <TableHead>
-                    <TableHeadCell class="px-8">ID</TableHeadCell>
                     <TableHeadCell class="px-8">Почта</TableHeadCell>
+                    <TableHeadCell class="px-8">Курс</TableHeadCell>
+                    <TableHeadCell class="px-8">Группа</TableHeadCell>
+                    <TableHeadCell class="px-8">Фамилия</TableHeadCell>
+                    <TableHeadCell class="px-8">Имя</TableHeadCell>
+                    <TableHeadCell class="px-8">Отчество</TableHeadCell>
+                    <TableHeadCell class="px-8">Тип</TableHeadCell>
+                    <TableHeadCell class="px-8">Номер студенческого</TableHeadCell>
                 </TableHead>
                 <TableBody>
                     {#each activeStudents as student}
-                        <TableBodyRow on:click={() => fullInfo(student.id)}>
-                            <TableBodyCell class="px-8">{student.id}</TableBodyCell>
-                            <TableBodyCell class="px-8">{student.email}</TableBodyCell>
-                        </TableBodyRow>
+                        {#if student.info !== null}
+                            {console.log(student)}
+                            <TableBodyRow on:click={() => fullInfo(student.id)}>
+                                <TableBodyCell class="px-8">{student.info.email}</TableBodyCell>
+                                <TableBodyCell class="px-8">{student.info.group.numberCourse}</TableBodyCell>
+                                <TableBodyCell class="px-8">{student.info.group.number}</TableBodyCell>
+                                <TableBodyCell class="px-8">{student.info.surname}</TableBodyCell>
+                                <TableBodyCell class="px-8">{student.info.name}</TableBodyCell>
+                                <TableBodyCell class="px-8">{student.info.patronymic}</TableBodyCell>
+                                <TableBodyCell class="px-8">{student.info.typeOfCost}</TableBodyCell>
+                                <TableBodyCell class="px-8">{student.info.personalNumber}</TableBodyCell>
+                            </TableBodyRow>
+                        {/if}
                     {/each}
                 </TableBody>
             </Table>

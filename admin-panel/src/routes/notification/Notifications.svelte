@@ -4,6 +4,7 @@
     import { ArrowRightOutline } from 'flowbite-svelte-icons';
     import { onMount } from "svelte";
     import { Link, navigate } from "svelte-routing";
+    import { server_url } from "../../utils/store";
 
     let notifications = [];
     let searchTerm = "";
@@ -12,7 +13,7 @@
         let response;
 
         try {
-            response = await fetch("http://193.168.3.39:5000/core/admin/notifications", {
+            response = await fetch(`${server_url}/core/admin/notifications`, {
                 credentials: "include",
             });
         } catch (err) { }
@@ -48,26 +49,26 @@
                 </Heading>
                 <Search size='md' class='block w-80 p-2.5 ps-10 text-sm mb-4' placeholder="Поиск" bind:value={searchTerm} />
             </div>
-          <Table hoverable={true}>
-            <TableHead>
-              <TableHeadCell class="px-8">Содержание</TableHeadCell>
-              <TableHeadCell class="px-8" defaultSort>Дата</TableHeadCell>
-              <TableHeadCell class="px-8">Отправлено</TableHeadCell>
-            </TableHead>
-            <TableBody tableBodyClass="divide-y">
-              {#each filtered as notification}
-                <TableBodyRow on:click={() => fullInfo(notification.id)}>
-                  <TableBodyCell class="px-8 break-all">{notification.content.length > 50 ? notification.content.slice(0, 50) : notification.content}</TableBodyCell>
-                  <TableBodyCell class="px-8">{notification.date}</TableBodyCell>
-                  <TableBodyCell class="px-8">
-                    {#each notification.students as student}
-                      {student.email},
+            <Table hoverable={true}>
+                <TableHead>
+                    <TableHeadCell class="px-8">Содержание</TableHeadCell>
+                    <TableHeadCell class="px-8" defaultSort>Дата</TableHeadCell>
+                    <TableHeadCell class="px-8">Отправлено</TableHeadCell>
+                </TableHead>
+                <TableBody tableBodyClass="divide-y">
+                    {#each filtered as notification}
+                        <TableBodyRow on:click={() => fullInfo(notification.id)}>
+                            <TableBodyCell class="px-8 break-all">{notification.content.length > 50 ? notification.content.slice(0, 50) : notification.content}</TableBodyCell>
+                            <TableBodyCell class="px-8">{notification.date}</TableBodyCell>
+                            <TableBodyCell class="px-8 overflow-hidden text-ellipsis" style='max-width: 50dvw'>
+                                {#each notification.students as student}
+                                    {student.email},&nbsp;
+                                {/each}
+                            </TableBodyCell>
+                        </TableBodyRow>
                     {/each}
-                  </TableBodyCell>
-                </TableBodyRow>
-              {/each}
-            </TableBody>
-          </Table>
+                </TableBody>
+            </Table>
         </div>
     </div>
 </div>

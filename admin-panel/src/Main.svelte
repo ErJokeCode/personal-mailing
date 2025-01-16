@@ -24,10 +24,14 @@
 
     import Builder from "./routes/onboarding/Builder.svelte";
     import Edit from "./routes/subjects/Edit.svelte";
+
+    import AssignGroup from "./routes/groups/AssignGroup.svelte";
+  import { compile } from "svelte/compiler";
+  import Faq from "./routes/faq/Faq.svelte";
 </script>
 
 <main>
-    <Route path="/" component={Home} />
+    <Route path="/" component={Chats} />
     <Route path="/login" component={Login} />
     <Route path="/profile" component={Profile} />
 
@@ -45,12 +49,16 @@
     <Route path="/admin/create" component={CreateAdmin} />
     <Route path="/admin/:id" component={SingleAdmin} />
 
-    <Route path="/chats" component={Chats} />
+    <!-- <Route path="/chats" component={Chats} /> -->
     <Route path="/chat/:studentId" component={SingleChat} />
 
     <Route path="/builder" component={Builder} />
     
     <Route path="/names" component={Edit} />
+
+    <Route path="/groups" component={AssignGroup} />
+
+    <Route path="/faq" component={Faq} />
 </main>
 
 <style>
