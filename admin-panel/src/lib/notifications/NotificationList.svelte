@@ -3,7 +3,6 @@
     import { BellSolid } from "flowbite-svelte-icons";
     import Notification from "./Notification.svelte";
     import { onDestroy, onMount } from "svelte";
-    import { notifications } from "../../utils/store";
     import { signal } from "../../utils/signal";
     import http from "../../utils/http";
     import { navigate } from "svelte-routing";

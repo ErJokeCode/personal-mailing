@@ -33,7 +33,7 @@
                 <Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl mb-3">
                     {student.name} {student.surname} {student.patronymic}
                 </Heading>
-                <Tabs>
+                <Tabs tabStyle='underline' contentClass='p-4 bg-white rounded-lg dark:bg-gray-800 mt-4'>
                     <TabItem open title="Основная информация">
                         <ul>
                             <li>

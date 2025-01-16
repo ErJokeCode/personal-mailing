@@ -1,7 +1,7 @@
 <script>
     import { onMount } from "svelte";
     import http from "../../utils/http";
-
+    import { server_url } from "../../utils/store";
 	import {
 		Breadcrumb,
 		BreadcrumbItem,
@@ -15,9 +15,7 @@
         TableBodyCell,
         Heading,
         Helper
-
 	} from 'flowbite-svelte';
-
     import { Link } from 'svelte-routing'
 
     let groups = $state({});
@@ -36,7 +34,7 @@
 
     async function getGroups() {
         let result = await fetch(
-            "http://localhost:5000/core/data/groups?search=" + searchGroup,
+            `${server_url}/core/data/groups?search=` + searchGroup,
             {
                 credentials: "include",
             },
@@ -49,7 +47,7 @@
 
     async function getAdmins() {
         let result = await fetch(
-            "http://localhost:5000/core/admin?search=" + searchAdmin,
+            `${server_url}/core/admin?search=` + searchAdmin,
             {
                 credentials: "include",
             },
@@ -76,10 +74,10 @@
         is_active_btn = true;
         if (chosenGroup === group) {
             chosenGroup = '';
+            is_active_btn = false;
         } else {
             chosenGroup = group;
         }
-        console.log(chosenGroup)
     }
 
     async function handleAdminChoose(adminId) {

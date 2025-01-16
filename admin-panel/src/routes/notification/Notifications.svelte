@@ -4,6 +4,7 @@
     import { ArrowRightOutline } from 'flowbite-svelte-icons';
     import { onMount } from "svelte";
     import { Link, navigate } from "svelte-routing";
+    import { server_url } from "../../utils/store";
 
     let notifications = [];
     let searchTerm = "";
@@ -12,7 +13,7 @@
         let response;
 
         try {
-            response = await fetch("http://localhost:5000/core/admin/notifications", {
+            response = await fetch(`${server_url}/core/admin/notifications`, {
                 credentials: "include",
             });
         } catch (err) { }

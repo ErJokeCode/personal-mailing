@@ -5,6 +5,7 @@
     import { Link } from "svelte-routing";
 	import http from '../../utils/http';
 	import { signal } from '../../utils/signal';
+    import { server_url } from "../../utils/store";
 
 	export let studentId;
 
@@ -115,7 +116,7 @@
                     <li class="inline-flex items-center"><svg class="w-6 h-6 text-gray-400 rtl:-scale-x-100" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                         <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0
                         z" clip-rule="evenodd"></path></svg>
-                    <Link class="ml-0 ms-1 text-sm font-medium text-gray-700 hover:text-gray-900 md:ms-2 dark:text-gray-400 dark:hover:text-white" to="/chats">Все чаты</Link></li>
+                    <Link class="ml-0 ms-1 text-sm font-medium text-gray-700 hover:text-gray-900 md:ms-2 dark:text-gray-400 dark:hover:text-white" to="/">Все чаты</Link></li>
                     <BreadcrumbItem>Чат</BreadcrumbItem>
                 </Breadcrumb>
             </div>
@@ -144,7 +145,7 @@
                                             {#if document.mimeType.includes('image')}
                                                 <img
                                                     class="mb-1"
-                                                    src={`http://localhost:5000/core/document/${document.id}/download`}
+                                                    src={`${server_url}/core/document/${document.id}/download`}
                                                     alt=""
                                                 />
                                             {/if}
@@ -152,7 +153,7 @@
                                                 <Helper>{document.name}</Helper>
                                                 <a
                                                     class="ml-3"
-                                                    href={`http://localhost:5000/core/document/${document.id}/download`}
+                                                    href={`${server_url}/core/document/${document.id}/download`}
                                                     >Скачать</a
                                                 >
                                             </div>
@@ -176,7 +177,7 @@
                                             {#if document.mimeType.includes('image')}
                                                 <img
                                                     class="mb-1"
-                                                    src={`http://localhost:5000/core/document/${document.id}/download`}
+                                                    src={`${server_url}/core/document/${document.id}/download`}
                                                     alt=""
                                                 />
                                             {/if}
@@ -184,7 +185,7 @@
                                                 <Helper>{document.name}</Helper>
                                                 <a
                                                     class="ml-3"
-                                                    href={`http://localhost:5000/core/document/${document.id}/download`}
+                                                    href={`${server_url}/core/document/${document.id}/download`}
                                                     >Скачать</a
                                                 >
                                             </div>

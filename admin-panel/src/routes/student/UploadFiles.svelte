@@ -1,11 +1,11 @@
 <script lang="ts">
-    import { Breadcrumb, BreadcrumbItem, Fileupload, Label, Button, Helper, Heading, A, Pagination } from 'flowbite-svelte';
+    import { Breadcrumb, BreadcrumbItem, Fileupload, Button, Helper, Heading, A } from 'flowbite-svelte';
     import { TableHeadCell, Table, TableBody, TableBodyCell, TableBodyRow, TableHead } from 'flowbite-svelte';
     import { ChevronLeftOutline, ChevronRightOutline } from 'flowbite-svelte-icons';
     import { onDestroy, onMount } from "svelte";
     import http from "../../utils/http";
-    import { navigate } from "svelte-routing";
     import { signal } from "../../utils/signal";
+    import { server_url } from "../../utils/store";
   
     let student_files;
     let student_success = "";
@@ -48,10 +48,6 @@
         }
         maxPage = Math.ceil(history.length / amountPage);
     }
-
-    async function download_file(link) {
-        navigate(link);
-    }
   
       async function send_students() {
       if (student_files.length <= 0) return;
@@ -63,7 +59,7 @@
       var data = new FormData();
       data.append("file", file);
   
-      let result = await fetch('http://localhost:5000/parser/upload/student', {
+      let result = await fetch(`${server_url}/parser/upload/student`, {
         method: "POST",
         body: data,
         credentials: "include",
@@ -94,7 +90,7 @@
           data.append("file", file);
   
           let result = await fetch(
-              'http://localhost:5000/parser/upload/choice_in_modeus',
+              `${server_url}/parser/upload/choice_in_modeus`,
               {
                   method: "POST",
                   body: data,
@@ -127,7 +123,7 @@
           data.append("file", file);
   
           let result = await fetch(
-              'http://localhost:5000/parser/upload/report_online_course',
+              `${server_url}/parser/upload/report_online_course`,
               {
                   method: "POST",
                   body: data,
@@ -149,7 +145,6 @@
           }
       }
 
-
       async function toPage(page) {
         if (page < 0) {
             page = 0;
@@ -165,7 +160,7 @@
 
       async function update_inf() {
         let result = await fetch(
-              'http://localhost:5000/parser/upload/report_online_course/site_inf',
+              `${server_url}/parser/upload/report_online_course/site_inf`,
               {
                   method: "POST",
                   credentials: "include",
@@ -194,7 +189,7 @@
             <div class="space-y-2 mb-6">
                 <div style="display: flex; flex-direction: row; gap: 30px; align-items: baseline; margin-bottom: 20px">
                     <Heading tag="h3" class="w-100 text-xl font-semibold text-gray-900 dark:text-gray-100 sm:text-s">Студенты</Heading>
-                    <A class="font-medium hover:underline text-sm" for="larg_size" href="http://localhost:5000/parser/upload/student/example">Скачать пример</A>
+                    <A class="font-medium hover:underline text-sm" for="larg_size" href={server_url + "/parser/upload/student/example"}>Скачать пример</A>
                 </div>
                 <Fileupload value="" bind:files={student_files} id="larg_size" size="lg" />
                 <Helper>{student_success}</Helper>
@@ -203,7 +198,7 @@
             <div class="space-y-2 mb-6">
                 <div style="display: flex; flex-direction: row; gap: 30px; align-items: baseline; margin-bottom: 20px">
                     <Heading tag="h3" class="w-100 text-xl font-semibold text-gray-900 dark:text-gray-100 sm:text-l">Модеус</Heading>
-                    <A class="font-medium hover:underline text-sm" for="larg_size" href="http://localhost:5000/parser/upload/choice_in_modeus/example">Скачать пример</A>
+                    <A class="font-medium hover:underline text-sm" for="larg_size" href={server_url + "/parser/upload/choice_in_modeus/example"}>Скачать пример</A>
                 </div>
                 <Fileupload value="" bind:files={modeus_files} id="larg_size" size="lg" />
                 <Helper>{modeus_success}</Helper>
@@ -212,7 +207,7 @@
             <div class="space-y-2 mb-6">
                 <div style="display: flex; flex-direction: row; gap: 30px; align-items: baseline; margin-bottom: 20px">
                     <Heading tag="h3" class="w-100 text-xl font-semibold text-gray-900 dark:text-gray-100 sm:text-l">Курсы</Heading>
-                    <A class="font-medium hover:underline text-sm" for="larg_size" href="http://localhost:5000/parser/upload/report_online_course/example">Скачать пример</A>
+                    <A class="font-medium hover:underline text-sm" for="larg_size" href={server_url + "/parser/upload/report_online_course/example"}>Скачать пример</A>
                     <A class="font-medium hover:underline text-sm" for="larg_size" on:click={update_inf}>Обновить информацию с сайта inf-urfu</A>
                 </div>
                 <Fileupload value="" bind:files={courses_files} id="larg_size" size="lg" />

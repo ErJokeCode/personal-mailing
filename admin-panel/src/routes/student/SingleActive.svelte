@@ -45,7 +45,7 @@
                     Начать чат
                     <ArrowRightOutline class="w-6 h-6 ms-2" />
                 </Button>
-                <Tabs>
+                <Tabs tabStyle='underline' contentClass='p-4 bg-white rounded-lg dark:bg-gray-800 mt-4'>
                     <TabItem open title="Основная информация">
                         <ul>
                             <li>
