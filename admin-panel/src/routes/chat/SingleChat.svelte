@@ -5,6 +5,7 @@
     import { Link } from "svelte-routing";
 	import http from '../../utils/http';
 	import { signal } from '../../utils/signal';
+    import { server_url } from "../../utils/store";
 
 	export let studentId;
 
@@ -144,7 +145,7 @@
                                             {#if document.mimeType.includes('image')}
                                                 <img
                                                     class="mb-1"
-                                                    src={`http://localhost:5000/core/document/${document.id}/download`}
+                                                    src={`${server_url}/core/document/${document.id}/download`}
                                                     alt=""
                                                 />
                                             {/if}
@@ -152,7 +153,7 @@
                                                 <Helper>{document.name}</Helper>
                                                 <a
                                                     class="ml-3"
-                                                    href={`http://localhost:5000/core/document/${document.id}/download`}
+                                                    href={`${server_url}/core/document/${document.id}/download`}
                                                     >Скачать</a
                                                 >
                                             </div>
@@ -176,7 +177,7 @@
                                             {#if document.mimeType.includes('image')}
                                                 <img
                                                     class="mb-1"
-                                                    src={`http://localhost:5000/core/document/${document.id}/download`}
+                                                    src={`${server_url}/core/document/${document.id}/download`}
                                                     alt=""
                                                 />
                                             {/if}
@@ -184,7 +185,7 @@
                                                 <Helper>{document.name}</Helper>
                                                 <a
                                                     class="ml-3"
-                                                    href={`http://localhost:5000/core/document/${document.id}/download`}
+                                                    href={`${server_url}/core/document/${document.id}/download`}
                                                     >Скачать</a
                                                 >
                                             </div>

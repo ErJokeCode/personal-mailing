@@ -12,6 +12,7 @@
 	import { TableHeadCell, Textarea, Helper } from 'flowbite-svelte';
     import { Link } from "svelte-routing";
 	import { onMount } from "svelte";
+    import { server_url } from "../../utils/store";
 
     let send_status = "";
     let content = "";
@@ -26,7 +27,7 @@
 
     const load_students = async () => {
         let response;
-        let url = new URL('http://localhost:5000/core/student?')
+        let url = new URL(`${server_url}/core/student?`)
         url.searchParams.append('notOnCourse', notOnCourse);
         url.searchParams.append('lowScore', lowScore);
         if (course !== 'Выберите курс') {
@@ -79,7 +80,7 @@
             add_id(checkboxes[i].checked, checkboxes[i].value);
         }
         if (ids.length === 0) return;
-        send_status = "Sending...";
+        send_status = "Отправка...";
 
         let response;
 
@@ -98,17 +99,20 @@
                 }
             }
 
-            response = await fetch('http://localhost:5000/core/notification', {
+            response = await fetch(`${server_url}/core/notification`, {
                 method: "Post",
                 body: data,
                 credentials: "include",
             });
         } catch (err) {
-            send_status = "Something went wrong! " + err;
+            send_status = "Что-то пошло не так! " + err;
         }
 
         if (response?.ok) {
-            send_status = "You successfully sent a notification!";
+            send_status = "Вы успешно отправили рассылку!";
+            content = "";
+            files = undefined;
+            value = [];
         }
     }
 	
@@ -185,6 +189,18 @@
             load_students();
         }
     }
+    const cancel = () => {
+        notOnCourse = false;
+        lowScore = false;
+        course = 'Выберите курс';
+        group = '';
+        typeOfEducation = 'Выберите форму';
+        typeOfCost = 'Выберите тип';
+        onlineCourse = '';
+        subject = '';
+        team = '';
+        load_students()
+    };
 
     let pageIndex = 0;
     let pageSize = 10;
@@ -298,7 +314,10 @@
                             <span>Команда</span>
                             <Input bind:value={team} type="text" placeholder="Введите название команды" size="md" on:keypress={handle_keypress} />
                         </Label>
-                        <Button class='flex ml-2' on:click={load_students}>Применить</Button>
+                        <div class="flex">
+                            <Button class='ml-2' on:click={load_students}>Применить</Button>
+                            <Button class='ml-4' on:click={cancel}>Сбросить</Button>
+                        </div>
                     </div>
                 </div>
                 <Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
