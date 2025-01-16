@@ -10,6 +10,7 @@ class TypeFile(str, Enum):
     student = "student"
     modeus = "modeus"
     online_course = "online_course"
+    site_inf = "site_inf"
     
 class TypeFormSubject(str, Enum):
     online = "online"

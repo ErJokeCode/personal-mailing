@@ -93,7 +93,19 @@ async def get_example_file_online_course() -> dict[str, str]:
     
 @router_data.post("/report_online_course/site_inf")
 async def update_online_course_inf():
-    asyncio.create_task(background_site_inf())
+    hist = await get_history()
+    if len(hist) == 1 and hist[0].status_upload is None:
+        raise HTTPException(status_code=400, detail=f"Wait for the {hist[0].name_file} file to be processed")
+    
+    hist_info = HistoryUploadFile(
+        name_file="Обновление информации с сайта",
+        key="",
+        date=datetime.now(),
+        type=TypeFile.site_inf,
+    )
+    hist = worker_db.history.insert_one(hist_info)
+
+    asyncio.create_task(background_site_inf(hist))
     
     return {"status": "success"}
     
@@ -172,9 +184,11 @@ async def background_online_course(file, filename, size, headers, hist_info_db: 
 
     update_status_history(hist_info_db, text_status="Success")
         
-async def background_site_inf():
+async def background_site_inf(hist: HistoryUploadFileInDB):
     try:
-        parse_info_online_courses(worker_db)
+        parse_info_online_courses(worker_db, hist)
         update_info_from_inf(worker_db)
+        update_status_history(hist, text_status="Success")
     except Exception as e:
+        update_status_history(hist, text_status="Error update info from inf")
         print(e)
