@@ -12,6 +12,7 @@
 	import { TableHeadCell, Textarea, Helper } from 'flowbite-svelte';
     import { Link } from "svelte-routing";
 	import { onMount } from "svelte";
+    import { server_url } from "../../utils/store";
 
     let send_status = "";
     let content = "";
@@ -26,7 +27,7 @@
 
     const load_students = async () => {
         let response;
-        let url = new URL('http://localhost:5000/core/student?')
+        let url = new URL(`${server_url}/core/student?`)
         url.searchParams.append('notOnCourse', notOnCourse);
         url.searchParams.append('lowScore', lowScore);
         if (course !== 'Выберите курс') {
@@ -98,7 +99,7 @@
                 }
             }
 
-            response = await fetch('http://localhost:5000/core/notification', {
+            response = await fetch(`${server_url}/core/notification`, {
                 method: "Post",
                 body: data,
                 credentials: "include",

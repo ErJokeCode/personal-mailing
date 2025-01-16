@@ -2,6 +2,7 @@
 	import { Breadcrumb, BreadcrumbItem, Heading, Accordion, AccordionItem, Input, Label, Button, Helper, Checkbox } from 'flowbite-svelte';
     import { onMount } from 'svelte';
     import { Link } from "svelte-routing";
+    import { server_url } from "../../utils/store";
 
     let courses;
 
@@ -14,7 +15,7 @@
     const load = async () => {
         let response;
         try {
-            response = await fetch("http://localhost:5000/parser/bot/onboard/", {
+            response = await fetch(`${server_url}/parser/bot/onboard/`, {
                 credentials: "include",
             });
         } catch (err) {
@@ -37,7 +38,7 @@
 
         let body = JSON.stringify(res);
   
-        let result = await fetch(`http://localhost:5000/parser/bot/onboard/${id}`, {
+        let result = await fetch(`${server_url}/parser/bot/onboard/${id}`, {
             method: "PUT",
             headers: {
                 'Accept': 'application/json, */*',
@@ -85,7 +86,7 @@
         };
         let body = JSON.stringify(new_course);
   
-        let result = await fetch(`http://localhost:5000/parser/bot/onboard/one_course`, {
+        let result = await fetch(`${server_url}/parser/bot/onboard/one_course`, {
             method: "POST",
             headers: {
                 'Accept': 'application/json, */*',
@@ -98,7 +99,7 @@
     }
 
     const delete_course = async (id) => {
-        let result = await fetch(`http://localhost:5000/parser/bot/onboard/${id}`, {
+        let result = await fetch(`${server_url}/parser/bot/onboard/${id}`, {
             method: "DELETE",
             credentials: "include",
         });
