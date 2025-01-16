@@ -63,6 +63,12 @@
             credentials: "include",
         });
         topics = (await http.get("/parser/bot/faq/", qStatus)) ?? [];
+    const delete_topic = async(topic) => {
+        await fetch(`${server_url}/parser/bot/faq/${topic._id}`, {
+            method: "DELETE",
+            credentials: "include",
+        });
+        topics = (await http.get("/parser/bot/faq/", qStatus)) ?? [];
     }
 </script>
 
@@ -99,9 +105,12 @@
                                 {#each topic.faqs as question}
                                     <AccordionItem>
                                         <span slot="header">{question.question}</span>
+                                        <span slot="header">{question.question}</span>
                                         <Label for="question" class="mb-2">Вопрос</Label>
                                         <Textarea bind:value={question.question} id="question" placeholder="Введите текст" rows="4" name="message" class='dark:bg-gray-700 mb-4' />
+                                        <Textarea bind:value={question.question} id="question" placeholder="Введите текст" rows="4" name="message" class='dark:bg-gray-700 mb-4' />
                                         <Label for="answer" class="mb-2">Ответ</Label>
+                                        <Textarea bind:value={question.answer} id="answer" placeholder="Введите текст" rows="4" name="message" class='dark:bg-gray-700' />
                                         <Textarea bind:value={question.answer} id="answer" placeholder="Введите текст" rows="4" name="message" class='dark:bg-gray-700' />
                                     </AccordionItem>
                                 {/each}
@@ -113,6 +122,7 @@
                             </div>
                         </TabItem>
                     {/each}
+                    <Button class='mt-2 w-9 h-9' pill size='sm' on:click={() => add_topic()}><CirclePlusOutline size='lg'/></Button>
                     <Button class='mt-2 w-9 h-9' pill size='sm' on:click={() => add_topic()}><CirclePlusOutline size='lg'/></Button>
                 </Tabs>
             </div>
