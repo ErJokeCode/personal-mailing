@@ -1,11 +1,14 @@
 <script lang='ts'>
-	import { Breadcrumb, BreadcrumbItem, Heading, Accordion, AccordionItem, Textarea, Label, Button, Helper, Tabs, TabItem } from 'flowbite-svelte';
+	import { Breadcrumb, BreadcrumbItem, Heading, Accordion, AccordionItem, Textarea, Label, Button, Helper, Tabs, TabItem, Input } from 'flowbite-svelte';
     import { onMount } from 'svelte';
     import { Link } from "svelte-routing";
     import { CirclePlusOutline } from 'flowbite-svelte-icons'
+    import http from "../../utils/http";
+    import { server_url } from "../../utils/store.js"
 
-    let questons;
-    let topics = [{'theme': 'Тема 1'}, {'theme': 'Тема 2'}, {'theme': 'Тема 3'}];
+    let qStatus = http.status();
+
+    let topics = $state([]);
 
     let success = '';
 
@@ -14,24 +17,55 @@
     });
 
     const load = async () => {
-        // let response;
-        // try {
-        //     response = await fetch("http://localhost:5000/parser/bot/onboard/", {
-        //         credentials: "include",
-        //     });
-        // } catch (err) {
-        //     console.log(err)
-        // }
-        // let json = await response?.json();
-        // courses = json;
+        qStatus.start_load();
+        topics = (await http.get("/parser/bot/faq/", qStatus)) ?? [];
+        qStatus.end_load();
+        console.log(questions)
     }
 
-    const add_tab = async () => {
+    const add_topic = async () => {
+        let name = "new_topic";
+        let i = 0;
+        topics.forEach(element => {
+            let sp = element.name.split("__")
+            if (sp[0] == name) {
+                if (sp.length == 1) {
+                    i = 0
+                }
+                else if(i < parseInt(sp[1])) {
+                    i = parseInt(sp[1])
+                }
+           }
+        });
 
+        name = name + "__" + (i + 1).toString();
+
+        qStatus.start_load();
+        let topic = (await http.post("/parser/bot/faq/?name_topic=" + name, {}, qStatus)) ?? {};
+        topics = [...topics, topic];
+        qStatus.end_load();   
     }
 
-    const add_question = async () => {
+    const add_question = async (topic) => {
+        qStatus.start_load();
+        let new_faqs = [...topic.faqs, {"question": "Новый вопрос", "answer": ""}]
+        let update_topic = (await http.put_json("/parser/bot/faq/" + topic._id, {"name" : topic.name, "faqs": new_faqs}, qStatus)) ?? {};
+        topics = (await http.get("/parser/bot/faq/", qStatus)) ?? [];
+        qStatus.end_load();
+    }
 
+    const save_topic_name = async(topic) => {
+        qStatus.start_load();
+        let new_topic = (await http.put_json("/parser/bot/faq/" + topic._id, {"name" : topic.name, "faqs": topic.faqs}, qStatus)) ?? {};
+        qStatus.end_load();
+    }
+
+    const delete_topic = async(topic) => {
+        await fetch(`${server_url}/parser/bot/faq/${topic._id}`, {
+            method: "DELETE",
+            credentials: "include",
+        });
+        topics = (await http.get("/parser/bot/faq/", qStatus)) ?? [];
     }
 </script>
 
@@ -51,34 +85,38 @@
                 </Heading>
                 <Tabs tabStyle="underline">
                     {#each topics as topic}
-                        <TabItem title={topic.theme}>
-                            <Button on:click={add_question}>
+                        <TabItem title={topic.name} open>
+                            <Label for="name" class="mb-2">Название раздела</Label>
+                            <div class="flex mb-10">
+                                <Input class="mr-2" type="text" placeholder="Введите название" bind:value={topic.name}></Input>
+                                <Button class='' on:click={() => save_topic_name(topic)}>
+                                    Сохранить
+                                </Button>
+                            </div>
+                            
+                            <Button on:click={() => add_question(topic)}>
                                 Добавить вопрос
                             </Button>
                             <Helper class="mb-4 mt-1"></Helper>
-                            <!-- {#each topic.questons as question} -->
-                                <Accordion class='mb-5'>
+                            <Accordion class='mb-5'>
+                                {#each topic.faqs as question}
                                     <AccordionItem>
-                                        <span slot="header">Вопрос 1</span>
+                                        <span slot="header">{question.question}</span>
                                         <Label for="question" class="mb-2">Вопрос</Label>
-                                        <Textarea id="question" placeholder="Введите текст" rows="4" name="message" class='dark:bg-gray-700 mb-4' />
+                                        <Textarea bind:value={question.question} id="question" placeholder="Введите текст" rows="4" name="message" class='dark:bg-gray-700 mb-4' />
                                         <Label for="answer" class="mb-2">Ответ</Label>
-                                        <Textarea id="answer" placeholder="Введите текст" rows="4" name="message" class='dark:bg-gray-700' />
+                                        <Textarea bind:value={question.answer} id="answer" placeholder="Введите текст" rows="4" name="message" class='dark:bg-gray-700' />
                                     </AccordionItem>
-                                </Accordion>
-                                <Accordion class='mb-5'>
-                                    <AccordionItem>
-                                        <span slot="header">Вопрос 2</span>
-                                        <Label for="question" class="mb-2">Вопрос</Label>
-                                        <Textarea id="question" placeholder="Введите текст" rows="4" name="message" class='dark:bg-gray-700 mb-4' />
-                                        <Label for="answer" class="mb-2">Ответ</Label>
-                                        <Textarea id="answer" placeholder="Введите текст" rows="4" name="message" class='dark:bg-gray-700' />
-                                    </AccordionItem>
-                                </Accordion>
-                            <!-- {/each} -->
+                                {/each}
+                            </Accordion>
+                            <div class="flex justify-center">
+                                <Button class='' on:click={() => delete_topic(topic)}>
+                                    Удалить раздел
+                                </Button>
+                            </div>
                         </TabItem>
                     {/each}
-                    <Button class='mt-2 w-9 h-9' pill size='sm' on:click={add_tab}><CirclePlusOutline size='lg'/></Button>
+                    <Button class='mt-2 w-9 h-9' pill size='sm' on:click={() => add_topic()}><CirclePlusOutline size='lg'/></Button>
                 </Tabs>
             </div>
         </div>
