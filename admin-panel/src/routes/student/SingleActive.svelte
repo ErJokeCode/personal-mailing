@@ -2,11 +2,9 @@
 	import { Breadcrumb, BreadcrumbItem, Heading, Tabs, TabItem, Accordion, AccordionItem } from 'flowbite-svelte';
 	import { Button } from 'flowbite-svelte';
 	import { ArrowRightOutline } from 'flowbite-svelte-icons';
-
 	import { onMount } from "svelte";
     import { Link, navigate } from "svelte-routing";
     import http from "../../utils/http";
-    import { traverseObject } from "../../utils/helper";
 
     export let id;
 
@@ -52,63 +50,63 @@
                         <ul>
                             <li>
                                 <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
-                                    Номер студенческого билета:
+                                    <b>Номер студенческого билета:</b>
                                     {student.personalNumber}
                                 </p>
                             </li>
 
                             <li>
                                 <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
-                                    Почта:
+                                    <b>Почта:</b>
                                     {student.email}
                                 </p>
                             </li>
 
                             <li>
                                 <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
-                                    Дата раждения:
+                                    <b>Дата рождения:</b>
                                     {student.dateOfBirth}
                                 </p>
                             </li>
 
                             <li>
                                 <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
-                                    Группа:
+                                    <b>Группа:</b>
                                     {(student.group !== undefined) ? student.group.number : 'Не известен'}
                                 </p>
                             </li>
 
                             <li>
                                 <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
-                                    Номер курса:
+                                    <b>Номер курса:</b>
                                     {(student.group !== undefined) ? student.group.numberCourse : 'Не известен'}
                                 </p>
                             </li>
 
                             <li>
                                 <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
-                                    Направление:
+                                    <b>Направление:</b>
                                     {(student.group !== undefined) ? student.group.directionCode + " " + student.group.nameSpeciality : 'Не известно'}
                                 </p>
                             </li>
 
                             <li>
                                 <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
-                                    Статус:
+                                    <b>Статус:</b>
                                     {student.status ? 'Активный студент' : 'Не активный студент'}
                                 </p>
                             </li>
 
                             <li>
                                 <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
-                                    Тип оплаты обучения:
+                                    <b>Тип оплаты обучения:</b>
                                     {student.typeOfCost}
                                 </p>
                             </li>
 
                             <li>
                                 <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
-                                    Форма обучения:
+                                    <b>Форма обучения:</b>
                                     {student.typeOfEducation}
                                 </p>
                             </li>
@@ -165,7 +163,7 @@
 
                                         <li>
                                             <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
-                                                <b>Группа в телеграмме:</b>
+                                                <b>Группа в телеграме:</b>
                                                 {subject.groupTgLink === null ? "Нет" : subject.groupTgLink}
                                             </p>
                                         </li>

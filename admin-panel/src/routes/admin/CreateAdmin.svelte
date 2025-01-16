@@ -1,16 +1,23 @@
 <script>
 	import { Label, Input, Button } from 'flowbite-svelte';
-	import { Breadcrumb, BreadcrumbItem, Heading } from 'flowbite-svelte';
+	import { Breadcrumb, BreadcrumbItem, Heading, Checkbox } from 'flowbite-svelte';
     import { Link } from "svelte-routing";
     import http from "../../utils/http.js";
+    import { onMount } from 'svelte';
 
     let status = http.status();
     let email = "";
     let password = "";
 
-    let permissions = ["SendNotifications"];
+    let permissions = [];
+    let permission_list;
+
+    onMount(async () => {
+        permission_list = (await http.get("/core/data/permissions", status)) ?? [];
+    });
 
     async function create() {
+        if (email.length === 0 || password.length === 0) return;
         status = status.start_load();
         await http.post_json(
             "/core/admin/create",
@@ -24,12 +31,13 @@
         status = status.end_load();
     }
 
-    function add_id(checked, permission) {
+    function add_permission(checked, permission) {
         if (checked) {
             permissions.push(permission);
         } else {
             permissions = permissions.filter(p => p != permission);
         }
+        console.log(permissions)
     }
 </script>
 
@@ -64,7 +72,7 @@
                 />
               </Label>
             </div>
-            <div class="mb-6">
+            <div class="mb-4">
               <Label class='space-y-2 dark:text-white'>
                <span>Пароль</span>
                <Input
@@ -77,10 +85,20 @@
                 />
               </Label>
             </div>
-            <!-- <div class="flex mb-6 dark:text-white">
-                <Checkbox class="mx-1" on:click={(event) => add_id(event.target?.checked, "CreateAdmins")}/>
-                Создать суперадмина
-            </div> -->
+            <div class="mb-5 dark:text-white">
+                <Label class='space-y-2 dark:text-white'>
+                    <span>Права:</span>
+                </Label>
+                <div>
+                    {#each permission_list as permission}
+                        {#if permission.claim !== 'View'}
+                            <Checkbox class="ml-2 mt-2" on:click={(event) => add_permission(event.target?.checked, permission.claim)}>{permission.name}</Checkbox>
+                        {:else}
+                            <Checkbox class="ml-2 mt-2" checked disabled>{permission.name}</Checkbox>
+                        {/if}                        
+                    {/each}
+                </div>
+            </div>
             <Button class="mb-2" on:click={create}>{status.value} Создать</Button>
             </div>
         </div>

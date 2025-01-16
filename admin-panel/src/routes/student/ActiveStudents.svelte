@@ -2,7 +2,6 @@
 	import { Breadcrumb, BreadcrumbItem, Heading } from 'flowbite-svelte';
 	import { Table, TableBody, TableBodyCell, TableBodyRow, TableHead } from 'flowbite-svelte';
 	import { TableHeadCell } from 'flowbite-svelte';
-
 	import { onDestroy, onMount } from "svelte";
     import { Link, navigate } from "svelte-routing";
     import http from "../../utils/http";
