@@ -113,8 +113,8 @@
                         </ul>
                     </TabItem>
                     <TabItem title="Предметы">
-                        <Accordion>
-                            {#each student.subjects as subject}
+                        {#each student.subjects as subject}
+                            <Accordion class='mb-5'>
                                 <AccordionItem>
                                     <span slot="header">{subject.name}</span>
                                     <ul>
@@ -169,12 +169,12 @@
                                         </li>
                                     </ul>
                                 </AccordionItem>
-                            {/each}
-                        </Accordion>
+                            </Accordion>
+                        {/each}
                     </TabItem>
                     <TabItem title="Онлайн курсы">
-                        <Accordion>
-                            {#each student.onlineCourse as course}
+                        {#each student.onlineCourse as course}
+                            <Accordion class='mb-5'>
                                 <AccordionItem>
                                     <span slot="header">{course.name}</span>
                                     <ul>
@@ -223,8 +223,8 @@
                                         </ul>
                                     </ul>
                                 </AccordionItem>
-                            {/each}
-                        </Accordion>
+                            </Accordion>
+                        {/each}
                     </TabItem>
                 </Tabs>
             </div>

@@ -49,21 +49,15 @@
         });
   
         if (result.ok) {
-            success = "Сохранено";
+            console.log("Сохранено");
         } else {
-            success = "Ошибка";
+            console.log("Ошибка");
         }
     }
 
     const add_course = async () => {
         let is_active = true;
         let is_main = false;
-        if (group.indexOf('active') === -1) {
-            is_active = false;
-        }
-        if (group.indexOf('main') !== -1) {
-            is_main = true;
-        }
 
         let new_course = {
             "name": "Новый курс",
