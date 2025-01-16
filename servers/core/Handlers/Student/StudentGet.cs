@@ -45,6 +45,8 @@ public static partial class StudentHandler
         var activeStudents = db.ActiveStudents.Include(a => a.Chats).ThenInclude(ch => ch.Admin).ToList();
         await activeStudents.IncludeStudents();
 
+        activeStudents = activeStudents.Where(a => a.Student is not null).ToList();
+
         if (lowScore && notOnCourse)
         {
             return Results.BadRequest($"Can not filter by both {nameof(notOnCourse)} and {nameof(lowScore)}");
