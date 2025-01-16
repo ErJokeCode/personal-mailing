@@ -79,7 +79,7 @@
                                 <ul>
                                     <li>
                                         <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
-                                            <b>{permission}</b>
+                                            <b>{permission.name}</b>
                                         </p>
                                     </li>
                                 </ul>
