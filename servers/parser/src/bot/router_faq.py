@@ -44,4 +44,3 @@ async def update_topic(id_topic: str, topic: FAQTopic | FAQTopicInDB) -> FAQTopi
 @router_bot_faq.delete("/{id_topic}")
 async def delete_topic(id_topic: str) -> dict[str, str]:
     return worker_db.bot_faq.delete_one(id=id_topic)
-

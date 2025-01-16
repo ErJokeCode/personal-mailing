@@ -33,7 +33,7 @@
                 <Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl mb-3">
                     {student.name} {student.surname} {student.patronymic}
                 </Heading>
-                <Tabs>
+                <Tabs tabStyle='underline' contentClass='p-4 bg-white rounded-lg dark:bg-gray-800 mt-4'>
                     <TabItem open title="Основная информация">
                         <ul>
                             <li>
@@ -101,8 +101,8 @@
                         </ul>
                     </TabItem>
                     <TabItem title="Предметы">
-                        <Accordion>
-                            {#each student.subjects as subject}
+                        {#each student.subjects as subject}
+                            <Accordion class='mb-5'>
                                 <AccordionItem>
                                     <span slot="header">{subject.name}</span>
                                     <ul>
@@ -157,12 +157,12 @@
                                         </li>
                                     </ul>
                                 </AccordionItem>
-                            {/each}
-                        </Accordion>
+                            </Accordion>
+                        {/each}
                     </TabItem>
                     <TabItem title="Онлайн курсы">
-                        <Accordion>
-                            {#each student.online_course as course}
+                        {#each student.online_course as course}
+                            <Accordion class='mb-5'>
                                 <AccordionItem>
                                     <span slot="header">{course.name}</span>
                                     <ul>
@@ -211,8 +211,8 @@
                                         </ul>
                                     </ul>
                                 </AccordionItem>
-                            {/each}
-                        </Accordion>
+                            </Accordion>
+                        {/each}
                     </TabItem>
                 </Tabs>
             </div>

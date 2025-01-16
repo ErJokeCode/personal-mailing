@@ -49,21 +49,15 @@
         });
   
         if (result.ok) {
-            success = "Сохранено";
+            console.log("Сохранено");
         } else {
-            success = "Ошибка";
+            console.log("Ошибка");
         }
     }
 
     const add_course = async () => {
         let is_active = true;
         let is_main = false;
-        if (group.indexOf('active') === -1) {
-            is_active = false;
-        }
-        if (group.indexOf('main') !== -1) {
-            is_main = true;
-        }
 
         let new_course = {
             "name": "Новый курс",
@@ -200,9 +194,6 @@
     const topic_down = async (course_index, section_name, topic_index) => {
         topic_up(course_index, section_name, topic_index, 1, 1)
     }
-
-    
-    
 </script>
 
 <div class="overflow-hidden lg:flex">

@@ -9,9 +9,6 @@
     import http from "../../utils/http";
     import { server_url } from "../../utils/store.js"
 
-    let allsubjectNames = []
-    let allCourseNames = []
-
     let dictNames = $state([])
     let allCourseNamesInFile = $state([])
     let allCourseNamesInSite = $state([])

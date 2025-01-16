@@ -1,9 +1,8 @@
 <script>
-	import { Breadcrumb, BreadcrumbItem, Heading, Tabs, TabItem, Accordion, AccordionItem } from 'flowbite-svelte';
+	import { Breadcrumb, BreadcrumbItem, Heading, Tabs, TabItem } from 'flowbite-svelte';
     import http from "../../utils/http";
     import { onMount } from "svelte";
     import { Link } from "svelte-routing";
-    import { traverseObject } from "../../utils/helper";
 
     export let id;
 
@@ -14,7 +13,6 @@
     onMount(async () => {
         admin = (await http.get(`/core/admin/${id}`, status)) ?? {};
         student = []
-        console.log(admin)
     });
 </script>
 
@@ -37,7 +35,7 @@
                     {admin.email}
                 </Heading>
                 <div class="text-gray-900 dark:text-white">
-                    <Tabs>
+                    <Tabs tabStyle='underline' contentClass='p-4 bg-white rounded-lg dark:bg-gray-800 mt-4'>
                         <TabItem open title="Основная информация">
                             <ul>
                                 <li>

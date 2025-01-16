@@ -1,5 +1,5 @@
 <script lang='ts'>
-	import { Breadcrumb, BreadcrumbItem, Heading, Accordion, AccordionItem, Textarea, Label, Button, Helper, Tabs, TabItem, Input } from 'flowbite-svelte';
+	import { Breadcrumb, BreadcrumbItem, Heading, Accordion, AccordionItem, Textarea, Label, Button, Tabs, TabItem, Input } from 'flowbite-svelte';
     import { onMount } from 'svelte';
     import { Link } from "svelte-routing";
     import { CirclePlusOutline } from 'flowbite-svelte-icons'
@@ -10,8 +10,6 @@
 
     let topics = $state([]);
 
-    let success = '';
-
     onMount(async () => {
         load();
     });
@@ -20,7 +18,6 @@
         qStatus.start_load();
         topics = (await http.get("/parser/bot/faq/", qStatus)) ?? [];
         qStatus.end_load();
-        console.log(questions)
     }
 
     const add_topic = async () => {
@@ -72,7 +69,7 @@
 <div class="overflow-hidden lg:flex">
     <div class="relative h-full w-full overflow-y-auto lg:ml-64 pt-[70px]">
         <div class="relative h-full w-full overflow-y-auto bg-white dark:bg-gray-800">
-            <div class="p-4 px-6">
+            <div class="py-4 px-6">
                 <Breadcrumb class="mb-5">
                     <Link class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
                         to="/"><svg class="w-4 h-4 me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
@@ -83,20 +80,23 @@
                 <Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl mb-1">
                     Редактор FAQ
                 </Heading>
-                <Tabs tabStyle="underline">
+                <Tabs tabStyle="underline" contentClass='p-4 bg-white rounded-lg dark:bg-gray-800 mt-4'>
                     {#each topics as topic}
-                        <TabItem title={topic.name} open>
+                        <TabItem title={topic.name}>
                             <Label for="name" class="mb-2">Название раздела</Label>
                             <div class="flex mb-10">
                                 <Input class="mr-2" type="text" placeholder="Введите название" bind:value={topic.name}></Input>
+                                <div>
+                                    <Button class='h-full' on:click={() => save_topic_name(topic)}>
+                                        Сохранить
+                                    </Button>
+                                </div>
                             </div>
-                            
-                            <Button on:click={() => add_question(topic)}>
+                            <Button class="mb-4" on:click={() => add_question(topic)}>
                                 Добавить вопрос
                             </Button>
-                            <Helper class="mb-4 mt-1"></Helper>
-                            <Accordion class='mb-5'>
-                                {#each topic.faqs as question}
+                            {#each topic.faqs as question}
+                                <Accordion class='mb-5'>
                                     <AccordionItem>
                                         <span slot="header">{question.question}</span>
                                         <Label for="question" class="mb-2">Вопрос</Label>
@@ -104,13 +104,10 @@
                                         <Label for="answer" class="mb-2">Ответ</Label>
                                         <Textarea bind:value={question.answer} id="answer" placeholder="Введите текст" rows="4" name="message" class='dark:bg-gray-700' />
                                     </AccordionItem>
-                                {/each}
-                            </Accordion>
+                                </Accordion>
+                            {/each}
                             <div class="flex justify-center">
-                                <Button class='mr-5' on:click={() => save_topic_name(topic)}>
-                                    Сохранить
-                                </Button>
-                                <Button class='' on:click={() => delete_topic(topic)}>
+                                <Button on:click={() => delete_topic(topic)}>
                                     Удалить раздел
                                 </Button>
                             </div>

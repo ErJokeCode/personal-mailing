@@ -2,7 +2,6 @@
     import { onMount } from "svelte";
     import http from "../../utils/http";
     import { server_url } from "../../utils/store";
-
 	import {
 		Breadcrumb,
 		BreadcrumbItem,
@@ -16,9 +15,7 @@
         TableBodyCell,
         Heading,
         Helper
-
 	} from 'flowbite-svelte';
-
     import { Link } from 'svelte-routing'
 
     let groups = $state({});
@@ -77,10 +74,10 @@
         is_active_btn = true;
         if (chosenGroup === group) {
             chosenGroup = '';
+            is_active_btn = false;
         } else {
             chosenGroup = group;
         }
-        console.log(chosenGroup)
     }
 
     async function handleAdminChoose(adminId) {
