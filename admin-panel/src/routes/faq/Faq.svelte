@@ -89,9 +89,6 @@
                             <Label for="name" class="mb-2">Название раздела</Label>
                             <div class="flex mb-10">
                                 <Input class="mr-2" type="text" placeholder="Введите название" bind:value={topic.name}></Input>
-                                <Button class='' on:click={() => save_topic_name(topic)}>
-                                    Сохранить
-                                </Button>
                             </div>
                             
                             <Button on:click={() => add_question(topic)}>
@@ -110,6 +107,9 @@
                                 {/each}
                             </Accordion>
                             <div class="flex justify-center">
+                                <Button class='mr-5' on:click={() => save_topic_name(topic)}>
+                                    Сохранить
+                                </Button>
                                 <Button class='' on:click={() => delete_topic(topic)}>
                                     Удалить раздел
                                 </Button>
