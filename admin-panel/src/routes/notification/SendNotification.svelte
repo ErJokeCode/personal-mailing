@@ -180,6 +180,12 @@
         if (counter === checkboxes.length - 1) checkboxes[0].checked = true;
     }
 
+    async function handle_keypress(event) {
+        if (event.key == 'Enter') {
+            load_students();
+        }
+    }
+
     let pageIndex = 0;
     let pageSize = 10;
     let notOnCourse = false;
@@ -276,21 +282,21 @@
                             <div class="w-full space-y-4">
                                 <Label class="space-y-2">
                                     <span>Группа</span>
-                                    <Input bind:value={group} type="text" placeholder="РИ-123456" size="md" />
+                                    <Input bind:value={group} type="text" placeholder="РИ-123456" size="md" on:keypress={handle_keypress} />
                                 </Label>
                                 <Label class="space-y-2">
                                     <span>Онлайн курс</span>
-                                    <Input bind:value={onlineCourse} type="text" placeholder="Введите название курса" size="md" />
+                                    <Input bind:value={onlineCourse} type="text" placeholder="Введите название курса" size="md" on:keypress={handle_keypress} />
                                 </Label>
                                 <Label class="space-y-2">
                                     <span>Предмет</span>
-                                    <Input bind:value={subject} type="text" placeholder="Введите название предмета" size="md" />
+                                    <Input bind:value={subject} type="text" placeholder="Введите название предмета" size="md" on:keypress={handle_keypress} />
                                 </Label>
                             </div>
                         </div>
                         <Label class="space-y-2 ml-2 mb-6">
                             <span>Команда</span>
-                            <Input bind:value={team} type="text" placeholder="Введите название команды" size="md" />
+                            <Input bind:value={team} type="text" placeholder="Введите название команды" size="md" on:keypress={handle_keypress} />
                         </Label>
                         <Button class='flex ml-2' on:click={load_students}>Применить</Button>
                     </div>
