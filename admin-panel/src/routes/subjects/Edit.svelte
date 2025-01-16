@@ -87,7 +87,7 @@
                         1 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>Главная</Link>
                     <BreadcrumbItem>Редактор соотношений</BreadcrumbItem>
                 </Breadcrumb>
-                <Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl mb-4">
+                <Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
                     Соотношения
                 </Heading>
             </div>

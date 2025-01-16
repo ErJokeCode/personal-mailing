@@ -6,7 +6,7 @@
 		Breadcrumb,
 		BreadcrumbItem,
 		Button,
-        Input,
+        Search,
         Table,
         TableHead,
         TableHeadCell,
@@ -14,7 +14,6 @@
         TableBodyRow,
         TableBodyCell,
         Heading,
-
         Helper
 
 	} from 'flowbite-svelte';
@@ -26,7 +25,7 @@
     let searchAdmin = "";
     let admins = $state([]);
 
-    let chosenGroup = "";
+    let chosenGroup = $state();
 
     let is_active_btn = $state(false);
 
@@ -80,6 +79,7 @@
         } else {
             chosenGroup = group;
         }
+        console.log(chosenGroup)
     }
 
     async function handleAdminChoose(adminId) {
@@ -121,14 +121,14 @@
             </Heading>
             <div class="flex">
                 <div class="mr-6 w-full">
-                    <Input
+                    <Search
                         bind:value={searchGroup}
                         on:keypress={handleGroupInput}
-                        type="text"
                         placeholder="Поиск по группам"
-                        class='mb-1 w-1/2'
+                        class='block w-80 p-2.5 ps-10 text-sm mb-1'
+                        size='md'
                     />
-                    <Helper class='mb-6'>Выберите группу:</Helper>
+                    <Helper class='ml-1 mb-6'>Выберите группу:</Helper>
                     <Table>
                         <TableHead>
                             <TableHeadCell>Группа</TableHeadCell>
@@ -154,14 +154,14 @@
                 </div>
                 <div class="w-full">
                     <div class="absolute" style="top: 5.25rem;">{chosenGroup}</div>
-                    <Input
+                    <Search
                         bind:value={searchAdmin}
-                        type="text"
                         on:keypress={handleAdminInput}
                         placeholder="Поиск по админам"
-                        class='mb-1 w-1/2'
+                        class='block w-80 p-2.5 ps-10 text-sm mb-1'
+                        size='md'
                     />
-                    <Helper class='mb-6'>Выберите админа:</Helper>
+                    <Helper class='ml-1 mb-6'>Выберите админа:</Helper>
                     <Table>
                         <TableHead>
                             <TableHeadCell>Админ</TableHeadCell>

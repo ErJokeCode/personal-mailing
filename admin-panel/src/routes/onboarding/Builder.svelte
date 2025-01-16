@@ -48,9 +48,9 @@
         });
   
         if (result.ok) {
-            console.log("Сохранено");
+            success = "Сохранено";
         } else {
-            console.log("Ошибка");
+            success = "Ошибка";
         }
     }
 
@@ -223,7 +223,6 @@
                 </Button>
                 <Helper class="mb-4 mt-1"></Helper>
                 {#each courses as course, course_index}
-                    {console.log(course)}
                     <Accordion class='mb-5'>
                         <AccordionItem>
                             <span slot="header">{course.name}</span>

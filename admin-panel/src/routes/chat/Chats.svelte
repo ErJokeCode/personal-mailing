@@ -1,5 +1,5 @@
 <script>
-	import { Input, Breadcrumb, BreadcrumbItem, Button, Heading, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
+	import { Search, Breadcrumb, BreadcrumbItem, Button, Heading, Table, TableBody, TableBodyCell, TableBodyRow, TableHead, TableHeadCell } from 'flowbite-svelte';
 	import { ArrowRightOutline } from 'flowbite-svelte-icons';
     import { onMount, onDestroy } from "svelte";
     import { Link, navigate } from "svelte-routing";
@@ -58,15 +58,15 @@
                         1 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>Главная</Link>
                     <BreadcrumbItem>Все чаты</BreadcrumbItem>
                 </Breadcrumb>
-                <Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
+                <Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl mb-4">
                     Чаты
                 </Heading>
-                <Input
+                <Search
+                    size='md'
+                    class='block w-80 p-2.5 ps-10 text-sm'
+                    placeholder="Поиск нового чата"
                     bind:value={searchChat}
                     on:keypress={handleSearchChat}
-                    type="text"
-                    placeholder="Поиск нового чата"
-                    class='mb-1 w-1/2'
                 />
             </div>
             <Table>
