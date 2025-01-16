@@ -189,7 +189,7 @@
             <div class="space-y-2 mb-6">
                 <div style="display: flex; flex-direction: row; gap: 30px; align-items: baseline; margin-bottom: 20px">
                     <Heading tag="h3" class="w-100 text-xl font-semibold text-gray-900 dark:text-gray-100 sm:text-s">Студенты</Heading>
-                    <A class="font-medium hover:underline text-sm" for="larg_size" href={server_url + "/parser/upload/student/example"}>Скачать пример</A>
+                    <A class="font-medium hover:underline text-sm" href={server_url + "/parser/upload/student/example"}>Скачать пример</A>
                 </div>
                 <Fileupload value="" bind:files={student_files} id="larg_size" size="lg" />
                 <Helper>{student_success}</Helper>
@@ -198,7 +198,7 @@
             <div class="space-y-2 mb-6">
                 <div style="display: flex; flex-direction: row; gap: 30px; align-items: baseline; margin-bottom: 20px">
                     <Heading tag="h3" class="w-100 text-xl font-semibold text-gray-900 dark:text-gray-100 sm:text-l">Модеус</Heading>
-                    <A class="font-medium hover:underline text-sm" for="larg_size" href={server_url + "/parser/upload/choice_in_modeus/example"}>Скачать пример</A>
+                    <A class="font-medium hover:underline text-sm" href={server_url + "/parser/upload/choice_in_modeus/example"}>Скачать пример</A>
                 </div>
                 <Fileupload value="" bind:files={modeus_files} id="larg_size" size="lg" />
                 <Helper>{modeus_success}</Helper>
@@ -207,8 +207,8 @@
             <div class="space-y-2 mb-6">
                 <div style="display: flex; flex-direction: row; gap: 30px; align-items: baseline; margin-bottom: 20px">
                     <Heading tag="h3" class="w-100 text-xl font-semibold text-gray-900 dark:text-gray-100 sm:text-l">Курсы</Heading>
-                    <A class="font-medium hover:underline text-sm" for="larg_size" href={server_url + "/parser/upload/report_online_course/example"}>Скачать пример</A>
-                    <A class="font-medium hover:underline text-sm" for="larg_size" on:click={update_inf}>Обновить информацию с сайта inf-urfu</A>
+                    <A class="font-medium hover:underline text-sm" href={server_url + "/parser/upload/report_online_course/example"}>Скачать пример</A>
+                    <A class="font-medium hover:underline text-sm" on:click={update_inf}>Обновить информацию с сайта inf-urfu</A>
                 </div>
                 <Fileupload value="" bind:files={courses_files} id="larg_size" size="lg" />
                 <Helper>{courses_success}</Helper>
