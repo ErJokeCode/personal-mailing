@@ -13,13 +13,10 @@
     let main_student = {};
     let student = {};
     let status = http.status();
-    let article;
 
     onMount(async () => {
         main_student = await http.get(`/core/student/${id}`, status) ?? {};
         student = main_student.info !== undefined && main_student.info !== null ? main_student.info : {};
-        
-        article.appendChild(traverseObject(student));
     });
 
     async function start_chat(studentId) {
@@ -56,7 +53,7 @@
                             <li>
                                 <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
                                     Номер студенческого билета:
-                                    {student.personal_number}
+                                    {student.personalNumber}
                                 </p>
                             </li>
 
@@ -70,7 +67,7 @@
                             <li>
                                 <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
                                     Дата раждения:
-                                    {student.date_of_birth}
+                                    {student.dateOfBirth}
                                 </p>
                             </li>
 
@@ -84,14 +81,14 @@
                             <li>
                                 <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
                                     Номер курса:
-                                    {(student.group !== undefined) ? student.group.number_course : 'Не известен'}
+                                    {(student.group !== undefined) ? student.group.numberCourse : 'Не известен'}
                                 </p>
                             </li>
 
                             <li>
                                 <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
                                     Направление:
-                                    {(student.group !== undefined) ? student.group.direction_code + " " + student.group.name_speciality : 'Не известно'}
+                                    {(student.group !== undefined) ? student.group.directionCode + " " + student.group.nameSpeciality : 'Не известно'}
                                 </p>
                             </li>
 
@@ -105,14 +102,14 @@
                             <li>
                                 <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
                                     Тип оплаты обучения:
-                                    {student.type_of_cost}
+                                    {student.typeOfCost}
                                 </p>
                             </li>
 
                             <li>
                                 <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
                                     Форма обучения:
-                                    {student.type_of_education}
+                                    {student.typeOfEducation}
                                 </p>
                             </li>
                         </ul>
@@ -126,7 +123,7 @@
                                         <li>
                                             <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
                                                 <b>Полное название:</b>
-                                                {subject.full_name}
+                                                {subject.fullName}
                                             </p>
                                         </li>
 
@@ -162,14 +159,14 @@
                                         <li>
                                             <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
                                                 <b>Форма обучения:</b>
-                                                {subject.form_education === "traditional" ? "Традиционное" : subject.form_education === "mixed" ? "Смешанное" : subject.form_education === "online" ? "Онлайн" : "Другое"}
+                                                {subject.formEducation === "traditional" ? "Традиционное" : subject.formEducation === "mixed" ? "Смешанное" : subject.formEducation === "online" ? "Онлайн" : "Другое"}
                                             </p>
                                         </li>
 
                                         <li>
                                             <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
                                                 <b>Группа в телеграмме:</b>
-                                                {subject.group_tg_link === null ? "Нет" : subject.group_tg_link}
+                                                {subject.groupTgLink === null ? "Нет" : subject.groupTgLink}
                                             </p>
                                         </li>
                                     </ul>
@@ -179,7 +176,7 @@
                     </TabItem>
                     <TabItem title="Онлайн курсы">
                         <Accordion>
-                            {#each student.online_course as course}
+                            {#each student.onlineCourse as course}
                                 <AccordionItem>
                                     <span slot="header">{course.name}</span>
                                     <ul>
@@ -193,7 +190,7 @@
                                         <li>
                                             <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
                                                 <b>Дата начала:</b>
-                                                {course.date_start === null ? "Нет информации" : course.date_start}
+                                                {course.dateStart === null ? "Нет информации" : course.dateStart}
                                             </p>
                                         </li>
 
