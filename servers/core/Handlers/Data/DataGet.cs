@@ -12,7 +12,7 @@ public static partial class DataHandler
 {
     public static IResult GetAllPermissions()
     {
-        return Results.Ok(Permissions.All.Select(p => p.Claim));
+        return Results.Ok(Permissions.All);
     }
 
     public static IResult GetText(CoreDb db)

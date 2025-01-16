@@ -19,8 +19,6 @@ public static partial class AdminHandler
         public List<string> Permissions { get; set; } = [];
     }
 
-    // NOTE right now creates admins with all permissions
-    // TODO when frontend is done, change to specific permissions
     public static async Task<IResult> AddAdmin(AdminDetails details, HttpContext context,
                                                UserManager<AdminUser> userManager, IUserStore<AdminUser> userStore,
                                                CoreDb db)
@@ -35,10 +33,13 @@ public static partial class AdminHandler
             }
         }
 
-        details.Permissions.Add(Permissions.View.Claim);
+        if (!details.Permissions.Contains(Permissions.View.Claim))
+        {
+            details.Permissions.Add(Permissions.View.Claim);
+        }
 
-        var created = await CreateAdmin(details.Email, details.Password, Permissions.All.Select(p => p.Claim).ToList(),
-                                        userManager, userStore, db);
+        var created =
+            await CreateAdmin(details.Email, details.Password, details.Permissions, userManager, userStore, db);
         if (!created)
         {
             return Results.BadRequest("Could not create an admin");
