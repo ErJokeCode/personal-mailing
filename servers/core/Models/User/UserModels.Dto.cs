@@ -8,7 +8,7 @@ public partial class AdminUserDto
     public string Id { get; set; }
     public string Email { get; set; }
     public string Date { get; set; }
-    public List<string> Permissions { get; set; } = [];
+    public List<Identity.Permission> Permissions { get; set; } = [];
     public List<string> Groups {get; set;} = [];
 }
 

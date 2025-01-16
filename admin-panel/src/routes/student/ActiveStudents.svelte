@@ -61,7 +61,6 @@
                 <TableBody>
                     {#each activeStudents as student}
                         {#if student.info !== null}
-                            {console.log(student)}
                             <TableBodyRow on:click={() => fullInfo(student.id)}>
                                 <TableBodyCell class="px-8">{student.info.email}</TableBodyCell>
                                 <TableBodyCell class="px-8">{student.info.group.numberCourse}</TableBodyCell>

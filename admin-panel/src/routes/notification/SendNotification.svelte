@@ -79,7 +79,12 @@
         for (let i = 1; i < checkboxes.length; i++) {
             add_id(checkboxes[i].checked, checkboxes[i].value);
         }
-        if (ids.length === 0) return;
+        if (ids.length === 0) {
+            return;
+        }
+        if (files === undefined && value.length === 0 && content === '') {
+            return;
+        }
         send_status = "Отправка...";
 
         let response;
@@ -110,16 +115,14 @@
 
         if (response?.ok) {
             send_status = "Вы успешно отправили рассылку!";
-            content = "";
-            files = undefined;
-            value = [];
         }
     }
-	
 	
 	let value: any[] = [];
 
   const dropHandle = (event) => {
+    is_empty = false;
+    send_status = ''
     value = [];
     event.preventDefault();
     if (event.dataTransfer.items) {
@@ -138,6 +141,8 @@
   };
 
   const handleChange = (event) => {
+    is_empty = false;
+    send_status = ''
     const files = event.target.files;
     if (files.length > 0) {
         for (let file of files) {
@@ -163,16 +168,16 @@
   };
 
   function toggle(source) {
-        let table = document.querySelector('#table')
-        let checkboxes = table.querySelectorAll('input[type=checkbox]')
+        let table = document.querySelector('#table');
+        let checkboxes = table.querySelectorAll('input[type=checkbox]');
         for (let i = 0; i < checkboxes.length; i++) {
             checkboxes[i].checked = source.checked;
         }
     }
     
     function remove() {
-        let table = document.querySelector('#table')
-        let checkboxes = table.querySelectorAll('input[type=checkbox]')
+        let table = document.querySelector('#table');
+        let checkboxes = table.querySelectorAll('input[type=checkbox]');
         let counter = 0;
         for (let i = 1; i < checkboxes.length; i++) {
             if (!checkboxes[i].checked) {
@@ -189,6 +194,7 @@
             load_students();
         }
     }
+    
     const cancel = () => {
         notOnCourse = false;
         lowScore = false;
@@ -199,8 +205,32 @@
         onlineCourse = '';
         subject = '';
         team = '';
-        load_students()
+        load_students();
     };
+
+    const clear = () => {
+        is_empty = true;
+        files = undefined;
+        value = [];
+    }
+
+    const clear_all = () => {
+        send_status = '';
+        content = "";
+        files = undefined;
+        value = [];
+        ids = [];
+        let table = document.querySelector('#table')
+        let checkbox = table.querySelector('#check');
+        checkbox.checked = false;
+        let checkboxes = table.querySelectorAll('input[type=checkbox]')
+        for (let i = 1; i < checkboxes.length; i++) {
+            checkboxes[i].checked = false;
+        }
+    }
+
+    let is_empty = true;
+    let is_disabled = true;
 
     let pageIndex = 0;
     let pageSize = 10;
@@ -213,6 +243,13 @@
     let onlineCourse = '';
     let subject = '';
     let team = '';
+
+    $: if (notOnCourse === false && lowScore === false && course === 'Выберите курс' && group === '' && typeOfEducation === 'Выберите форму'
+            && typeOfCost === 'Выберите тип' && onlineCourse === '' && subject === '' && team === '') {
+        is_disabled = true;
+    } else {
+        is_disabled = false;
+    }
 </script>
 
 <div class="overflow-hidden lg:flex">
@@ -251,7 +288,11 @@
                                 {/if}
                             </Dropzone>
                             <Textarea id="editor" rows=6 class="mb-2 bg-white dark:bg-gray-800" placeholder="Введите текст" bind:value={content}></Textarea>
-                            <Button class="mb-2" on:click={send}>Отправить рассылку</Button>
+                            <div>
+                                <Button class="mb-2" on:click={send}>Отправить рассылку</Button>
+                                <Button class="mb-2 ml-3" disabled={is_empty} on:click={clear}>Сбросить вложения</Button>
+                                <Button class="mb-2 ml-3" on:click={clear_all}>Очистить всё</Button>
+                            </div>
                             <Helper>{send_status}</Helper>
                         </div>
                     </form>
@@ -315,8 +356,8 @@
                             <Input bind:value={team} type="text" placeholder="Введите название команды" size="md" on:keypress={handle_keypress} />
                         </Label>
                         <div class="flex">
-                            <Button class='ml-2' on:click={load_students}>Применить</Button>
-                            <Button class='ml-4' on:click={cancel}>Сбросить</Button>
+                            <Button class='ml-2' disabled={is_disabled} on:click={load_students}>Применить</Button>
+                            <Button class='ml-4' disabled={is_disabled} on:click={cancel}>Сбросить</Button>
                         </div>
                     </div>
                 </div>
@@ -326,7 +367,7 @@
             </div>
             <Table id='table'>
                 <TableHead class="border-y border-gray-200 bg-gray-100 dark:border-gray-700">
-                    <TableHeadCell class="w-4 p-4 pl-8 font-medium"><Checkbox on:click={(e) => toggle(e.target)} /></TableHeadCell>
+                    <TableHeadCell class="w-4 p-4 pl-8 font-medium"><Checkbox id='check' on:click={(e) => toggle(e.target)} /></TableHeadCell>
                     <TableHeadCell class="w-4 p-4 font-medium">Курс</TableHeadCell>
                     <TableHeadCell class="w-4 p-4 font-medium">Фамилия</TableHeadCell>
                     <TableHeadCell class="w-4 p-4 font-medium">Имя</TableHeadCell>

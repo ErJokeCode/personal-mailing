@@ -1,21 +1,32 @@
 <script>
-	import { Breadcrumb, BreadcrumbItem, Heading } from 'flowbite-svelte';
+	import { Breadcrumb, BreadcrumbItem, Heading, Tabs, TabItem, A } from 'flowbite-svelte';
     import http from "../../utils/http";
     import { onMount } from "svelte";
-    import { traverseObject } from "../../utils/helper";
     import { Link } from "svelte-routing";
+    import { server_url } from '../../utils/store';
+  import Students from '../student/Students.svelte';
 
     export let id;
 
     let notification = {};
     let status = http.status();
-    let article;
+    
+    let send_status = ''
+    let count = 0;
 
     onMount(async () => {
-        notification =
-            (await http.get(`/core/notification/${id}`, status)) ?? {};
-
-        article.appendChild(traverseObject(notification));
+        notification = (await http.get(`/core/notification/${id}`, status)) ?? {};
+        console.log(notification)
+        for (let status of notification.statuses) {
+            if (status.code === 0) count++;
+        }
+        if (count === notification.statuses.length) {
+            send_status = 'успешно';
+        } else if (count === 0) {
+            send_status = 'ошибка отправки';
+        } else {
+            send_status = 'частично отправлено'
+        }
     });
 </script>
 
@@ -37,7 +48,69 @@
                 <Heading tag="h1" class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl mb-3">
                     {notification.date}
                 </Heading>
-                <div class="text-gray-900 dark:text-white" bind:this={article}></div>
+                <div class="text-gray-900 dark:text-white">
+                    <Tabs tabStyle='underline' contentClass='p-4 bg-white rounded-lg dark:bg-gray-800 mt-4'>
+                        <TabItem open title="Основная информация">
+                            <ul>
+                                <li>
+                                    <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
+                                        <b>Статус рассылок:</b>
+                                        {send_status}
+                                    </p>
+                                </li>
+    
+                                <li>
+                                    <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
+                                        <b>Дата рассылки:</b>
+                                        {notification.date}
+                                    </p>
+                                </li>
+    
+                                <li>
+                                    <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
+                                        <b>Текст сообщения:</b>
+                                        {notification.content !== '' ? notification.content : 'отсутствует'}
+                                    </p>
+                                </li>
+    
+                                <li>
+                                    <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
+                                        <b>Email админа:</b>
+                                        {notification.admin === undefined ? 'нет данных' : notification.admin.email}
+                                    </p>
+                                </li>
+                            </ul>
+                        </TabItem>
+                        <TabItem title="Приложенные документы">
+                            <ul>
+                                {#each notification.documents as document}
+                                    <li>
+                                        <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
+                                            <b>{document.name}</b>
+                                            <A class="ml-1" href={`${server_url}/core/document/${document.id}/download`}>Скачать</A>
+                                        </p>
+                                    </li>
+                                {/each}
+                                {#if notification.documents.length === 0}
+                                    <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
+                                        Нет вложений
+                                    </p>
+                                {/if}
+                            </ul>
+                        </TabItem>
+                        <TabItem title="Получатели">
+                            <ul>
+                                {#each notification.students as student}
+                                    <li>
+                                        <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
+                                            <b>{student.email}</b>
+                                        </p>
+                                    </li>
+                                {/each}
+                            </ul>
+                        </TabItem>
+                    </Tabs>
+                </div>
             </div>
         </div>
     </div>

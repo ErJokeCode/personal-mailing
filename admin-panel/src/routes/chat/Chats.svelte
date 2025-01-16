@@ -42,7 +42,8 @@
     async function handleMessage(message) {
         await getChats();
     }
-    async function open_chat(id, studentId) {
+    
+    async function open_chat(studentId) {
         navigate(`/chat/${studentId}`);
     }
 </script>
@@ -81,7 +82,7 @@
                             <TableBodyCell class="px-8">{student.email}</TableBodyCell>
                             <TableBodyCell>
                                 <Button size="sm" class="gap-2 px-3"
-                                    on:click={() => open_chat(0, student.id)}>
+                                    on:click={() => open_chat(student.id)}>
                                     Начать чат
                                     <ArrowRightOutline size="sm" />
                                 </Button>
@@ -94,7 +95,7 @@
                             <TableBodyCell class="px-8">{chat.student.email}</TableBodyCell>
                             <TableBodyCell>
                                 <Button size="sm" class="gap-2 px-3"
-                                    on:click={() => open_chat(chat.id, chat.student.id)}>
+                                    on:click={() => open_chat(chat.student.id)}>
                                     Открыть
                                     <ArrowRightOutline size="sm" />
                                 </Button>

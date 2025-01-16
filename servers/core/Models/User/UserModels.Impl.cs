@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Core;
 
 namespace Core.Models.Dto;
 
@@ -13,7 +14,7 @@ public partial class AdminUserDto : IMappable<AdminUserDto, AdminUser>
             Id = orig.Id,
             Email = orig.Email,
             Date = orig.Date,
-            Permissions = orig.Permissions,
+            Permissions = Identity.Permissions.All.Where(p => orig.Permissions.Contains(p.Claim)).ToList(),
             Groups = orig.Groups,
         };
     }

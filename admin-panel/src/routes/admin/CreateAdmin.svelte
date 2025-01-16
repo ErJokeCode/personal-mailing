@@ -37,7 +37,6 @@
         } else {
             permissions = permissions.filter(p => p != permission);
         }
-        console.log(permissions)
     }
 </script>
 
