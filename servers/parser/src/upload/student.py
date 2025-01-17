@@ -7,7 +7,6 @@ from worker import update_status_history
 from src.schemas import HistoryUploadFileInDB, InfoGroupInStudent, Student
 from config import WorkerDataBase
 
-
 def upload_student(link: str, worker_db: WorkerDataBase, hist: HistoryUploadFileInDB) -> dict[str, str]:
     try:
         df = pd.read_excel(link, sheet_name=0)
@@ -27,8 +26,13 @@ def upload_student(link: str, worker_db: WorkerDataBase, hist: HistoryUploadFile
         raise HTTPException(status_code=500, detail="Error parse file")
             
     try:
-        worker_db.student.delete_many()
-        worker_db.student.insert_many(students)
+        col_st = worker_db.student.get_collect()
+        col_st.update_many({}, {"$set": {"status": False}})
+        
+        fl = ["personal_number", "surname", "name", "patronymic", "date_of_birth"]
+        up_fl = ["status", "type_of_cost", "type_of_education", "group"]
+        
+        worker_db.student.bulk_update(fl, up_fl, students, upsert=True)
         
     except Exception as e:
         print(e)
@@ -45,8 +49,6 @@ def create_student(item) -> Student:
         surname=FIO[0] if len(FIO) > 0 else "",
         name=FIO[1] if len(FIO) > 1 else "",
         patronymic="".join(FIO[2:]) if len(FIO) > 2 else "",
-        faculty = item["Форм. факультет"],
-        city = item["Территориальное подразделение"],
         department = item["Кафедра"],
         group = InfoGroupInStudent(number=item["Группа"], number_course=int(item["Курс"])),
         status = True if item["Состояние"] == "Активный" else False,

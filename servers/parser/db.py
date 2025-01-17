@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from pymongo import MongoClient
 from passlib.context import CryptContext
 from pymongo.collection import Collection
-from pymongo import database
+from pymongo import database, UpdateOne
 
 from datetime import datetime
 import hashlib
@@ -113,6 +113,27 @@ class WorkerCollection(Generic[V, T]):
             return self.__cls_db(**item)
         else:
             return None
+        
+    def bulk_update(self, filter: list[str], update_filter: list[str], data: Sequence[V], upsert: bool = False) -> dict[str, str]:
+        collect = self.__collection
+        
+        operations = []
+        for item in data:
+            dict_item = item.model_dump(by_alias=True, exclude="_id")
+            
+            fl = {}
+            for key in filter:
+                fl[key] = dict_item[key]
+                
+            up_fl = {}
+            for key in update_filter:
+                up_fl[key] = dict_item[key]
+                
+            operations.append(UpdateOne(fl, {"$set": up_fl}, upsert=upsert))
+        
+        collect.bulk_write(operations)
+        
+        return {"status": "success"}
     
     def delete_one(self, id: str) -> dict[str, str]:
         res = self.__collection.delete_one({"_id": ObjectId(id)})
