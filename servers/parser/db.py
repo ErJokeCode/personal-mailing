@@ -115,19 +115,31 @@ class WorkerCollection(Generic[V, T]):
             return None
         
     def bulk_update(self, filter: list[str], update_filter: list[str], data: Sequence[V], upsert: bool = False) -> dict[str, str]:
+        
+        def create_filter(filter: list[str], item) -> dict[str, str]:
+            dict = {}
+            for fl in filter:
+                dict[fl] = get_value(fl, item)
+            print(dict)
+            return dict
+        
+        def get_value(filter: str, item):
+            sp_fl = filter.split(".")
+            if len(sp_fl) == 1:
+                return item[filter]
+            else:
+                return get_value(sp_fl[1], item[sp_fl[0]])
+            
+        
         collect = self.__collection
         
         operations = []
         for item in data:
             dict_item = item.model_dump(by_alias=True, exclude="_id")
             
-            fl = {}
-            for key in filter:
-                fl[key] = dict_item[key]
+            fl = create_filter(filter, dict_item)
                 
-            up_fl = {}
-            for key in update_filter:
-                up_fl[key] = dict_item[key]
+            up_fl = create_filter(update_filter, dict_item)
                 
             operations.append(UpdateOne(fl, {"$set": up_fl}, upsert=upsert))
         

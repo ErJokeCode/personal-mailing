@@ -30,7 +30,7 @@ def upload_student(link: str, worker_db: WorkerDataBase, hist: HistoryUploadFile
         col_st.update_many({}, {"$set": {"status": False}})
         
         fl = ["personal_number", "surname", "name", "patronymic", "date_of_birth"]
-        up_fl = ["status", "type_of_cost", "type_of_education", "group"]
+        up_fl = ["status", "type_of_cost", "type_of_education", "group.number", "group.number_course"]
         
         worker_db.student.bulk_update(fl, up_fl, students, upsert=True)
         
