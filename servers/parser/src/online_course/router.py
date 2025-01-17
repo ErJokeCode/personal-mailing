@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from config import worker_db
-from src.online_course.dict_names import upload_dict_names
+from src.online_course.dict_names import add_dict_names, update_dict_names
 from src.schemas import DictNames, DictNamesInDB, InfoOCInFile, InfoOCInFileInDB, InfoOnlineCourseInDB
 
 
@@ -20,6 +20,8 @@ async def get_courses_in_file() -> list[str]:
     
     return cl_oc.find().distinct("name")
 
+
+
 @router_course.get("/search")
 async def get_courses(name: str, university: str | None = None) -> InfoOnlineCourseInDB:
     collection = worker_db.info_online_course.get_collect()
@@ -29,13 +31,17 @@ async def get_courses(name: str, university: str | None = None) -> InfoOnlineCou
     course = collection.find_one(query)
     return InfoOnlineCourseInDB(**course)
 
+
+
 @router_course.get("/names")
 async def get_names() -> list[str]:
     return worker_db.info_online_course.get_collect().distinct("name")
 
+
+
 @router_course.post("/dict_names")
-async def post_dict_modeus_inf(modeus:str = None, site_inf: str = None, file_course: str = None):
-    return upload_dict_names(modeus, site_inf, file_course, worker_db)
+async def post_dict_modeus_inf(modeus:str = None, site_inf: str = None, file_course: str = None) -> DictNamesInDB:
+    return add_dict_names(modeus, site_inf, file_course, worker_db)
 
 @router_course.get("/dict_names")
 async def get_list_modeus_to_inf(limit: int = None) -> list[DictNamesInDB]:
@@ -45,9 +51,11 @@ async def get_list_modeus_to_inf(limit: int = None) -> list[DictNamesInDB]:
 
 @router_course.put("/dict_names")
 async def put_list_modeus_to_inf(dict: list[DictNamesInDB|DictNames]) -> list[DictNamesInDB]:
+    res = []
     for d in dict:
-        worker_db.dict_names.update_one(d, upsert=True, get_item=False)
-    return worker_db.dict_names.get_all(limit=-1)
+        dict_db = update_dict_names(dict, worker_db, upsert=True)
+        res.append(dict_db)
+    return res
 
 @router_course.get("/dict_names/names")
 async def get_modeus_to_inf_names(modeus:str = None, site_inf: str = None, file_course: str = None) -> DictNamesInDB:
@@ -67,7 +75,7 @@ async def get_modeus_to_inf_one(id: str) -> DictNamesInDB:
 
 @router_course.put("/dict_names/one")
 async def put_modeus_to_inf(dict: DictNamesInDB) -> DictNamesInDB:
-    return worker_db.dict_names.update_one(dict)
+    return update_dict_names(dict, worker_db)
 
 @router_course.delete("/dict_names/{id}")
 async def delete_modeus_to_inf(id: str) -> dict[str, str]:
