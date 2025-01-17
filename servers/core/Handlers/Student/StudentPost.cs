@@ -48,7 +48,7 @@ public static partial class StudentHandler
 
         if (admin == null)
         {
-            admin = db.Users.ToList().MinBy(a => a.Groups.Count);
+            admin = db.Users.MinBy(a => DateTime.Parse(a.Date));
             admin.Groups.Add(activeStudent.Student.Group.Number);
         }
 

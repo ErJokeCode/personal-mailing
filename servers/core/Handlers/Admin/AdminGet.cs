@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -71,8 +72,7 @@ public static partial class AdminHandler
     }
 
     public static async Task<IResult> GetAdminChats(HttpContext context, UserManager<AdminUser> userManager, CoreDb db,
-                                                    bool onlyUnread = false, int pageIndex = 0,
-                                                    int pageSize = -1)
+                                                    bool onlyUnread = false, int pageIndex = 0, int pageSize = -1)
     {
         var adminId = userManager.GetUserId(context.User);
 
@@ -91,13 +91,13 @@ public static partial class AdminHandler
                         .ThenInclude(ch => ch.ActiveStudent)
                         .SingleOrDefaultAsync(a => a.Id == adminId);
 
-        var chats = admin.Chats.OrderByDescending(ch => ch.Messages.ElementAt(0).Date).ToList();
+        var chats = admin.Chats.OrderByDescending(ch => DateTime.Parse(ch.Messages.ElementAt(0).Date)).ToList();
 
         if (onlyUnread)
         {
             chats = chats.Where(ch => ch.UnreadCount > 0).ToList();
         }
-   
+
         var dtos = ChatDto.Maps(chats);
         var paginated = new PaginatedList<ChatDto>(dtos.ToList(), pageIndex, pageSize);
 

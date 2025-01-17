@@ -12,6 +12,10 @@ router_user = APIRouter(
 async def get_student(limit: int = None) -> list[StudentInDB]:
     return worker_db.student.get_all(limit=limit)
 
+@router_user.get("/number_groups")
+async def get_number_group_student() -> list[str]:
+    return worker_db.student.get_collect().distinct("group.number")
+
 @router_user.get("/{id}")
 async def get_courses(id: str) -> StudentInDB:
     return worker_db.student.get_one(id = id)
@@ -24,5 +28,4 @@ async def get_courses(id: str) -> list[InfoOnlineCourseInStudent]:
 @router_user.get("/")
 async def get_student(email: str) -> StudentInDB:
     return worker_db.student.get_one(email=email)
-
 
