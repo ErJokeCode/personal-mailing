@@ -215,6 +215,7 @@
     }
 
     const clear_all = () => {
+        is_empty = true;
         send_status = '';
         content = "";
         files = undefined;
