@@ -1,6 +1,8 @@
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Core.Identity;
 using Core.Models.Dto;
 using Core.Utility;
@@ -27,8 +29,11 @@ public static partial class DataHandler
         return Results.Ok(text);
     }
 
-    public static IResult GetGroups(CoreDb db, string search = null)
+    public static async Task<IResult> GetGroups(CoreDb db, string search = null)
     {
+        var allGroups = await ParserHandler.GetFromParser<List<string>>("/student/number_groups", []);
+
+        var mainAdmin = db.Users.ToList().MinBy(a => DateTime.Parse(a.Date));
         var admins = db.Users.ToList();
         var dict = new Dictionary<string, AdminUserDto>();
 
@@ -40,11 +45,19 @@ public static partial class DataHandler
             }
         }
 
+        foreach (var group in allGroups)
+        {
+            if (!dict.ContainsKey(group))
+            {
+                dict.Add(group, AdminUserDto.Map(mainAdmin));
+            }
+        }
+
         if (!string.IsNullOrEmpty(search))
         {
             dict = dict.Where(p => p.Key.ToLower().Contains(search.ToLower())).ToDictionary();
         }
 
-        return Results.Ok(dict);
+        return Results.Ok(dict.OrderBy(pair => pair.Key).ToDictionary());
     }
 }
