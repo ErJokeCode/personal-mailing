@@ -14,6 +14,8 @@ def upload_modeus(hist: HistoryUploadFileInDB, worker_db: WorkerDataBase) -> dic
         print(e)
         update_status_history(hist, text_status="Error file read")
         raise HTTPException(status_code=500, detail="File read error")
+    
+    worker_db.student.get_collect().update_many({"status": True}, {"$set": {"subjects": []}})
 
     fill_subjects(df, worker_db, hist)
     fill_students(df, worker_db, hist)
@@ -26,65 +28,70 @@ def fill_subjects(df: pd.DataFrame, worker_db: WorkerDataBase, hist: HistoryUplo
         data = df.groupby(["РМУП название", "МУП или УК", "Частный план название"])[["Студент", "Специальность", "Сотрудники", "Группа название"]]
     except Exception as e:
         print(e) 
-        update_status_history(hist, text_status=f"Error work with file. Use stucture file example")      
+        update_status_history(hist, text_status=f"Error work with file. Use stucture file example")   
     
-    subjects: list[Subject] = []
-    for key, info in data:
-        teams: list[Team] = []
-        
-        number_course = get_number_course(key[2], hist)
-        
-        for group, item in info.groupby(["Группа название"]):
-            teachers = item["Сотрудники"].drop_duplicates().dropna().to_list()
-            students = item["Студент"].drop_duplicates().to_list()
+    try:   
+        subjects: list[Subject] = []
+        for key, info in data:
+            teams: list[Team] = []
             
-            students_in_team: list[StudentInTeam] = []
-            for student in students:
-                sername, name, patronymic = get_split_fio(student)
+            number_course = get_number_course(key[2], hist)
+            
+            for group, item in info.groupby(["Группа название"]):
+                teachers = item["Сотрудники"].drop_duplicates().dropna().to_list()
+                students = item["Студент"].drop_duplicates().to_list()
                 
-                st_team = StudentInTeam(
-                    sername=sername,
-                    name=name,
-                    patronymic=patronymic
-                    )
-                
-                student_db: StudentInDB | None = worker_db.student.get_one(
-                    get_none=True, find_dict={
-                        "surname": sername,
-                        "name": name,
-                        "patronymic": patronymic, 
-                        "group.number_course": number_course
-                    })
-                
-                if student_db != None:
-                    st_team.id = student_db.id
+                students_in_team: list[StudentInTeam] = []
+                for student in students:
+                    sername, name, patronymic = get_split_fio(student)
                     
-                students_in_team.append(st_team)
+                    st_team = StudentInTeam(
+                        sername=sername,
+                        name=name,
+                        patronymic=patronymic
+                        )
+                    
+                    find_dict = {
+                            "surname": sername,
+                            "name": name,
+                            "patronymic": patronymic
+                        }
+                    if number_course != None:
+                        find_dict["group.number_course"] = number_course
+                    
+                    student_db: StudentInDB | None = worker_db.student.get_one(get_none=True, find_dict=find_dict)
+                    
+                    if student_db != None:
+                        st_team.id = student_db.id
+                        
+                    students_in_team.append(st_team)
+                
+                teams.append(Team(
+                    name=group[0],
+                    teachers=teachers,
+                    students=students_in_team
+                ))
+                
+            subject = Subject(
+                full_name=key[0],
+                name=key[1],
+                teams=teams,
+                form_education=get_form_edu(key[0]).value
+            )
+            subjects.append(subject)
             
-            teams.append(Team(
-                name=group[0],
-                teachers=teachers,
-                students=students_in_team
-            ))
-            
-        subject = Subject(
-            full_name=key[0],
-            name=key[1],
-            teams=teams,
-            form_education=get_form_edu(key[0]).value
-        )
-        subjects.append(subject)
+        worker_db.subject.insert_many(subjects)
         
-    worker_db.subject.insert_many(subjects)
+    except Exception as e:
+        print(e)
+        update_status_history(hist, text_status=f"Ошибка заполнение предметов, используйте шаблон")
         
 def get_number_course(plan: str, hist: HistoryUploadFileInDB) -> int:
     try:
         start_index = plan.rindex("курс")
         return int(plan[start_index - 2: start_index - 1])
     except Exception as e:
-        print(e)
-        update_status_history(hist, text_status=f"Ошибка получения номера курса из плана обучения: {plan}, укажите номер курса в виде '1 курс'")
-        raise HTTPException(status_code=500, detail=f"Error get number course from {plan}")
+        return None
 
 def fill_students(df: pd.DataFrame, worker_db: WorkerDataBase, hist: HistoryUploadFileInDB):
     try:
@@ -100,13 +107,16 @@ def fill_students(df: pd.DataFrame, worker_db: WorkerDataBase, hist: HistoryUplo
         direction_code, name_speciality = get_info_speciality(key[2])
         number_course = get_number_course(key[4], hist)
         
-        student: StudentInDB | None = worker_db.student.get_one(
-            get_none=True, find_dict={
+        find_dict={
                 "surname": surname,
                 "name": name,
-                "patronymic": patronymic, 
-                "group.number_course": number_course
-            })
+                "patronymic": patronymic
+            }
+        
+        if number_course != None:
+            find_dict["group.number_course"] = number_course
+        
+        student: StudentInDB | None = worker_db.student.get_one(get_none=True, find_dict=find_dict)
         
         if student != None:
             subjects: list[SubjectInStudent] = []

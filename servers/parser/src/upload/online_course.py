@@ -79,6 +79,7 @@ def upload_report(link: str, worker_db: WorkerDataBase, hist: HistoryUploadFileI
         raise HTTPException(status_code=500, detail="File read error")
     
     try:
+        worker_db.student.get_collect().update_many({"status": True}, {"$set": {"online_course": []}})
         students = parse_students(excel, worker_db)
     except Exception as e:
         print(e)

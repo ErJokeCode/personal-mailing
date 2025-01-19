@@ -132,23 +132,28 @@ class WorkerCollection(Generic[V, T]):
             except Exception as e:
                 print(e)
         
-        collect = self.__collection
-        ids = collect.find().distinct(filter[0])
-        
-        operations = []
-        for item in data:
-            dict_item = item.model_dump()
+        try:
+            collect = self.__collection
+            ids = collect.find().distinct(filter[0])
             
-            if dict_item[filter[0]] in ids:
-                fl = create_filter(filter, dict_item)
+            operations = []
+            for item in data:
+                dict_item = item.model_dump()
                 
-                up_fl = create_filter(update_filter, dict_item)
-                
-                operations.append(UpdateOne(fl, {"$set": up_fl}, upsert=upsert))
-            else:
-                operations.append(InsertOne(dict_item))
-        
-        collect.bulk_write(operations)
+                if dict_item[filter[0]] in ids:
+                    fl = create_filter(filter, dict_item)
+                    
+                    up_fl = create_filter(update_filter, dict_item)
+                    
+                    operations.append(UpdateOne(fl, {"$set": up_fl}, upsert=upsert))
+                else:
+                    operations.append(InsertOne(dict_item))
+            
+            if len(operations) > 0:
+                collect.bulk_write(operations)
+        except Exception as e:
+            print(e)
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error bulk update")
         
         return {"status": "success"}
     
