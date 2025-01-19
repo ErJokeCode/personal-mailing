@@ -105,8 +105,8 @@ class Student(BaseModel):
     status: bool | None = False
     type_of_cost: str | None = None
     type_of_education: str | None = None
-    subjects: list[SubjectInStudent]
-    online_course: list[InfoOnlineCourseInStudent]
+    subjects: list[SubjectInStudent] = []
+    online_course: list[InfoOnlineCourseInStudent] = []
     
 class StudentInDB(Student, BaseModelInDB):
     pass
