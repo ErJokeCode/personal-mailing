@@ -53,13 +53,15 @@ class Team(BaseModel):
 class TeamInSubjectInStudent(BaseModel):
     name: str
     teachers: list[str]
+    group_tg_link: str | None = None
 
 class SubjectInStudent(BaseModel):
     full_name: str
     name: str
     teams: list[TeamInSubjectInStudent]
     form_education: str
-    online_course_id: PyObjectId | None = None
+    site_oc_id: PyObjectId | None = None
+    file_oc_id: PyObjectId | None = None
     group_tg_link: str | None = None 
     
 class Subject(BaseModel):
@@ -107,6 +109,22 @@ class Student(BaseModel):
     type_of_education: str | None = None
     subjects: list[SubjectInStudent] = []
     online_course: list[InfoOnlineCourseInStudent] = []
+    
+    @classmethod
+    def filter_update_fields(self) -> list[str]:
+        return ["personal_number"]
+
+    @classmethod
+    def update_fields(self) -> list[str]:
+        return ["status", "type_of_cost", "type_of_education", "group.number", "group.number_course", "surname", "name", "patronymic", "date_of_birth"]
+    
+    @classmethod
+    def modeus_filter_update_fields(self) -> list[str]:
+        return ["personal_number"]
+    
+    @classmethod
+    def modeus_update_fields(self) -> list[str]:
+        return ["group.direction_code", "group.name_speciality", "subjects"]
     
 class StudentInDB(Student, BaseModelInDB):
     pass

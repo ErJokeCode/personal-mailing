@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 
 from config import WorkerDataBase
 from worker import update_status_history
-from src.schemas import HistoryUploadFileInDB, InfoOCInFile, InfoOnlineCourse, InfoOnlineCourseInDB, InfoOnlineCourseInStudent
+from src.schemas import HistoryUploadFileInDB, InfoOCInFile, InfoOCInFileInDB, InfoOnlineCourse, InfoOnlineCourseInDB, InfoOnlineCourseInStudent
 
 def parse_info_online_courses(worker_db: WorkerDataBase, hist: HistoryUploadFileInDB):
 
@@ -97,8 +97,6 @@ def upload_report(link: str, worker_db: WorkerDataBase, hist: HistoryUploadFileI
 def parse_students(excel: pd.ExcelFile, worker_db: WorkerDataBase):
     all_students = {}
     
-    worker_db.onl_cr_in_file.delete_many()
-    
     for sheet_name in excel.sheet_names[1:]:
         df = excel.parse(sheet_name)
         
@@ -131,7 +129,10 @@ def fill_file_online_course_info(df: pd.DataFrame, worker_db: WorkerDataBase):
             form_edu=form_edu
             )
         
-        res = worker_db.onl_cr_in_file.insert_one(onl_course)       
+        worker_db.onl_cr_in_file.update_one(onl_course, upsert=True, dict_keys={
+            "name" : onl_course.name, 
+            "name_subject" : onl_course.name_subject
+        })
 
 def fill_in_students_from_one_sheet(df: pd.DataFrame, all_students: dict, worker_db: WorkerDataBase):
     cols_fill_name = df.columns[:3]
@@ -159,24 +160,38 @@ def get_info_online_course(row, col_name_course: str, col_university: str, cols_
     scores = {}
     for col_score in cols_scores:
         scores[col_score] = row[col_score]
-
-    info_course = worker_db.info_online_course.get_one(get_none=True, find_dict={"name" : name_course, "university" : {"$regex": university}})
+        
+    file_course = worker_db.onl_cr_in_file.get_one(name = name_course, get_none=True)
+        
+    info_course = None
+    dict_name = worker_db.dict_names.get_one(get_none=True, file_course=name_course)
+    
+    if dict_name != None:
+        info_course = worker_db.info_online_course.get_one(get_none=True, name=dict_name.site_inf)
+    else:
+        info_course = worker_db.info_online_course.get_one(get_none=True, find_dict={"name" : name_course, "university" : {"$regex": university}})
 
     if info_course == None:
         info_course = create_default_info_course_in_db(name_course, university, worker_db)
-
-    course = create_course_in_student(info_course, scores)
+        
+    info_course.name = name_course
+    course = create_course_in_student(info_course, file_course, scores)
 
     return course
 
     
 def create_default_info_course_in_db(name: str, university: str, worker_db: WorkerDataBase) -> InfoOnlineCourse:
     online_course = InfoOnlineCourse(name=name, university=university)
-    # res = worker_db.info_online_course.insert_one(online_course)
     return online_course
 
 
-def create_course_in_student(info_course: InfoOnlineCourse, scores: dict) -> InfoOnlineCourseInStudent:
+def create_course_in_student(info_course: InfoOnlineCourse, file_course: InfoOCInFileInDB, scores: dict) -> InfoOnlineCourseInStudent:
+    if file_course != None:
+        if info_course.info != None:
+            info_course.info = f"Предмет: {file_course.name_subject}, платформа: {file_course.platform}, форма обучения: {file_course.form_edu}. Дополнительная информация: {info_course.info}"
+        else:
+            info_course.info = f"Предмет: {file_course.name_subject}, платформа: {file_course.platform}, форма обучения: {file_course.form_edu}"
+    
     dict = info_course.model_dump(by_alias=True, exclude="_id")
     return InfoOnlineCourseInStudent(**dict, scores=scores)
 
@@ -213,14 +228,29 @@ def update_info_from_inf(worked_db: WorkerDataBase):
     courses = worked_db.info_online_course.get_all(limit=-1)
     
     for course in courses:
+        dict_names = worked_db.dict_names.get_one(get_none=True, site_inf=course.name)
+        
+        find_name = course.name
+        find_university = course.university
+        info = course.info
+        
+        if dict_names != None:
+            file_course = worked_db.onl_cr_in_file.get_one(name=dict_names.file_course, get_none=True)
+            
+            if file_course != None:
+                find_name = file_course.name
+                find_university = file_course.university
+                info = f"Предмет: {file_course.name_subject}, платформа: {file_course.platform}, форма обучения: {file_course.form_edu}. Дополнительная информация: {course.info}"
+                
         cl_st.update_many({
-            "online_course.name" : course.name, 
-            "online_course.university" : course.university
+            "online_course.name" : find_name, 
+            "online_course.university" : find_university
             }, 
             {
                 "$set": {
                     "online_course.$.date_start": course.date_start, 
                     "online_course.$.deadline": course.deadline, 
-                    "online_course.$.info": course.info
+                    "online_course.$.info": info
                 }
             })
+        
