@@ -95,7 +95,7 @@ def get_number_course(plan: str, hist: HistoryUploadFileInDB) -> int:
 
 def fill_students(df: pd.DataFrame, worker_db: WorkerDataBase, hist: HistoryUploadFileInDB):
     try:
-        data = df.groupby(["Студент", "Поток", "Специальность", "Профиль", "Частный план название"])[["РМУП название", "Группа название", "МУП или УК"]]
+        data = df.groupby(["Студент", "Поток", "Специальность", "Профиль"])[["РМУП название", "Группа название", "МУП или УК", "Частный план название"]]
     except Exception as e:
         print(e)   
         update_status_history(hist, text_status=f"Error work with file. Use stucture file example")
@@ -105,7 +105,7 @@ def fill_students(df: pd.DataFrame, worker_db: WorkerDataBase, hist: HistoryUplo
     for key, value in data:
         surname, name, patronymic = get_split_fio(key[0])
         direction_code, name_speciality = get_info_speciality(key[2])
-        number_course = get_number_course(key[4], hist)
+        number_course = get_number_course(value["Частный план название"], hist)
         
         find_dict={
                 "surname": surname,
@@ -126,6 +126,8 @@ def fill_students(df: pd.DataFrame, worker_db: WorkerDataBase, hist: HistoryUplo
             student.group.direction_code = direction_code
             student.group.name_speciality = name_speciality
             student.subjects = subjects
+            
+            print(student)
             
             update_students.append(student)
     

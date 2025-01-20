@@ -10,7 +10,9 @@ router_user = APIRouter(
 )
 @router_user.get("/all")
 async def get_student(limit: int = None) -> list[StudentInDB]:
-    return worker_db.student.get_all(limit=limit)
+    if limit is None:
+        limit = -1
+    return worker_db.student.get_all(limit=limit, status=True)
 
 @router_user.get("/number_groups")
 async def get_number_group_student() -> list[str]:
