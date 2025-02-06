@@ -1,0 +1,18 @@
+meta {
+  name: admin-register
+  type: http
+  seq: 2
+}
+
+post {
+  url: http://localhost:5000/admin/register
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "test@test",
+    "password": "test"
+  }
+}
