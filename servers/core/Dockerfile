@@ -5,8 +5,8 @@ RUN apt-get install -yqq dotnet-sdk-8.0
 RUN apt-get install -yqq aspnetcore-runtime-8.0
 RUN apt-get install -yqq curl
 
-ADD ./core /opt/core
-WORKDIR /opt/core
+ADD ./core /core
+WORKDIR /core
 RUN dotnet restore
 
 EXPOSE 5000

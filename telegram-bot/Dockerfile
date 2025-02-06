@@ -1,7 +1,7 @@
 FROM python:3
 
-ADD . /opt/bot
-WORKDIR /opt/bot
+ADD . /bot
+WORKDIR /bot
 RUN pip install -r requirements.txt
 
 CMD ["./start.sh"]

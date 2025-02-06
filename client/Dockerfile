@@ -1,7 +1,7 @@
 FROM node
 
-ADD . /opt/client
-WORKDIR /opt/client
+ADD . /client
+WORKDIR /client
 RUN npm install
 
 EXPOSE 5010

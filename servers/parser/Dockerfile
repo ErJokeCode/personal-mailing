@@ -1,7 +1,7 @@
 FROM python:3
 
-ADD . /opt/parser
-WORKDIR /opt/parser
+ADD . /parser
+WORKDIR /parser
 RUN pip install -r requirements.txt
 
 EXPOSE 8000

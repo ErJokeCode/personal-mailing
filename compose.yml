@@ -1,5 +1,6 @@
 services:
   client:
+    user: root
     build: ./client
     command: npm run dev
     ports:
@@ -9,6 +10,7 @@ services:
       - client_node_modules:/opt/client/node_modules
 
   admin-panel:
+    user: root
     build: ./admin-panel
     command: pnpm dev
     ports:
@@ -16,6 +18,7 @@ services:
     volumes:
       - ./admin-panel:/opt/admin-panel
       - admin-panel_node_modules:/opt/admin-panel/node_modules
+
   redis:
     image: redis
     restart: always
@@ -25,6 +28,7 @@ services:
       - redisdata:/var/lib/redis/data
 
   bot:
+    user: root
     build: ./telegram-bot
     command: bash start.sh
     depends_on:
@@ -61,6 +65,7 @@ services:
       - coredata:/var/lib/core/data
 
   core:
+    user: root
     build:
       context: ./servers
       dockerfile: ./core/Dockerfile
@@ -89,6 +94,7 @@ services:
       - parserdata:/var/lib/parser/data
 
   parser:
+    user: root
     build: ./servers/parser
     command: python main.py
     depends_on:
