@@ -1,4 +1,16 @@
 services:
+  coredb2:
+    image: postgres
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: coredb
+    ports:
+      - 5400:5432
+    volumes:
+      - coredata:/var/lib/core/data
+
   client:
     user: root
     build: ./client
