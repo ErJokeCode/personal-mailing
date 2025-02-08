@@ -28,6 +28,7 @@ public static class Startup
         builder.Services.AddHttpContextAccessor();
         builder.Services.AddProblemDetails();
         builder.Services.AddExceptionHandler<ExceptionHandler>();
+        builder.Services.AddHttpClient();
 
         builder.Services.AddOpenApi();
 

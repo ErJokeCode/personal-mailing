@@ -9,7 +9,7 @@ services:
       POSTGRES_DB: coredb
     volumes:
       - coredata:/var/lib/core/data
-  
+
   pgadmin:
     image: dpage/pgadmin4
     ports:
@@ -55,7 +55,7 @@ services:
       - 6397:6379
     volumes:
       - redisdata:/var/lib/redis/data
-  
+
   redis-insight:
     image: redislabs/redisinsight
     ports:
@@ -86,7 +86,7 @@ services:
       - 27071:27017
     volumes:
       - parserdata:/var/lib/parser/data
-  
+
   monogo-express:
     image: mongo-express
     ports:
@@ -106,6 +106,10 @@ services:
     build: ./servers/parser
     ports:
       - 8000:8000
+    environment:
+      MGO_HOST: parserdb
+      MGO_PORT: 27017
+      MGO_NAME_DB: personal-mailing
     depends_on:
       parserdb:
         condition: service_started

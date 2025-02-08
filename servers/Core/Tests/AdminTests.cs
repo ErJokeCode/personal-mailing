@@ -5,6 +5,9 @@ using Core.Routes.Admins.Queries;
 using Core.Tests.Setup;
 using Microsoft.AspNetCore.Authentication;
 
+namespace Core.Tests;
+
+[Collection("Tests")]
 public class AdminTests : BaseTest
 {
     public AdminTests(TestWebAppFactory appFactory) : base(appFactory)

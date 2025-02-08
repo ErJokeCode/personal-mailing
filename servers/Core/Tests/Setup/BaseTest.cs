@@ -4,7 +4,8 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Core.Tests.Setup;
 
-public abstract class BaseTest : IClassFixture<TestWebAppFactory>
+[Collection("Tests")]
+public abstract class BaseTest
 {
     private readonly IServiceScope _scope;
     protected readonly ISender Sender;

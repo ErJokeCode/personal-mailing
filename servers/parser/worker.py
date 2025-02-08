@@ -9,7 +9,7 @@ def get_cookie_core():
     global COOKIE_CORE
 
     if COOKIE_CORE == "":
-        url = "http://core:5000/login/"
+        url = "http://core:5000/admin/login/"
         body = {
             "email": ADMIN_EMAIL_CORE,
             "password": ADMIN_PASSWORD_CORE,

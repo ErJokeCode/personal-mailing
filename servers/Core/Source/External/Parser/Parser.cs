@@ -11,18 +11,14 @@ namespace Core.External.Parser;
 
 public class Parser : IParser
 {
-    private readonly HttpClient _client;
+    private readonly IHttpClientFactory _clientFactory;
     private readonly JsonSerializerOptions _jsonOptions;
     private readonly string _parserUrl;
 
-    public Parser(IOptions<ParserOptions> options)
+    public Parser(IOptions<ParserOptions> options, IHttpClientFactory clientFactory)
     {
         _parserUrl = options.Value.ParserUrl;
-
-        _client = new()
-        {
-            BaseAddress = new Uri(_parserUrl)
-        };
+        _clientFactory = clientFactory;
 
         _jsonOptions = new()
         {
@@ -32,7 +28,10 @@ public class Parser : IParser
 
     public async Task<T?> GetAsync<T>(string path, Dictionary<string, string?> query)
     {
-        var response = await _client.GetAsync(QueryHelpers.AddQueryString(path, query));
+        var client = _clientFactory.CreateClient();
+        client.BaseAddress = new Uri(_parserUrl);
+
+        var response = await client.GetAsync(QueryHelpers.AddQueryString(path, query));
 
         if (!response.IsSuccessStatusCode)
         {
