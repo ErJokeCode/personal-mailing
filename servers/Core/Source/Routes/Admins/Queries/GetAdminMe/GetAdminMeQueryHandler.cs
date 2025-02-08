@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Data;
+using Core.Infrastructure.Services;
 using Core.Models;
 using Core.Routes.Admins.Dtos;
 using FluentResults;
@@ -14,20 +15,17 @@ namespace Core.Routes.Admins.Queries;
 public class GetAdminMeQueryHandler : IRequestHandler<GetAdminMeQuery, Result<AdminDto>>
 {
     private readonly AdminMapper _adminMapper;
-    private readonly IHttpContextAccessor _contextAccessor;
-    private readonly UserManager<Admin> _userManager;
+    private readonly IUserAccessor _userAccessor;
 
-    public GetAdminMeQueryHandler(AppDbContext db, IHttpContextAccessor contextAccessor, UserManager<Admin> userManager)
+    public GetAdminMeQueryHandler(IUserAccessor userAccessor)
     {
         _adminMapper = new AdminMapper();
-        _contextAccessor = contextAccessor;
-        _userManager = userManager;
+        _userAccessor = userAccessor;
     }
 
     public async Task<Result<AdminDto>> Handle(GetAdminMeQuery request, CancellationToken cancellationToken)
     {
-        var principal = _contextAccessor.HttpContext!.User;
-        var admin = await _userManager.GetUserAsync(principal);
+        var admin = await _userAccessor.GetUserAsync();
 
         if (admin is null)
         {

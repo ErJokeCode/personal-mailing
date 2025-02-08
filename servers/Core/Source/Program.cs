@@ -1,9 +1,6 @@
-using System.Linq;
 using System.Threading.Tasks;
-using Core.Data;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Http;
 
 namespace Core;
 
@@ -18,6 +15,9 @@ public class Program
 
         await app.InitialzieServices();
         app.MapRoutes();
+
+        app.MapGet("/ping", () => TypedResults.Ok())
+            .WithDescription("Used for docker container setup");
 
         app.Run();
     }

@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Core.Data;
+using Core.External.Parser;
 using Core.Infrastructure.Handlers;
+using Core.Infrastructure.Services;
 using Core.Models;
 using Core.Routes;
 using Core.Routes.Admins.Commands;
@@ -59,8 +61,16 @@ public static class Startup
         .AddDefaultTokenProviders();
 
         builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
-
         builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+        builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+
+        builder.Services.Configure<ParserOptions>(o =>
+        {
+            o.ParserUrl = builder.Configuration.GetConnectionString("Parser")!;
+        });
+        builder.Services.AddScoped<IParser, Parser>();
+
+        builder.Services.AddScoped<IUserAccessor, UserAccessor>();
     }
 
     public static async Task InitialzieServices(this WebApplication app)
@@ -71,17 +81,23 @@ public static class Startup
             app.MapOpenApi();
             app.MapScalarApiReference(o =>
             {
+                o.Servers =
+                [
+                    new ScalarServer("http://localhost:5000")
+                ];
                 o.DefaultHttpClient = new(ScalarTarget.JavaScript, ScalarClient.Fetch);
             });
         }
 
         await app.EnsureAdminCreated();
 
+        app.UseRequestLocalization((o) => o.SetDefaultCulture("ru"));
         app.UseCors();
         app.UseAuthentication();
         app.UseAuthorization();
-        app.UseRequestLocalization((o) => o.SetDefaultCulture("ru"));
         app.UseExceptionHandler();
+
+        app.MapReverseProxy();
     }
 
     public static void MapRoutes(this WebApplication app)

@@ -1,124 +1,121 @@
 services:
-  coredb2:
+  coredb:
     image: postgres
-    restart: always
+    ports:
+      - 5400:5432
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: coredb
-    ports:
-      - 5400:5432
     volumes:
       - coredata:/var/lib/core/data
-
-  client:
-    user: root
-    build: ./client
-    command: npm run dev
+  
+  pgadmin:
+    image: dpage/pgadmin4
     ports:
-      - 5010:5010
+      - 5401:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@domain.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    depends_on:
+      coredb:
+        condition: service_started
     volumes:
-      - ./client:/opt/client
-      - client_node_modules:/opt/client/node_modules
+      - pgadmindata:/var/lib/pgadmin/data
+
+  core:
+    user: root
+    build: ./servers/Core/Source
+    ports:
+      - 5000:5000
+    depends_on:
+      coredb:
+        condition: service_started
+    healthcheck:
+      test: "curl -f localhost:5000/ping"
+      interval: 10s
+      timeout: 30s
+      retries: 10
+    volumes:
+      - './servers/Core/Source:/app:z'
+      - '/app/bin'
+      - '/app/obj'
 
   admin-panel:
-    user: root
     build: ./admin-panel
-    command: pnpm dev
     ports:
       - 5015:5015
     volumes:
-      - ./admin-panel:/opt/admin-panel
-      - admin-panel_node_modules:/opt/admin-panel/node_modules
+      - './admin-panel:/app:z'
+      - '/app/node_modules'
 
   redis:
     image: redis
-    restart: always
     ports:
       - 6397:6379
     volumes:
       - redisdata:/var/lib/redis/data
+  
+  redis-insight:
+    image: redislabs/redisinsight
+    ports:
+      - 6398:5540
+    depends_on:
+      redis:
+        condition: service_started
+    volumes:
+      - insightdata:/var/lib/redisinsight/data
 
   bot:
     user: root
     build: ./telegram-bot
     command: bash start.sh
+    ports:
+      - 8001:8000
     depends_on:
       redis:
         condition: service_started
       core:
         condition: service_healthy
     volumes:
-      - ./telegram-bot:/opt/bot
-
-  rabbitmq:
-    image: rabbitmq:management
-    ports:
-      - 5627:5672
-      - 15627:15672
-    volumes:
-      - rabbitmqdata:/var/lib/rabbitmq
-    healthcheck:
-      test: rabbitmq-diagnostics check_port_connectivity
-      interval: 10s
-      timeout: 30s
-      retries: 10
-
-  coredb:
-    image: postgres
-    restart: always
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: coredb
-    ports:
-      - 5423:5432
-    volumes:
-      - coredata:/var/lib/core/data
-
-  core:
-    user: root
-    build:
-      context: ./servers
-      dockerfile: ./core/Dockerfile
-    command: dotnet run
-    ports:
-      - 5000:5000
-    depends_on:
-      coredb:
-        condition: service_started
-      rabbitmq:
-        condition: service_healthy
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://core:5000/ping" ]
-      interval: 10s
-      timeout: 30s
-      retries: 10
-    volumes:
-      - ./servers/core:/opt/core
+      - './telegram-bot:/app:z'
 
   parserdb:
     image: mongo
-    restart: always
     ports:
       - 27071:27017
     volumes:
       - parserdata:/var/lib/parser/data
-
-  parser:
-    user: root
-    build: ./servers/parser
-    command: python main.py
+  
+  monogo-express:
+    image: mongo-express
+    ports:
+      - 27072:8081
+    environment:
+      ME_CONFIG_MONGODB_SERVER: parserdb
+      ME_CONFIG_BASICAUTH_USERNAME: user
+      ME_CONFIG_BASICAUTH_PASSWORD: pass
     depends_on:
       parserdb:
         condition: service_started
     volumes:
-      - ./servers/parser:/opt/parser
+      - expressdata:/var/lib/mongoexpress/data
+
+  parser:
+    user: root
+    build: ./servers/parser
+    ports:
+      - 8000:8000
+    depends_on:
+      parserdb:
+        condition: service_started
+    volumes:
+      - './servers/parser:/app:z'
 
 volumes:
-  client_node_modules:
-  admin-panel_node_modules:
   redisdata:
   parserdata:
   coredata:
-  rabbitmqdata:
+  pgadmindata:
+  insightdata:
+  expressdata:

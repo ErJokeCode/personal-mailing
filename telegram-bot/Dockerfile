@@ -1,7 +1,9 @@
 FROM python:3
 
-ADD . /bot
-WORKDIR /bot
+WORKDIR /app
+COPY . .
 RUN pip install -r requirements.txt
+
+EXPOSE 8000
 
 CMD ["./start.sh"]

@@ -1,7 +1,9 @@
+using Core.Models;
 using Core.Routes.Admins.Commands;
 using Core.Routes.Admins.Dtos;
 using Core.Routes.Admins.Queries;
 using Core.Tests.Setup;
+using Microsoft.AspNetCore.Authentication;
 
 public class AdminTests : BaseTest
 {
@@ -46,5 +48,13 @@ public class AdminTests : BaseTest
         };
         var result = await Sender.Send(command);
         Assert.True(result.IsFailed);
+    }
+
+    [Fact]
+    public async Task GetAdminMe_ShouldReturnMe()
+    {
+        var query = new GetAdminMeQuery();
+        var result = await Sender.Send(query);
+        Assert.IsAssignableFrom<AdminDto>(result.Value);
     }
 }

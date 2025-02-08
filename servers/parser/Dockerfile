@@ -1,7 +1,7 @@
 FROM python:3
 
-ADD . /parser
-WORKDIR /parser
+WORKDIR /app
+COPY . .
 RUN pip install -r requirements.txt
 
 EXPOSE 8000

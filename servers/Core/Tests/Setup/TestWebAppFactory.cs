@@ -1,4 +1,6 @@
 using Core.Data;
+using Core.Infrastructure.Services;
+using Core.Tests.Mocks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
@@ -21,17 +23,26 @@ public class TestWebAppFactory : WebApplicationFactory<Program>, IAsyncLifetime
     {
         builder.ConfigureTestServices(services =>
         {
-            var descriptior = services.SingleOrDefault(s => s.ServiceType == typeof(DbContextOptions<AppDbContext>));
+            var dbDescriptor = services.SingleOrDefault(s => s.ServiceType == typeof(DbContextOptions<AppDbContext>));
 
-            if (descriptior is not null)
+            if (dbDescriptor is not null)
             {
-                services.Remove(descriptior);
+                services.Remove(dbDescriptor);
             }
 
             services.AddDbContext<AppDbContext>(o =>
             {
                 o.UseNpgsql(_dbContainer.GetConnectionString());
             });
+
+            var userDescriptor = services.SingleOrDefault(s => s.ServiceType == typeof(IUserAccessor));
+
+            if (userDescriptor is not null)
+            {
+                services.Remove(userDescriptor);
+            }
+
+            services.AddScoped<IUserAccessor, UserAccessorMock>();
         });
     }
 

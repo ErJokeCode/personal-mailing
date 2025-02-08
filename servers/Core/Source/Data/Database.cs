@@ -8,6 +8,8 @@ namespace Core.Data;
 
 public class AppDbContext : IdentityDbContext<Admin, IdentityRole<Guid>, Guid>
 {
+    public DbSet<Student> Students => Set<Student>();
+
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }
