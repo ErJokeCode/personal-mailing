@@ -17,6 +17,11 @@ router_data = APIRouter(
     tags=["Upload Files"],
 )
 
+
+@router_data.get("/ping")
+async def ping():
+    return "ok"
+
 @router_data.post("/student")
 async def upload_data_student(file: UploadFile) -> dict[str, str]:
     hist = await get_history()

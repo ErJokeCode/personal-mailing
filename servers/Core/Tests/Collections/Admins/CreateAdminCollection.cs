@@ -1,27 +1,15 @@
-using Core.Models;
+
 using Core.Routes.Admins.Commands;
-using Core.Routes.Admins.Dtos;
 using Core.Routes.Admins.Queries;
 using Core.Tests.Setup;
-using Microsoft.AspNetCore.Authentication;
 
-namespace Core.Tests;
+namespace Core.Tests.Collections.Admins;
 
 [Collection("Tests")]
-public class AdminTests : BaseTest
+public class CreateAdminCollection : BaseCollection
 {
-    public AdminTests(TestWebAppFactory appFactory) : base(appFactory)
+    public CreateAdminCollection(ApplicationFactory appFactory) : base(appFactory)
     {
-    }
-
-    [Fact]
-    public async Task GetAllAdmins_ShouldBeAdminArray()
-    {
-        var query = new GetAllAdminsQuery();
-
-        var result = await Sender.Send(query);
-
-        Assert.IsAssignableFrom<IEnumerable<AdminDto>>(result);
     }
 
     [Fact]
@@ -39,6 +27,7 @@ public class AdminTests : BaseTest
         var query = new GetAdminByIdQuery(admin.Id);
         var queryResult = await Sender.Send(query);
         Assert.True(queryResult.IsSuccess);
+        Assert.Equal(command.Email, queryResult.Value.Email);
     }
 
     [Fact]
@@ -51,13 +40,5 @@ public class AdminTests : BaseTest
         };
         var result = await Sender.Send(command);
         Assert.True(result.IsFailed);
-    }
-
-    [Fact]
-    public async Task GetAdminMe_ShouldReturnMe()
-    {
-        var query = new GetAdminMeQuery();
-        var result = await Sender.Send(query);
-        Assert.IsAssignableFrom<AdminDto>(result.Value);
     }
 }
