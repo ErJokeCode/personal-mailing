@@ -16,7 +16,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Core.Routes.Students;
 
-public class StudentsRoute : IRoute
+public class StudentRoute : IRoute
 {
     public void MapRoutes(WebApplication app)
     {

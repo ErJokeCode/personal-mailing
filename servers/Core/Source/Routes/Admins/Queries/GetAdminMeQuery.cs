@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Infrastructure.Services;
 using Core.Routes.Admins.Dtos;
+using Core.Routes.Admins.Errors;
 using Core.Routes.Admins.Maps;
 using FluentResults;
 using MediatR;
@@ -28,7 +29,7 @@ public class GetAdminMeQueryHandler : IRequestHandler<GetAdminMeQuery, Result<Ad
 
         if (admin is null)
         {
-            return Result.Fail<AdminDto>("Админ не был найден");
+            return Result.Fail<AdminDto>(AdminErrors.NotFound());
         }
 
         return Result.Ok(_adminMapper.Map(admin));

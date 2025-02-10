@@ -1,6 +1,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Models;
+using Core.Routes.Admins.Errors;
 using FluentResults;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
@@ -28,7 +29,7 @@ public class LoginAdminCommandHandler : IRequestHandler<LoginAdminCommand, Resul
 
         if (!result.Succeeded)
         {
-            return Result.Fail("Почта или пароль не совпадают");
+            return Result.Fail(AdminErrors.LoginError());
         }
 
         return Result.Ok();

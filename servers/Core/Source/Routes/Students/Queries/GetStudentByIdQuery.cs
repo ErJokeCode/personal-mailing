@@ -4,7 +4,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Data;
+using Core.External.Parser;
 using Core.Routes.Students.Dtos;
+using Core.Routes.Students.Errors;
 using Core.Routes.Students.Maps;
 using FluentResults;
 using MediatR;
@@ -20,12 +22,14 @@ public class GetStudentByIdQuery : IRequest<Result<StudentDto>>
 public class GetStudentByIdQueryHandler : IRequestHandler<GetStudentByIdQuery, Result<StudentDto>>
 {
     private readonly AppDbContext _db;
+    private readonly IParser _parser;
     private readonly StudentMapper _studentMapper;
 
-    public GetStudentByIdQueryHandler(AppDbContext db)
+    public GetStudentByIdQueryHandler(AppDbContext db, IParser parser)
     {
         _db = db;
         _studentMapper = new StudentMapper();
+        _parser = parser;
     }
 
     public async Task<Result<StudentDto>> Handle(GetStudentByIdQuery request, CancellationToken cancellationToken)
@@ -34,8 +38,10 @@ public class GetStudentByIdQueryHandler : IRequestHandler<GetStudentByIdQuery, R
 
         if (student is null)
         {
-            return Result.Fail<StudentDto>($"Студент с айди {request.StudentId} не был найден");
+            return Result.Fail<StudentDto>(StudentErrors.NotFound(request.StudentId));
         }
+
+        await _parser.IncludeInfoAsync(student);
 
         return Result.Ok(_studentMapper.Map(student));
     }

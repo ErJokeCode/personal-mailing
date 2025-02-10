@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Core.Routes.Admins;
 
-public class AdminsRoute : IRoute
+public class AdminRoute : IRoute
 {
     public void MapRoutes(WebApplication app)
     {

@@ -5,6 +5,7 @@ using Core.Data;
 using Core.External.Parser;
 using Core.Models;
 using Core.Routes.Students.Dtos;
+using Core.Routes.Students.Errors;
 using Core.Routes.Students.Maps;
 using FluentResults;
 using MediatR;
@@ -40,7 +41,7 @@ public class AuthStudentCommandHandler : IRequestHandler<AuthStudentCommand, Res
         {
             if (!await CanAuth(request, student))
             {
-                return Result.Fail<StudentDto>("Ошибка аутентификации");
+                return Result.Fail<StudentDto>(StudentErrors.AuthError());
             }
 
             return Result.Ok(_mapper.Map(student));
@@ -55,7 +56,7 @@ public class AuthStudentCommandHandler : IRequestHandler<AuthStudentCommand, Res
 
         if (!await CanAuth(request, student))
         {
-            return Result.Fail<StudentDto>("Ошибка аутентификации");
+            return Result.Fail<StudentDto>(StudentErrors.AuthError());
         }
 
         await _db.Students.AddAsync(student, cancellationToken);

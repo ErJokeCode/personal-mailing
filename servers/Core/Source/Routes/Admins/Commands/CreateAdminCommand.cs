@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Models;
 using Core.Routes.Admins.Dtos;
+using Core.Routes.Admins.Errors;
 using Core.Routes.Admins.Maps;
 using FluentResults;
 using MediatR;
@@ -34,7 +35,7 @@ public class CreateAdminCommandHandler : IRequestHandler<CreateAdminCommand, Res
 
         if (user != null)
         {
-            return Result.Fail("Админ с такой почтой уже существует");
+            return Result.Fail(AdminErrors.AlreadyExists(request.Email));
         }
 
         var newUser = new Admin()
@@ -48,8 +49,7 @@ public class CreateAdminCommandHandler : IRequestHandler<CreateAdminCommand, Res
 
         if (!result.Succeeded)
         {
-            var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-            return Result.Fail($"Произошла ошибка при регистрации: {errors}");
+            return Result.Fail(AdminErrors.RegisterError(result.Errors));
         }
 
         return Result.Ok(_mapper.Map(newUser));

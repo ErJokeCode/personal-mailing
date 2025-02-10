@@ -15,7 +15,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Core.Routes.Notifications;
 
-class NotificationsRoute : IRoute
+class NotificationRoute : IRoute
 {
     public void MapRoutes(WebApplication app)
     {

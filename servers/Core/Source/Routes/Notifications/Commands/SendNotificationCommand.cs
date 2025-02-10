@@ -6,8 +6,10 @@ using Core.Data;
 using Core.External.TelegramBot;
 using Core.Infrastructure.Services;
 using Core.Models;
+using Core.Routes.Admins.Errors;
 using Core.Routes.Notifications.Dtos;
 using Core.Routes.Notifications.Maps;
+using Core.Routes.Students.Errors;
 using FluentResults;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -41,7 +43,7 @@ public class SendNotificationCommandHandler : IRequestHandler<SendNotificationCo
 
         if (admin is null)
         {
-            return Result.Fail<NotificationDto>("Админ не был найден");
+            return Result.Fail<NotificationDto>(AdminErrors.NotFound());
         }
 
         var notification = new Notification()
@@ -58,7 +60,7 @@ public class SendNotificationCommandHandler : IRequestHandler<SendNotificationCo
 
             if (student is null)
             {
-                return Result.Fail<NotificationDto>($"Студент с айди {studentId} не был найден");
+                return Result.Fail<NotificationDto>(StudentErrors.NotFound(studentId));
             }
 
             notification.Students.Add(student);

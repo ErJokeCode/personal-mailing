@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Data;
 using Core.Routes.Notifications.Dtos;
+using Core.Routes.Notifications.Errors;
 using Core.Routes.Notifications.Maps;
 using FluentResults;
 using MediatR;
@@ -35,7 +36,7 @@ public class GetNotificationByIdQueryHandler : IRequestHandler<GetNotificationBy
 
         if (notification is null)
         {
-            return Result.Fail<NotificationDto>($"Рассылка с айди {request.NotificationId} не была найдена");
+            return Result.Fail<NotificationDto>(NotificationErrors.NotFound(request.NotificationId));
         }
 
         return Result.Ok(_notificationMapper.Map(notification));
