@@ -15,5 +15,5 @@ public class Student
     [NotMapped]
     public ParserStudent? Info { get; set; }
 
-    public ICollection<Notification> Notifications { get; } = [];
+    public ICollection<Notification> Notifications { get; set; } = [];
 }

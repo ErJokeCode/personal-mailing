@@ -12,5 +12,5 @@ public class Notification
 
     public required Guid AdminId { get; set; }
     public Admin? Admin { get; set; }
-    public ICollection<Student> Students { get; } = [];
+    public ICollection<Student> Students { get; set; } = [];
 }

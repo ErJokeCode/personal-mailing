@@ -8,5 +8,5 @@ public class Admin : IdentityUser<Guid>
 {
     public required DateOnly CreatedAt { get; set; }
 
-    public ICollection<Notification> Notifications { get; } = [];
+    public ICollection<Notification> Notifications { get; set; } = [];
 }

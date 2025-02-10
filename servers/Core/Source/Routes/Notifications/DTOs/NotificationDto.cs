@@ -14,5 +14,5 @@ public class NotificationDto
     public required DateTime CreatedAt { get; set; }
 
     public AdminDto? Admin { get; set; }
-    public IEnumerable<StudentDto> Students { get; } = [];
+    public IEnumerable<StudentDto> Students { get; set; } = [];
 }

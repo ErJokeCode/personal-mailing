@@ -9,6 +9,6 @@ public class GetAdminByIdQueryValidator : AbstractValidator<GetAdminByIdQuery>
 {
     public GetAdminByIdQueryValidator()
     {
-        RuleFor(x => x.AdminId).NotEmpty().SetValidator(new GuidValidator());
+        RuleFor(x => x.AdminId).SetValidator(new GuidValidator());
     }
 }

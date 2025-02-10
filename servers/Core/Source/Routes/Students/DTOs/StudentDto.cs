@@ -16,6 +16,4 @@ public class StudentDto
     public required DateOnly CreatedAt { get; set; }
 
     public ParserStudent? Info { get; set; }
-
-    public IEnumerable<NotificationDto> Notifications { get; } = [];
 }

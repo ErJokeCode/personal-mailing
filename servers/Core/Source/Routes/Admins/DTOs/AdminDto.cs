@@ -11,6 +11,4 @@ public class AdminDto
     public required string UserName { get; init; }
     public required string Email { get; init; }
     public required DateOnly CreatedAt { get; init; }
-
-    public IEnumerable<NotificationDto> Notifications { get; } = [];
 }

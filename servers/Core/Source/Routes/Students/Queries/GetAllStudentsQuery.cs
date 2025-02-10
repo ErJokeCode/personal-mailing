@@ -1,7 +1,9 @@
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Data;
+using Core.External.Parser;
 using Core.Models;
 using Core.Routes.Students.Dtos;
 using Core.Routes.Students.Maps;
@@ -16,16 +18,23 @@ public class GetAllStudentsQueryHandler : IRequestHandler<GetAllStudentsQuery, I
 {
     private readonly AppDbContext _db;
     private readonly StudentMapper _studentMapper;
+    private readonly IParser _parser;
 
-    public GetAllStudentsQueryHandler(AppDbContext db)
+    public GetAllStudentsQueryHandler(AppDbContext db, IParser parser)
     {
         _db = db;
         _studentMapper = new StudentMapper();
+        _parser = parser;
     }
 
     public async Task<IEnumerable<StudentDto>> Handle(GetAllStudentsQuery request, CancellationToken cancellationToken)
     {
         var students = await _db.Students.ToListAsync(cancellationToken);
+
+        await _parser.IncludeInfoAsync(students);
+
+        students = students.Where(s => s.Info is not null).ToList();
+
         return _studentMapper.Map(students);
     }
 }
