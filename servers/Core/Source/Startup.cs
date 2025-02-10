@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Core.Data;
 using Core.External.Parser;
+using Core.External.TelegramBot;
 using Core.Infrastructure.Handlers;
 using Core.Infrastructure.Services;
 using Core.Models;
@@ -70,6 +71,12 @@ public static class Startup
             o.ParserUrl = builder.Configuration.GetConnectionString("Parser")!;
         });
         builder.Services.AddScoped<IParser, Parser>();
+
+        builder.Services.Configure<TelegarmBotOptions>(o =>
+        {
+            o.TelegarmBotUrl = builder.Configuration.GetConnectionString("TelegramBot")!;
+        });
+        builder.Services.AddScoped<ITelegramBot, TelegramBot>();
 
         builder.Services.AddScoped<IUserAccessor, UserAccessor>();
     }

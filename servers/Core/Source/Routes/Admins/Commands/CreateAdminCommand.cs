@@ -4,11 +4,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Models;
 using Core.Routes.Admins.Dtos;
+using Core.Routes.Admins.Maps;
 using FluentResults;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
 namespace Core.Routes.Admins.Commands;
+
+public class CreateAdminCommand : IRequest<Result<AdminDto>>
+{
+    public required string Email { get; init; }
+    public required string Password { get; init; }
+}
 
 public class CreateAdminCommandHandler : IRequestHandler<CreateAdminCommand, Result<AdminDto>>
 {

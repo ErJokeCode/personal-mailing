@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Threading.Tasks;
 using Core.Infrastructure.Errors;
-using Core.Models;
 using Core.Routes;
 using Core.Routes.Admins.Commands;
 using Core.Routes.Admins.Dtos;
@@ -15,11 +13,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
-public class AdminRoute : IRoute
+namespace Core.Routes.Admins;
+
+public class AdminsRoute : IRoute
 {
     public void MapRoutes(WebApplication app)
     {
-        var group = app.MapGroup("/admin")
+        var group = app.MapGroup("/admins")
             .RequireAuthorization();
 
         group.MapPost("/", CreateAdmin)
@@ -57,7 +57,10 @@ public class AdminRoute : IRoute
 
     public async Task<Results<Ok<AdminDto>, NotFound<ProblemDetails>, ValidationProblem>> GetAdminById(Guid adminId, IValidator<GetAdminByIdQuery> validator, IMediator mediator)
     {
-        var query = new GetAdminByIdQuery(adminId);
+        var query = new GetAdminByIdQuery()
+        {
+            AdminId = adminId,
+        };
 
         var validationResult = await validator.ValidateAsync(query);
 

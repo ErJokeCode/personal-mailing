@@ -1,14 +1,16 @@
 
-using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Data;
 using Core.Routes.Admins.Dtos;
+using Core.Routes.Admins.Maps;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Core.Routes.Admins.Queries;
+
+public class GetAllAdminsQuery : IRequest<IEnumerable<AdminDto>>;
 
 public class GetAllAdminsQueryHandler : IRequestHandler<GetAllAdminsQuery, IEnumerable<AdminDto>>
 {

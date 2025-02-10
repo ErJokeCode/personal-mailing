@@ -5,11 +5,19 @@ using Core.Data;
 using Core.External.Parser;
 using Core.Models;
 using Core.Routes.Students.Dtos;
+using Core.Routes.Students.Maps;
 using FluentResults;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Core.Routes.Students.Commands;
+
+public class AuthStudentCommand : IRequest<Result<StudentDto>>
+{
+    public required string Email { get; set; }
+    public required string PersonalNumber { get; set; }
+    public required string ChatId { get; set; }
+}
 
 public class AuthStudentCommandHandler : IRequestHandler<AuthStudentCommand, Result<StudentDto>>
 {
@@ -26,7 +34,7 @@ public class AuthStudentCommandHandler : IRequestHandler<AuthStudentCommand, Res
 
     public async Task<Result<StudentDto>> Handle(AuthStudentCommand request, CancellationToken cancellationToken)
     {
-        var student = await _db.Students.SingleOrDefaultAsync(s => s.Email == request.Email);
+        var student = await _db.Students.SingleOrDefaultAsync(s => s.Email == request.Email, cancellationToken);
 
         if (student is not null)
         {
@@ -50,8 +58,8 @@ public class AuthStudentCommandHandler : IRequestHandler<AuthStudentCommand, Res
             return Result.Fail<StudentDto>("Ошибка аутентификации");
         }
 
-        await _db.Students.AddAsync(student);
-        await _db.SaveChangesAsync();
+        await _db.Students.AddAsync(student, cancellationToken);
+        await _db.SaveChangesAsync(cancellationToken);
 
         return Result.Ok(_mapper.Map(student));
     }

@@ -8,7 +8,7 @@ public class CreateAdminCommandValidator : AbstractValidator<CreateAdminCommand>
 {
     public CreateAdminCommandValidator()
     {
-        RuleFor(x => x.Email).NotEmpty().MinimumLength(1);
-        RuleFor(x => x.Password).NotEmpty().MinimumLength(1);
+        RuleFor(x => x.Email).NotEmpty();
+        RuleFor(x => x.Password).NotEmpty();
     }
 }

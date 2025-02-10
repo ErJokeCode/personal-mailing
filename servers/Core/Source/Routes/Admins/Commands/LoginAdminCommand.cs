@@ -7,6 +7,12 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Core.Routes.Admins.Commands;
 
+public class LoginAdminCommand : IRequest<Result>
+{
+    public required string Email { get; init; }
+    public required string Password { get; init; }
+}
+
 public class LoginAdminCommandHandler : IRequestHandler<LoginAdminCommand, Result>
 {
     private readonly SignInManager<Admin> _signInManager;

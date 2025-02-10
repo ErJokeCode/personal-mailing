@@ -17,7 +17,7 @@ def get_cookie():
     global COOKIE
 
     if COOKIE == "":
-        url = "http://core:5000/admin/login/"
+        url = "http://core:5000/admins/login/"
         body = {
             "email": "admin",
             "password": "admin",

@@ -7,8 +7,8 @@ public class AuthStudentCommandValidator : AbstractValidator<AuthStudentCommand>
 {
     public AuthStudentCommandValidator()
     {
-        RuleFor(x => x.Email).NotEmpty().MinimumLength(1);
-        RuleFor(x => x.PersonalNumber).NotEmpty().MinimumLength(1);
-        RuleFor(x => x.ChatId).NotEmpty().MinimumLength(1);
+        RuleFor(x => x.Email).NotEmpty();
+        RuleFor(x => x.PersonalNumber).NotEmpty();
+        RuleFor(x => x.ChatId).NotEmpty();
     }
 }

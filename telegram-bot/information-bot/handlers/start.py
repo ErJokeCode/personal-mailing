@@ -51,7 +51,7 @@ async def auth_user(user_data, chat_id: str):
 
     async with aiohttp.ClientSession() as session:
         async with session.post(
-            f"{URL_SERVER}/core/student/auth", 
+            f"{URL_SERVER}/core/students/auth", 
             json=body, 
             headers=headers) as response:
             if response.status < 400:

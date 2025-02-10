@@ -1,16 +1,15 @@
 
 using System.Threading;
 using System.Threading.Tasks;
-using Core.Data;
 using Core.Infrastructure.Services;
-using Core.Models;
 using Core.Routes.Admins.Dtos;
+using Core.Routes.Admins.Maps;
 using FluentResults;
 using MediatR;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 
 namespace Core.Routes.Admins.Queries;
+
+public class GetAdminMeQuery : IRequest<Result<AdminDto>>;
 
 public class GetAdminMeQueryHandler : IRequestHandler<GetAdminMeQuery, Result<AdminDto>>
 {

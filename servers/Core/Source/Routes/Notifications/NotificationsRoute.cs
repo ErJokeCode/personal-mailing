@@ -1,8 +1,8 @@
 using System;
 using System.Threading.Tasks;
 using Core.Infrastructure.Errors;
-using Core.Routes.Students.Commands;
-using Core.Routes.Students.Dtos;
+using Core.Routes.Notifications.Commands;
+using Core.Routes.Notifications.Dtos;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -10,19 +10,20 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Core.Routes.Students;
+namespace Core.Routes.Notifications;
 
-public class StudentRoute : IRoute
+class NotificationsRoute : IRoute
 {
     public void MapRoutes(WebApplication app)
     {
-        var group = app.MapGroup("/student").RequireAuthorization();
+        var group = app.MapGroup("/notifications");
 
-        group.MapPost("/auth", AuthStudent);
+        group.MapPost("/", SendNotification)
+            .WithDescription("Sends a notification");
     }
 
-    public async Task<Results<Ok<StudentDto>, BadRequest<ProblemDetails>, ValidationProblem>> AuthStudent(
-        AuthStudentCommand command, IValidator<AuthStudentCommand> validator, IMediator mediator
+    public async Task<Results<Ok<NotificationDto>, BadRequest<ProblemDetails>, ValidationProblem>> SendNotification(
+        SendNotificationCommand command, IValidator<SendNotificationCommand> validator, IMediator mediator
     )
     {
         var validationResult = await validator.ValidateAsync(command);

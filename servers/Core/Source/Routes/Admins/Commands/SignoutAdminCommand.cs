@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Core.Routes.Admins.Commands;
 
+public class SignoutAdminCommand : IRequest<Unit>;
+
 public class SignoutAdminCommandHandler : IRequestHandler<SignoutAdminCommand, Unit>
 {
     private readonly SignInManager<Admin> _signInManager;

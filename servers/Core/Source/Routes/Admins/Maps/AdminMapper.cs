@@ -1,9 +1,9 @@
-
-using System.Collections;
 using System.Collections.Generic;
 using Core.Models;
 using Core.Routes.Admins.Dtos;
 using Riok.Mapperly.Abstractions;
+
+namespace Core.Routes.Admins.Maps;
 
 [Mapper]
 public partial class AdminMapper
