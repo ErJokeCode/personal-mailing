@@ -1,3 +1,5 @@
+using System.Data.Common;
+using Core.External.TelegramBot;
 using Core.Infrastructure.Services;
 using Core.Tests.Mocks;
 using DotNet.Testcontainers;
@@ -9,6 +11,8 @@ using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Npgsql;
+using Respawn;
 using Testcontainers.MongoDb;
 using Testcontainers.PostgreSql;
 
@@ -24,6 +28,14 @@ public class ApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
 
     private IFutureDockerImage? _parserImage;
     private IContainer? _parserContainer;
+
+    private DbConnection? _dbConnection;
+    private Respawner? _respawner;
+
+    public async Task ResetDatabase()
+    {
+        await _respawner!.ResetAsync(_dbConnection!);
+    }
 
     public async Task InitializeAsync()
     {
@@ -88,6 +100,18 @@ public class ApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
             .Build();
 
         await _parserContainer.StartAsync();
+
+        _dbConnection = new NpgsqlConnection(_dbContainer.GetConnectionString());
+
+        CreateClient();
+
+        await _dbConnection.OpenAsync();
+
+        _respawner = await Respawner.CreateAsync(_dbConnection, new RespawnerOptions
+        {
+            SchemasToInclude = ["public"],
+            DbAdapter = DbAdapter.Postgres
+        });
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
@@ -112,6 +136,15 @@ public class ApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
             }
 
             services.AddScoped<IUserAccessor, UserAccessorMock>();
+
+            var botDescriptor = services.SingleOrDefault(s => s.ServiceType == typeof(ITelegramBot));
+
+            if (botDescriptor is not null)
+            {
+                services.Remove(botDescriptor);
+            }
+
+            services.AddScoped<ITelegramBot, TelegramBotMock>();
         });
     }
 

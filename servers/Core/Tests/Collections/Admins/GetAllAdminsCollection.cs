@@ -5,7 +5,7 @@ using Core.Tests.Setup;
 
 namespace Core.Tests.Collections.Admins;
 
-[Collection("Tests")]
+[Collection(nameof(SharedCollection))]
 public class GetAllAdminsCollection : BaseCollection
 {
     public GetAllAdminsCollection(ApplicationFactory appFactory) : base(appFactory)

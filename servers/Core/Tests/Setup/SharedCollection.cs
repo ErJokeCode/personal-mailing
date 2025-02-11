@@ -1,4 +1,4 @@
 namespace Core.Tests.Setup;
 
-[CollectionDefinition("Tests")]
+[CollectionDefinition(nameof(SharedCollection))]
 public class SharedCollection : ICollectionFixture<ApplicationFactory>;

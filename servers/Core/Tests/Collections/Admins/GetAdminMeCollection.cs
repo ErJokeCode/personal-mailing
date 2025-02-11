@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Tests.Collections.Admins;
 
-[Collection("Tests")]
+[Collection(nameof(SharedCollection))]
 public class GetAdminMeCollection : BaseCollection
 {
     public GetAdminMeCollection(ApplicationFactory appFactory) : base(appFactory)

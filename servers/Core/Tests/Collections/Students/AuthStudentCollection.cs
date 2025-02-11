@@ -4,7 +4,7 @@ using Core.Tests.Setup;
 
 namespace Core.Tests.Collections.Students;
 
-[Collection("Tests")]
+[Collection(nameof(SharedCollection))]
 public class AuthStudentCollection : BaseCollection
 {
     public AuthStudentCollection(ApplicationFactory appFactory) : base(appFactory)
@@ -20,8 +20,11 @@ public class AuthStudentCollection : BaseCollection
             PersonalNumber = "00000000",
             ChatId = "0",
         };
+
         var result = await Sender.Send(command);
+
         Assert.True(result.IsSuccess);
+        Assert.Equal(command.Email, result.Value.Email);
     }
 
     [Fact]
