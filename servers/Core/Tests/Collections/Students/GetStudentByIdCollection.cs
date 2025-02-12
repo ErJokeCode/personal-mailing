@@ -1,3 +1,5 @@
+using System.Net;
+using System.Net.Http.Json;
 using Core.Routes.Students.Commands;
 using Core.Routes.Students.Dtos;
 using Core.Routes.Students.Queries;
@@ -15,37 +17,30 @@ public class GetStudentByIdCollection : BaseCollection
     [Fact]
     public async Task GetStudentById_ShouldReturnStudent_WhenCorrectInput()
     {
-        var command = new AuthStudentCommand()
+        var authCommand = new AuthStudentCommand()
         {
             Email = "ivan.example1@urfu.me",
             PersonalNumber = "00000000",
             ChatId = "0",
         };
 
-        var student = await Sender.Send(command);
+        var studentAuthed = await HttpClient.PostFromJsonAsync<StudentDto, AuthStudentCommand>("/students/auth", authCommand);
 
-        var query = new GetStudentByIdQuery()
-        {
-            StudentId = student.Value.Id,
-        };
+        var response = await HttpClient.GetAsync($"/students/{studentAuthed.Id}");
 
-        var result = await Sender.Send(query);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        Assert.True(result.IsSuccess);
-        Assert.IsAssignableFrom<StudentDto>(result.Value);
-        Assert.Equal(command.Email, result.Value.Email);
+        var student = await response.Content.ReadFromJsonAsync<StudentDto>();
+
+        Assert.NotNull(student);
+        Assert.Equivalent(studentAuthed, student);
     }
 
     [Fact]
     public async Task GetStudentById_ShouldFail_WhenBadInput()
     {
-        var query = new GetStudentByIdQuery()
-        {
-            StudentId = Guid.NewGuid(),
-        };
+        var response = await HttpClient.GetAsync($"/students/{Guid.NewGuid()}");
 
-        var result = await Sender.Send(query);
-
-        Assert.True(result.IsFailed);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 }

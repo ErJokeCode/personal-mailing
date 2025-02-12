@@ -19,16 +19,17 @@ class NotificationRoute : IRoute
 {
     public void MapRoutes(WebApplication app)
     {
-        var group = app.MapGroup("/notifications");
+        var group = app.MapGroup("/notifications")
+            .RequireAuthorization();
 
         group.MapPost("/", SendNotification)
             .WithDescription("Sends a notification");
 
         group.MapGet("/", GetAllNotifications)
-            .WithDescription("Gets all notifications");
+            .WithDescription("Gets a compact version of all notifications");
 
         group.MapGet("/{notificationId}", GetNotificationById)
-            .WithDescription("Gets a notification by id");
+            .WithDescription("Gets a detailed notification by id");
     }
 
     public async Task<Results<Ok<NotificationDto>, NotFound<ProblemDetails>, ValidationProblem>> GetNotificationById(

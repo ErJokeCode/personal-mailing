@@ -1,8 +1,17 @@
 
 using System;
 using System.Collections.Generic;
+using Microsoft.EntityFrameworkCore;
+using Riok.Mapperly.Abstractions;
 
 namespace Core.Models;
+
+[Owned]
+public class NotificationError
+{
+    public Guid StudentId { get; set; }
+    public required string Message { get; set; }
+}
 
 public class Notification
 {
@@ -10,7 +19,10 @@ public class Notification
     public required string Content { get; set; }
     public required DateTime CreatedAt { get; set; }
 
+    [MapperIgnore]
     public required Guid AdminId { get; set; }
     public Admin? Admin { get; set; }
     public ICollection<Student> Students { get; set; } = [];
+
+    public ICollection<NotificationError> Errors { get; set; } = [];
 }

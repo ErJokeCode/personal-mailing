@@ -1,4 +1,7 @@
 
+using System.Net;
+using System.Net.Http.Json;
+using Core.Routes.Admins.Dtos;
 using Core.Routes.Notifications.Commands;
 using Core.Routes.Notifications.Dtos;
 using Core.Routes.Students.Commands;
@@ -24,35 +27,49 @@ public class SendNotificationCollection : BaseCollection
             PersonalNumber = "00000000",
             ChatId = "0",
         };
-        var studentResult = await Sender.Send(authCommand);
-        var admin = await UserAccessor.GetUserAsync();
 
-        var command = new SendNotificationCommand()
+        var studentResponse = await HttpClient.PostAsJsonAsync($"/students/auth", authCommand);
+        var studentAuthed = await studentResponse.Content.ReadFromJsonAsync<StudentDto>();
+        var adminMe = await HttpClient.GetFromJsonAsync<AdminDto>($"/admins/me");
+
+        Assert.NotNull(studentAuthed);
+        Assert.NotNull(adminMe);
+
+        var sendCommand = new SendNotificationCommand()
         {
             Content = "test",
-            StudentIds = [studentResult.Value.Id],
+            StudentIds = [studentAuthed.Id],
         };
 
-        var result = await Sender.Send(command);
+        var response = await HttpClient.PostAsJsonAsync("/notifications", sendCommand);
 
-        Assert.True(result.IsSuccess);
-        Assert.IsAssignableFrom<NotificationDto>(result.Value);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        Assert.Equivalent(new StudentDto[] { studentResult.Value }, result.Value.Students);
-        Assert.Equal(admin!.Id, result.Value.Admin!.Id);
+        var notification = await response.Content.ReadFromJsonAsync<NotificationDto>();
+
+        Assert.NotNull(notification);
+        Assert.Equal(sendCommand.Content, notification.Content);
+
+        Assert.NotEmpty(notification.Students);
+        Assert.Equivalent(new StudentDto[] { studentAuthed }, notification.Students);
+
+        Assert.NotNull(notification.Admin);
+        Assert.Equivalent(notification.Admin, adminMe);
     }
 
-    [Fact]
-    public async Task SendNotification_ShouldFail_WhenBadInput()
-    {
-        var command = new SendNotificationCommand()
-        {
-            Content = "test",
-            StudentIds = [Guid.NewGuid()],
-        };
+    // TODO Should transaction, try to send to who you can, if error, display that
 
-        var result = await Sender.Send(command);
+    // [Fact]
+    // public async Task SendNotification_ShouldFail_WhenBadInput()
+    // {
+    //     var command = new SendNotificationCommand()
+    //     {
+    //         Content = "test",
+    //         StudentIds = [Guid.NewGuid()],
+    //     };
 
-        Assert.True(result.IsFailed);
-    }
+    //     var result = await Sender.Send(command);
+
+    //     Assert.True(result.IsFailed);
+    // }
 }

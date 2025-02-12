@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
+using System.Net.Http.Json;
 using System.Threading.Tasks;
+using Core.Routes.Admins.Commands;
 using Core.Routes.Admins.Dtos;
 using Core.Routes.Admins.Queries;
 using Core.Tests.Setup;
@@ -18,30 +21,27 @@ public class GetAdminByIdCollection : BaseCollection
     [Fact]
     public async Task GetAdminById_ShouldReturnAdmin_WhenCorrectInput()
     {
-        var admin = await UserAccessor.GetUserAsync();
-
-        var query = new GetAdminByIdQuery()
+        var newAdmin = await CreateAdmin(new CreateAdminCommand()
         {
-            AdminId = admin!.Id
-        };
+            Email = "newadmin",
+            Password = "newadmin",
+        });
 
-        var result = await Sender.Send(query);
+        var response = await HttpClient.GetAsync($"/admins/{newAdmin.Id}");
 
-        Assert.True(result.IsSuccess);
-        Assert.IsAssignableFrom<AdminDto>(result.Value);
-        Assert.Equal(admin.Email, result.Value.Email);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var admin = await response.Content.ReadFromJsonAsync<AdminDto>();
+
+        Assert.NotNull(admin);
+        Assert.Equal(newAdmin.Id, admin.Id);
     }
 
     [Fact]
     public async Task GetAdminById_ShouldFail_WhenBadInput()
     {
-        var query = new GetAdminByIdQuery()
-        {
-            AdminId = Guid.NewGuid()
-        };
+        var response = await HttpClient.GetAsync($"/admins/{Guid.NewGuid()}");
 
-        var result = await Sender.Send(query);
-
-        Assert.True(result.IsFailed);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 }

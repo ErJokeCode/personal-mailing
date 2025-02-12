@@ -10,9 +10,12 @@ using Core.Infrastructure.Services;
 using Core.Models;
 using Core.Routes;
 using Core.Routes.Admins.Commands;
+using Core.Routes.Events.Commands;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -62,6 +65,26 @@ public static class Startup
         .AddEntityFrameworkStores<AppDbContext>()
         .AddDefaultTokenProviders();
 
+        builder.Services.ConfigureApplicationCookie(o =>
+        {
+            o.SlidingExpiration = true;
+
+            o.Events = new CookieAuthenticationEvents
+            {
+                OnRedirectToLogin = context =>
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return Task.CompletedTask;
+                },
+
+                OnRedirectToAccessDenied = context =>
+                {
+                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                    return Task.CompletedTask;
+                }
+            };
+        });
+
         builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
         builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
         builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
@@ -98,6 +121,7 @@ public static class Startup
         }
 
         await app.EnsureAdminCreated();
+        await app.UpdateStudentsInfo();
 
         app.UseRequestLocalization((o) => o.SetDefaultCulture("ru"));
         app.UseCors();
@@ -122,6 +146,17 @@ public static class Startup
         }
     }
 
+    private static void MigrateDatabase(this WebApplication app)
+    {
+        using var scope = app.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        if (context.Database.GetPendingMigrations().Any())
+        {
+            context.Database.Migrate();
+        }
+    }
+
     private static async Task EnsureAdminCreated(this WebApplication app)
     {
         using var scope = app.Services.CreateScope();
@@ -136,14 +171,13 @@ public static class Startup
         await mediator.Send(command);
     }
 
-    private static void MigrateDatabase(this WebApplication app)
+    private static async Task UpdateStudentsInfo(this WebApplication app)
     {
         using var scope = app.Services.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
 
-        if (context.Database.GetPendingMigrations().Any())
-        {
-            context.Database.Migrate();
-        }
+        var command = new UploadEventCommand();
+
+        await mediator.Send(command);
     }
 }

@@ -1,69 +1,77 @@
+using System.Net;
+using System.Net.Http.Json;
 using Core.Routes.Admins.Commands;
-using Core.Routes.Admins.Queries;
+using Core.Routes.Admins.Dtos;
+using Core.Routes.Admins.Maps;
 using Core.Tests.Setup;
+using Microsoft.EntityFrameworkCore;
 
-namespace Core.Tests.Collections.Admins;
-
-[Collection(nameof(SharedCollection))]
-public class CreateAdminCollection : BaseCollection
+namespace Core.Tests.Setup
 {
-    public CreateAdminCollection(ApplicationFactory appFactory) : base(appFactory)
+    public partial class BaseCollection
     {
+        public async Task<AdminDto> CreateAdmin(CreateAdminCommand command)
+        {
+            var response = await HttpClient.PostAsJsonAsync("/admins", command);
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+            var admin = await response.Content.ReadFromJsonAsync<AdminDto>();
+
+            Assert.NotNull(admin);
+            Assert.Equal(command.Email, admin.Email);
+
+            var adminDb = await DbContext.Users.FindAsync(admin.Id);
+
+            Assert.NotNull(adminDb);
+
+            var adminMapper = new AdminMapper();
+            var adminDto = adminMapper.Map(adminDb);
+
+            Assert.Equivalent(admin, adminDto);
+
+            return admin;
+        }
     }
+}
 
-    [Fact]
-    public async Task CreateAdmin_ShouldCreateAdmin_WhenCorrectInput()
+namespace Core.Tests.Collections.Admins
+{
+    [Collection(nameof(SharedCollection))]
+    public class CreateAdminCollection : BaseCollection
     {
-        var command = new CreateAdminCommand()
+        public CreateAdminCollection(ApplicationFactory appFactory) : base(appFactory)
         {
-            Email = "test",
-            Password = "test",
-        };
-        var result = await Sender.Send(command);
-        Assert.True(result.IsSuccess);
+        }
 
-        var admin = result.Value;
-        var query = new GetAdminByIdQuery()
+        [Fact]
+        public async Task CreateAdmin_ShouldAddAdmin_WhenCorrectInput()
         {
-            AdminId = admin.Id
-        };
+            var createCommand = new CreateAdminCommand()
+            {
+                Email = "newadmin",
+                Password = "newadmin",
+            };
 
-        var queryResult = await Sender.Send(query);
-        Assert.True(queryResult.IsSuccess);
-        Assert.Equal(command.Email, queryResult.Value.Email);
-    }
+            await CreateAdmin(createCommand);
+        }
 
-    [Fact]
-    public async Task CreateAdmin_ShouldCreateAdmin_WhenSecondTest()
-    {
-        var command = new CreateAdminCommand()
+        [Fact]
+        public async Task CreateAdmin_ShouldFail_WhenBadInput()
         {
-            Email = "test",
-            Password = "test",
-        };
-        var result = await Sender.Send(command);
-        Assert.True(result.IsSuccess);
+            var createCommand = new CreateAdminCommand()
+            {
+                Email = "",
+                Password = "",
+            };
 
-        var admin = result.Value;
-        var query = new GetAdminByIdQuery()
-        {
-            AdminId = admin.Id
-        };
+            var response = await HttpClient.PostAsJsonAsync("/admins", createCommand);
 
-        var queryResult = await Sender.Send(query);
-        Assert.True(queryResult.IsSuccess);
-        Assert.Equal(command.Email, queryResult.Value.Email);
-    }
+            Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
-    [Fact]
-    public async Task CreateAdmin_ShouldFail_WhenBadInput()
-    {
-        var command = new CreateAdminCommand()
-        {
-            Email = "",
-            Password = "",
-        };
-        var result = await Sender.Send(command);
-        Assert.True(result.IsFailed);
+            var adminsDb = await DbContext.Users.ToListAsync();
+
+            Assert.Empty(adminsDb);
+        }
     }
 }

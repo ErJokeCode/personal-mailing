@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Data;
+using Core.External.Parser;
 using Core.External.TelegramBot;
 using Core.Infrastructure.Services;
 using Core.Models;
 using Core.Routes.Admins.Errors;
 using Core.Routes.Notifications.Dtos;
+using Core.Routes.Notifications.Errors;
 using Core.Routes.Notifications.Maps;
 using Core.Routes.Students.Errors;
 using FluentResults;
@@ -58,17 +60,34 @@ public class SendNotificationCommandHandler : IRequestHandler<SendNotificationCo
         {
             var student = await _db.Students.SingleOrDefaultAsync(s => s.Id == studentId);
 
-            if (student is null)
+            if (student is null || !student.Active)
             {
-                return Result.Fail<NotificationDto>(StudentErrors.NotFound(studentId));
+                var error = new NotificationError()
+                {
+                    StudentId = studentId,
+                    Message = StudentErrors.NotFound(studentId),
+                };
+                notification.Errors.Add(error);
             }
-
-            notification.Students.Add(student);
+            else
+            {
+                notification.Students.Add(student);
+            }
         }
 
         foreach (var student in notification.Students)
         {
-            await _telegramBot.SendNotificationAsync(student.ChatId, notification.Content);
+            var sent = await _telegramBot.SendNotificationAsync(student.ChatId, notification.Content);
+
+            if (!sent)
+            {
+                var error = new NotificationError()
+                {
+                    StudentId = student.Id,
+                    Message = NotificationErrors.CouldNotSend(student.Email),
+                };
+                notification.Errors.Add(error);
+            }
         }
 
         await _db.Notifications.AddAsync(notification);

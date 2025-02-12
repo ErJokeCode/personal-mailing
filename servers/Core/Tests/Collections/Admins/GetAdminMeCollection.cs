@@ -1,9 +1,8 @@
-
-using Core.Routes.Admins.Queries;
 using Core.Routes.Admins.Dtos;
 using Core.Routes.Admins.Commands;
 using Core.Tests.Setup;
-using Microsoft.EntityFrameworkCore;
+using System.Net.Http.Json;
+using System.Net;
 
 namespace Core.Tests.Collections.Admins;
 
@@ -15,33 +14,44 @@ public class GetAdminMeCollection : BaseCollection
     }
 
     [Fact]
-    public async Task GetAdminMe_ShouldReturnMainAdmin()
+    public async Task GetAdminMe_ShouldReturnMe()
     {
-        var query = new GetAdminMeQuery();
-        var result = await Sender.Send(query);
-        Assert.IsAssignableFrom<AdminDto>(result.Value);
-        Assert.Equal("admin", result.Value.Email);
+        var response = await HttpClient.GetAsync("/admins/me");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var adminMe = await response.Content.ReadFromJsonAsync<AdminDto>();
+
+        Assert.NotNull(adminMe);
+        Assert.Equal("admin", adminMe.Email);
     }
 
     [Fact]
     public async Task GetAdminMe_ShouldReturnMe_WhenLoggedInAsDifferentUser()
     {
-        var command = new CreateAdminCommand()
+        var createCommand = new CreateAdminCommand()
         {
             Email = "newadmin",
             Password = "newadmin",
         };
-        var createResult = await Sender.Send(command);
-        Assert.True(createResult.IsSuccess);
 
-        var newAdmin = await DbContext.Users.SingleOrDefaultAsync(a => a.Id == createResult.Value.Id);
-        Assert.NotNull(newAdmin);
+        await CreateAdmin(createCommand);
 
-        UserAccessor.InjectUser(newAdmin);
+        var loginCommand = new LoginAdminCommand()
+        {
+            Email = "newadmin",
+            Password = "newadmin",
+        };
 
-        var query = new GetAdminMeQuery();
-        var getResult = await Sender.Send(query);
-        Assert.IsAssignableFrom<AdminDto>(getResult.Value);
-        Assert.Equal(newAdmin.Id, getResult.Value.Id);
+        await LoginAsAdmin(loginCommand);
+
+        var response = await HttpClient.GetAsync("/admins/me");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var adminMe = await response.Content.ReadFromJsonAsync<AdminDto>();
+
+        Assert.NotNull(adminMe);
+        Assert.Equal(loginCommand.Email, adminMe.Email);
     }
 }

@@ -12,6 +12,5 @@ public class ParserOptions
 public interface IParser
 {
     public Task<T?> GetAsync<T>(string path, Dictionary<string, string?> query);
-    public Task<bool> IncludeInfoAsync(Student student);
-    public Task<bool> IncludeInfoAsync(IEnumerable<Student> students);
+    public Task<ParserStudent?> GetInfoAsync(string email);
 }

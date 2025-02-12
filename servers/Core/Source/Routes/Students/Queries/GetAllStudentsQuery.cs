@@ -18,22 +18,18 @@ public class GetAllStudentsQueryHandler : IRequestHandler<GetAllStudentsQuery, I
 {
     private readonly AppDbContext _db;
     private readonly StudentMapper _studentMapper;
-    private readonly IParser _parser;
 
-    public GetAllStudentsQueryHandler(AppDbContext db, IParser parser)
+    public GetAllStudentsQueryHandler(AppDbContext db)
     {
         _db = db;
         _studentMapper = new StudentMapper();
-        _parser = parser;
     }
 
     public async Task<IEnumerable<StudentDto>> Handle(GetAllStudentsQuery request, CancellationToken cancellationToken)
     {
-        var students = await _db.Students.ToListAsync(cancellationToken);
-
-        await _parser.IncludeInfoAsync(students);
-
-        students = students.Where(s => s.Info is not null).ToList();
+        var students = await _db.Students
+            .Where(s => s.Active)
+            .ToListAsync(cancellationToken);
 
         return _studentMapper.Map(students);
     }

@@ -3,6 +3,7 @@ using System;
 using Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Core.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250212153732_AddNotificationError")]
+    partial class AddNotificationError
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -121,17 +124,11 @@ namespace Core.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<bool>("Active")
-                        .HasColumnType("boolean");
-
                     b.Property<string>("ChatId")
                         .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<DateOnly>("CreatedAt")
-                        .HasColumnType("date");
-
-                    b.Property<DateOnly?>("DeactivatedAt")
                         .HasColumnType("date");
 
                     b.Property<string>("Email")
@@ -325,235 +322,6 @@ namespace Core.Migrations
                     b.Navigation("Admin");
 
                     b.Navigation("Errors");
-                });
-
-            modelBuilder.Entity("Core.Models.Student", b =>
-                {
-                    b.OwnsOne("Core.External.Parser.ParserStudent", "Info", b1 =>
-                        {
-                            b1.Property<Guid>("StudentId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<string>("DateOfBirth")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.Property<string>("Email")
-                                .HasColumnType("text");
-
-                            b1.Property<string>("Name")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.Property<string>("Patronymic")
-                                .HasColumnType("text");
-
-                            b1.Property<string>("PersonalNumber")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.Property<bool?>("Status")
-                                .HasColumnType("boolean");
-
-                            b1.Property<string>("Surname")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.Property<string>("TypeOfCost")
-                                .HasColumnType("text");
-
-                            b1.Property<string>("TypeOfEducation")
-                                .HasColumnType("text");
-
-                            b1.HasKey("StudentId");
-
-                            b1.ToTable("Students");
-
-                            b1.WithOwner()
-                                .HasForeignKey("StudentId");
-
-                            b1.OwnsOne("Core.External.Parser.Group", "Group", b2 =>
-                                {
-                                    b2.Property<Guid>("ParserStudentStudentId")
-                                        .HasColumnType("uuid");
-
-                                    b2.Property<string>("DirectionCode")
-                                        .HasColumnType("text");
-
-                                    b2.Property<string>("NameSpeciality")
-                                        .HasColumnType("text");
-
-                                    b2.Property<string>("Number")
-                                        .IsRequired()
-                                        .HasColumnType("text");
-
-                                    b2.Property<int>("NumberCourse")
-                                        .HasColumnType("integer");
-
-                                    b2.HasKey("ParserStudentStudentId");
-
-                                    b2.ToTable("Students");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("ParserStudentStudentId");
-                                });
-
-                            b1.OwnsMany("Core.External.Parser.CourseInfo", "OnlineCourse", b2 =>
-                                {
-                                    b2.Property<Guid>("ParserStudentStudentId")
-                                        .HasColumnType("uuid");
-
-                                    b2.Property<int>("Id")
-                                        .ValueGeneratedOnAdd()
-                                        .HasColumnType("integer");
-
-                                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b2.Property<int>("Id"));
-
-                                    b2.Property<string>("DateStart")
-                                        .HasColumnType("text");
-
-                                    b2.Property<string>("Deadline")
-                                        .HasColumnType("text");
-
-                                    b2.Property<string>("Info")
-                                        .HasColumnType("text");
-
-                                    b2.Property<string>("Name")
-                                        .IsRequired()
-                                        .HasColumnType("text");
-
-                                    b2.Property<string>("Scores")
-                                        .IsRequired()
-                                        .HasColumnType("text");
-
-                                    b2.Property<string>("University")
-                                        .HasColumnType("text");
-
-                                    b2.HasKey("ParserStudentStudentId", "Id");
-
-                                    b2.ToTable("Students_OnlineCourse");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("ParserStudentStudentId");
-                                });
-
-                            b1.OwnsMany("Core.External.Parser.Subject", "Subjects", b2 =>
-                                {
-                                    b2.Property<Guid>("ParserStudentStudentId")
-                                        .HasColumnType("uuid");
-
-                                    b2.Property<int>("Id")
-                                        .ValueGeneratedOnAdd()
-                                        .HasColumnType("integer");
-
-                                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b2.Property<int>("Id"));
-
-                                    b2.Property<string>("FormEducation")
-                                        .IsRequired()
-                                        .HasColumnType("text");
-
-                                    b2.Property<string>("FullName")
-                                        .IsRequired()
-                                        .HasColumnType("text");
-
-                                    b2.Property<string>("GroupTgLink")
-                                        .HasColumnType("text");
-
-                                    b2.Property<string>("Info")
-                                        .HasColumnType("text");
-
-                                    b2.Property<string>("Name")
-                                        .IsRequired()
-                                        .HasColumnType("text");
-
-                                    b2.HasKey("ParserStudentStudentId", "Id");
-
-                                    b2.ToTable("Subject");
-
-                                    b2.WithOwner()
-                                        .HasForeignKey("ParserStudentStudentId");
-
-                                    b2.OwnsOne("Core.External.Parser.CourseInfo", "OnlineCourse", b3 =>
-                                        {
-                                            b3.Property<Guid>("SubjectParserStudentStudentId")
-                                                .HasColumnType("uuid");
-
-                                            b3.Property<int>("SubjectId")
-                                                .HasColumnType("integer");
-
-                                            b3.Property<string>("DateStart")
-                                                .HasColumnType("text");
-
-                                            b3.Property<string>("Deadline")
-                                                .HasColumnType("text");
-
-                                            b3.Property<string>("Info")
-                                                .HasColumnType("text");
-
-                                            b3.Property<string>("Name")
-                                                .IsRequired()
-                                                .HasColumnType("text");
-
-                                            b3.Property<string>("Scores")
-                                                .IsRequired()
-                                                .HasColumnType("text");
-
-                                            b3.Property<string>("University")
-                                                .HasColumnType("text");
-
-                                            b3.HasKey("SubjectParserStudentStudentId", "SubjectId");
-
-                                            b3.ToTable("Subject");
-
-                                            b3.WithOwner()
-                                                .HasForeignKey("SubjectParserStudentStudentId", "SubjectId");
-                                        });
-
-                                    b2.OwnsMany("Core.External.Parser.Team", "Teams", b3 =>
-                                        {
-                                            b3.Property<Guid>("SubjectParserStudentStudentId")
-                                                .HasColumnType("uuid");
-
-                                            b3.Property<int>("SubjectId")
-                                                .HasColumnType("integer");
-
-                                            b3.Property<int>("Id")
-                                                .ValueGeneratedOnAdd()
-                                                .HasColumnType("integer");
-
-                                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b3.Property<int>("Id"));
-
-                                            b3.Property<string>("Name")
-                                                .IsRequired()
-                                                .HasColumnType("text");
-
-                                            b3.PrimitiveCollection<string[]>("Teachers")
-                                                .IsRequired()
-                                                .HasColumnType("text[]");
-
-                                            b3.HasKey("SubjectParserStudentStudentId", "SubjectId", "Id");
-
-                                            b3.ToTable("Team");
-
-                                            b3.WithOwner()
-                                                .HasForeignKey("SubjectParserStudentStudentId", "SubjectId");
-                                        });
-
-                                    b2.Navigation("OnlineCourse");
-
-                                    b2.Navigation("Teams");
-                                });
-
-                            b1.Navigation("Group")
-                                .IsRequired();
-
-                            b1.Navigation("OnlineCourse");
-
-                            b1.Navigation("Subjects");
-                        });
-
-                    b.Navigation("Info")
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>

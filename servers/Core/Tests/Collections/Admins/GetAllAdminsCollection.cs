@@ -1,7 +1,10 @@
-
+using System.Net;
+using System.Net.Http.Json;
+using Core.Models;
+using Core.Routes.Admins.Commands;
 using Core.Routes.Admins.Dtos;
-using Core.Routes.Admins.Queries;
 using Core.Tests.Setup;
+using Microsoft.AspNetCore.Http;
 
 namespace Core.Tests.Collections.Admins;
 
@@ -13,12 +16,32 @@ public class GetAllAdminsCollection : BaseCollection
     }
 
     [Fact]
-    public async Task GetAllAdmins_ShouldBeAdminArray()
+    public async Task GetAllAdmins_ShouldContainOneItem()
     {
-        var query = new GetAllAdminsQuery();
+        var response = await HttpClient.GetAsync("/admins");
 
-        var result = await Sender.Send(query);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        Assert.IsAssignableFrom<IEnumerable<AdminDto>>(result);
+        var admins = await response.Content.ReadFromJsonAsync<IEnumerable<AdminDto>>();
+
+        Assert.NotNull(admins);
+        Assert.NotEmpty(admins);
+        Assert.Single(admins);
+    }
+
+    [Fact]
+    public async Task GetAllAdmins_ShouldContainMultipleItems_AfterAdminCreate()
+    {
+        await CreateAdmin(new CreateAdminCommand()
+        {
+            Email = "newadmin",
+            Password = "newadmin",
+        });
+
+        var response = await HttpClient.GetFromJsonAsync<IEnumerable<AdminDto>>("/admins");
+
+        Assert.NotNull(response);
+        Assert.NotEmpty(response);
+        Assert.Equal(2, response.Count());
     }
 }

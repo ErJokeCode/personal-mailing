@@ -39,12 +39,25 @@ public class AuthStudentCommandHandler : IRequestHandler<AuthStudentCommand, Res
 
         if (student is not null)
         {
-            if (!await CanAuth(request, student))
+            if (!student.Active || !CanAuth(request, student))
             {
                 return Result.Fail<StudentDto>(StudentErrors.AuthError());
             }
 
+            if (student.ChatId != request.ChatId)
+            {
+                student.ChatId = request.ChatId;
+                await _db.SaveChangesAsync();
+            }
+
             return Result.Ok(_mapper.Map(student));
+        }
+
+        var info = await _parser.GetInfoAsync(request.Email);
+
+        if (info is null)
+        {
+            return Result.Fail<StudentDto>(StudentErrors.AuthError());
         }
 
         student = new Student()
@@ -52,9 +65,10 @@ public class AuthStudentCommandHandler : IRequestHandler<AuthStudentCommand, Res
             Email = request.Email,
             ChatId = request.ChatId,
             CreatedAt = DateOnly.FromDateTime(DateTime.UtcNow),
+            Info = info,
         };
 
-        if (!await CanAuth(request, student))
+        if (!CanAuth(request, student))
         {
             return Result.Fail<StudentDto>(StudentErrors.AuthError());
         }
@@ -65,15 +79,8 @@ public class AuthStudentCommandHandler : IRequestHandler<AuthStudentCommand, Res
         return Result.Ok(_mapper.Map(student));
     }
 
-    private async Task<bool> CanAuth(AuthStudentCommand request, Student student)
+    private static bool CanAuth(AuthStudentCommand request, Student student)
     {
-        var found = await _parser.IncludeInfoAsync(student);
-
-        if (!found || student.Info!.PersonalNumber != request.PersonalNumber)
-        {
-            return false;
-        }
-
-        return true;
+        return request.Email == student.Email && request.PersonalNumber == student.Info.PersonalNumber;
     }
 }

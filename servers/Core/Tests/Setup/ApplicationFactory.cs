@@ -1,6 +1,8 @@
 using System.Data.Common;
+using System.Net.Http.Json;
 using Core.External.TelegramBot;
 using Core.Infrastructure.Services;
+using Core.Routes.Admins.Commands;
 using Core.Tests.Mocks;
 using DotNet.Testcontainers;
 using DotNet.Testcontainers.Builders;
@@ -20,34 +22,41 @@ namespace Core.Tests.Setup;
 
 public class ApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    private PostgreSqlContainer? _dbContainer;
+    private PostgreSqlContainer _postgresContainer = null!;
 
-    private MongoDbContainer? _mongoContainer;
-    private IFutureDockerImage? _mongoSeedImage;
-    private IContainer? _mongoSeedContainer;
+    private MongoDbContainer _mongoContainer = null!;
+    private IFutureDockerImage _mongoSeedImage = null!;
+    private IContainer _mongoSeedContainer = null!;
 
-    private IFutureDockerImage? _parserImage;
-    private IContainer? _parserContainer;
+    private IFutureDockerImage _parserImage = null!;
+    private IContainer _parserContainer = null!;
 
-    private DbConnection? _dbConnection;
-    private Respawner? _respawner;
+    private DbConnection _dbConnection = null!;
+    private Respawner _respawner = null!;
 
-    public async Task ResetDatabase()
-    {
-        await _respawner!.ResetAsync(_dbConnection!);
-    }
+    public HttpClient HttpClient { get; private set; } = null!;
 
     public async Task InitializeAsync()
     {
-        _dbContainer = new PostgreSqlBuilder()
+        await InitializePostgres();
+        await InitializeParser();
+        await InitializeRespawn();
+    }
+
+    private async Task InitializePostgres()
+    {
+        _postgresContainer = new PostgreSqlBuilder()
             .WithImage("postgres")
             .WithDatabase("coredb")
             .WithUsername("postgres")
             .WithPassword("postgres")
             .Build();
 
-        await _dbContainer.StartAsync();
+        await _postgresContainer.StartAsync();
+    }
 
+    private async Task InitializeParser()
+    {
         var mongoNetwork = new NetworkBuilder()
           .WithName("mongo-network")
           .Build();
@@ -100,10 +109,19 @@ public class ApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
             .Build();
 
         await _parserContainer.StartAsync();
+    }
 
-        _dbConnection = new NpgsqlConnection(_dbContainer.GetConnectionString());
+    private async Task InitializeRespawn()
+    {
+        _dbConnection = new NpgsqlConnection(_postgresContainer.GetConnectionString());
 
-        CreateClient();
+        HttpClient = CreateClient();
+
+        await HttpClient.PostAsJsonAsync("/admins/login", new LoginAdminCommand()
+        {
+            Email = "admin",
+            Password = "admin",
+        });
 
         await _dbConnection.OpenAsync();
 
@@ -118,25 +136,16 @@ public class ApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
     {
         Environment.SetEnvironmentVariable(
             "ConnectionStrings:Database",
-            _dbContainer!.GetConnectionString()
+            _postgresContainer!.GetConnectionString()
         );
 
         Environment.SetEnvironmentVariable(
             "ConnectionStrings:Parser",
-            "http://" + _parserContainer!.Hostname + ":" + _parserContainer!.GetMappedPublicPort(8000)
+            "http://" + _parserContainer.Hostname + ":" + _parserContainer.GetMappedPublicPort(8000)
         );
 
         builder.ConfigureTestServices(services =>
         {
-            var userDescriptor = services.SingleOrDefault(s => s.ServiceType == typeof(IUserAccessor));
-
-            if (userDescriptor is not null)
-            {
-                services.Remove(userDescriptor);
-            }
-
-            services.AddScoped<IUserAccessor, UserAccessorMock>();
-
             var botDescriptor = services.SingleOrDefault(s => s.ServiceType == typeof(ITelegramBot));
 
             if (botDescriptor is not null)
@@ -148,11 +157,17 @@ public class ApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
         });
     }
 
+    public async Task ResetDatabase()
+    {
+        await _respawner.ResetAsync(_dbConnection);
+    }
+
     public new async Task DisposeAsync()
     {
-        await _dbContainer!.StopAsync();
-        await _mongoContainer!.StopAsync();
-        await _parserImage!.DisposeAsync();
-        await _parserContainer!.DisposeAsync();
+        await _postgresContainer.StopAsync();
+        await _dbConnection.DisposeAsync();
+        await _mongoContainer.StopAsync();
+        await _parserImage.DisposeAsync();
+        await _parserContainer.DisposeAsync();
     }
 }

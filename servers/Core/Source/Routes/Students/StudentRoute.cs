@@ -20,7 +20,8 @@ public class StudentRoute : IRoute
 {
     public void MapRoutes(WebApplication app)
     {
-        var group = app.MapGroup("/students").RequireAuthorization();
+        var group = app.MapGroup("/students")
+            .RequireAuthorization();
 
         group.MapPost("/auth", AuthStudent)
             .WithDescription("Auths the student");

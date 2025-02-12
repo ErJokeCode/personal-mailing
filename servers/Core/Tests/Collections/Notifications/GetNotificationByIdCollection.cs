@@ -1,4 +1,5 @@
-
+using System.Net;
+using System.Net.Http.Json;
 using Core.Routes.Notifications.Commands;
 using Core.Routes.Notifications.Dtos;
 using Core.Routes.Notifications.Queries;
@@ -18,44 +19,46 @@ public class GetNotificationByIdCollection : BaseCollection
     [Fact]
     public async Task GetNotificationById_ShouldReturnNotification_WhenCorrectInput()
     {
-        var admin = await UserAccessor.GetUserAsync();
-
-        var student = await Sender.Send(new AuthStudentCommand()
+        var authCommand = new AuthStudentCommand()
         {
             Email = "ivan.example1@urfu.me",
             PersonalNumber = "00000000",
             ChatId = "0",
-        });
-
-        var notification = await Sender.Send(new SendNotificationCommand()
-        {
-            Content = "test",
-            StudentIds = [student.Value.Id],
-        });
-
-        var query = new GetNotificationByIdQuery()
-        {
-            NotificationId = notification.Value.Id
         };
 
-        var result = await Sender.Send(query);
+        var studentResponse = await HttpClient.PostAsJsonAsync($"/students/auth", authCommand);
+        var studentAuthed = await studentResponse.Content.ReadFromJsonAsync<StudentDto>();
 
-        Assert.True(result.IsSuccess);
-        Assert.IsAssignableFrom<NotificationDto>(result.Value);
-        Assert.Equal(notification.Value.Content, result.Value.Content);
-        Assert.Equivalent(new StudentDto[] { student.Value }, notification.Value.Students);
+        Assert.NotNull(studentAuthed);
+
+        var sendCommand = new SendNotificationCommand()
+        {
+            Content = "test",
+            StudentIds = [studentAuthed.Id],
+        };
+
+        var notificationResponse = await HttpClient.PostAsJsonAsync("/notifications", sendCommand);
+        var notificationSent = await notificationResponse.Content.ReadFromJsonAsync<NotificationDto>();
+
+        Assert.NotNull(notificationSent);
+
+        var response = await HttpClient.GetAsync($"/notifications/{notificationSent.Id}");
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var notification = await response.Content.ReadFromJsonAsync<NotificationDto>();
+
+        Assert.NotNull(notification);
+        Assert.Equal(notificationSent.Id, notification.Id);
+        Assert.NotEmpty(notification.Students);
+        Assert.NotNull(notification.Admin);
     }
 
     [Fact]
     public async Task GetAdminById_ShouldFail_WhenBadInput()
     {
-        var query = new GetNotificationByIdQuery()
-        {
-            NotificationId = 0
-        };
+        var response = await HttpClient.GetAsync($"/notification/{0}");
 
-        var result = await Sender.Send(query);
-
-        Assert.True(result.IsFailed);
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
 }

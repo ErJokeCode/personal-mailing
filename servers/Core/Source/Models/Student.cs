@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using Core.External.Parser;
+using Riok.Mapperly.Abstractions;
 
 namespace Core.Models;
 
@@ -12,8 +13,11 @@ public class Student
     public required string ChatId { get; set; }
     public required DateOnly CreatedAt { get; set; }
 
-    [NotMapped]
-    public ParserStudent? Info { get; set; }
+    public required ParserStudent Info { get; set; }
 
+    public bool Active { get; set; } = true;
+    public DateOnly? DeactivatedAt { get; set; }
+
+    [MapperIgnore]
     public ICollection<Notification> Notifications { get; set; } = [];
 }

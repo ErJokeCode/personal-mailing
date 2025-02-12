@@ -1,3 +1,6 @@
+using System.Net;
+using System.Net.Http.Json;
+using Core.Routes.Students.Commands;
 using Core.Routes.Students.Dtos;
 using Core.Routes.Students.Queries;
 using Core.Tests.Setup;
@@ -12,23 +15,33 @@ public class GetAllStudentsCollection : BaseCollection
     }
 
     [Fact]
-    public async Task GetAllStudents_ShouldBeStudentArray()
+    public async Task GetAllStudents_ShouldBeEmpty()
     {
-        var query = new GetAllStudentsQuery();
+        var response = await HttpClient.GetAsync("/students");
 
-        var result = await Sender.Send(query);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        Assert.IsAssignableFrom<IEnumerable<StudentDto>>(result);
-        Assert.All(result, (s) => Assert.NotNull(s.Info));
+        var admins = await response.Content.ReadFromJsonAsync<IEnumerable<StudentDto>>();
+
+        Assert.NotNull(admins);
+        Assert.Empty(admins);
     }
 
     [Fact]
-    public async Task GetAllStudents_ShouldBeEmtpy()
+    public async Task GetAllStudents_ShouldHaveOneItem_AfterStudentAuth()
     {
-        var query = new GetAllStudentsQuery();
+        var authCommand = new AuthStudentCommand()
+        {
+            Email = "ivan.example1@urfu.me",
+            PersonalNumber = "00000000",
+            ChatId = "0",
+        };
 
-        var result = await Sender.Send(query);
+        await AuthStudent(authCommand);
 
-        Assert.Empty(result);
+        var admins = await HttpClient.GetFromJsonAsync<IEnumerable<StudentDto>>("/students");
+
+        Assert.NotNull(admins);
+        Assert.Single(admins);
     }
 }

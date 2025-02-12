@@ -36,12 +36,10 @@ public class GetStudentByIdQueryHandler : IRequestHandler<GetStudentByIdQuery, R
     {
         var student = await _db.Students.SingleOrDefaultAsync(s => s.Id == request.StudentId);
 
-        if (student is null)
+        if (student is null || !student.Active)
         {
             return Result.Fail<StudentDto>(StudentErrors.NotFound(request.StudentId));
         }
-
-        await _parser.IncludeInfoAsync(student);
 
         return Result.Ok(_studentMapper.Map(student));
     }

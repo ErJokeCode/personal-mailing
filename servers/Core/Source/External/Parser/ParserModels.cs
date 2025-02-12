@@ -1,18 +1,16 @@
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Text.Json.Serialization;
 using Microsoft.EntityFrameworkCore;
 
 namespace Core.External.Parser;
 
-[Keyless]
+[Owned]
 public class Team
 {
     public required string Name { get; set; }
-    public List<string> Teachers { get; set; } = [];
+    public ICollection<string> Teachers { get; set; } = [];
 }
 
-[Keyless]
+[Owned]
 public class Subject
 {
     public required string FullName { get; set; }
@@ -21,10 +19,11 @@ public class Subject
     public string? Info { get; set; }
     public CourseInfo? OnlineCourse { get; set; }
     public string? GroupTgLink { get; set; }
-    public List<Team> Teams { get; set; } = [];
+
+    public ICollection<Team> Teams { get; set; } = [];
 }
 
-[Keyless]
+[Owned]
 public class CourseInfo
 {
     public required string Name { get; set; }
@@ -32,10 +31,11 @@ public class CourseInfo
     public string? DateStart { get; set; }
     public string? Deadline { get; set; }
     public string? Info { get; set; }
+
     public Dictionary<string, object> Scores { get; set; } = [];
 }
 
-[Keyless]
+[Owned]
 public class Group
 {
     public required string Number { get; set; }
@@ -44,23 +44,20 @@ public class Group
     public string? NameSpeciality { get; set; }
 }
 
+[Owned]
 public class ParserStudent
 {
-    [JsonPropertyName("_id")]
-    public string? _id { get; set; }
     public required string PersonalNumber { get; set; }
     public required string Name { get; set; }
     public required string Surname { get; set; }
     public string? Patronymic { get; set; }
     public string? Email { get; set; }
     public required string DateOfBirth { get; set; }
-    [NotMapped]
     public required Group Group { get; set; }
     public bool? Status { get; set; }
     public string? TypeOfCost { get; set; }
     public string? TypeOfEducation { get; set; }
-    [NotMapped]
-    public List<Subject> Subjects { get; set; } = [];
-    [NotMapped]
-    public List<CourseInfo> OnlineCourse { get; set; } = [];
+
+    public ICollection<Subject> Subjects { get; set; } = [];
+    public ICollection<CourseInfo> OnlineCourse { get; set; } = [];
 }

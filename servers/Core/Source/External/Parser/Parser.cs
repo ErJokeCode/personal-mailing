@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Core.Models;
@@ -42,40 +43,13 @@ public class Parser : IParser
         return JsonSerializer.Deserialize<T>(result, _jsonOptions);
     }
 
-    public async Task<bool> IncludeInfoAsync(Student student)
+    public async Task<ParserStudent?> GetInfoAsync(string email)
     {
         var query = new Dictionary<string, string?>
         {
-            ["email"] = student.Email,
+            ["email"] = email,
         };
 
-        var info = await GetAsync<ParserStudent>("/student", query);
-
-        if (info == null)
-        {
-            return false;
-        }
-        else
-        {
-            student.Info = info;
-            return true;
-        }
-    }
-
-    public async Task<bool> IncludeInfoAsync(IEnumerable<Student> students)
-    {
-        var anyFalse = false;
-
-        foreach (var student in students)
-        {
-            var result = await IncludeInfoAsync(student);
-
-            if (result == false)
-            {
-                anyFalse = true;
-            }
-        }
-
-        return anyFalse;
+        return await GetAsync<ParserStudent>("/student", query);
     }
 }

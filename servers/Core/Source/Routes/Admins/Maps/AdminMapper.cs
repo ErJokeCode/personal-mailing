@@ -8,11 +8,7 @@ namespace Core.Routes.Admins.Maps;
 [Mapper]
 public partial class AdminMapper
 {
-#pragma warning disable RMG020 // Source member is not mapped to any target member
     public partial AdminDto Map(Admin admin);
-#pragma warning restore RMG020 // Source member is not mapped to any target member
 
-#pragma warning disable RMG020 // Source member is not mapped to any target member
     public partial IEnumerable<AdminDto> Map(IEnumerable<Admin> admins);
-#pragma warning restore RMG020 // Source member is not mapped to any target member
 }

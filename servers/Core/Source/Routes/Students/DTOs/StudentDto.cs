@@ -15,5 +15,8 @@ public class StudentDto
     public required string ChatId { get; set; }
     public required DateOnly CreatedAt { get; set; }
 
-    public ParserStudent? Info { get; set; }
+    public required ParserStudent Info { get; set; }
+
+    public bool Active { get; set; }
+    public DateOnly? DeactivatedAt { get; set; }
 }
