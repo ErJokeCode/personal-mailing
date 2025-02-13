@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
@@ -93,19 +94,26 @@ public static class Startup
         builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
         builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
+        builder.Services.AddScoped<IUserAccessor, UserAccessor>();
+
         builder.Services.Configure<ParserOptions>(o =>
         {
-            o.ParserUrl = builder.Configuration["Parser:Url"]!;
+            o.ParserUrl = builder.Configuration.GetConnectionString("Parser")!;
         });
         builder.Services.AddScoped<IParser, Parser>();
 
         builder.Services.Configure<MailServiceOptions>(o =>
         {
-            o.MailServiceUrl = builder.Configuration["TelegramBot:Url"]!;
+            o.MailServiceUrl = builder.Configuration.GetConnectionString("TelegramBot")!;
         });
         builder.Services.AddScoped<IMailService, TelegramBot>();
 
-        builder.Services.AddScoped<IUserAccessor, UserAccessor>();
+        builder.Services.Configure<FileStorageOptions>(o =>
+        {
+            o.ContainerName = builder.Configuration["FileStorage:ContainerName"]!;
+        });
+        builder.Services.AddSingleton(_ => new BlobServiceClient(builder.Configuration.GetConnectionString("BlobStorage")));
+        builder.Services.AddSingleton<IFileStorage, BlobStorage>();
     }
 
     public static async Task InitialzieServices(this WebApplication app)
