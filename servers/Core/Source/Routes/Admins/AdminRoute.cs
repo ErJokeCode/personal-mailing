@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core.Infrastructure.Errors;
@@ -6,6 +7,7 @@ using Core.Routes;
 using Core.Routes.Admins.Commands;
 using Core.Routes.Admins.Dtos;
 using Core.Routes.Admins.Queries;
+using Core.Routes.Notifications.Dtos;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -19,7 +21,7 @@ public class AdminRoute : IRoute
 {
     public void MapRoutes(WebApplication app)
     {
-        var group = app.MapGroup("/admins")
+        var group = app.MapGroup("/core/admins")
             .RequireAuthorization();
 
         group.MapPost("/", CreateAdmin)
@@ -35,11 +37,47 @@ public class AdminRoute : IRoute
         group.MapGet("/", GetAllAdmins)
             .WithDescription("Gets all admins");
 
+        group.MapGet("/me", GetAdminMe)
+            .WithDescription("Gets an admin by cookie");
+
         group.MapGet("/{adminId}", GetAdminById)
             .WithDescription("Gets an admin by id");
 
-        group.MapGet("/me", GetAdminMe)
-            .WithDescription("Gets an admin by cookie");
+        group.MapGet("/{adminId}/notifications", GetAdminNotificatioins)
+            .WithDescription("Gets a compact version of all notifications of an admin");
+    }
+
+    public async Task<Results<Ok<IEnumerable<NotificationDto>>, NotFound<ProblemDetails>, ValidationProblem>> GetAdminNotificatioins(
+        Guid adminId, IValidator<GetAdminByIdQuery> validator, IMediator mediator
+    )
+    {
+        var adminQuery = new GetAdminByIdQuery()
+        {
+            AdminId = adminId
+        };
+
+        var validationResult = await validator.ValidateAsync(adminQuery);
+
+        if (!validationResult.IsValid)
+        {
+            return validationResult.ToValidationProblem();
+        }
+
+        var adminResult = await mediator.Send(adminQuery);
+
+        if (adminResult.IsFailed)
+        {
+            return adminResult.ToNotFoundProblem();
+        }
+
+        var query = new GetAdminNotificatioinsQuery()
+        {
+            AdminId = adminId
+        };
+
+        var notifications = await mediator.Send(query);
+
+        return TypedResults.Ok(notifications);
     }
 
     public async Task<Results<Ok<AdminDto>, NotFound<ProblemDetails>>> GetAdminMe(IMediator mediator)
@@ -55,7 +93,9 @@ public class AdminRoute : IRoute
         return TypedResults.Ok(result.Value);
     }
 
-    public async Task<Results<Ok<AdminDto>, NotFound<ProblemDetails>, ValidationProblem>> GetAdminById(Guid adminId, IValidator<GetAdminByIdQuery> validator, IMediator mediator)
+    public async Task<Results<Ok<AdminDto>, NotFound<ProblemDetails>, ValidationProblem>> GetAdminById(
+        Guid adminId, IValidator<GetAdminByIdQuery> validator, IMediator mediator
+    )
     {
         var query = new GetAdminByIdQuery()
         {

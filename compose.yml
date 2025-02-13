@@ -23,6 +23,14 @@ services:
     volumes:
       - pgadmindata:/var/lib/pgadmin/data
 
+  blob-storage:
+    image: mcr.microsoft.com/azure-storage/azurite
+    command: "azurite-blob --blobHost 0.0.0.0 -l /var/lib/blob/data"
+    ports:
+      - 10000:10000
+    volumes:
+      - blobdata:/var/lib/blob/data
+
   core:
     user: root
     build: ./servers/Core/Source
@@ -120,6 +128,7 @@ volumes:
   redisdata:
   parserdata:
   coredata:
+  blobdata:
   pgadmindata:
   insightdata:
   expressdata:

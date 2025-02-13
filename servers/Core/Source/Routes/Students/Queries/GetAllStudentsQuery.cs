@@ -3,8 +3,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Data;
-using Core.External.Parser;
-using Core.Models;
 using Core.Routes.Students.Dtos;
 using Core.Routes.Students.Maps;
 using MediatR;

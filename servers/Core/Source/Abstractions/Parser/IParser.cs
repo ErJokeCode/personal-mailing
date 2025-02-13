@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Core.Models;
 
-namespace Core.External.Parser;
+namespace Core.Abstractions.Parser;
 
 public class ParserOptions
 {

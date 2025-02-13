@@ -11,7 +11,7 @@ public class EventRoute : IRoute
 {
     public void MapRoutes(WebApplication app)
     {
-        var group = app.MapGroup("/events")
+        var group = app.MapGroup("/core/events")
             .RequireAuthorization();
 
         group.MapPost("/upload", UploadEvent)

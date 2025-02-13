@@ -1,10 +1,5 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using Core.External.Parser;
-using Core.Models;
-using Core.Routes.Notifications.Dtos;
+using Core.Abstractions.Parser;
 
 namespace Core.Routes.Students.Dtos;
 

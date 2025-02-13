@@ -19,7 +19,7 @@ class NotificationRoute : IRoute
 {
     public void MapRoutes(WebApplication app)
     {
-        var group = app.MapGroup("/notifications")
+        var group = app.MapGroup("/core/notifications")
             .RequireAuthorization();
 
         group.MapPost("/", SendNotification)

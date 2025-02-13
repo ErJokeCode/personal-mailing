@@ -1,8 +1,8 @@
-using Core.External.TelegramBot;
+using Core.Abstractions;
 
 namespace Core.Tests.Mocks;
 
-public class TelegramBotMock : ITelegramBot
+public class MailServiceMock : IMailService
 {
     public Task<bool> SendNotificationAsync(string chatId, string text)
     {

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
-using Core.External.Parser;
+using Core.Abstractions.Parser;
 using Core.Identity;
 using Core.Models;
 using Microsoft.AspNetCore.Identity;

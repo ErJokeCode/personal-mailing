@@ -1,6 +1,6 @@
 using System.Data.Common;
 using System.Net.Http.Json;
-using Core.External.TelegramBot;
+using Core.Abstractions;
 using Core.Infrastructure.Services;
 using Core.Routes.Admins.Commands;
 using Core.Tests.Mocks;
@@ -146,14 +146,14 @@ public class ApplicationFactory : WebApplicationFactory<Program>, IAsyncLifetime
 
         builder.ConfigureTestServices(services =>
         {
-            var botDescriptor = services.SingleOrDefault(s => s.ServiceType == typeof(ITelegramBot));
+            var botDescriptor = services.SingleOrDefault(s => s.ServiceType == typeof(IMailService));
 
             if (botDescriptor is not null)
             {
                 services.Remove(botDescriptor);
             }
 
-            services.AddScoped<ITelegramBot, TelegramBotMock>();
+            services.AddScoped<IMailService, MailServiceMock>();
         });
     }
 

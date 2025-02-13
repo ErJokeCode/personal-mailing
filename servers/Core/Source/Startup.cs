@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Azure.Storage.Blobs;
+using Azure.Storage.Blobs.Models;
+using Core.Abstractions;
+using Core.Abstractions.Parser;
 using Core.Data;
-using Core.External.Parser;
-using Core.External.TelegramBot;
 using Core.Identity;
 using Core.Infrastructure.Handlers;
 using Core.Infrastructure.Services;
@@ -93,15 +95,15 @@ public static class Startup
 
         builder.Services.Configure<ParserOptions>(o =>
         {
-            o.ParserUrl = builder.Configuration.GetConnectionString("Parser")!;
+            o.ParserUrl = builder.Configuration["Parser:Url"]!;
         });
         builder.Services.AddScoped<IParser, Parser>();
 
-        builder.Services.Configure<TelegarmBotOptions>(o =>
+        builder.Services.Configure<MailServiceOptions>(o =>
         {
-            o.TelegarmBotUrl = builder.Configuration.GetConnectionString("TelegramBot")!;
+            o.MailServiceUrl = builder.Configuration["TelegramBot:Url"]!;
         });
-        builder.Services.AddScoped<ITelegramBot, TelegramBot>();
+        builder.Services.AddScoped<IMailService, TelegramBot>();
 
         builder.Services.AddScoped<IUserAccessor, UserAccessor>();
     }

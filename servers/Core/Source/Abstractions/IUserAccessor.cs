@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using Core.Models;
 
-namespace Core.Infrastructure.Services;
+namespace Core.Abstractions;
 
 public interface IUserAccessor
 {

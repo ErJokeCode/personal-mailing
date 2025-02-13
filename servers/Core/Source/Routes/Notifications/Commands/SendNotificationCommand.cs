@@ -2,9 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using Core.Abstractions;
 using Core.Data;
-using Core.External.Parser;
-using Core.External.TelegramBot;
 using Core.Infrastructure.Services;
 using Core.Models;
 using Core.Routes.Admins.Errors;
@@ -28,14 +27,14 @@ public class SendNotificationCommandHandler : IRequestHandler<SendNotificationCo
 {
     private readonly AppDbContext _db;
     private readonly IUserAccessor _userAccessor;
-    private readonly ITelegramBot _telegramBot;
+    private readonly IMailService _mailService;
     private readonly NotificationMapper _notificationMapper;
 
-    public SendNotificationCommandHandler(AppDbContext db, IUserAccessor userAccessor, ITelegramBot telegramBot)
+    public SendNotificationCommandHandler(AppDbContext db, IUserAccessor userAccessor, IMailService mailService)
     {
         _db = db;
         _userAccessor = userAccessor;
-        _telegramBot = telegramBot;
+        _mailService = mailService;
         _notificationMapper = new NotificationMapper();
     }
 
@@ -77,7 +76,7 @@ public class SendNotificationCommandHandler : IRequestHandler<SendNotificationCo
 
         foreach (var student in notification.Students)
         {
-            var sent = await _telegramBot.SendNotificationAsync(student.ChatId, notification.Content);
+            var sent = await _mailService.SendNotificationAsync(student.ChatId, notification.Content);
 
             if (!sent)
             {

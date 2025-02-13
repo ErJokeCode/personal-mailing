@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
-using Core.External.Parser;
+using Core.Abstractions.Parser;
 using Riok.Mapperly.Abstractions;
 
 namespace Core.Models;
