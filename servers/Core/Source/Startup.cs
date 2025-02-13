@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Core.Data;
 using Core.External.Parser;
 using Core.External.TelegramBot;
+using Core.Identity;
 using Core.Infrastructure.Handlers;
 using Core.Infrastructure.Services;
 using Core.Models;
@@ -68,6 +69,7 @@ public static class Startup
         builder.Services.ConfigureApplicationCookie(o =>
         {
             o.SlidingExpiration = true;
+            o.SessionStore = new AdminTicketStore(builder.Services);
 
             o.Events = new CookieAuthenticationEvents
             {
@@ -129,7 +131,7 @@ public static class Startup
         app.UseAuthorization();
         app.UseExceptionHandler();
 
-        app.MapReverseProxy();
+        app.MapReverseProxy().RequireAuthorization();
     }
 
     public static void MapRoutes(this WebApplication app)

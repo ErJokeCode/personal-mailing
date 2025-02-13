@@ -6,6 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Core.Models;
 using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 
 namespace Core.External.Parser;
