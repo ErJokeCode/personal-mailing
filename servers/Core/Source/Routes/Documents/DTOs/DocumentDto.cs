@@ -1,10 +1,8 @@
 using System;
-using Microsoft.EntityFrameworkCore;
 
-namespace Core.Models;
+namespace Core.Routes.Documents.DTOs;
 
-[Owned]
-public class Document
+public class DocumentDto
 {
     public required Guid BlobId { get; set; }
     public required string Name { get; set; }

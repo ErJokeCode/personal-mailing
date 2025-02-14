@@ -19,6 +19,8 @@ public class Notification
     public required string Content { get; set; }
     public required DateTime CreatedAt { get; set; }
 
+    public ICollection<Document> Documents { get; set; } = [];
+
     [MapperIgnore]
     public required Guid AdminId { get; set; }
     public Admin? Admin { get; set; }

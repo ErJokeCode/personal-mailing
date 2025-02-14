@@ -1,9 +1,12 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
-using Core.Abstractions;
+using Azure.Storage.Blobs.Models;
+using Core.Abstractions.FileStorage;
+using Core.Models;
 using Microsoft.Extensions.Options;
 
 namespace Core.Infrastructure.Services;
@@ -23,28 +26,48 @@ public class BlobStorage : IFileStorage
         _blobContainer.CreateIfNotExists();
     }
 
-    public async Task<Guid> UploadAsync(Stream stream, CancellationToken cancellationToken = default)
+    public async Task<Document> UploadAsync(BlobData data, CancellationToken cancellationToken = default)
     {
         var fileId = Guid.NewGuid();
         var blob = _blobContainer.GetBlobClient(fileId.ToString());
 
-        await blob.UploadAsync(stream, cancellationToken);
+        await blob.UploadAsync(data.Stream, new BlobUploadOptions()
+        {
+            HttpHeaders = new BlobHttpHeaders()
+            {
+                ContentType = data.ContentType,
+            }
+        }, cancellationToken);
 
-        return fileId;
+        await blob.SetMetadataAsync(new Dictionary<string, string> {
+            {"name", data.Name},
+        }, cancellationToken: cancellationToken);
+
+        return new Document()
+        {
+            BlobId = fileId,
+            Name = data.Name,
+            MimeType = MimeTypes.GetMimeType(data.Name),
+        };
     }
 
-    public async Task<Stream?> DownloadAsync(Guid fileId, CancellationToken cancellationToken = default)
+    public async Task<BlobData?> DownloadAsync(Guid fileId, CancellationToken cancellationToken = default)
     {
         var blob = _blobContainer.GetBlobClient(fileId.ToString());
 
-        if (!blob.Exists())
+        if (!await blob.ExistsAsync(cancellationToken))
         {
             return null;
         }
 
         var response = await blob.DownloadContentAsync(cancellationToken: cancellationToken);
 
-        return response.Value.Content.ToStream();
+        return new BlobData()
+        {
+            Stream = response.Value.Content.ToStream(),
+            ContentType = response.Value.Details.ContentType,
+            Name = response.Value.Details.Metadata["name"],
+        };
     }
 
     public async Task DeleteAsync(Guid fileId, CancellationToken cancellationToken = default)

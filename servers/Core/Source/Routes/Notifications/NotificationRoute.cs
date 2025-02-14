@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.Json;
 using System.Threading.Tasks;
 using Core.Infrastructure.Errors;
 using Core.Routes.Notifications.Commands;
@@ -23,7 +24,8 @@ class NotificationRoute : IRoute
             .RequireAuthorization();
 
         group.MapPost("/", SendNotification)
-            .WithDescription("Sends a notification");
+            .WithDescription("Sends a notification")
+            .DisableAntiforgery();
 
         group.MapGet("/", GetAllNotifications)
             .WithDescription("Gets a compact version of all notifications");
@@ -67,10 +69,31 @@ class NotificationRoute : IRoute
         return result;
     }
 
+    private class NotificationDetails
+    {
+        public required string Content { get; set; }
+        public required IEnumerable<Guid> StudentIds { get; set; }
+    }
+
     public async Task<Results<Ok<NotificationDto>, BadRequest<ProblemDetails>, ValidationProblem>> SendNotification(
-        SendNotificationCommand command, IValidator<SendNotificationCommand> validator, IMediator mediator
+        [FromForm] IFormFileCollection documents, [FromForm] string body, IValidator<SendNotificationCommand> validator, IMediator mediator
     )
     {
+        var details = JsonSerializer.Deserialize<NotificationDetails>(
+            body,
+            new JsonSerializerOptions()
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            }
+        );
+
+        var command = new SendNotificationCommand()
+        {
+            Content = details?.Content ?? "",
+            StudentIds = details?.StudentIds ?? [],
+            FormFiles = documents,
+        };
+
         var validationResult = await validator.ValidateAsync(command);
 
         if (!validationResult.IsValid)

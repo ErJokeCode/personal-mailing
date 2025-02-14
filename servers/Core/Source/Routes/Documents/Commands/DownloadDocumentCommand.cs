@@ -1,20 +1,22 @@
 using System;
 using System.IO;
+using System.Reflection.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Abstractions;
+using Core.Abstractions.FileStorage;
 using Core.Routes.Documents.Errors;
 using FluentResults;
 using MediatR;
 
 namespace Core.Routes.Documents.Commands;
 
-public class DownloadDocumentCommand : IRequest<Result<Stream>>
+public class DownloadDocumentCommand : IRequest<Result<BlobData>>
 {
-    public required Guid DocumentId { get; set; }
+    public required Guid BlobId { get; set; }
 }
 
-public class DownloadDocumentCommandHandler : IRequestHandler<DownloadDocumentCommand, Result<Stream>>
+public class DownloadDocumentCommandHandler : IRequestHandler<DownloadDocumentCommand, Result<BlobData>>
 {
     private readonly IFileStorage _fileStorage;
 
@@ -23,15 +25,15 @@ public class DownloadDocumentCommandHandler : IRequestHandler<DownloadDocumentCo
         _fileStorage = fileStorage;
     }
 
-    public async Task<Result<Stream>> Handle(DownloadDocumentCommand request, CancellationToken cancellationToken)
+    public async Task<Result<BlobData>> Handle(DownloadDocumentCommand request, CancellationToken cancellationToken)
     {
-        var stream = await _fileStorage.DownloadAsync(request.DocumentId, cancellationToken);
+        var data = await _fileStorage.DownloadAsync(request.BlobId, cancellationToken);
 
-        if (stream is null)
+        if (data is null)
         {
-            return Result.Fail<Stream>(DocumentErrors.NotFound(request.DocumentId));
+            return Result.Fail<BlobData>(DocumentErrors.NotFound(request.BlobId));
         }
 
-        return stream;
+        return data;
     }
 }

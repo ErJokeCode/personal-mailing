@@ -2,8 +2,9 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Core.Models;
 
-namespace Core.Abstractions;
+namespace Core.Abstractions.FileStorage;
 
 public class FileStorageOptions
 {
@@ -12,9 +13,9 @@ public class FileStorageOptions
 
 public interface IFileStorage
 {
-    public Task<Guid> UploadAsync(Stream stream, CancellationToken cancellationToken = default);
+    public Task<Document> UploadAsync(BlobData data, CancellationToken cancellationToken = default);
 
-    public Task<Stream?> DownloadAsync(Guid fileId, CancellationToken cancellationToken = default);
+    public Task<BlobData?> DownloadAsync(Guid fileId, CancellationToken cancellationToken = default);
 
     public Task DeleteAsync(Guid fileId, CancellationToken cancellationToken = default);
 }

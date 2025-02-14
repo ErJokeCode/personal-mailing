@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Core.Infrastructure.Errors;
 using Core.Routes.Documents.Commands;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -14,31 +15,38 @@ public class DocumentRoute : IRoute
 {
     public void MapRoutes(WebApplication app)
     {
-        var group = app.MapGroup("/core/documents");
+        var group = app.MapGroup("/core/documents")
+            .RequireAuthorization();
 
-        group.MapGet("/{documentId}", DownloadDocument);
+        group.MapGet("/{blobId}", DownloadDocument)
+            .WithDescription("Download a document by id");
     }
 
     // TODO Add validator for guid, implement documents on notifications, test it out
-    // Damn, with this approch we cant have contentType and fileName since document is owned
-    // One possible solution is to store metadata in the blob storage itself as well
-    // Or just require to pass the whole document object as json into the download method
     // also setup depends on in the docker compose file, because right now stuff might break
-    public async Task<Results<FileStreamHttpResult, NotFound<ProblemDetails>>> DownloadDocument(Guid documentId, IMediator mediator)
+    public async Task<Results<FileStreamHttpResult, NotFound<ProblemDetails>, ValidationProblem>> DownloadDocument(
+        Guid blobId, IMediator mediator, IValidator<DownloadDocumentCommand> validator
+    )
     {
         var command = new DownloadDocumentCommand()
         {
-            DocumentId = documentId,
+            BlobId = blobId,
         };
 
-        var result = await mediator.Send(command);
+        var validationResult = await validator.ValidateAsync(command);
 
+        if (!validationResult.IsValid)
+        {
+            return validationResult.ToValidationProblem();
+        }
+
+        var result = await mediator.Send(command);
 
         if (result.IsFailed)
         {
             return result.ToNotFoundProblem();
         }
 
-        return TypedResults.File(result.Value);
+        return TypedResults.File(result.Value.Stream, result.Value.ContentType, result.Value.Name);
     }
 }
