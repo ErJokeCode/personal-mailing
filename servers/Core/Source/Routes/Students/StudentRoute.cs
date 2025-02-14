@@ -96,10 +96,8 @@ public class StudentRoute : IRoute
         return TypedResults.Ok(result.Value);
     }
 
-    public async Task<Ok<IEnumerable<StudentDto>>> GetAllStudents(IMediator mediator)
+    public async Task<Ok<IEnumerable<StudentDto>>> GetAllStudents([AsParameters] GetAllStudentsQuery query, IMediator mediator)
     {
-        var query = new GetAllStudentsQuery();
-
         var result = await mediator.Send(query);
 
         return TypedResults.Ok(result);

@@ -9,6 +9,8 @@ public class Admin : IdentityUser<Guid>
 {
     public required DateOnly CreatedAt { get; set; }
 
+    public ICollection<string> Groups { get; set; } = [];
+
     [MapperIgnore]
     public ICollection<Notification> Notifications { get; set; } = [];
 

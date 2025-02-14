@@ -7,8 +7,9 @@ namespace Core.Routes.Admins.Dtos;
 
 public class AdminDto
 {
-    public Guid Id { get; init; }
-    public required string UserName { get; init; }
-    public required string Email { get; init; }
-    public required DateOnly CreatedAt { get; init; }
+    public Guid Id { get; set; }
+    public required string UserName { get; set; }
+    public required string Email { get; set; }
+    public required DateOnly CreatedAt { get; set; }
+    public required IEnumerable<string> Groups { get; set; } = [];
 }
