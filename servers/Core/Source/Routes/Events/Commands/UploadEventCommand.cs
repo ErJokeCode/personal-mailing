@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Abstractions.Parser;
 using Core.Data;
+using Core.Models;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +31,28 @@ public class UploadEventCommandHandler : IRequestHandler<UploadEventCommand, Uni
 
     public async Task<Unit> Handle(UploadEventCommand request, CancellationToken cancellationToken)
     {
+        var groups = await _parser.GetAsync<IEnumerable<string>>("/student/number_groups", []);
+        var groupAssignments = await _db.GroupAssignments.Select(g => g.Name).ToHashSetAsync();
+
+        if (groups is not null)
+        {
+            var mainAdmin = await _db.Users.SingleAsync(a => a.Email == _configuration["MainAdmin:Name"]);
+
+            foreach (var group in groups)
+            {
+                if (!groupAssignments.Contains(group))
+                {
+                    await _db.GroupAssignments.AddAsync(new GroupAssignment()
+                    {
+                        Name = group,
+                        AdminId = mainAdmin.Id,
+                    });
+                }
+            }
+        }
+
+        await _db.SaveChangesAsync();
+
         var students = await _db.Students.ToListAsync();
 
         // TODO implement a timestamp check if a student's data needs update
@@ -49,25 +72,6 @@ public class UploadEventCommandHandler : IRequestHandler<UploadEventCommand, Uni
                 student.Active = true;
                 student.DeactivatedAt = null;
                 student.Info = info;
-            }
-        }
-
-        // TODO HashSet for all groups and adminGroups
-        // Use HashSet Contains to check for entry
-        // Should be faster than rechecking every time, and they should not repeat, at all
-        var groups = await _parser.GetAsync<IEnumerable<string>>("/student/number_groups", []);
-
-        if (groups is not null)
-        {
-            var admins = await _db.Users.ToListAsync();
-            var mainAdmin = admins.Single(a => a.Email == _configuration["MainAdmin:Name"]);
-
-            foreach (var group in groups)
-            {
-                if (!admins.Any(a => a.Groups.Contains(group)))
-                {
-                    mainAdmin.Groups.Add(group);
-                }
             }
         }
 

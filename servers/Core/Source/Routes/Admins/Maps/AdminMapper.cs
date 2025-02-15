@@ -5,10 +5,14 @@ using Riok.Mapperly.Abstractions;
 
 namespace Core.Routes.Admins.Maps;
 
+// TODO separate into a new dto and mapper, model could stay like that
+
 [Mapper]
 public partial class AdminMapper
 {
     public partial AdminDto Map(Admin admin);
-
     public partial IEnumerable<AdminDto> Map(IEnumerable<Admin> admins);
+
+    public partial GroupAssignmentDto Map(GroupAssignment admin);
+    public partial IEnumerable<GroupAssignmentDto> Map(IEnumerable<GroupAssignment> admins);
 }

@@ -7,6 +7,7 @@ using Core.Routes;
 using Core.Routes.Admins.Commands;
 using Core.Routes.Admins.Dtos;
 using Core.Routes.Admins.Queries;
+using Core.Routes.Admins.Validators;
 using Core.Routes.Notifications.Dtos;
 using FluentValidation;
 using MediatR;
@@ -40,11 +41,74 @@ public class AdminRoute : IRoute
         group.MapGet("/me", GetAdminMe)
             .WithDescription("Gets an admin by cookie");
 
+        group.MapGet("/groups", GetAllGroups)
+            .WithDescription("Gets all group assignments");
+
         group.MapGet("/{adminId}", GetAdminById)
             .WithDescription("Gets an admin by id");
 
         group.MapGet("/{adminId}/notifications", GetAdminNotificatioins)
             .WithDescription("Gets a compact version of all notifications of an admin");
+
+        // TODO rewrite using a separate group table, with metadata like an admin assigned to this group
+        // Overall number of students, number of authed students, and we can work with that
+        group.MapPatch("/{adminId}/groups", AssignGroups)
+            .WithDescription("Assigns groups to the admin");
+    }
+
+    private async Task<Ok<IEnumerable<GroupAssignmentDto>>> GetAllGroups(IMediator mediator)
+    {
+        var query = new GetAllGroupsQuery();
+
+        var groups = await mediator.Send(query);
+
+        return TypedResults.Ok(groups);
+    }
+
+    public async Task<Results<NoContent, NotFound<ProblemDetails>, ValidationProblem>> AssignGroups(
+        Guid adminId, ICollection<int> groups, IValidator<GetAdminByIdQuery> idValidator, IValidator<AssignGroupsCommand> assignValidator, IMediator mediator
+    )
+    {
+        var adminQuery = new GetAdminByIdQuery()
+        {
+            AdminId = adminId
+        };
+
+        var idValidation = await idValidator.ValidateAsync(adminQuery);
+
+        if (!idValidation.IsValid)
+        {
+            return idValidation.ToValidationProblem();
+        }
+
+        var adminResult = await mediator.Send(adminQuery);
+
+        if (adminResult.IsFailed)
+        {
+            return adminResult.ToNotFoundProblem();
+        }
+
+        var command = new AssignGroupsCommand()
+        {
+            AdminId = adminId,
+            GroupIds = groups,
+        };
+
+        var assignValidation = await assignValidator.ValidateAsync(command);
+
+        if (!assignValidation.IsValid)
+        {
+            return assignValidation.ToValidationProblem();
+        }
+
+        var result = await mediator.Send(command);
+
+        if (result.IsFailed)
+        {
+            return result.ToNotFoundProblem();
+        }
+
+        return TypedResults.NoContent();
     }
 
     public async Task<Results<Ok<IEnumerable<NotificationDto>>, NotFound<ProblemDetails>, ValidationProblem>> GetAdminNotificatioins(
