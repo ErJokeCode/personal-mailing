@@ -32,6 +32,7 @@ public class GetNotificationByIdQueryHandler : IRequestHandler<GetNotificationBy
         var notification = await _db.Notifications
             .Include(n => n.Admin)
             .Include(n => n.Students)
+            .AsSplitQuery()
             .SingleOrDefaultAsync(n => n.Id == request.NotificationId);
 
         if (notification is null)

@@ -39,6 +39,8 @@ services:
     depends_on:
       coredb:
         condition: service_started
+      parser:
+        condition: service_started
     healthcheck:
       test: "curl -f localhost:5000/ping"
       interval: 10s

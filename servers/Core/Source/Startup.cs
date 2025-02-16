@@ -25,6 +25,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -53,7 +54,11 @@ public static class Startup
         );
 
         var connection = builder.Configuration.GetConnectionString("Database");
-        builder.Services.AddDbContext<AppDbContext>(options => options.UseNpgsql(connection));
+        builder.Services.AddDbContext<AppDbContext>(o =>
+        {
+            o.UseNpgsql(connection);
+            o.ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning));
+        });
 
         builder.Services.AddAuthentication();
         builder.Services.AddAuthorization();

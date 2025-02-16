@@ -8,7 +8,6 @@ using Core.Infrastructure.Search;
 using Core.Models;
 using Core.Routes.Notifications.Dtos;
 using Core.Routes.Notifications.Maps;
-using FuzzySharp;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -37,6 +36,7 @@ public class GetAllNotificationsQueryHandler : IRequestHandler<GetAllNotificatio
         var notifications = await _db.Notifications
             .Include(n => n.Admin)
             .Include(n => n.Students)
+            .AsSplitQuery()
             .ToListAsync();
 
         notifications = FilterNotifications(notifications, request).ToList();
