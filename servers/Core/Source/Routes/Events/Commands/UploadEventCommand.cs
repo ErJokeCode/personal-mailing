@@ -42,7 +42,7 @@ public class UploadEventCommandHandler : IRequestHandler<UploadEventCommand, Uni
             {
                 if (!groupAssignments.Contains(group))
                 {
-                    await _db.GroupAssignments.AddAsync(new GroupAssignment()
+                    await _db.GroupAssignments.AddAsync(new Models.GroupAssignment()
                     {
                         Name = group,
                         AdminId = mainAdmin.Id,

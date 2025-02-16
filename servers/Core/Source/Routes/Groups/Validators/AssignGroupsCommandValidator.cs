@@ -1,5 +1,5 @@
 using Core.Infrastructure.Validators;
-using Core.Routes.Admins.Commands;
+using Core.Routes.Groups.Commands;
 using FluentValidation;
 
 namespace Core.Routes.Admins.Validators;

@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Http;
 
 namespace Core;
 
+// TODO, put filter options on all methods, that get list of resources
+
 public class Program
 {
     public static async Task Main(string[] args)

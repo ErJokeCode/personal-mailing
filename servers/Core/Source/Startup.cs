@@ -144,6 +144,7 @@ public static class Startup
         app.UseAuthorization();
         app.UseExceptionHandler();
 
+        // TODO, make proxy in memory, instead of in appsettings
         app.MapReverseProxy().RequireAuthorization();
     }
 

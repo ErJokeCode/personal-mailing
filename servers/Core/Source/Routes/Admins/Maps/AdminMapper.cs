@@ -12,7 +12,4 @@ public partial class AdminMapper
 {
     public partial AdminDto Map(Admin admin);
     public partial IEnumerable<AdminDto> Map(IEnumerable<Admin> admins);
-
-    public partial GroupAssignmentDto Map(GroupAssignment admin);
-    public partial IEnumerable<GroupAssignmentDto> Map(IEnumerable<GroupAssignment> admins);
 }

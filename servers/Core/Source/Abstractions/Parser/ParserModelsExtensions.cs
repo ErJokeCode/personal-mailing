@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Abstractions.Parser;
 
+// TODO add a compare operator on conversion, to get rid of the warning
+
 public static class ParserModelsExtensions
 {
     public static void BuildParserModels(this ModelBuilder builder)

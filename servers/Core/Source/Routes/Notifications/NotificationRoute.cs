@@ -28,10 +28,10 @@ class NotificationRoute : IRoute
             .DisableAntiforgery();
 
         group.MapGet("/", GetAllNotifications)
-            .WithDescription("Gets a compact version of all notifications");
+            .WithDescription("Gets all notifications");
 
         group.MapGet("/{notificationId}", GetNotificationById)
-            .WithDescription("Gets a detailed notification by id");
+            .WithDescription("Gets a notification by id");
     }
 
     public async Task<Results<Ok<NotificationDto>, NotFound<ProblemDetails>, ValidationProblem>> GetNotificationById(
@@ -60,10 +60,8 @@ class NotificationRoute : IRoute
         return TypedResults.Ok(result.Value);
     }
 
-    public async Task<IEnumerable<NotificationDto>> GetAllNotifications(IMediator mediator)
+    public async Task<IEnumerable<NotificationDto>> GetAllNotifications([AsParameters] GetAllNotificationsQuery query, IMediator mediator)
     {
-        var query = new GetAllNotificationsQuery();
-
         var result = await mediator.Send(query);
 
         return result;

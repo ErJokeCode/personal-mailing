@@ -4,13 +4,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Data;
-using Core.Routes.Admins.Dtos;
-using Core.Routes.Admins.Maps;
 using FluentResults;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Core.Routes.Admins.Commands;
+namespace Core.Routes.Groups.Commands;
 
 public class AssignGroupsCommand : IRequest<Result>
 {
@@ -21,12 +19,10 @@ public class AssignGroupsCommand : IRequest<Result>
 public class AssignGroupsCommandHandler : IRequestHandler<AssignGroupsCommand, Result>
 {
     private readonly AppDbContext _db;
-    private readonly AdminMapper _adminMapper;
 
     public AssignGroupsCommandHandler(AppDbContext db)
     {
         _db = db;
-        _adminMapper = new AdminMapper();
     }
 
     public async Task<Result> Handle(AssignGroupsCommand request, CancellationToken cancellationToken)

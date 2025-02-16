@@ -5,13 +5,6 @@ using Core.Routes.Notifications.Dtos;
 
 namespace Core.Routes.Admins.Dtos;
 
-public class GroupAssignmentDto
-{
-    public int Id { get; set; }
-    public required string Name { get; set; }
-    public AdminDto? Admin { get; set; }
-}
-
 public class AdminDto
 {
     public Guid Id { get; set; }
