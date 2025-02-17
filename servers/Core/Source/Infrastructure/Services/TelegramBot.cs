@@ -27,7 +27,7 @@ public class TelegramBot : IMailService
         _fileStorage = fileStorage;
     }
 
-    public async Task<bool> SendNotificationAsync(string id, string content, IEnumerable<Document>? documents = null)
+    private async Task<bool> SendAsync(string id, string content, IEnumerable<Document>? documents = null, bool isNotification = true)
     {
         var client = _clientFactory.CreateClient();
         client.BaseAddress = new Uri(_telegramBotUrl);
@@ -40,7 +40,16 @@ public class TelegramBot : IMailService
                 text = content,
             };
 
-            var uri = QueryHelpers.AddQueryString($"/send/{id}", "text", content);
+            string uri;
+
+            if (isNotification)
+            {
+                uri = QueryHelpers.AddQueryString($"/send/{id}", "text", content);
+            }
+            else
+            {
+                uri = QueryHelpers.AddQueryString($"/chat_student/{id}/text", "text", content);
+            }
 
             try
             {
@@ -69,7 +78,16 @@ public class TelegramBot : IMailService
                 }
             }
 
-            var uri = QueryHelpers.AddQueryString($"/send/files", "text", content);
+            string uri;
+
+            if (isNotification)
+            {
+                uri = QueryHelpers.AddQueryString($"/send/files", "text", content);
+            }
+            else
+            {
+                uri = QueryHelpers.AddQueryString($"/chat_student/{id}/files", "text", content);
+            }
 
             try
             {
@@ -81,5 +99,15 @@ public class TelegramBot : IMailService
                 return false;
             }
         }
+    }
+
+    public async Task<bool> SendNotificationAsync(string id, string content, IEnumerable<Document>? documents = null)
+    {
+        return await SendAsync(id, content, documents);
+    }
+
+    public async Task<bool> SendMessageAsync(string id, string content, IEnumerable<Document>? documents = null)
+    {
+        return await SendAsync(id, content, documents, false);
     }
 }

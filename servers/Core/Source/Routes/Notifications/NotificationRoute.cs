@@ -23,12 +23,12 @@ class NotificationRoute : IRoute
         var group = app.MapGroup("/core/notifications")
             .RequireAuthorization();
 
+        group.MapGet("/", GetAllNotifications)
+            .WithDescription("Gets all notifications");
+
         group.MapPost("/", SendNotification)
             .WithDescription("Sends a notification")
             .DisableAntiforgery();
-
-        group.MapGet("/", GetAllNotifications)
-            .WithDescription("Gets all notifications");
 
         group.MapGet("/{notificationId}", GetNotificationById)
             .WithDescription("Gets a notification by id");

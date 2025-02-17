@@ -24,11 +24,11 @@ public class StudentRoute : IRoute
         var group = app.MapGroup("/core/students")
             .RequireAuthorization();
 
-        group.MapPost("/auth", AuthStudent)
-            .WithDescription("Auths the student");
-
         group.MapGet("/", GetAllStudents)
             .WithDescription("Gets all students");
+
+        group.MapPost("/auth", AuthStudent)
+            .WithDescription("Auths the student");
 
         group.MapGet("/{studentId}", GetStudentById)
             .WithDescription("Gets a student by id");

@@ -25,6 +25,9 @@ public class AdminRoute : IRoute
         var group = app.MapGroup("/core/admins")
             .RequireAuthorization();
 
+        group.MapGet("/", GetAllAdmins)
+            .WithDescription("Gets all admins");
+
         group.MapPost("/", CreateAdmin)
             .WithDescription("Creates a new admin");
 
@@ -34,9 +37,6 @@ public class AdminRoute : IRoute
 
         group.MapPost("/signout", SignoutAdmin)
             .WithDescription("Signs out the admin by retrieving the cookie");
-
-        group.MapGet("/", GetAllAdmins)
-            .WithDescription("Gets all admins");
 
         group.MapGet("/me", GetAdminMe)
             .WithDescription("Gets an admin by cookie");

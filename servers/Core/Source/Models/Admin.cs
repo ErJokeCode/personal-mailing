@@ -16,6 +16,9 @@ public class Admin : IdentityUser<Guid>
     public ICollection<Notification> Notifications { get; set; } = [];
 
     [MapperIgnore]
+    public ICollection<Chat> Chats { get; set; } = [];
+
+    [MapperIgnore]
     public override DateTimeOffset? LockoutEnd { get; set; }
     [PersonalData]
     [MapperIgnore]

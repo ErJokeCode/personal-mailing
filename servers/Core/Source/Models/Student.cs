@@ -20,4 +20,7 @@ public class Student
 
     [MapperIgnore]
     public ICollection<Notification> Notifications { get; set; } = [];
+
+    [MapperIgnore]
+    public ICollection<Chat> Chats { get; set; } = [];
 }

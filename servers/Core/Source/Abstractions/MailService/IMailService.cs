@@ -13,4 +13,5 @@ public class MailServiceOptions
 public interface IMailService
 {
     public Task<bool> SendNotificationAsync(string id, string content, IEnumerable<Document>? documents = null);
+    public Task<bool> SendMessageAsync(string id, string content, IEnumerable<Document>? documents = null);
 }
