@@ -3,13 +3,13 @@ import uvicorn
 from fastapi import FastAPI
 import logging
 
+from config import settings
 from upload_file.router import router_upload
 # from src.student.router import router_user
 # from src.online_course.router import router_course
 # from src.subject.router import router_subject
 # from src.bot.router_onboard import router_bot_onboard
 # from src.bot.router_faq import router_bot_faq
-from config import settings
 
 
 _log = logging.getLogger(__name__)
@@ -33,4 +33,4 @@ app.include_router(router_upload)
 # app.include_router(router_bot_faq)
 
 if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000)
+    uvicorn.run("main:app", host="0.0.0.0", port=8000, reload=True)

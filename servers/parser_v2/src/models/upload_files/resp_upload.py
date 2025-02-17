@@ -3,7 +3,7 @@ from pydantic import BaseModel
 
 
 class TypeFile(Enum):
-    ONLINE_COURSE = "online_course"
+    ONLINE_COURSE = "online"
     STUDENT = "student"
     MODEUS = "modeus"
 
