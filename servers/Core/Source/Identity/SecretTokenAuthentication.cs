@@ -27,7 +27,7 @@ public class SecretTokenAuthenticationHandler : AuthenticationHandler<Authentica
 
             if (token == "secrettoken")
             {
-                var claims = new[] { new Claim(ClaimTypes.Name, "SecretTokenUser") };
+                var claims = new[] { new Claim("SecretToken", "") };
                 var identity = new ClaimsIdentity(claims, Scheme.Name);
                 var principal = new ClaimsPrincipal(identity);
                 var ticket = new AuthenticationTicket(principal, Scheme.Name);

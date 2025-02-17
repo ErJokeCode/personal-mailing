@@ -9,7 +9,8 @@ namespace Core.Models;
 // Chats could be transfered to a new admin, if groups are reassigned, to preserve the context
 // ?? Maybe even allow for all admins to send a message in the chat
 
-// POST /core/chats?fromStudent=id&?toStudent=id
+// POST /core/chats send message to student
+// Post /core/chats/from-student
 // GET /core/chats chats for this admin
 // GET /core/chats/{studentId} chat with a specific student, automatically makes chat read
 // Return an empty chat if admin is assigned to the student, return forbidden if not
@@ -19,6 +20,9 @@ public class Message
 {
     public required string Content { get; set; }
     public required DateTime CreatedAt { get; set; }
+    public ICollection<Document> Documents { get; set; } = [];
+
+    public bool IsRead { get; set; } = false;
 
     public Guid? AdminId { get; set; }
     public Admin? Admin { get; set; }
