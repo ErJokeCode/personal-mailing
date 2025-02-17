@@ -42,7 +42,7 @@ services:
       parser:
         condition: service_started
     healthcheck:
-      test: "curl -f localhost:5000/ping"
+      test: "curl --fail http://localhost:5000/healthy || exit"
       interval: 10s
       timeout: 30s
       retries: 10

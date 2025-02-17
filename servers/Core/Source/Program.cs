@@ -18,9 +18,6 @@ public class Program
         await app.InitialzieServices();
         app.MapRoutes();
 
-        app.MapGet("/ping", () => TypedResults.Ok())
-            .WithDescription("Used for docker container setup");
-
         app.Run();
     }
 }

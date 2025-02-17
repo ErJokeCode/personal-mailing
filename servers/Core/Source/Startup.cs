@@ -1,11 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
-using Azure.Storage.Blobs.Models;
-using Core.Abstractions;
 using Core.Abstractions.FileStorage;
 using Core.Abstractions.MailService;
 using Core.Abstractions.Parser;
@@ -20,7 +17,9 @@ using Core.Routes.Admins.Commands;
 using Core.Routes.Events.Commands;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -41,6 +40,7 @@ public static class Startup
         builder.Services.AddProblemDetails();
         builder.Services.AddExceptionHandler<ExceptionHandler>();
         builder.Services.AddHttpClient();
+        builder.Services.AddHealthChecks();
 
         builder.Services.AddOpenApi();
 
@@ -60,8 +60,15 @@ public static class Startup
             o.ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning));
         });
 
-        builder.Services.AddAuthentication();
-        builder.Services.AddAuthorization();
+        builder.Services.AddAuthentication()
+            .AddScheme<AuthenticationSchemeOptions, SecretTokenAuthenticationHandler>("SecretTokenScheme", null); ;
+        builder.Services.AddAuthorization(o =>
+        {
+            o.DefaultPolicy = new AuthorizationPolicyBuilder()
+                .AddAuthenticationSchemes("SecretTokenScheme", IdentityConstants.ApplicationScheme)
+                .RequireAuthenticatedUser()
+                .Build();
+        });
 
         builder.Services.AddIdentity<Admin, IdentityRole<Guid>>((o) =>
         {
@@ -148,6 +155,7 @@ public static class Startup
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseExceptionHandler();
+        app.UseHealthChecks("/healthy");
 
         // TODO, make proxy in memory, instead of in appsettings
         app.MapReverseProxy().RequireAuthorization();
