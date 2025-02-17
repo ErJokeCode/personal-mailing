@@ -1,15 +1,16 @@
-from enum import Enum
 from pydantic import BaseModel
 
 
-class ResponseStudent(BaseModel):
-    name: dict[int, str]
-    cafedra: dict[int, str]
-    number_course: dict[int, int]
-    group: dict[int, str]
-    status: dict[int, str]
-    type_of_cost: dict[int, str]
-    type_of_education: dict[int, str]
-    date_birth: dict[int, str]
-    personal_number: dict[int, str]
-    in_db: dict[int, bool]
+class RespStudent(BaseModel):
+    personal_number: str
+    full_name: str
+    name: str
+    surname: str
+    patronymic: str | None = None
+    date_of_birth: str
+    number_group: str
+    number_course: int
+    status: bool | None = False
+    type_of_cost: str | None = None
+    type_of_education: str | None = None
+    in_db: bool = False

@@ -6,7 +6,7 @@ from models.upload_files.resp_upload import ResponseUpload, TypeFile
 from models.upload_files.filters import FilterModeus, FilterOnline, FilterOnlineStudent, FilterStudent
 from models.student.db_student import Student, StudentInDB
 from models.student.db_group import InfoGroupInStudent
-from models.upload_files.resp_student import ResponseStudent
+from models.upload_files.resp_student import RespStudent
 from upload_file.u_file import UFileOnline, UFileModeus, UFileStudent
 from upload_file.manager import manager_files, ManagerFiles
 from database import db
@@ -32,7 +32,7 @@ async def upload_file(file: UploadFile) -> ResponseUpload:
 async def get_info_student(
     key: str,
     filter: FilterStudent,
-) -> ResponseStudent:
+) -> list[RespStudent]:
 
     _log.info("Get info about student from file %s", key)
     file = manager_files.get(key)
@@ -55,9 +55,9 @@ async def get_info_student(
 
 
 @router_upload.post("/student/{key}/save")
-async def get_info_student(
+async def save_students(
     key: str,
-    ids: list[int | str],
+    ids: list[int | str] = [-1],
 ):
     _log.info("Save info about student from file %s", key)
 
@@ -159,7 +159,7 @@ async def get_info_online_stsedent() -> StudentInDB:
             number_course=1
         )
     )
-    st_db = db.student.insert_auto(st)
+    st_db = db.student.update_auto(st)
     if st_db is None:
         raise HTTPException(
             status_code=404,

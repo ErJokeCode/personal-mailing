@@ -1,3 +1,4 @@
+from datetime import datetime
 import logging
 import pandas as pd
 
@@ -5,10 +6,10 @@ from models.upload_files.resp_upload import TypeFile
 from models.upload_files.filters import FilterModeus, FilterOnline, FilterOnlineStudent, FilterStudent
 from pandas.core.groupby.generic import DataFrameGroupBy
 
-from models.upload_files.resp_student import ResponseStudent
 from database import db
 from models.student.db_student import Student
 from models.student.db_group import InfoGroupInStudent
+from models.upload_files.resp_student import RespStudent
 
 _log = logging.getLogger(__name__)
 
@@ -53,89 +54,80 @@ class UFileStudent(UFile):
     def __init__(self, name: str | int, df: pd.DataFrame):
         super().__init__(TypeFile.STUDENT)
         self.__name = name
-        self._add_sheet(name, df)
+        new_df = pd.DataFrame()
 
-    def filter(self, filter: FilterStudent) -> ResponseStudent | None:
+        # spl_fio = str(student_sr[name_cl[1]]).split()
+        # surname = spl_fio[0] if len(spl_fio) > 0 else ""
+        # name = spl_fio[1] if len(spl_fio) > 1 else ""
+        # patronymic = " ".join(spl_fio[2:]) if len(spl_fio) > 2 else ""
+
+        name_cl_df = df.columns
+
+        numbers = df[name_cl_df[-1]
+                     ].apply(lambda x: "0" * (8 - len(str(x))) + str(x))
+
+        new_df["personal_number"] = numbers
+        new_df["full_name"] = df[name_cl_df[1]]
+        new_df[["name", "surname", "patronymic"]] = df[name_cl_df[1]
+                                                       ].str.extract(r'(\w+)\s*(\w+)\s*(.*)')
+        new_df["date_of_birth"] = df[name_cl_df[-2]
+                                     ].apply(lambda x: x.strftime('%d.%m.%Y') if isinstance(x, datetime) else x)
+        new_df[["number_group", "number_course"]
+               ] = df[[name_cl_df[6], name_cl_df[5]]]
+        new_df["status"] = df[name_cl_df[7]].apply(
+            lambda x: True if x == "Активный" else False)
+        new_df[["type_of_cost", "type_of_education"]
+               ] = df[[name_cl_df[8], name_cl_df[9]]]
+        new_df["in_db"] = numbers.apply(
+            lambda x: db.student.is_in(personal_number=x))
+
+        self._add_sheet(name, new_df)
+
+    def filter(self, filter: FilterStudent) -> list[RespStudent] | None:
         df = self._get_sheet(self.__name)
 
         if df is None:
             return None
+        name_cl = df.columns
+        _log.info(name_cl)
 
         filter_df = df[
-            (df['Фамилия, имя, отчество'].str.contains(filter.name_student)) &
-            (df['Группа'].str.contains(filter.number_group)) &
-            (df['Курс'].apply(str).str.contains(filter.number_course)) &
-            (df['Форма освоения'].str.contains(filter.form_education))
+            (df[name_cl[1]].str.contains(filter.name_student)) &
+            (df[name_cl[6]].str.contains(filter.number_group)) &
+            (df[name_cl[7]].apply(str).str.contains(filter.number_course)) &
+            (df[name_cl[10]].str.contains(filter.form_education))
         ]
 
-        return self.__to_model_resp(filter_df, filter)
+        students = self._slice(
+            filter_df, filter).reset_index().to_dict("records")
+
+        md_students: list[RespStudent] = [
+            RespStudent.model_validate(student) for student in students]
+
+        return md_students
 
     def save(self, ids: list[int | str]):
         df = self.df
-        name_cl = df.columns
+        int_ids = [int(id) for id in ids]
 
-        for id in ids:
-            student_sr = df.iloc[int(id)]
-            student_model = self.__to_model_student(student_sr, name_cl)
-            db.student.insert_auto(
-                student_model)
+        if len(ids) == 1 and ids[0] == -1:
+            students = df
+        else:
+            students = df.iloc[int_ids]
+
+        for student in students.to_dict("records"):
+            student_model = Student.model_validate(student)
+            if student["in_db"] == True:
+                _log.info("Update")
+                db.student.update_auto(
+                    student_model, "$set", Student.update_fields_file_student())
+            else:
+                _log.info("Insert")
+                db.student.update_auto(student_model)
 
     @property
     def df(self):
         return self._get_sheet(self.__name)
-
-    def __to_model_resp(self, df: pd.DataFrame, filter: FilterStudent) -> ResponseStudent:
-        sl_df = self._slice(df, filter)
-        cl = sl_df.columns
-
-        in_db = pd.Series(False, index=sl_df.index)
-        for i, number in sl_df[cl[11]].items():
-            new_number = "0" * (8 - len(str(number))) + str(number)
-            sl_df[cl[11]][i] = new_number
-            in_db[i] = db.student.find_one(personal_number=new_number) != None
-        sl_df["in_db"] = in_db
-        cl = sl_df.columns
-
-        dict_sl_df = sl_df.to_dict()
-
-        model = ResponseStudent(
-            name=dict_sl_df[cl[1]],
-            cafedra=dict_sl_df[cl[4]],
-            number_course=dict_sl_df[cl[5]],
-            group=dict_sl_df[cl[6]],
-            status=dict_sl_df[cl[7]],
-            type_of_cost=dict_sl_df[cl[8]],
-            type_of_education=dict_sl_df[cl[9]],
-            date_birth=dict_sl_df[cl[10]],
-            personal_number=dict_sl_df[cl[11]],
-            in_db=dict_sl_df[cl[12]],
-        )
-        return model
-
-    def __to_model_student(self, student_sr: pd.Series, name_cl: list[str]):
-
-        spl_fio = str(student_sr[name_cl[1]]).split()
-        surname = spl_fio[0] if len(spl_fio) > 0 else ""
-        name = spl_fio[1] if len(spl_fio) > 1 else ""
-        patronymic = " ".join(spl_fio[2:]) if len(spl_fio) > 2 else ""
-        number = student_sr[-1]
-
-        student_model = Student(
-            personal_number="0" * (8 - len(str(number))) + str(number),
-            surname=surname,
-            name=name,
-            patronymic=patronymic,
-            date_of_birth=student_sr[-2],
-            group=InfoGroupInStudent(
-                number=student_sr[6],
-                number_course=student_sr[5]
-            ),
-            status=str(student_sr[7]).lower() == "активный",
-            type_of_cost=student_sr[8],
-            type_of_education=student_sr[9]
-        )
-
-        return student_model
 
 
 class UFileModeus(UFile):

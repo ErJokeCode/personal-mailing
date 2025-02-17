@@ -219,13 +219,23 @@ class ECollectV2(Generic[V, T]):
             return None
         return self.__cls_db(**item)
 
-    def insert_auto(self, item: V, fields_update: list[str] | None = None, get_item_db: bool = False) -> T | None:
-        query = {key: item.model_dump()[key]
+    def is_in(self, **kwargs) -> bool:
+        return self.__collect.find_one(kwargs) != None
+
+    def update_auto(
+        self,
+        item: V,
+        type_job: str = "$setOnInsert",
+        fields_update: list[str] | None = None,
+        get_item_db: bool = False
+    ) -> T | None:
+
+        query = {key: item.model_dump().get(key)
                  for key in self.__cls.primary_keys()}
         set_update = self.__create_fields_update(item, fields_update)
 
         self.__collect.update_one(
-            query, {"$setOnInsert": set_update, "$inc": {"version": 1}}, upsert=True)
+            query, {type_job: set_update, "$inc": {"version": 1}}, upsert=True)
         item_db = self.__collect.find_one(query)
 
         if item_db == None:
@@ -241,7 +251,7 @@ class ECollectV2(Generic[V, T]):
             return model
         return None
 
-    def __create_fields_update(self, item: V, fields_update: list[str] | None = None) -> dict:
+    def __create_fields_update(self, item: V | T, fields_update: list[str] | None = None) -> dict:
         if fields_update == None:
             return item.model_dump()
 
