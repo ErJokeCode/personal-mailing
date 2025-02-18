@@ -24,14 +24,14 @@ class NotificationRoute : IRoute
             .RequireAuthorization();
 
         group.MapGet("/", GetAllNotifications)
-            .WithDescription("Gets all notifications");
+            .WithDescription("Получает все рассылки");
 
         group.MapPost("/", SendNotification)
-            .WithDescription("Sends a notification")
+            .WithDescription("Отправляет рассылку")
             .DisableAntiforgery();
 
         group.MapGet("/{notificationId}", GetNotificationById)
-            .WithDescription("Gets a notification by id");
+            .WithDescription("Получает рассылку по айди");
     }
 
     public async Task<Results<Ok<NotificationDto>, NotFound<ProblemDetails>, ValidationProblem>> GetNotificationById(

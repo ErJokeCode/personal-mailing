@@ -26,23 +26,23 @@ public class AdminRoute : IRoute
             .RequireAuthorization();
 
         group.MapGet("/", GetAllAdmins)
-            .WithDescription("Gets all admins");
+            .WithDescription("Получает всех админов");
 
         group.MapPost("/", CreateAdmin)
-            .WithDescription("Creates a new admin");
+            .WithDescription("Создает нового админа");
 
         group.MapPost("/login", LoginAdmin)
-            .WithDescription("Logs in the admin by issuing a cookie")
+            .WithDescription("Логинит админа")
             .AllowAnonymous();
 
         group.MapPost("/signout", SignoutAdmin)
-            .WithDescription("Signs out the admin by retrieving the cookie");
+            .WithDescription("Разлогинивает админа");
 
         group.MapGet("/me", GetAdminMe)
-            .WithDescription("Gets an admin by cookie");
+            .WithDescription("Получает свой профиль");
 
         group.MapGet("/{adminId}", GetAdminById)
-            .WithDescription("Gets an admin by id");
+            .WithDescription("Получает админа по айди");
     }
 
     public async Task<Results<Ok<AdminDto>, NotFound<ProblemDetails>>> GetAdminMe(IMediator mediator)

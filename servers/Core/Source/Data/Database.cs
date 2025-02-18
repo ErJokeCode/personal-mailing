@@ -15,6 +15,7 @@ public class AppDbContext : IdentityDbContext<Admin, IdentityRole<Guid>, Guid>
     public DbSet<AdminAuthTicket> AdminAuthTickets => Set<AdminAuthTicket>();
     public DbSet<GroupAssignment> GroupAssignments => Set<GroupAssignment>();
     public DbSet<Chat> Chats => Set<Chat>();
+    public DbSet<Permission> Permissions => Set<Permission>();
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {

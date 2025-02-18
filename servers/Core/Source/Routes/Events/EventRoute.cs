@@ -15,7 +15,7 @@ public class EventRoute : IRoute
             .RequireAuthorization();
 
         group.MapPost("/upload", UploadEvent)
-            .WithDescription("Updates all students info with new parser data");
+            .WithDescription("Обновляет информацию о студентах новыми данными из парсера");
     }
 
     public async Task<Ok> UploadEvent(IMediator mediator)

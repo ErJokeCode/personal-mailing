@@ -2,12 +2,20 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using System;
+using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 
 namespace Core.Identity;
+
+public static class SecretTokenAuthentication
+{
+    public static string Claim => "SecretToken";
+    public static string Policy => Claim + "Policy";
+    public static string Tag => Claim + "Route";
+}
 
 public class SecretTokenAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
 {
@@ -25,9 +33,9 @@ public class SecretTokenAuthenticationHandler : AuthenticationHandler<Authentica
         {
             var token = header.Parameter;
 
-            if (token == "secrettoken")
+            if (token == Environment.GetEnvironmentVariable("SECRET_TOKEN"))
             {
-                var claims = new[] { new Claim("SecretToken", "") };
+                var claims = new[] { new Claim(SecretTokenAuthentication.Claim, "") };
                 var identity = new ClaimsIdentity(claims, Scheme.Name);
                 var principal = new ClaimsPrincipal(identity);
                 var ticket = new AuthenticationTicket(principal, Scheme.Name);

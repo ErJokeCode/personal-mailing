@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 
 import aiohttp
 
-from config import URL_SERVER, get_cookie, MANAGER_ONB
+from config import URL_SERVER, SECRET_TOKEN, MANAGER_ONB
 import keyboards.main_menu as keyboard
 from states import Info_teaching, LKStates
 from texts.error import Registration, Input
@@ -20,7 +20,7 @@ async def show_main_menu(message: types.Message, state: FSMContext):
         await message.answer("Главное меню\n\n👋 Привет! Я ваш помощник. Вы можете получить доступ к следующей информации:\n\n📚 Основная информация о предметах\nУзнайте расписание, материалы и темы лекций по вашим предметам.\n\n💻 Онлайн-курсы\nПросмотрите доступные онлайн-курсы, их описание и расписание. \n\n🔔 Уведомления\nПолучите последние уведомления о важных событиях, изменениях в расписании и других новостях.", reply_markup=keyboard.menu(MANAGER_ONB.is_active_add_course(), MANAGER_ONB.is_active_main()))
         
         async with aiohttp.ClientSession() as session:
-            headers = {"cookie": f"{get_cookie()}"}
+            headers = {"Authorization": f"Basic {SECRET_TOKEN}"}
             async with session.get(f"{URL_SERVER}/core/student/{user_data.get('user_id')}", headers=headers) as response:
                 if response.status == 200:
                     student_data = await response.json()
@@ -64,7 +64,7 @@ async def process_course_info(callback_query: types.CallbackQuery, state: FSMCon
         course_id = int(callback_query.data.split("_")[1])
 
         async with aiohttp.ClientSession() as session:
-            headers = {"cookie": f"{get_cookie()}"}
+            headers = {"Authorization": f"Basic {SECRET_TOKEN}"}
             
             await callback_query.message.delete()
             await callback_query.message.answer(text_main_menu.create_text_online_course(online_courses[course_id], online_courses[course_id]['scores']), reply_markup=keyboard.back_to_courses())

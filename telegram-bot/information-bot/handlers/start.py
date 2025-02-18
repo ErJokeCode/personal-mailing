@@ -10,7 +10,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 import aiohttp
 import re
 
-from config import URL_SERVER, get_cookie
+from config import URL_SERVER, SECRET_TOKEN
 from handlers.main_menu import show_main_menu
 from handlers.onboarding import choice_onboarding
 from states import RegistrationStates, LKStates
@@ -41,7 +41,7 @@ async def auth_user(user_data, chat_id: str):
     if email == None or persinal_number == None or chat_id == None:
         raise NotValueForAuth()
     
-    headers = {"cookie": f"{get_cookie()}"}
+    headers = {"Authorization": f"Basic {SECRET_TOKEN}"}
 
     body = {
             "email": email,

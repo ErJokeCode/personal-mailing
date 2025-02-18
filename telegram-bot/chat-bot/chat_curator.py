@@ -14,7 +14,7 @@ import asyncio
 import json
 import requests
 
-from config import URL_REDIS, TOKEN_CHAT_CURATOR, URL_SERVER, get_cookie
+from config import URL_REDIS, TOKEN_CHAT_CURATOR, URL_SERVER, SECRET_TOKEN
 
 
 storage = RedisStorage.from_url(URL_REDIS)
@@ -30,7 +30,7 @@ async def all_message_in_group(message: types.Message, state: FSMContext):
     link = await message.bot.export_chat_invite_link(message.chat.id)
 
     async with aiohttp.ClientSession() as session:
-        headers = {"cookie": f"{get_cookie()}"}
+        headers = {"Authorization": f"Basic {SECRET_TOKEN}"}
         async with session.post(
             f"{URL_SERVER}/parser/subject/add_group_tg", 
             headers=headers, 
@@ -55,7 +55,7 @@ async def cmd_start(message: types.Message, state: FSMContext):
         await message.answer("Зарегестрируйтесть в боте @test123show_bot")
     else:
         async with aiohttp.ClientSession() as session:
-            headers = {"cookie": f"{get_cookie()}"}
+            headers = {"Authorization": f"Basic {SECRET_TOKEN}"}
 
             async with session.put(f"{URL_SERVER}/core/student/addChat/{user_id}", headers=headers, json={"chatId": str(message.chat.id)}) as resp:
                 await message.answer("Какой вопрос вас интенресует")
@@ -68,7 +68,7 @@ async def all_message(message: types.Message, state: FSMContext):
         await message.answer("Войдите в аккаунт в @test123show_bot")
     else:
         async with aiohttp.ClientSession() as session:
-            headers = {"cookie": f"{get_cookie()}"}
+            headers = {"Authorization": f"Basic {SECRET_TOKEN}"}
 
             async with session.get(f"{URL_SERVER}/core/admin", headers=headers) as response_admins:
                 if response_admins.status == 200:

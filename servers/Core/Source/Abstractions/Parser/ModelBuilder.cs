@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.ChangeTracking;
 
 namespace Core.Abstractions.Parser;
 
-public static class ParserModelsBuilder
+public static class ParserModelBuilder
 {
     public static void BuildParserModels(this ModelBuilder builder)
     {

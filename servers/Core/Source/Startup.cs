@@ -61,9 +61,15 @@ public static class Startup
         });
 
         builder.Services.AddAuthentication()
-            .AddScheme<AuthenticationSchemeOptions, SecretTokenAuthenticationHandler>("SecretTokenScheme", null); ;
+            .AddScheme<AuthenticationSchemeOptions, SecretTokenAuthenticationHandler>("SecretTokenScheme", null);
+
         builder.Services.AddAuthorization(o =>
         {
+            o.AddPolicy(SecretTokenAuthentication.Policy, (p) =>
+            {
+                p.RequireClaim(SecretTokenAuthentication.Claim);
+            });
+
             o.DefaultPolicy = new AuthorizationPolicyBuilder()
                 .AddAuthenticationSchemes("SecretTokenScheme", IdentityConstants.ApplicationScheme)
                 .RequireAuthenticatedUser()
@@ -208,5 +214,33 @@ public static class Startup
         var command = new UploadEventCommand();
 
         await mediator.Send(command);
+    }
+
+    public static async Task SyncPermissions(this WebApplication app, IEnumerable<RouteMetadata> routes)
+    {
+        using var scope = app.Services.CreateScope();
+        var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+        foreach (var route in routes)
+        {
+            var permission = new Permission()
+            {
+                Metadata = route,
+                Value = $"{route.HttpMethod} {route.Path}",
+            };
+
+            var exists = await context.Permissions.SingleOrDefaultAsync(p => p.Value == permission.Value);
+
+            if (exists is null)
+            {
+                await context.AddAsync(permission);
+            }
+            else
+            {
+                exists.Metadata = route;
+            }
+        }
+
+        await context.SaveChangesAsync();
     }
 }

@@ -41,6 +41,9 @@ services:
         condition: service_started
       parser:
         condition: service_started
+    environment:
+      # Store this in a .env file
+      SECRET_TOKEN: secrettoken
     healthcheck:
       test: "curl --fail http://localhost:5000/healthy || exit"
       interval: 10s
@@ -82,6 +85,9 @@ services:
     command: bash start.sh
     ports:
       - 8001:8000
+    environment:
+      # Store this in a .env file
+      SECRET_TOKEN: secrettoken
     depends_on:
       redis:
         condition: service_started
@@ -120,6 +126,8 @@ services:
       MGO_HOST: parserdb
       MGO_PORT: 27017
       MGO_NAME_DB: personal-mailing
+      # Store this in a .env file
+      SECRET_TOKEN: secrettoken
     depends_on:
       parserdb:
         condition: service_started

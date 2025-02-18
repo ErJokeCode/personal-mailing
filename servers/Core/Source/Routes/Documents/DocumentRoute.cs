@@ -19,7 +19,7 @@ public class DocumentRoute : IRoute
             .RequireAuthorization();
 
         group.MapGet("/{blobId}", DownloadDocument)
-            .WithDescription("Downloads a document by id");
+            .WithDescription("Скачивает документ по айди");
     }
 
     // TODO Add validator for guid, implement documents on notifications, test it out

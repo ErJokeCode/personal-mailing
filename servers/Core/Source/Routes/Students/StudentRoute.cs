@@ -2,7 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Core.Identity;
 using Core.Infrastructure.Errors;
+using Core.Infrastructure.Metadata;
 using Core.Routes.Admins.Queries;
 using Core.Routes.Notifications.Dtos;
 using Core.Routes.Students.Commands;
@@ -25,13 +27,15 @@ public class StudentRoute : IRoute
             .RequireAuthorization();
 
         group.MapGet("/", GetAllStudents)
-            .WithDescription("Gets all students");
+            .WithDescription("Получает всех студентов");
 
         group.MapPost("/auth", AuthStudent)
-            .WithDescription("Auths the student");
+            .WithDescription("Аутентифицирует студента")
+            .WithTags(SecretTokenAuthentication.Tag)
+            .RequireAuthorization(SecretTokenAuthentication.Policy);
 
         group.MapGet("/{studentId}", GetStudentById)
-            .WithDescription("Gets a student by id");
+            .WithDescription("Получает студента по айди");
     }
 
     private async Task<Results<Ok<StudentDto>, NotFound<ProblemDetails>, ValidationProblem>> GetStudentById(

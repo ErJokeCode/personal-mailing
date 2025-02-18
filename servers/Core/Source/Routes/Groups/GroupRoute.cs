@@ -21,12 +21,12 @@ public class GroupRoute : IRoute
         var group = app.MapGroup("/core/groups");
 
         group.MapGet("/", GetAllGroups)
-            .WithDescription("Gets all group assignments");
+            .WithDescription("Получет все привязывания групп");
 
         // TODO rewrite using a separate group table, with metadata like an admin assigned to this group
         // Overall number of students, number of authed students, and we can work with that
         group.MapPatch("/", AssignGroups)
-            .WithDescription("Assigns groups to the admin");
+            .WithDescription("Привязывает группы к админу");
     }
 
     private async Task<Ok<IEnumerable<GroupAssignmentDto>>> GetAllGroups([AsParameters] GetAllGroupsQuery query, IMediator mediator)

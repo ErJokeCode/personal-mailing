@@ -17,28 +17,7 @@ URL_SERVER = os.getenv("URL_SERVER")
 URL_REDIS = os.getenv("URL_REDIS")
 NGROK_TUNNEL_URL = os.getenv("NGROK_TUNNEL_URL")
 URL_BOT_CHAT_CURATOR = os.getenv("URL_BOT_CHAT_CURATOR")
-
-COOKIE = ""
-
-
-def get_cookie():
-    global COOKIE
-
-    if COOKIE == "":
-        url = "http://core:5000/core/admins/login/"
-        body = {
-            "email": "admin",
-            "password": "admin",
-        }
-
-        session = requests.Session()
-        response = session.post(url, json=body)
-        name = ".AspNetCore.Identity.Application"
-        COOKIE = name + "=" + response.cookies.get_dict()[name]
-
-    return COOKIE
-
-
+SECRET_TOKEN = os.getenv("SECRET_TOKEN")
 
 test_data_course = [{
     "name": "Вводный курс", 
@@ -159,6 +138,6 @@ test_data_course = [{
 MANAGER_ONB = ManegerOnboarding()
 MANAGER_FAQ = ManagerFaq()
 
-WORKER = Worker(10, LOGGER, get_cookie())
+WORKER = Worker(10, LOGGER, "")
 WORKER.add_manager_onboarding(MANAGER_ONB, URL_SERVER + "/parser/bot/onboard/")
 WORKER.add_manager_faq(MANAGER_FAQ, URL_SERVER + "/parser/bot/faq/")

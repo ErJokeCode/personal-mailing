@@ -2,7 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Core.Identity;
 using Core.Infrastructure.Errors;
+using Core.Infrastructure.Metadata;
 using Core.Routes.Chats.Commands;
 using Core.Routes.Chats.DTOs;
 using Core.Routes.Chats.Queries;
@@ -25,17 +27,20 @@ public class ChatRoute : IRoute
             .RequireAuthorization();
 
         group.MapGet("/", GetChats)
-            .WithDescription("Gets admins chats");
+            .WithDescription("Получает чаты админа");
 
         group.MapPost("/", SendMessage)
-            .WithDescription("Sends a message to the student");
+            .WithDescription("Отправляет сообщение студенту")
+            .DisableAntiforgery();
 
         group.MapPost("/from-student", SendMessageFromStudent)
-            .WithDescription("Sends a message to the admin")
+            .WithDescription("Отправляет сообщение админу")
+            .WithTags(SecretTokenAuthentication.Tag)
+            .RequireAuthorization(SecretTokenAuthentication.Policy)
             .DisableAntiforgery();
 
         group.MapGet("/{studentId}", GetChatById)
-            .WithDescription("Gets a chat with the student");
+            .WithDescription("Получает чат со студентом по айди");
     }
 
     public async Task<Results<Ok<ChatDto>, NotFound<ProblemDetails>, ValidationProblem>> GetChatById(

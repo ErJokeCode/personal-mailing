@@ -1,6 +1,16 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using Core.Infrastructure.Metadata;
+using Core.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Metadata;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.DependencyInjection;
+using Yarp.ReverseProxy.Configuration;
 
 namespace Core;
 
@@ -17,6 +27,9 @@ public class Program
 
         await app.InitialzieServices();
         app.MapRoutes();
+
+        var routes = app.DiscoverRoutes();
+        await app.SyncPermissions(routes);
 
         app.Run();
     }

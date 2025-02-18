@@ -113,7 +113,7 @@ class Worker:
                 
     async def __update_onboarding_info(self):
         async with aiohttp.ClientSession() as session:
-            headers = {"cookie": f"{self.cookie}"}
+            headers = {"Authorization": f"Basic secrettoken"}
             async with session.get(f"{self.url_update_onb}?is_active=true", headers=headers) as response:
                 if response.status == 200:
                     data = await response.json()
