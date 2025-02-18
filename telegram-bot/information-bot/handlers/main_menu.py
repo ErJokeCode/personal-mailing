@@ -5,7 +5,7 @@ from aiogram.fsm.context import FSMContext
 
 import aiohttp
 
-from config import URL_SERVER, SECRET_TOKEN, MANAGER_ONB
+from config import URL_CORE, SECRET_TOKEN, MANAGER_ONB
 import keyboards.main_menu as keyboard
 from states import Info_teaching, LKStates
 from texts.error import Registration, Input
@@ -21,12 +21,12 @@ async def show_main_menu(message: types.Message, state: FSMContext):
         
         async with aiohttp.ClientSession() as session:
             headers = {"Authorization": f"Basic {SECRET_TOKEN}"}
-            async with session.get(f"{URL_SERVER}/core/student/{user_data.get('user_id')}", headers=headers) as response:
+            async with session.get(f"{URL_CORE}/core/student/{user_data.get('user_id')}", headers=headers) as response:
                 if response.status == 200:
                     student_data = await response.json()
                     student_info = student_data.get("info")
                     info_id = student_info["_id"]
-                    async with session.get(f"{URL_SERVER}/parser/student/{info_id}", headers=headers) as response:
+                    async with session.get(f"{URL_CORE}/parser/student/{info_id}", headers=headers) as response:
                         if response.status == 200:
                             st_data = await response.json()
                             subjects = st_data.get("subjects")

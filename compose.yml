@@ -32,8 +32,7 @@ services:
       - blobdata:/var/lib/blob/data
 
   core:
-    user: root
-    build: ./servers/Core/Source
+    build: ./servers/core/Source
     ports:
       - 5000:5000
     depends_on:
@@ -41,16 +40,15 @@ services:
         condition: service_started
       parser:
         condition: service_started
-    environment:
-      # Store this in a .env file
-      SECRET_TOKEN: secrettoken
+    env_file:
+      - .env
     healthcheck:
       test: "curl --fail http://localhost:5000/healthy || exit"
       interval: 10s
       timeout: 30s
       retries: 10
     volumes:
-      - './servers/Core/Source:/app:z'
+      - './servers/core/Source:/app:z'
       - '/app/bin'
       - '/app/obj'
 
@@ -77,17 +75,15 @@ services:
       redis:
         condition: service_started
     volumes:
-      - insightdata:/var/lib/redisinsight/data
+      - redisinsightdata:/var/lib/redisinsight/data
 
   bot:
-    user: root
     build: ./telegram-bot
     command: bash start.sh
     ports:
       - 8001:8000
-    environment:
-      # Store this in a .env file
-      SECRET_TOKEN: secrettoken
+    env_file:
+      - .env
     depends_on:
       redis:
         condition: service_started
@@ -115,19 +111,14 @@ services:
       parserdb:
         condition: service_started
     volumes:
-      - expressdata:/var/lib/mongoexpress/data
+      - mongoexpressdata:/var/lib/mongoexpress/data
 
   parser:
-    user: root
     build: ./servers/parser
     ports:
       - 8000:8000
-    environment:
-      MGO_HOST: parserdb
-      MGO_PORT: 27017
-      MGO_NAME_DB: personal-mailing
-      # Store this in a .env file
-      SECRET_TOKEN: secrettoken
+    env_file:
+      - .env
     depends_on:
       parserdb:
         condition: service_started
@@ -140,5 +131,5 @@ volumes:
   coredata:
   blobdata:
   pgadmindata:
-  insightdata:
-  expressdata:
+  redisinsightdata:
+  mongoexpressdata:

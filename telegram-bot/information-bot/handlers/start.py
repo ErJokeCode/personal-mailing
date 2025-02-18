@@ -10,7 +10,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 import aiohttp
 import re
 
-from config import URL_SERVER, SECRET_TOKEN
+from config import URL_CORE, SECRET_TOKEN
 from handlers.main_menu import show_main_menu
 from handlers.onboarding import choice_onboarding
 from states import RegistrationStates, LKStates
@@ -51,7 +51,7 @@ async def auth_user(user_data, chat_id: str):
 
     async with aiohttp.ClientSession() as session:
         async with session.post(
-            f"{URL_SERVER}/core/students/auth", 
+            f"{URL_CORE}/core/students/auth", 
             json=body, 
             headers=headers) as response:
             if response.status < 400:

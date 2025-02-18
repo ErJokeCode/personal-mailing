@@ -1,5 +1,5 @@
 import requests
-from config import ADMIN_EMAIL_CORE, ADMIN_PASSWORD_CORE, worker_db, URL_CORE, SECRET_TOKEN
+from config import worker_db, URL_CORE, SECRET_TOKEN
 from src.schemas import HistoryUploadFileInDB
 
 def update_status_history(hist_info_db: HistoryUploadFileInDB, text_status: str ):

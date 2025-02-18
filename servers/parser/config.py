@@ -36,8 +36,6 @@ URL_S3_GET = os.getenv('URL_S3_GET')
 
 URL_CORE = os.getenv('URL_CORE')
 SECRET_TOKEN = os.getenv('SECRET_TOKEN')
-ADMIN_EMAIL_CORE = os.getenv('ADMIN_EMAIL_CORE')
-ADMIN_PASSWORD_CORE = os.getenv('ADMIN_PASSWORD_CORE')
 
 worker_db = WorkerDataBase(
     host=MGO_HOST, 
