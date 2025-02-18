@@ -32,6 +32,7 @@ using Scalar.AspNetCore;
 
 namespace Core;
 
+// TODO refactor startup class into a new folder with separation
 public static class Startup
 {
     public static void ConfigureServices(this WebApplicationBuilder builder)
@@ -113,7 +114,7 @@ public static class Startup
 
         builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
         builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
-        builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+        builder.Services.AddReverseProxy().LoadFromMemory(YarpReverseProxy.GetRoutes(), YarpReverseProxy.GetClusters());
 
         builder.Services.AddScoped<IUserAccessor, UserAccessor>();
 

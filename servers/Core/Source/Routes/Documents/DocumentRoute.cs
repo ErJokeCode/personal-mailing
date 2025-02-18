@@ -22,8 +22,7 @@ public class DocumentRoute : IRoute
             .WithDescription("Скачивает документ по айди");
     }
 
-    // TODO Add validator for guid, implement documents on notifications, test it out
-    // also setup depends on in the docker compose file, because right now stuff might break
+    // TODO setup depends on in the docker compose file, because right now stuff might break
     public async Task<Results<FileStreamHttpResult, NotFound<ProblemDetails>, ValidationProblem>> DownloadDocument(
         Guid blobId, IMediator mediator, IValidator<DownloadDocumentCommand> validator
     )

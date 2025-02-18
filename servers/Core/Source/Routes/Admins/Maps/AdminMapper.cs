@@ -5,8 +5,6 @@ using Riok.Mapperly.Abstractions;
 
 namespace Core.Routes.Admins.Maps;
 
-// TODO separate into a new dto and mapper, model could stay like that
-
 [Mapper]
 public partial class AdminMapper
 {

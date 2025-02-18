@@ -13,7 +13,6 @@ using Core.Routes.Groups.Maps;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-// TODO add method to get an admins assigned groups
 namespace Core.Routes.Groups.Queries;
 
 public class GetAllGroupsQuery : IRequest<IEnumerable<GroupAssignmentDto>>

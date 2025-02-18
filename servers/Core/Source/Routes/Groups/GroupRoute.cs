@@ -23,8 +23,6 @@ public class GroupRoute : IRoute
         group.MapGet("/", GetAllGroups)
             .WithDescription("Получет все привязывания групп");
 
-        // TODO rewrite using a separate group table, with metadata like an admin assigned to this group
-        // Overall number of students, number of authed students, and we can work with that
         group.MapPatch("/", AssignGroups)
             .WithDescription("Привязывает группы к админу");
     }
