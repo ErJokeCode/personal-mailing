@@ -38,11 +38,9 @@ public class GroupRoute : IRoute
         AssignGroupsCommand command, IValidator<AssignGroupsCommand> validator, IMediator mediator
     )
     {
-        var validationResult = await validator.ValidateAsync(command);
-
-        if (!validationResult.IsValid)
+        if (validator.TryValidate(command, out var validation))
         {
-            return validationResult.ToValidationProblem();
+            return validation.ToValidationProblem();
         }
 
         var adminQuery = new GetAdminByIdQuery()

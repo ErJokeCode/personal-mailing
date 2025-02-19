@@ -15,7 +15,7 @@ namespace Core.Routes.Admins.Queries;
 
 public class GetAllAdminsQuery : IRequest<IEnumerable<AdminDto>>
 {
-    public string? Email { get; set; }
+    public string? Search { get; set; }
 }
 
 public class GetAllAdminsQueryHandler : IRequestHandler<GetAllAdminsQuery, IEnumerable<AdminDto>>
@@ -40,10 +40,10 @@ public class GetAllAdminsQueryHandler : IRequestHandler<GetAllAdminsQuery, IEnum
 
     public IEnumerable<Admin> FilterAdmins(IEnumerable<Admin> admins, GetAllAdminsQuery request)
     {
-        if (!string.IsNullOrEmpty(request.Email))
+        if (!string.IsNullOrEmpty(request.Search))
         {
             admins = admins
-                .Where(a => FuzzySearch.Contains(a.Email!, request.Email));
+                .Where(a => FuzzySearch.Contains(a.Email!, request.Search));
         }
 
         return admins;

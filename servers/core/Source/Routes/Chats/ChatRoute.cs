@@ -4,12 +4,11 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Core.Identity;
 using Core.Infrastructure.Errors;
-using Core.Infrastructure.Metadata;
 using Core.Routes.Chats.Commands;
 using Core.Routes.Chats.DTOs;
+using Core.Routes.Chats.Maps;
 using Core.Routes.Chats.Queries;
 using Core.Routes.Students.Queries;
-using FluentResults;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -41,10 +40,13 @@ public class ChatRoute : IRoute
 
         group.MapGet("/{studentId}", GetChatById)
             .WithDescription("Получает чат со студентом по айди");
+
+        group.MapPatch("/{studentId}/read", ReadChat)
+            .WithDescription("Делает чат прочитанным");
     }
 
-    public async Task<Results<Ok<ChatDto>, NotFound<ProblemDetails>, ValidationProblem>> GetChatById(
-        Guid studentId, IValidator<GetStudentByIdQuery> validator, IMediator mediator
+    private async Task<Results<NoContent, NotFound<ProblemDetails>, ValidationProblem>> ReadChat(
+        Guid studentId, IMediator mediator
     )
     {
         var studentQuery = new GetStudentByIdQuery()
@@ -52,12 +54,31 @@ public class ChatRoute : IRoute
             StudentId = studentId
         };
 
-        var studentValidation = await validator.ValidateAsync(studentQuery);
+        var studentResult = await mediator.Send(studentQuery);
 
-        if (!studentValidation.IsValid)
+        if (studentResult.IsFailed)
         {
-            return studentValidation.ToValidationProblem();
+            return studentResult.ToNotFoundProblem();
         }
+
+        var command = new ReadChatCommand()
+        {
+            StudentId = studentId,
+        };
+
+        await mediator.Send(command);
+
+        return TypedResults.NoContent();
+    }
+
+    public async Task<Results<Ok<ChatDto>, NotFound<ProblemDetails>>> GetChatById(
+        Guid studentId, IMediator mediator
+    )
+    {
+        var studentQuery = new GetStudentByIdQuery()
+        {
+            StudentId = studentId
+        };
 
         var studentResult = await mediator.Send(studentQuery);
 
@@ -82,28 +103,15 @@ public class ChatRoute : IRoute
     }
 
     public async Task<Results<Ok<MessageDto>, BadRequest<ProblemDetails>, ValidationProblem>> SendMessageFromStudent(
-        [FromForm] IFormFileCollection documents, [FromForm] string body, IValidator<GetStudentByIdQuery> studentValidator, IValidator<SendMessageFromStudentCommand> validator, IMediator mediator
+        [FromForm] IFormFileCollection documents, [FromForm] string body, IValidator<SendMessageFromStudentCommand> validator, IMediator mediator
     )
     {
-        var details = JsonSerializer.Deserialize<MessageDetails>(
-            body,
-            new JsonSerializerOptions()
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            }
-        );
+        var sendDto = new ChatMapper().Map(body);
 
         var query = new GetStudentByIdQuery()
         {
-            StudentId = details?.StudentId ?? Guid.Empty
+            StudentId = sendDto?.StudentId ?? Guid.Empty
         };
-
-        var studentValidation = await studentValidator.ValidateAsync(query);
-
-        if (!studentValidation.IsValid)
-        {
-            studentValidation.ToValidationProblem();
-        }
 
         var studentResult = await mediator.Send(query);
 
@@ -114,16 +122,14 @@ public class ChatRoute : IRoute
 
         var command = new SendMessageFromStudentCommand()
         {
-            Content = details?.Content ?? "",
-            StudentId = details?.StudentId ?? Guid.Empty,
+            Content = sendDto?.Content ?? "",
+            StudentId = sendDto?.StudentId ?? Guid.Empty,
             FormFiles = documents,
         };
 
-        var validationResult = await validator.ValidateAsync(command);
-
-        if (!validationResult.IsValid)
+        if (validator.TryValidate(command, out var validation))
         {
-            return validationResult.ToValidationProblem();
+            return validation.ToValidationProblem();
         }
 
         var result = await mediator.Send(command);
@@ -136,44 +142,23 @@ public class ChatRoute : IRoute
         return TypedResults.Ok(result.Value);
     }
 
-    public async Task<Ok<IEnumerable<ChatDto>>> GetChats(IMediator mediator)
+    public async Task<Ok<IEnumerable<ChatDto>>> GetChats([AsParameters] GetChatsQuery query, IMediator mediator)
     {
-        var query = new GetChatsQuery();
-
         var chats = await mediator.Send(query);
 
         return TypedResults.Ok(chats);
     }
 
-    private class MessageDetails
-    {
-        public required string Content { get; set; }
-        public required Guid StudentId { get; set; }
-    }
-
     public async Task<Results<Ok<MessageDto>, BadRequest<ProblemDetails>, ValidationProblem>> SendMessage(
-        [FromForm] IFormFileCollection documents, [FromForm] string body, IValidator<GetStudentByIdQuery> studentValidator, IValidator<SendMessageCommand> validator, IMediator mediator
+        [FromForm] IFormFileCollection documents, [FromForm] string body, IValidator<SendMessageCommand> validator, IMediator mediator
     )
     {
-        var details = JsonSerializer.Deserialize<MessageDetails>(
-            body,
-            new JsonSerializerOptions()
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            }
-        );
+        var sendDto = new ChatMapper().Map(body);
 
         var query = new GetStudentByIdQuery()
         {
-            StudentId = details?.StudentId ?? Guid.Empty
+            StudentId = sendDto?.StudentId ?? Guid.Empty
         };
-
-        var studentValidation = await studentValidator.ValidateAsync(query);
-
-        if (!studentValidation.IsValid)
-        {
-            studentValidation.ToValidationProblem();
-        }
 
         var studentResult = await mediator.Send(query);
 
@@ -184,16 +169,14 @@ public class ChatRoute : IRoute
 
         var command = new SendMessageCommand()
         {
-            Content = details?.Content ?? "",
-            StudentId = details?.StudentId ?? Guid.Empty,
+            Content = sendDto?.Content ?? "",
+            StudentId = sendDto?.StudentId ?? Guid.Empty,
             FormFiles = documents,
         };
 
-        var validationResult = await validator.ValidateAsync(command);
-
-        if (!validationResult.IsValid)
+        if (validator.TryValidate(command, out var validation))
         {
-            return validationResult.ToValidationProblem();
+            return validation.ToValidationProblem();
         }
 
         var result = await mediator.Send(command);

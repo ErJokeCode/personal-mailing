@@ -11,6 +11,7 @@ using Core.Routes.Students.Commands;
 using Core.Routes.Students.Dtos;
 using Core.Routes.Students.Queries;
 using FluentValidation;
+using FluentValidation.TestHelper;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -38,21 +39,14 @@ public class StudentRoute : IRoute
             .WithDescription("Получает студента по айди");
     }
 
-    private async Task<Results<Ok<StudentDto>, NotFound<ProblemDetails>, ValidationProblem>> GetStudentById(
-        Guid studentId, IValidator<GetStudentByIdQuery> validator, IMediator mediator
+    private async Task<Results<Ok<StudentDto>, NotFound<ProblemDetails>>> GetStudentById(
+        Guid studentId, IMediator mediator
     )
     {
         var query = new GetStudentByIdQuery()
         {
             StudentId = studentId,
         };
-
-        var validationResult = await validator.ValidateAsync(query);
-
-        if (!validationResult.IsValid)
-        {
-            return validationResult.ToValidationProblem();
-        }
 
         var result = await mediator.Send(query);
 
@@ -75,11 +69,9 @@ public class StudentRoute : IRoute
         AuthStudentCommand command, IValidator<AuthStudentCommand> validator, IMediator mediator
     )
     {
-        var validationResult = await validator.ValidateAsync(command);
-
-        if (!validationResult.IsValid)
+        if (validator.TryValidate(command, out var validation))
         {
-            return validationResult.ToValidationProblem();
+            return validation.ToValidationProblem();
         }
 
         var result = await mediator.Send(command);

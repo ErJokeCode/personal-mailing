@@ -17,7 +17,7 @@ namespace Core.Routes.Groups.Queries;
 
 public class GetAllGroupsQuery : IRequest<IEnumerable<GroupAssignmentDto>>
 {
-    public string? Name { get; set; }
+    public string? Search { get; set; }
     public Guid? AdminId { get; set; }
 }
 
@@ -45,10 +45,10 @@ public class GetAllGroupsQueryHandler : IRequestHandler<GetAllGroupsQuery, IEnum
 
     private IEnumerable<GroupAssignment> FilterGroups(IEnumerable<GroupAssignment> groups, GetAllGroupsQuery request)
     {
-        if (!string.IsNullOrEmpty(request.Name))
+        if (!string.IsNullOrEmpty(request.Search))
         {
             groups = groups
-                .Where(n => FuzzySearch.Contains(n.Name, request.Name));
+                .Where(n => FuzzySearch.Contains(n.Name, request.Search));
         }
 
         if (request.AdminId is not null)

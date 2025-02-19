@@ -1,4 +1,3 @@
-using Core.Infrastructure.Validators;
 using Core.Routes.Chats.Commands;
 using FluentValidation;
 
@@ -9,6 +8,5 @@ public class SendMessageFromStudentCommandValidator : AbstractValidator<SendMess
     public SendMessageFromStudentCommandValidator()
     {
         RuleFor(x => x.Content).NotEmpty();
-        RuleFor(x => x.StudentId).SetValidator(new GuidValidator());
     }
 }

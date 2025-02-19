@@ -15,6 +15,7 @@ using Core.Models;
 using Core.Routes;
 using Core.Routes.Admins.Commands;
 using Core.Routes.Events.Commands;
+using Core.Signal;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
@@ -42,6 +43,7 @@ public static class Startup
         builder.Services.AddExceptionHandler<ExceptionHandler>();
         builder.Services.AddHttpClient();
         builder.Services.AddHealthChecks();
+        builder.Services.AddSignalR();
 
         builder.Services.AddOpenApi();
 
@@ -140,6 +142,8 @@ public static class Startup
 
     public static async Task InitialzieServices(this WebApplication app)
     {
+        app.UseRequestLocalization((o) => o.SetDefaultCulture("ru"));
+
         if (app.Environment.IsDevelopment())
         {
             app.MigrateDatabase();
@@ -157,14 +161,13 @@ public static class Startup
         await app.EnsureAdminCreated();
         await app.UpdateStudentsInfo();
 
-        app.UseRequestLocalization((o) => o.SetDefaultCulture("ru"));
         app.UseCors();
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseExceptionHandler();
         app.UseHealthChecks("/healthy");
+        app.MapHub<SignalHub>("/hub");
 
-        // TODO, make proxy in memory, instead of in appsettings
         app.MapReverseProxy().RequireAuthorization();
     }
 

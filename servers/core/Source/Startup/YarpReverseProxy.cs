@@ -4,6 +4,8 @@ using Yarp.ReverseProxy.Configuration;
 
 namespace Core;
 
+// TODO define endpoints for every proxied method
+// Inject UserInfo into every request that represents the admin doing the request
 public static class YarpReverseProxy
 {
     public static RouteConfig[] GetRoutes()

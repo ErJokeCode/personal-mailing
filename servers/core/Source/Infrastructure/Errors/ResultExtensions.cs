@@ -58,9 +58,4 @@ public static class ResultExtensions
             ).ProblemDetails
         );
     }
-
-    public static ValidationProblem ToValidationProblem(this ValidationResult validationResult)
-    {
-        return TypedResults.ValidationProblem(validationResult.ToDictionary());
-    }
 }

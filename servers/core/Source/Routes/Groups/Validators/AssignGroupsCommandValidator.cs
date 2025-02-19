@@ -1,4 +1,3 @@
-using Core.Infrastructure.Validators;
 using Core.Routes.Groups.Commands;
 using FluentValidation;
 
@@ -8,7 +7,6 @@ public class AssignGroupsCommandValidator : AbstractValidator<AssignGroupsComman
 {
     public AssignGroupsCommandValidator()
     {
-        RuleFor(x => x.AdminId).SetValidator(new GuidValidator());
         RuleFor(x => x.GroupIds).NotEmpty();
         RuleForEach(x => x.GroupIds).NotEmpty();
     }

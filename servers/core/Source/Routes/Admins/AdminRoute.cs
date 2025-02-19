@@ -58,21 +58,14 @@ public class AdminRoute : IRoute
         return TypedResults.Ok(result.Value);
     }
 
-    public async Task<Results<Ok<AdminDto>, NotFound<ProblemDetails>, ValidationProblem>> GetAdminById(
-        Guid adminId, IValidator<GetAdminByIdQuery> validator, IMediator mediator
+    public async Task<Results<Ok<AdminDto>, NotFound<ProblemDetails>>> GetAdminById(
+        Guid adminId, IMediator mediator
     )
     {
         var query = new GetAdminByIdQuery()
         {
             AdminId = adminId,
         };
-
-        var validationResult = await validator.ValidateAsync(query);
-
-        if (!validationResult.IsValid)
-        {
-            return validationResult.ToValidationProblem();
-        }
 
         var result = await mediator.Send(query);
 
@@ -94,11 +87,9 @@ public class AdminRoute : IRoute
         LoginAdminCommand command, IValidator<LoginAdminCommand> validator, IMediator mediator
     )
     {
-        var validationResult = await validator.ValidateAsync(command);
-
-        if (!validationResult.IsValid)
+        if (validator.TryValidate(command, out var validation))
         {
-            return validationResult.ToValidationProblem();
+            return validation.ToValidationProblem();
         }
 
         var result = await mediator.Send(command);
@@ -115,11 +106,9 @@ public class AdminRoute : IRoute
         CreateAdminCommand command, IValidator<CreateAdminCommand> validator, IMediator mediator
     )
     {
-        var validationResult = await validator.ValidateAsync(command);
-
-        if (!validationResult.IsValid)
+        if (validator.TryValidate(command, out var validation))
         {
-            return validationResult.ToValidationProblem();
+            return validation.ToValidationProblem();
         }
 
         var result = await mediator.Send(command);

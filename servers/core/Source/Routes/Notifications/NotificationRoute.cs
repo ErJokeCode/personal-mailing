@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Core.Infrastructure.Errors;
 using Core.Routes.Notifications.Commands;
 using Core.Routes.Notifications.Dtos;
+using Core.Routes.Notifications.Maps;
 using Core.Routes.Notifications.Queries;
 using FluentValidation;
 using MediatR;
@@ -43,11 +44,9 @@ class NotificationRoute : IRoute
             NotificationId = notificationId,
         };
 
-        var validationResult = await validator.ValidateAsync(query);
-
-        if (!validationResult.IsValid)
+        if (validator.TryValidate(query, out var validation))
         {
-            return validationResult.ToValidationProblem();
+            return validation.ToValidationProblem();
         }
 
         var result = await mediator.Send(query);
@@ -67,36 +66,22 @@ class NotificationRoute : IRoute
         return result;
     }
 
-    private class NotificationDetails
-    {
-        public required string Content { get; set; }
-        public required IEnumerable<Guid> StudentIds { get; set; }
-    }
-
     public async Task<Results<Ok<NotificationDto>, BadRequest<ProblemDetails>, ValidationProblem>> SendNotification(
         [FromForm] IFormFileCollection documents, [FromForm] string body, IValidator<SendNotificationCommand> validator, IMediator mediator
     )
     {
-        var details = JsonSerializer.Deserialize<NotificationDetails>(
-            body,
-            new JsonSerializerOptions()
-            {
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            }
-        );
+        var sendDto = new NotificationMapper().Map(body);
 
         var command = new SendNotificationCommand()
         {
-            Content = details?.Content ?? "",
-            StudentIds = details?.StudentIds ?? [],
+            Content = sendDto?.Content ?? "",
+            StudentIds = sendDto?.StudentIds ?? [],
             FormFiles = documents,
         };
 
-        var validationResult = await validator.ValidateAsync(command);
-
-        if (!validationResult.IsValid)
+        if (validator.TryValidate(command, out var validation))
         {
-            return validationResult.ToValidationProblem();
+            return validation.ToValidationProblem();
         }
 
         var result = await mediator.Send(command);

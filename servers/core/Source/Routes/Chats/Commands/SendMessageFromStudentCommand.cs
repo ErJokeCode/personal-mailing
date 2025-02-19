@@ -7,9 +7,11 @@ using Core.Data;
 using Core.Models;
 using Core.Routes.Chats.DTOs;
 using Core.Routes.Chats.Maps;
+using Core.Signal;
 using FluentResults;
 using MediatR;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Core.Routes.Chats.Commands;
@@ -26,12 +28,14 @@ public class SendMessageFromStudentCommandHandler : IRequestHandler<SendMessageF
     private readonly AppDbContext _db;
     private readonly ChatMapper _chatMapper;
     private readonly IFileStorage _fileStorage;
+    private readonly IHubContext<SignalHub> _hub;
 
-    public SendMessageFromStudentCommandHandler(AppDbContext db, IFileStorage fileStorage)
+    public SendMessageFromStudentCommandHandler(AppDbContext db, IFileStorage fileStorage, IHubContext<SignalHub> hub)
     {
         _db = db;
         _chatMapper = new ChatMapper();
         _fileStorage = fileStorage;
+        _hub = hub;
     }
 
     public async Task<Result<MessageDto>> Handle(SendMessageFromStudentCommand request, CancellationToken cancellationToken)
@@ -88,6 +92,9 @@ public class SendMessageFromStudentCommandHandler : IRequestHandler<SendMessageF
 
         await _db.SaveChangesAsync();
 
-        return _chatMapper.Map(message);
+        var dto = _chatMapper.Map(message);
+        await _hub.NotifyOfMessage(admin.Id, dto);
+
+        return dto;
     }
 }

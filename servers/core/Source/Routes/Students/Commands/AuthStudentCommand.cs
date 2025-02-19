@@ -7,8 +7,10 @@ using Core.Models;
 using Core.Routes.Students.Dtos;
 using Core.Routes.Students.Errors;
 using Core.Routes.Students.Maps;
+using Core.Signal;
 using FluentResults;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Core.Routes.Students.Commands;
@@ -25,12 +27,14 @@ public class AuthStudentCommandHandler : IRequestHandler<AuthStudentCommand, Res
     private readonly AppDbContext _db;
     private readonly IParser _parser;
     private readonly StudentMapper _mapper;
+    private readonly IHubContext<SignalHub> _hub;
 
-    public AuthStudentCommandHandler(AppDbContext db, IParser parser)
+    public AuthStudentCommandHandler(AppDbContext db, IParser parser, IHubContext<SignalHub> hub)
     {
         _db = db;
         _parser = parser;
         _mapper = new StudentMapper();
+        _hub = hub;
     }
 
     public async Task<Result<StudentDto>> Handle(AuthStudentCommand request, CancellationToken cancellationToken)
@@ -76,7 +80,10 @@ public class AuthStudentCommandHandler : IRequestHandler<AuthStudentCommand, Res
         await _db.Students.AddAsync(student, cancellationToken);
         await _db.SaveChangesAsync(cancellationToken);
 
-        return Result.Ok(_mapper.Map(student));
+        var dto = _mapper.Map(student);
+        await _hub.NotifyOfStudentAuth(dto);
+
+        return Result.Ok(dto);
     }
 
     private static bool CanAuth(AuthStudentCommand request, Student student)

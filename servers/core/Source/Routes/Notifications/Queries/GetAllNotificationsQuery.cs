@@ -15,7 +15,8 @@ namespace Core.Routes.Notifications.Queries;
 
 public class GetAllNotificationsQuery : IRequest<IEnumerable<NotificationDto>>
 {
-    public string? Content { get; set; }
+    public string? Search { get; set; }
+
     public Guid? AdminId { get; set; }
     public Guid? StudentId { get; set; }
 }
@@ -46,10 +47,10 @@ public class GetAllNotificationsQueryHandler : IRequestHandler<GetAllNotificatio
 
     private IEnumerable<Notification> FilterNotifications(IEnumerable<Notification> notifications, GetAllNotificationsQuery request)
     {
-        if (!string.IsNullOrEmpty(request.Content))
+        if (!string.IsNullOrEmpty(request.Search))
         {
             notifications = notifications
-                .Where(n => FuzzySearch.Contains(n.Content, request.Content));
+                .Where(n => FuzzySearch.Contains(n.Content, request.Search));
         }
 
         if (request.AdminId is not null)

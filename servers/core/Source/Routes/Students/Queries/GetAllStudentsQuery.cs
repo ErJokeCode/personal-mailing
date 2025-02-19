@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,7 +9,6 @@ using Core.Infrastructure.Search;
 using Core.Models;
 using Core.Routes.Students.Dtos;
 using Core.Routes.Students.Maps;
-using FuzzySharp;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,8 +16,8 @@ namespace Core.Routes.Students.Queries;
 
 public class GetAllStudentsQuery : IRequest<IEnumerable<StudentDto>>
 {
-    public string? Email { get; set; }
-    public string? Name { get; set; }
+    public string? Search { get; set; }
+
     public string? Group { get; set; }
     public int? CourseNumber { get; set; }
     public string? TypeOfCost { get; set; }
@@ -50,24 +51,21 @@ public class GetAllStudentsQueryHandler : IRequestHandler<GetAllStudentsQuery, I
 
     public IEnumerable<Student> FilterStudents(IEnumerable<Student> students, GetAllStudentsQuery request)
     {
-        if (!string.IsNullOrEmpty(request.Email))
-        {
-            students = students
-                .Where(s => FuzzySearch.Contains(s.Email, request.Email));
-        }
-
-        if (!string.IsNullOrEmpty(request.Name))
+        if (!string.IsNullOrEmpty(request.Search))
         {
             var getFullName = (Student s) => $"{s.Info.Surname} {s.Info.Name} {s.Info.Patronymic ?? ""}";
 
             students = students
-                .Where(s => FuzzySearch.Contains(getFullName(s), request.Name));
+                .Where(s =>
+                    FuzzySearch.Contains(s.Email, request.Search)
+                    || FuzzySearch.Contains(getFullName(s), request.Search)
+                );
         }
 
         if (!string.IsNullOrEmpty(request.Group))
         {
             students = students
-                .Where(s => FuzzySearch.Contains(s.Info.Group.Number, request.Group));
+                .Where(s => s.Info.Group.Number.Contains(request.Group, StringComparison.CurrentCultureIgnoreCase));
         }
 
         if (request.CourseNumber is not null && request.CourseNumber > 0)
@@ -79,31 +77,31 @@ public class GetAllStudentsQueryHandler : IRequestHandler<GetAllStudentsQuery, I
         if (!string.IsNullOrEmpty(request.TypeOfCost))
         {
             students = students
-                .Where(s => s.Info.TypeOfCost != null && FuzzySearch.IsMatch(s.Info.TypeOfCost, request.TypeOfCost));
+                .Where(s => s.Info.TypeOfCost != null && s.Info.TypeOfCost.Contains(request.TypeOfCost, StringComparison.CurrentCultureIgnoreCase));
         }
 
         if (!string.IsNullOrEmpty(request.TypeOfEducation))
         {
             students = students
-                .Where(s => s.Info.TypeOfEducation != null && FuzzySearch.IsMatch(s.Info.TypeOfEducation, request.TypeOfEducation));
+                .Where(s => s.Info.TypeOfEducation != null && s.Info.TypeOfEducation.Contains(request.TypeOfEducation, StringComparison.CurrentCultureIgnoreCase));
         }
 
         if (!string.IsNullOrEmpty(request.OnlineCourse))
         {
             students = students
-                .Where(s => s.Info.OnlineCourse.Any(o => FuzzySearch.Contains(o.Name, request.OnlineCourse)));
+                .Where(s => s.Info.OnlineCourse.Any(o => o.Name.Contains(request.OnlineCourse, StringComparison.CurrentCultureIgnoreCase)));
         }
 
         if (!string.IsNullOrEmpty(request.Subject))
         {
             students = students
-                .Where(s => s.Info.Subjects.Any(s => FuzzySearch.Contains(s.FullName, request.Subject)));
+                .Where(s => s.Info.Subjects.Any(s => s.FullName.Contains(request.Subject, StringComparison.CurrentCultureIgnoreCase)));
         }
 
         if (!string.IsNullOrEmpty(request.Team))
         {
             students = students
-                .Where(s => s.Info.Subjects.Any(s => s.Teams.Any(t => FuzzySearch.Contains(t.Name, request.Team))));
+                .Where(s => s.Info.Subjects.Any(s => s.Teams.Any(t => t.Name.Contains(request.Team, StringComparison.CurrentCultureIgnoreCase))));
         }
 
         return students;

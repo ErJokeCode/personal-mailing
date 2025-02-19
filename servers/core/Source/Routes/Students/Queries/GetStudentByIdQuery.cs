@@ -38,8 +38,6 @@ public class GetStudentByIdQueryHandler : IRequestHandler<GetStudentByIdQuery, R
 
     public async Task<Result<StudentDto>> Handle(GetStudentByIdQuery request, CancellationToken cancellationToken)
     {
-        Console.WriteLine((_contextAccessor.HttpContext!.GetEndpoint() as RouteEndpoint)!.RoutePattern.RawText);
-
         var student = await _db.Students.SingleOrDefaultAsync(s => s.Id == request.StudentId);
 
         if (student is null || !student.Active)

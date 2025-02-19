@@ -24,20 +24,13 @@ public class DocumentRoute : IRoute
 
     // TODO setup depends on in the docker compose file, because right now stuff might break
     public async Task<Results<FileStreamHttpResult, NotFound<ProblemDetails>, ValidationProblem>> DownloadDocument(
-        Guid blobId, IMediator mediator, IValidator<DownloadDocumentCommand> validator
+        Guid blobId, IMediator mediator
     )
     {
         var command = new DownloadDocumentCommand()
         {
             BlobId = blobId,
         };
-
-        var validationResult = await validator.ValidateAsync(command);
-
-        if (!validationResult.IsValid)
-        {
-            return validationResult.ToValidationProblem();
-        }
 
         var result = await mediator.Send(command);
 

@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 using Core.Abstractions.Parser;
 using Core.Data;
 using Core.Models;
+using Core.Signal;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -21,12 +23,14 @@ public class UploadEventCommandHandler : IRequestHandler<UploadEventCommand, Uni
     private readonly AppDbContext _db;
     private readonly IParser _parser;
     private readonly IConfiguration _configuration;
+    private readonly IHubContext<SignalHub> _hub;
 
-    public UploadEventCommandHandler(AppDbContext db, IParser parser, IConfiguration configuration)
+    public UploadEventCommandHandler(AppDbContext db, IParser parser, IConfiguration configuration, IHubContext<SignalHub> hub)
     {
         _db = db;
         _parser = parser;
         _configuration = configuration;
+        _hub = hub;
     }
 
     public async Task<Unit> Handle(UploadEventCommand request, CancellationToken cancellationToken)
@@ -76,6 +80,8 @@ public class UploadEventCommandHandler : IRequestHandler<UploadEventCommand, Uni
         }
 
         await _db.SaveChangesAsync();
+
+        await _hub.NotifyOfFileUpload();
 
         return Unit.Value;
     }

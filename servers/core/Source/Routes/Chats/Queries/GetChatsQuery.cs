@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Abstractions.UserAccesor;
 using Core.Data;
+using Core.Infrastructure.Search;
 using Core.Models;
 using Core.Routes.Admins.Errors;
 using Core.Routes.Chats.DTOs;
@@ -14,9 +15,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Routes.Chats.Queries;
 
-// TODO add a general Search parameter everywhere, that's gonna look for most important data
-
-public class GetChatsQuery : IRequest<IEnumerable<ChatDto>>;
+public class GetChatsQuery : IRequest<IEnumerable<ChatDto>>
+{
+    public string? Search { get; set; }
+}
 
 public class GetChatsQueryHandler : IRequestHandler<GetChatsQuery, IEnumerable<ChatDto>>
 {
@@ -46,11 +48,31 @@ public class GetChatsQueryHandler : IRequestHandler<GetChatsQuery, IEnumerable<C
             .AsSplitQuery()
             .ToListAsync();
 
+        chats = FilterChats(chats, request).ToList();
+
         foreach (var chat in chats)
         {
             chat.Messages = chat.Messages.OrderByDescending(m => m.CreatedAt).Take(1).ToList();
         }
 
+        chats = chats.OrderByDescending(ch => ch.Messages.Single().CreatedAt).ToList();
+
         return _chatMapper.Map(chats);
+    }
+
+    private IEnumerable<Chat> FilterChats(IEnumerable<Chat> chats, GetChatsQuery request)
+    {
+        if (!string.IsNullOrEmpty(request.Search))
+        {
+            var getFullName = (Student s) => $"{s.Info.Surname} {s.Info.Name} {s.Info.Patronymic ?? ""}";
+
+            chats = chats
+                .Where(ch =>
+                    FuzzySearch.Contains(ch.Student!.Email, request.Search)
+                    || FuzzySearch.Contains(getFullName(ch.Student), request.Search)
+                );
+        }
+
+        return chats;
     }
 }
