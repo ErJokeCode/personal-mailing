@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from config import worker_db
-from src.online_course.dict_names import add_dict_names, update_dict_names
+from src.online_course.dict_names import add_dict_names, update_dict_names, delete_dict_names
 from src.schemas import DictNames, DictNamesInDB, InfoOCInFile, InfoOCInFileInDB, InfoOnlineCourseInDB
 
 
@@ -79,7 +79,8 @@ async def put_modeus_to_inf(dict: DictNamesInDB) -> DictNamesInDB:
 
 @router_course.delete("/dict_names/{id}")
 async def delete_modeus_to_inf(id: str) -> dict[str, str]:
-    return worker_db.dict_names.delete_one(id)
+    dict = worker_db.dict_names.get_one(id=id)
+    return delete_dict_names(dict, worker_db)
 
 
 

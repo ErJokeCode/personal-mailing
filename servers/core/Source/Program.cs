@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Builder;
 
 namespace Core;
 
+// TODO add optional pagination to all methods returning collections
+
 public class Program
 {
     public static async Task Main(string[] args)

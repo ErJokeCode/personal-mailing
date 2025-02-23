@@ -21,7 +21,7 @@ async def show_main_menu(message: types.Message, state: FSMContext):
         
         async with aiohttp.ClientSession() as session:
             headers = {"Authorization": f"Basic {SECRET_TOKEN}"}
-            async with session.get(f"{URL_CORE}/core/student/{user_data.get('user_id')}", headers=headers) as response:
+            async with session.get(f"{URL_CORE}/core/students/{user_data.get('user_id')}", headers=headers) as response:
                 if response.status == 200:
                     student_data = await response.json()
                     student_info = student_data.get("info")

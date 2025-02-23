@@ -57,8 +57,8 @@ async def cmd_start(message: types.Message, state: FSMContext):
         async with aiohttp.ClientSession() as session:
             headers = {"Authorization": f"Basic {SECRET_TOKEN}"}
 
-            async with session.put(f"{URL_CORE}/core/student/addChat/{user_id}", headers=headers, json={"chatId": str(message.chat.id)}) as resp:
-                await message.answer("Какой вопрос вас интенресует")
+            # async with session.put(f"{URL_CORE}/core/student/addChat/{user_id}", headers=headers, json={"chatId": str(message.chat.id)}) as resp:
+            await message.answer("Какой вопрос вас интенресует")
 
 @dp.message(F.chat.type.in_({"private"}))
 async def all_message(message: types.Message, state: FSMContext):
@@ -70,13 +70,13 @@ async def all_message(message: types.Message, state: FSMContext):
         async with aiohttp.ClientSession() as session:
             headers = {"Authorization": f"Basic {SECRET_TOKEN}"}
 
-            async with session.get(f"{URL_CORE}/core/admin", headers=headers) as response_admins:
+            async with session.get(f"{URL_CORE}/core/admins", headers=headers) as response_admins:
                 if response_admins.status == 200:
                     with aiohttp.MultipartWriter('form-data') as mpwriter:
                         part = mpwriter.append_json({"content": message.text, "studentId": user_id})
                         part.set_content_disposition('form-data', name="body")
 
-                        async with session.post(f"{URL_CORE}/core/chat/studentSend", headers=headers, data=mpwriter) as resp:
+                        async with session.post(f"{URL_CORE}/core/chats/from-student", headers=headers, data=mpwriter) as resp:
                             if resp.status == 200:
                                 msg = await message.answer("Сообщение отправлено, ожидайте ответа")
                                 await asyncio.sleep(5)

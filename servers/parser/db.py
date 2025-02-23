@@ -5,7 +5,7 @@ from bson import ObjectId
 from fastapi import HTTPException, UploadFile, status
 from typing_extensions import Unpack, TypedDict
 from pydantic import BaseModel
-from pymongo import MongoClient
+from pymongo import InsertOne, MongoClient
 from passlib.context import CryptContext
 from pymongo.collection import Collection
 from pymongo import database, UpdateOne
@@ -114,36 +114,46 @@ class WorkerCollection(Generic[V, T]):
         else:
             return None
         
-    def bulk_update(self, filter: list[str], update_filter: list[str], data: Sequence[V], upsert: bool = False) -> dict[str, str]:
+    def bulk_update(self, filter: list[str], update_filter: list[str], data: Sequence[T | V], upsert: bool = False) -> dict[str, str]:
         
         def create_filter(filter: list[str], item) -> dict[str, str]:
             dict = {}
             for fl in filter:
                 dict[fl] = get_value(fl, item)
-            print(dict)
             return dict
         
         def get_value(filter: str, item):
-            sp_fl = filter.split(".")
-            if len(sp_fl) == 1:
-                return item[filter]
-            else:
-                return get_value(sp_fl[1], item[sp_fl[0]])
+            try:
+                sp_fl = filter.split(".")
+                if len(sp_fl) == 1:
+                    return item[filter]
+                else:
+                    return get_value(sp_fl[1], item[sp_fl[0]])
+            except Exception as e:
+                print(e)
+        
+        try:
+            collect = self.__collection
+            ids = collect.find().distinct(filter[0])
             
-        
-        collect = self.__collection
-        
-        operations = []
-        for item in data:
-            dict_item = item.model_dump(by_alias=True, exclude="_id")
+            operations = []
+            for item in data:
+                dict_item = item.model_dump()
+                
+                if dict_item[filter[0]] in ids:
+                    fl = create_filter(filter, dict_item)
+                    
+                    up_fl = create_filter(update_filter, dict_item)
+                    
+                    operations.append(UpdateOne(fl, {"$set": up_fl}, upsert=upsert))
+                else:
+                    operations.append(InsertOne(dict_item))
             
-            fl = create_filter(filter, dict_item)
-                
-            up_fl = create_filter(update_filter, dict_item)
-                
-            operations.append(UpdateOne(fl, {"$set": up_fl}, upsert=upsert))
-        
-        collect.bulk_write(operations)
+            if len(operations) > 0:
+                collect.bulk_write(operations)
+        except Exception as e:
+            print(e)
+            raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Error bulk update")
         
         return {"status": "success"}
     
