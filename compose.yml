@@ -39,7 +39,7 @@ services:
       coredb:
         condition: service_started
       parser:
-        condition: service_started
+        condition: service_healthy
     env_file:
       - .env
     healthcheck:
@@ -56,6 +56,9 @@ services:
     build: ./admin-panel
     ports:
       - 5015:5015
+    depends_on:
+      core:
+        condition: service_healthy
     volumes:
       - './admin-panel:/app:z'
       - '/app/node_modules'
@@ -122,6 +125,11 @@ services:
     depends_on:
       parserdb:
         condition: service_started
+    healthcheck:
+      test: "curl --fail http://localhost:8000/ping || exit"
+      interval: 10s
+      timeout: 30s
+      retries: 10
     volumes:
       - './servers/parser:/app:z'
 

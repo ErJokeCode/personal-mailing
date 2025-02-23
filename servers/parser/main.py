@@ -16,13 +16,17 @@ app = FastAPI(
     root_path="/parser"
 )
 
+
+@app.get("/ping")
+async def ping():
+    return "ok"
+
 app.include_router(router_data)
 app.include_router(router_user)
 app.include_router(router_course)
 app.include_router(router_subject)
 app.include_router(router_bot_onboard)
 app.include_router(router_bot_faq)
-
 
 
 if __name__ == "__main__":
