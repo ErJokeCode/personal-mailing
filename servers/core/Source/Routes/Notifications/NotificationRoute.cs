@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Core.Infrastructure.Errors;
+using Core.Infrastructure.Rest;
 using Core.Routes.Notifications.Commands;
 using Core.Routes.Notifications.Dtos;
 using Core.Routes.Notifications.Maps;
@@ -59,7 +60,7 @@ class NotificationRoute : IRoute
         return TypedResults.Ok(result.Value);
     }
 
-    public async Task<IEnumerable<NotificationDto>> GetAllNotifications([AsParameters] GetAllNotificationsQuery query, IMediator mediator)
+    public async Task<PagedList<NotificationDto>> GetAllNotifications([AsParameters] GetAllNotificationsQuery query, IMediator mediator)
     {
         var result = await mediator.Send(query);
 

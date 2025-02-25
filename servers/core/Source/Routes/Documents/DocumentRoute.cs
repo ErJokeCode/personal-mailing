@@ -22,7 +22,6 @@ public class DocumentRoute : IRoute
             .WithDescription("Скачивает документ по айди");
     }
 
-    // TODO setup depends on in the docker compose file, because right now stuff might break
     public async Task<Results<FileStreamHttpResult, NotFound<ProblemDetails>, ValidationProblem>> DownloadDocument(
         Guid blobId, IMediator mediator
     )

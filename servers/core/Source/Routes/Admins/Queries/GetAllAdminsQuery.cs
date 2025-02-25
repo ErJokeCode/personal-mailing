@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Data;
-using Core.Infrastructure.Search;
+using Core.Infrastructure.Rest;
 using Core.Models;
 using Core.Routes.Admins.Dtos;
 using Core.Routes.Admins.Maps;
@@ -13,12 +13,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Routes.Admins.Queries;
 
-public class GetAllAdminsQuery : IRequest<IEnumerable<AdminDto>>
+public class GetAllAdminsQuery : IRequest<PagedList<AdminDto>>
 {
     public string? Search { get; set; }
+
+    public int? Page { get; set; }
+    public int? PageSize { get; set; }
 }
 
-public class GetAllAdminsQueryHandler : IRequestHandler<GetAllAdminsQuery, IEnumerable<AdminDto>>
+public class GetAllAdminsQueryHandler : IRequestHandler<GetAllAdminsQuery, PagedList<AdminDto>>
 {
     private readonly AppDbContext _db;
     private readonly AdminMapper _adminMapper;
@@ -29,13 +32,13 @@ public class GetAllAdminsQueryHandler : IRequestHandler<GetAllAdminsQuery, IEnum
         _adminMapper = new AdminMapper();
     }
 
-    public async Task<IEnumerable<AdminDto>> Handle(GetAllAdminsQuery request, CancellationToken cancellationToken)
+    public async Task<PagedList<AdminDto>> Handle(GetAllAdminsQuery request, CancellationToken cancellationToken)
     {
         var admins = await _db.Users.ToListAsync(cancellationToken);
 
         admins = FilterAdmins(admins, request).ToList();
 
-        return _adminMapper.Map(admins);
+        return PagedList<AdminDto>.Create(_adminMapper.Map(admins), request.Page, request.PageSize);
     }
 
     public IEnumerable<Admin> FilterAdmins(IEnumerable<Admin> admins, GetAllAdminsQuery request)

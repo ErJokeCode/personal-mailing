@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using Core.Identity;
 using Core.Infrastructure.Errors;
 using Core.Infrastructure.Metadata;
+using Core.Infrastructure.Rest;
 using Core.Routes.Admins.Queries;
 using Core.Routes.Notifications.Dtos;
 using Core.Routes.Students.Commands;
@@ -58,7 +59,7 @@ public class StudentRoute : IRoute
         return TypedResults.Ok(result.Value);
     }
 
-    public async Task<Ok<IEnumerable<StudentDto>>> GetAllStudents([AsParameters] GetAllStudentsQuery query, IMediator mediator)
+    public async Task<Ok<PagedList<StudentDto>>> GetAllStudents([AsParameters] GetAllStudentsQuery query, IMediator mediator)
     {
         var result = await mediator.Send(query);
 

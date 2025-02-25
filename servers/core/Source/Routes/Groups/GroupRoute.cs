@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core.Infrastructure.Errors;
+using Core.Infrastructure.Rest;
 using Core.Routes.Admins.Queries;
 using Core.Routes.Groups.Commands;
 using Core.Routes.Groups.DTOs;
@@ -27,7 +28,7 @@ public class GroupRoute : IRoute
             .WithDescription("Привязывает группы к админу");
     }
 
-    private async Task<Ok<IEnumerable<GroupAssignmentDto>>> GetAllGroups([AsParameters] GetAllGroupsQuery query, IMediator mediator)
+    private async Task<Ok<PagedList<GroupAssignmentDto>>> GetAllGroups([AsParameters] GetAllGroupsQuery query, IMediator mediator)
     {
         var groups = await mediator.Send(query);
 

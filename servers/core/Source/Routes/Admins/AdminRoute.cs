@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core.Infrastructure.Errors;
+using Core.Infrastructure.Rest;
 using Core.Routes;
 using Core.Routes.Admins.Commands;
 using Core.Routes.Admins.Dtos;
@@ -77,7 +78,7 @@ public class AdminRoute : IRoute
         return TypedResults.Ok(result.Value);
     }
 
-    public async Task<Ok<IEnumerable<AdminDto>>> GetAllAdmins([AsParameters] GetAllAdminsQuery query, IMediator mediator)
+    public async Task<Ok<PagedList<AdminDto>>> GetAllAdmins([AsParameters] GetAllAdminsQuery query, IMediator mediator)
     {
         var admins = await mediator.Send(query);
         return TypedResults.Ok(admins);

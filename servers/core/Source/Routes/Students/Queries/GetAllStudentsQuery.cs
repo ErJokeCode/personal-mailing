@@ -5,7 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Data;
-using Core.Infrastructure.Search;
+using Core.Infrastructure.Rest;
 using Core.Models;
 using Core.Routes.Students.Dtos;
 using Core.Routes.Students.Maps;
@@ -14,9 +14,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Routes.Students.Queries;
 
-public class GetAllStudentsQuery : IRequest<IEnumerable<StudentDto>>
+public class GetAllStudentsQuery : IRequest<PagedList<StudentDto>>
 {
     public string? Search { get; set; }
+    public int? Page { get; set; }
+    public int? PageSize { get; set; }
 
     public string? Group { get; set; }
     public int? CourseNumber { get; set; }
@@ -27,7 +29,7 @@ public class GetAllStudentsQuery : IRequest<IEnumerable<StudentDto>>
     public string? Team { get; set; }
 }
 
-public class GetAllStudentsQueryHandler : IRequestHandler<GetAllStudentsQuery, IEnumerable<StudentDto>>
+public class GetAllStudentsQueryHandler : IRequestHandler<GetAllStudentsQuery, PagedList<StudentDto>>
 {
     private readonly AppDbContext _db;
     private readonly StudentMapper _studentMapper;
@@ -38,7 +40,7 @@ public class GetAllStudentsQueryHandler : IRequestHandler<GetAllStudentsQuery, I
         _studentMapper = new StudentMapper();
     }
 
-    public async Task<IEnumerable<StudentDto>> Handle(GetAllStudentsQuery request, CancellationToken cancellationToken)
+    public async Task<PagedList<StudentDto>> Handle(GetAllStudentsQuery request, CancellationToken cancellationToken)
     {
         var students = await _db.Students
             .Where(s => s.Active)
@@ -46,7 +48,7 @@ public class GetAllStudentsQueryHandler : IRequestHandler<GetAllStudentsQuery, I
 
         students = FilterStudents(students, request).ToList();
 
-        return _studentMapper.Map(students);
+        return PagedList<StudentDto>.Create(_studentMapper.Map(students), request.Page, request.PageSize);
     }
 
     public IEnumerable<Student> FilterStudents(IEnumerable<Student> students, GetAllStudentsQuery request)

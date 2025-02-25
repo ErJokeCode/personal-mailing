@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Core.Identity;
 using Core.Infrastructure.Errors;
+using Core.Infrastructure.Rest;
 using Core.Routes.Chats.Commands;
 using Core.Routes.Chats.DTOs;
 using Core.Routes.Chats.Maps;
@@ -43,22 +44,47 @@ public class ChatRoute : IRoute
 
         group.MapPatch("/{studentId}/read", ReadChat)
             .WithDescription("Делает чат прочитанным");
+
+        var messagesGroup = app.MapGroup("/core/messages")
+            .RequireAuthorization();
+
+        messagesGroup.MapGet("/{studentId}", GetMessages)
+            .WithDescription("Получает сообщения в чате");
+    }
+
+    private async Task<Results<Ok<PagedList<MessageDto>>, NotFound<ProblemDetails>>> GetMessages([AsParameters] GetMessagesQuery query, IMediator mediator)
+    {
+        var chatQuery = new GetChatById()
+        {
+            StudentId = query.StudentId,
+        };
+
+        var chatResult = await mediator.Send(chatQuery);
+
+        if (chatResult.IsFailed)
+        {
+            return chatResult.ToNotFoundProblem();
+        }
+
+        var result = await mediator.Send(query);
+
+        return TypedResults.Ok(result);
     }
 
     private async Task<Results<NoContent, NotFound<ProblemDetails>, ValidationProblem>> ReadChat(
         Guid studentId, IMediator mediator
     )
     {
-        var studentQuery = new GetStudentByIdQuery()
+        var chatQuery = new GetChatById()
         {
-            StudentId = studentId
+            StudentId = studentId,
         };
 
-        var studentResult = await mediator.Send(studentQuery);
+        var chatResult = await mediator.Send(chatQuery);
 
-        if (studentResult.IsFailed)
+        if (chatResult.IsFailed)
         {
-            return studentResult.ToNotFoundProblem();
+            return chatResult.ToNotFoundProblem();
         }
 
         var command = new ReadChatCommand()
@@ -142,7 +168,7 @@ public class ChatRoute : IRoute
         return TypedResults.Ok(result.Value);
     }
 
-    public async Task<Ok<IEnumerable<ChatDto>>> GetChats([AsParameters] GetChatsQuery query, IMediator mediator)
+    public async Task<Ok<PagedList<ChatDto>>> GetChats([AsParameters] GetChatsQuery query, IMediator mediator)
     {
         var chats = await mediator.Send(query);
 

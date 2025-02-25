@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Data;
-using Core.Infrastructure.Search;
+using Core.Infrastructure.Rest;
 using Core.Models;
 using Core.Routes.Admins.Dtos;
 using Core.Routes.Admins.Maps;
@@ -15,13 +15,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Routes.Groups.Queries;
 
-public class GetAllGroupsQuery : IRequest<IEnumerable<GroupAssignmentDto>>
+public class GetAllGroupsQuery : IRequest<PagedList<GroupAssignmentDto>>
 {
     public string? Search { get; set; }
+    public int? Page { get; set; }
+    public int? PageSize { get; set; }
+
     public Guid? AdminId { get; set; }
 }
 
-public class GetAllGroupsQueryHandler : IRequestHandler<GetAllGroupsQuery, IEnumerable<GroupAssignmentDto>>
+public class GetAllGroupsQueryHandler : IRequestHandler<GetAllGroupsQuery, PagedList<GroupAssignmentDto>>
 {
     private readonly AppDbContext _db;
     private readonly GroupMapper _adminMapper;
@@ -32,7 +35,7 @@ public class GetAllGroupsQueryHandler : IRequestHandler<GetAllGroupsQuery, IEnum
         _adminMapper = new GroupMapper();
     }
 
-    public async Task<IEnumerable<GroupAssignmentDto>> Handle(GetAllGroupsQuery request, CancellationToken cancellationToken)
+    public async Task<PagedList<GroupAssignmentDto>> Handle(GetAllGroupsQuery request, CancellationToken cancellationToken)
     {
         var groups = await _db.GroupAssignments
             .Include(g => g.Admin)
@@ -40,7 +43,7 @@ public class GetAllGroupsQueryHandler : IRequestHandler<GetAllGroupsQuery, IEnum
 
         groups = FilterGroups(groups, request).ToList();
 
-        return _adminMapper.Map(groups);
+        return PagedList<GroupAssignmentDto>.Create(_adminMapper.Map(groups), request.Page, request.PageSize);
     }
 
     private IEnumerable<GroupAssignment> FilterGroups(IEnumerable<GroupAssignment> groups, GetAllGroupsQuery request)

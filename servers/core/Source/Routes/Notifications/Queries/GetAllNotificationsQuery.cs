@@ -4,7 +4,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Data;
-using Core.Infrastructure.Search;
+using Core.Infrastructure.Rest;
 using Core.Models;
 using Core.Routes.Notifications.Dtos;
 using Core.Routes.Notifications.Maps;
@@ -13,15 +13,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Routes.Notifications.Queries;
 
-public class GetAllNotificationsQuery : IRequest<IEnumerable<NotificationDto>>
+public class GetAllNotificationsQuery : IRequest<PagedList<NotificationDto>>
 {
     public string? Search { get; set; }
+    public int? Page { get; set; }
+    public int? PageSize { get; set; }
 
     public Guid? AdminId { get; set; }
     public Guid? StudentId { get; set; }
 }
 
-public class GetAllNotificationsQueryHandler : IRequestHandler<GetAllNotificationsQuery, IEnumerable<NotificationDto>>
+public class GetAllNotificationsQueryHandler : IRequestHandler<GetAllNotificationsQuery, PagedList<NotificationDto>>
 {
     private readonly AppDbContext _db;
     private readonly NotificationMapper _notificationMapper;
@@ -32,7 +34,7 @@ public class GetAllNotificationsQueryHandler : IRequestHandler<GetAllNotificatio
         _notificationMapper = new NotificationMapper();
     }
 
-    public async Task<IEnumerable<NotificationDto>> Handle(GetAllNotificationsQuery request, CancellationToken cancellationToken)
+    public async Task<PagedList<NotificationDto>> Handle(GetAllNotificationsQuery request, CancellationToken cancellationToken)
     {
         var notifications = await _db.Notifications
             .Include(n => n.Admin)
@@ -42,7 +44,7 @@ public class GetAllNotificationsQueryHandler : IRequestHandler<GetAllNotificatio
 
         notifications = FilterNotifications(notifications, request).ToList();
 
-        return _notificationMapper.Map(notifications);
+        return PagedList<NotificationDto>.Create(_notificationMapper.Map(notifications), request.Page, request.PageSize);
     }
 
     private IEnumerable<Notification> FilterNotifications(IEnumerable<Notification> notifications, GetAllNotificationsQuery request)

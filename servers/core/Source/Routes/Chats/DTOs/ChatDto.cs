@@ -10,6 +10,7 @@ namespace Core.Routes.Chats.DTOs;
 
 public class MessageDto
 {
+    public int Id { get; set; }
     public required string Content { get; set; }
     public required DateTime CreatedAt { get; set; }
 

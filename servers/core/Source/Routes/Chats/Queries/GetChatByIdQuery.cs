@@ -1,4 +1,3 @@
-
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 
 public class GetChatById : IRequest<Result<ChatDto>>
 {
-    public Guid StudentId { get; set; }
+    public required Guid StudentId { get; set; }
 }
 
 public class GetChatByIdHandler : IRequestHandler<GetChatById, Result<ChatDto>>

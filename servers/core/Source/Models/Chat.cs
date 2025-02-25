@@ -16,14 +16,21 @@ namespace Core.Models;
 // GET /core/chats/{studentId} chat with a specific student, automatically makes chat read
 // Return an empty chat if admin is assigned to the student, return forbidden if not
 
-[Owned]
+// Make not owned but separate entity, make separate GetMessage endpoint
+
 public class Message
 {
+    public int Id { get; set; }
     public required string Content { get; set; }
     public required DateTime CreatedAt { get; set; }
     public bool IsRead { get; set; } = false;
 
     public ICollection<Document> Documents { get; set; } = [];
+
+    [MapperIgnore]
+    public int ChatId { get; set; }
+    [MapperIgnore]
+    public Chat? Chat { get; set; }
 
     [MapperIgnore]
     public Guid? AdminId { get; set; }

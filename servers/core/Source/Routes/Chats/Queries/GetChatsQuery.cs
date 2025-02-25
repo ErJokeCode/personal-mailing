@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Abstractions.UserAccesor;
 using Core.Data;
-using Core.Infrastructure.Search;
+using Core.Infrastructure.Rest;
 using Core.Models;
 using Core.Routes.Admins.Errors;
 using Core.Routes.Chats.DTOs;
@@ -15,12 +15,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Core.Routes.Chats.Queries;
 
-public class GetChatsQuery : IRequest<IEnumerable<ChatDto>>
+public class GetChatsQuery : IRequest<PagedList<ChatDto>>
 {
     public string? Search { get; set; }
+    public int? Page { get; set; }
+    public int? PageSize { get; set; }
 }
 
-public class GetChatsQueryHandler : IRequestHandler<GetChatsQuery, IEnumerable<ChatDto>>
+public class GetChatsQueryHandler : IRequestHandler<GetChatsQuery, PagedList<ChatDto>>
 {
     private readonly AppDbContext _db;
     private readonly ChatMapper _chatMapper;
@@ -33,31 +35,28 @@ public class GetChatsQueryHandler : IRequestHandler<GetChatsQuery, IEnumerable<C
         _userAccessor = userAccessor;
     }
 
-    public async Task<IEnumerable<ChatDto>> Handle(GetChatsQuery request, CancellationToken cancellationToken)
+    public async Task<PagedList<ChatDto>> Handle(GetChatsQuery request, CancellationToken cancellationToken)
     {
         var admin = await _userAccessor.GetUserAsync();
 
         if (admin is null)
         {
-            return [];
+            return PagedList<ChatDto>.Create([], request.Page, request.PageSize);
         }
 
         var chats = await _db.Chats
             .Include(ch => ch.Student)
+            .Include(ch => ch.Messages.OrderByDescending(m => m.CreatedAt).Take(1))
+            .ThenInclude(m => m.Admin)
             .Where(ch => ch.AdminId == admin.Id)
             .AsSplitQuery()
             .ToListAsync();
 
         chats = FilterChats(chats, request).ToList();
 
-        foreach (var chat in chats)
-        {
-            chat.Messages = chat.Messages.OrderByDescending(m => m.CreatedAt).Take(1).ToList();
-        }
-
         chats = chats.OrderByDescending(ch => ch.Messages.Single().CreatedAt).ToList();
 
-        return _chatMapper.Map(chats);
+        return PagedList<ChatDto>.Create(_chatMapper.Map(chats), request.Page, request.PageSize);
     }
 
     private IEnumerable<Chat> FilterChats(IEnumerable<Chat> chats, GetChatsQuery request)

@@ -1,6 +1,6 @@
 using FuzzySharp;
 
-namespace Core.Infrastructure.Search;
+namespace Core.Infrastructure.Rest;
 
 public static class FuzzySearch
 {

@@ -33,6 +33,18 @@ public class AssignGroupsCommandHandler : IRequestHandler<AssignGroupsCommand, R
 
         foreach (var group in groups)
         {
+            var oldAdmin = await _db.Users
+                .Include(a => a.Chats)
+                .ThenInclude(ch => ch.Student)
+                .SingleAsync(a => a.Id == group.AdminId);
+
+            var chats = oldAdmin.Chats.Where(ch => ch.Student!.Info.Group.Number == group.Name);
+
+            foreach (var chat in chats)
+            {
+                chat.AdminId = request.AdminId;
+            }
+
             group.AdminId = request.AdminId;
         }
 
