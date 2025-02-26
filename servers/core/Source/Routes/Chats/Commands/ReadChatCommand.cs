@@ -39,6 +39,8 @@ public class ReadChatCommandHandler : IRequestHandler<ReadChatCommand, Unit>
 
         chat.UnreadCount = 0;
 
+        await _db.SaveChangesAsync();
+
         var dto = _chatMapper.Map(chat);
         await _hub.NotifyOfChatRead(chat.AdminId, dto);
 

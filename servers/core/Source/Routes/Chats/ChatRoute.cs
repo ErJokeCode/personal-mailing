@@ -45,10 +45,7 @@ public class ChatRoute : IRoute
         group.MapPatch("/{studentId}/read", ReadChat)
             .WithDescription("Делает чат прочитанным");
 
-        var messagesGroup = app.MapGroup("/core/messages")
-            .RequireAuthorization();
-
-        messagesGroup.MapGet("/{studentId}", GetMessages)
+        group.MapGet("/{studentId}/messages", GetMessages)
             .WithDescription("Получает сообщения в чате");
     }
 

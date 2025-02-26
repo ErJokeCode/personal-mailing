@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using Core.Infrastructure.Metadata;
 using Microsoft.AspNetCore.Builder;
 
 namespace Core;
@@ -17,9 +16,6 @@ public class Program
 
         await app.InitialzieServices();
         app.MapRoutes();
-
-        var routes = app.DiscoverRoutes();
-        await app.SyncPermissions(routes);
 
         app.Run();
     }
