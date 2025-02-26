@@ -2,7 +2,7 @@ import * as signalR from "@microsoft/signalr";
 import { server_url } from "./store";
 
 export const signal = new signalR.HubConnectionBuilder()
-    .withUrl(`${server_url}/signal`, {
+    .withUrl(`${server_url}/hub`, {
         transport: signalR.HttpTransportType.ServerSentEvents,
         withCredentials: true,
     })

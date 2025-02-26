@@ -12,12 +12,12 @@
 
     getUnreadChats();
 
-    signal.on("StudentSentMessage", handleMessage);
-    signal.on("ChatRead", handleMessage);
+    signal.on("MessageReceived", handleMessage);
+    signal.on("ChatReadReceived", handleMessage);
 
     onDestroy(async () => {
-        signal.off("StudentSentMessage", handleMessage);
-        signal.off("ChatRead", handleMessage);
+        signal.off("MessageReceived", handleMessage);
+        signal.off("ChatReadReceived", handleMessage);
     });
 
     async function handleMessage(message) {
@@ -25,12 +25,10 @@
     }
 
     function getUnreadChats() {
-        http.get("/core/admin/chats?onlyUnread=true", http.status()).then(
-            (result) => {
-                chats = result.items;
-                count = chats.length;
-            },
-        );
+        http.get("/core/chats", http.status()).then((result) => {
+            chats = result.items.filter((ch) => ch.unreadCount > 0);
+            count = chats.length;
+        });
     }
 
     function view() {
@@ -104,4 +102,3 @@
         </div>
     </div>
 </div>
-

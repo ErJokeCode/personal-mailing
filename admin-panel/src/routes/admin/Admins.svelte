@@ -11,7 +11,7 @@
 
     onMount(async () => {
         status = status.start_load();
-        admins = (await http.get("/core/admin", status)).items ?? [];
+        admins = (await http.get("/core/admins", status)).items ?? [];
         status = status.end_load();
     });
 

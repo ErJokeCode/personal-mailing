@@ -5,7 +5,7 @@ import { admin } from "./utils/store";
 import http from "./utils/http";
 import { navigate } from 'svelte-routing';
 
-http.get("/core/admin/me", http.status()).then((the_admin) => {
+http.get("/core/admins/me", http.status()).then((the_admin) => {
     if (the_admin) {
         admin.update((_) => the_admin);
     }
