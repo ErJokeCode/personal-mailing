@@ -20,7 +20,7 @@
                 active: { class: ["bg-gray-100", "dark:bg-gray-700"] },
             }}
             use:route
-            href="/profile">
+            {href}>
             <Icon class="w-6 h-6" />
             <span class="ms-3">{label}</span>
         </a>

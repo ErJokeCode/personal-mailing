@@ -1,7 +1,25 @@
 <script lang="ts">
-    import { ArrowRightToBracketOutline } from "flowbite-svelte-icons";
-    import { DarkMode, Navbar, NavBrand, ToolbarButton } from "flowbite-svelte";
-    import { route } from "@mateothegreat/svelte5-router";
+    import {
+        ArrowLeftToBracketOutline,
+        ArrowRightToBracketOutline,
+    } from "flowbite-svelte-icons";
+    import { DarkMode, Navbar, ToolbarButton } from "flowbite-svelte";
+    import { goto, route } from "@mateothegreat/svelte5-router";
+    import { me } from "./stores/me.svelte";
+    import { serverUrl } from "./stores/server.svelte";
+
+    function login() {
+        goto("/login");
+    }
+
+    async function signout() {
+        await fetch(`${serverUrl}/core/admins/signout`, {
+            credentials: "include",
+            method: "POST",
+        });
+
+        window.location.replace("/");
+    }
 </script>
 
 <header class="border-b border-b-gray-200 dark:border-b-gray-600">
@@ -13,9 +31,15 @@
         </a>
 
         <div>
-            <ToolbarButton class="mr-2">
-                <ArrowRightToBracketOutline size="lg" />
-            </ToolbarButton>
+            {#if me.value !== null}
+                <ToolbarButton class="mr-2" on:click={signout}>
+                    <ArrowRightToBracketOutline size="lg" />
+                </ToolbarButton>
+            {:else}
+                <ToolbarButton class="mr-2" on:click={login}>
+                    <ArrowLeftToBracketOutline size="lg" />
+                </ToolbarButton>
+            {/if}
 
             <DarkMode size="lg" />
         </div>

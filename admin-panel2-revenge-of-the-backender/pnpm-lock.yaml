@@ -11,6 +11,9 @@ importers:
       '@mateothegreat/svelte5-router':
         specifier: ^0.3.3
         version: 0.3.3(svelte@5.20.4)
+      tailwind-merge:
+        specifier: ^3.0.2
+        version: 3.0.2
     devDependencies:
       '@sveltejs/vite-plugin-svelte':
         specifier: ^5.0.3
