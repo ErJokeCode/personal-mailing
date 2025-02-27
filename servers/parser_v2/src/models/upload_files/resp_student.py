@@ -1,7 +1,10 @@
 from pydantic import BaseModel
 
+from models.upload_files.resp_upload import InDB
+
 
 class RespStudent(BaseModel):
+    index: int
     personal_number: str
     full_name: str
     name: str
@@ -13,4 +16,4 @@ class RespStudent(BaseModel):
     status: bool | None = False
     type_of_cost: str | None = None
     type_of_education: str | None = None
-    in_db: bool = False
+    in_db: InDB = InDB.ERROR

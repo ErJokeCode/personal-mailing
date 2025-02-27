@@ -8,6 +8,13 @@ class TypeFile(Enum):
     MODEUS = "modeus"
 
 
+class InDB(Enum):
+    IN_DB = "in_db"
+    NOT_IN_DB = "not_in_db"
+    MANY = "many"
+    ERROR = "error"
+
+
 class ResponseUpload(BaseModel):
     type_file: TypeFile
     key: str

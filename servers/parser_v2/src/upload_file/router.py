@@ -1,4 +1,5 @@
 import logging
+from bson import ObjectId
 from fastapi import APIRouter, HTTPException, UploadFile
 from datetime import datetime
 
@@ -7,6 +8,9 @@ from models.upload_files.filters import FilterModeus, FilterOnline, FilterOnline
 from models.student.db_student import Student, StudentInDB
 from models.student.db_group import InfoGroupInStudent
 from models.upload_files.resp_student import RespStudent
+from models.upload_files.resp_modeus import RespModeus
+from models.file.stucture import ColsExcel, ListExcel, StuctureExcel, StuctureExcelInDB
+
 from upload_file.u_file import UFileOnline, UFileModeus, UFileStudent
 from upload_file.manager import manager_files, ManagerFiles
 from database import db
@@ -21,11 +25,24 @@ router_upload = APIRouter(
 
 
 @router_upload.post("/file")
-async def upload_file(file: UploadFile) -> ResponseUpload:
+async def upload_file(file: UploadFile) -> list[StuctureExcelInDB] | StuctureExcelInDB | StuctureExcel:
     _log.info("Upload file")
     key = await manager_files.add(file)
 
-    return manager_files.get_info(key)
+    structures = manager_files.get_structures(key)
+
+    if structures is None:
+        raise HTTPException(
+            status_code=404,
+            detail="File not found"
+        )
+
+    if len(structures) == 0:
+        return manager_files.get(key).get_base_structure()
+    elif len(structures) == 1:
+        return structures[0]
+
+    return structures
 
 
 @router_upload.post("/student/{key}")
@@ -64,9 +81,9 @@ async def save_students(
     file = manager_files.get(key)
 
     if isinstance(file, UFileStudent):
-        response = file.save(ids)
+        file.save(ids)
 
-        return response
+        return {"status": "success"}
     else:
         raise HTTPException(
             status_code=404,
@@ -78,7 +95,7 @@ async def save_students(
 async def get_info_modeus(
     key: str,
     filter: FilterModeus,
-) -> dict:
+) -> list[RespModeus]:
 
     _log.info("Get info about subject from file %s", key)
     file = manager_files.get(key)
@@ -93,6 +110,26 @@ async def get_info_modeus(
             )
 
         return response
+    else:
+        raise HTTPException(
+            status_code=404,
+            detail="Could not determine file type"
+        )
+
+
+@router_upload.post("/modeus/{key}/save")
+async def save_modeus(
+    key: str,
+    ids: list[int | str] = [-1],
+):
+    _log.info("Save modeus info from file %s", key)
+
+    file = manager_files.get(key)
+
+    if isinstance(file, UFileModeus):
+        resp = file.save(ids)
+
+        return resp
     else:
         raise HTTPException(
             status_code=404,
@@ -147,42 +184,128 @@ async def get_info_online_student(
         )
 
 
-@router_upload.post("/test")
-async def get_info_online_stsedent() -> StudentInDB:
-    st = Student(
-        personal_number="test",
-        name="tessst",
-        surname="test",
-        date_of_birth="test",
-        group=InfoGroupInStudent(
-            number="test",
-            number_course=1
-        )
+@router_upload.post("/structure")
+async def create_structure(structure: StuctureExcel) -> StuctureExcelInDB:
+    _log.info("Create structure")
+
+    structure = StuctureExcel(
+        type_file=TypeFile.STUDENT,
+        lists=[
+            ListExcel(
+                cols=[
+                    ColsExcel(
+                        number_col=0,
+                        name_col_excel="№"
+                    ),
+                    ColsExcel(
+                        number_col=1,
+                        name_col_excel="Фамилия, имя, отчество",
+                        name_col_db=["full_name"]
+                    ),
+                    # ColsExcel(
+                    #     number_col=1,
+                    #     name_col_excel="Фамилия, имя, отчество",
+                    #     name_col_db=["surname", "name", "patronymic"],
+                    #     split=" "
+                    # ),
+                    ColsExcel(
+                        number_col=2,
+                        name_col_excel="Форм. факультет"
+                    ),
+                    ColsExcel(
+                        number_col=3,
+                        name_col_excel="Территориальное подразделение"
+                    ),
+                    ColsExcel(
+                        number_col=4,
+                        name_col_excel="Кафедра"
+                    ),
+                    ColsExcel(
+                        number_col=5,
+                        name_col_excel="Курс",
+                        name_col_db=["number_course"]
+                    ),
+                    ColsExcel(
+                        number_col=6,
+                        name_col_excel="Группа",
+                        name_col_db=["number_group"]
+                    ),
+                    ColsExcel(
+                        number_col=7,
+                        name_col_excel="Состояние",
+                        name_col_db=["status"]
+                    ),
+                    ColsExcel(
+                        number_col=8,
+                        name_col_excel="Вид возм. затрат",
+                        name_col_db=["type_of_cost"]
+                    ),
+                    ColsExcel(
+                        number_col=9,
+                        name_col_excel="Форма освоения",
+                        name_col_db=["type_of_education"]
+                    ),
+                    ColsExcel(
+                        number_col=10,
+                        name_col_excel="Дата рождения",
+                        name_col_db=["date_of_birth"]
+                    ),
+                    ColsExcel(
+                        number_col=11,
+                        name_col_excel="Личный №",
+                        name_col_db=["personal_number"]
+                    )
+                ]
+            ),
+
+        ]
     )
-    st_db = db.student.update_auto(st)
-    if st_db is None:
+
+    try:
+        structure_db = db.structure.insert_one(structure, look_for=True)
+    except Exception as e:
+        _log.warning(e)
+        raise HTTPException(
+            status_code=400,
+            detail=e.__str__()
+        )
+
+    if structure_db is None:
         raise HTTPException(
             status_code=404,
-            detail="Error add student"
+            detail="Error add structure"
         )
-    return st_db
+
+    return structure_db
 
 
-# @router_upload.post("/online/{key}/save")
-# async def save_online_student(
-#     key: str,
-#     ids_student: list[int] = [-1],
-# ) -> dict:
+@router_upload.put("/structure/{id_structure}")
+async def update_structure(id_structure: str, structure: StuctureExcel) -> StuctureExcelInDB:
+    _log.info("Update structure")
+    try:
+        structure_db = db.structure.update_one(
+            structure,
+            filter={"_id": ObjectId(id_structure)},
+            query={"$inc": {"version": 1}},
+            look_for=True)
+    except Exception as e:
+        _log.warning(e)
+        raise HTTPException(
+            status_code=400,
+            detail=e.__str__()
+        )
 
-#     _log.info("Save info about student in online course from file %s", key)
-#     file = manager_files.get(key)
+    if structure_db is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Error add structure"
+        )
 
-#     if isinstance(file, UFileOnline):
-#         response = file.group_by(ids_student, filter)
+    return structure_db
 
-#         return response
-#     else:
-#         raise HTTPException(
-#             status_code=404,
-#             detail="Could not determine file type"
-#         )
+
+@router_upload.delete("/structure/{id_structure}")
+async def delete_structure(id_structure: str) -> dict[str, str]:
+    _log.info("Delete structure")
+
+    return db.structure.delete_one(id=id_structure)

@@ -11,6 +11,8 @@ from pymongo.collection import Collection
 
 from models.base.base import BaseModelInDB, EBaseModel
 from models.student.db_student import Student, StudentInDB
+from models.upload_files.resp_upload import InDB
+from models.file.stucture import StuctureExcel, StuctureExcelInDB
 
 _log = logging.getLogger(__name__)
 
@@ -219,8 +221,15 @@ class ECollectV2(Generic[V, T]):
             return None
         return self.__cls_db(**item)
 
-    def is_in(self, **kwargs) -> bool:
-        return self.__collect.find_one(kwargs) != None
+    def is_in(self, **kwargs) -> InDB:
+        ln = len(self.__collect.find(kwargs).to_list())
+
+        if ln == 0:
+            return InDB.NOT_IN_DB
+        elif ln == 1:
+            return InDB.IN_DB
+        else:
+            return InDB.MANY
 
     def update_auto(
         self,
@@ -265,8 +274,101 @@ class ECollectV2(Generic[V, T]):
         return set_update
 
 
+I = TypeVar("I", bound=BaseModel)
+O = TypeVar("O", bound=BaseModelInDB)
+
+
+class ECollectV3(Generic[I, O]):
+    def __init__(self, db_client: database.Database, cls: type[I], cls_db: type[O]) -> None:
+        self.__db_client = db_client
+
+        name_collect = cls.__name__[0].lower() + cls.__name__[1:]
+        name_collect = "".join(
+            [ch if ch.islower() else "_" + ch.lower() for ch in name_collect])
+        self.__collect = db_client[name_collect]
+        self.__collect_version = db_client[name_collect + "_version"]
+
+        self.__cls = cls
+        self.__cls_db = cls_db
+
+    def insert_one(self, item: I, look_for: bool = False) -> None | O:
+        id = self.__collect.insert_one(
+            {**item.model_dump(), "version": 1}).inserted_id
+
+        if id is None:
+            raise Exception("Item not inserted")
+
+        item_db = self.__collect.find_one({"_id": id})
+        if item_db is None:
+            raise Exception("Item not found")
+        m_item_db = self.__cls_db(**item_db)
+
+        d_item_db = m_item_db.model_dump()
+
+        self.__collect_version.insert_one(d_item_db)
+
+        if look_for:
+            return m_item_db
+
+        return None
+
+    def update_one(
+        self,
+        item: I | None = None,
+        filter: dict | None = None,
+        query: dict = {},
+        look_for: bool = False
+    ) -> None | O:
+
+        if filter is None:
+            raise Exception("Filter not found")
+
+        start_item = self.__collect.find_one(filter)
+        if start_item is None:
+            raise Exception("Item not found")
+        d_start_item = self.__cls_db(**start_item).model_dump()
+
+        queries = {}
+        if item is not None:
+            queries = {"$set": item.model_dump(), **query}
+        else:
+            queries = query
+
+        self.__collect.update_one(
+            filter, queries)
+
+        item_db = self.__collect.find_one(filter)
+        if item_db is None:
+            raise Exception("Item not found")
+        m_item_db = self.__cls_db(**item_db)
+
+        save_version = {"id": m_item_db.id, "version": m_item_db.version}
+        for key, value in m_item_db.model_dump().items():
+            start_value = d_start_item.get(key)
+            if start_value != value:
+                save_version[key] = value
+
+        self.__collect_version.insert_one(save_version)
+
+        if look_for:
+            return self.__cls_db(**item_db)
+
+        return None
+
+    def delete_one(self, id: str) -> dict:
+        cnt = self.__collect.delete_one({"_id": ObjectId(id)}).deleted_count
+
+        if cnt == 1:
+            return {"status": "success"}
+        return {"status": "error"}
+
+    def find(self, filter: dict) -> list[O]:
+        return [self.__cls_db(**item) for item in self.__collect.find(filter)]
+
+
 class EDataBase():
     student: ECollectV2[Student, StudentInDB]
+    structure: ECollectV3[StuctureExcel, StuctureExcelInDB]
 
     def __init__(self, host: str, port: int, name_db: str):
         self.__db: database.Database = MongoClient(
@@ -274,6 +376,10 @@ class EDataBase():
 
         self.student = ECollectV2(
             self.__db, Student, StudentInDB)
+
+        self.structure = ECollectV3(
+            self.__db, StuctureExcel, StuctureExcelInDB
+        )
 
     @property
     def db(self) -> database.Database:

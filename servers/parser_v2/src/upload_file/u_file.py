@@ -2,7 +2,7 @@ from datetime import datetime
 import logging
 import pandas as pd
 
-from models.upload_files.resp_upload import TypeFile
+from models.upload_files.resp_upload import InDB, TypeFile
 from models.upload_files.filters import FilterModeus, FilterOnline, FilterOnlineStudent, FilterStudent
 from pandas.core.groupby.generic import DataFrameGroupBy
 
@@ -10,6 +10,8 @@ from database import db
 from models.student.db_student import Student
 from models.student.db_group import InfoGroupInStudent
 from models.upload_files.resp_student import RespStudent
+from models.upload_files.resp_modeus import RespModeus
+from models.file.stucture import ColsExcel, ListExcel, StuctureExcel, StuctureExcelInDB
 
 _log = logging.getLogger(__name__)
 
@@ -54,12 +56,52 @@ class UFileStudent(UFile):
     def __init__(self, name: str | int, df: pd.DataFrame):
         super().__init__(TypeFile.STUDENT)
         self.__name = name
-        new_df = pd.DataFrame()
+        new_df = self.__create_new_df(df)
+        self._add_sheet(name, new_df)
 
-        # spl_fio = str(student_sr[name_cl[1]]).split()
-        # surname = spl_fio[0] if len(spl_fio) > 0 else ""
-        # name = spl_fio[1] if len(spl_fio) > 1 else ""
-        # patronymic = " ".join(spl_fio[2:]) if len(spl_fio) > 2 else ""
+    def filter(self, filter: FilterStudent) -> list[RespStudent] | None:
+        df = self._get_sheet(self.__name)
+
+        if df is None:
+            return None
+        name_cl = df.columns
+
+        filter_df = df[
+            (df[name_cl[1]].str.contains(filter.name_student)) &
+            (df[name_cl[6]].str.contains(filter.number_group)) &
+            (df[name_cl[7]].apply(str).str.contains(filter.number_course)) &
+            (df[name_cl[10]].str.contains(filter.form_education))
+        ]
+
+        students = self._slice(
+            filter_df, filter).reset_index().to_dict("records")
+
+        md_students: list[RespStudent] = [
+            RespStudent.model_validate(student) for student in students]
+
+        return md_students
+
+    def save(self, ids: list[int | str]) -> None:
+        df = self.df
+        int_ids = [int(id) for id in ids]
+
+        if len(ids) == 1 and ids[0] == -1:
+            students = df
+        else:
+            students = df.iloc[int_ids]
+
+        for student in students.to_dict("records"):
+            student_model = Student.model_validate(student)
+            if student["in_db"] == True:
+                _log.info("Update")
+                db.student.update_auto(
+                    student_model, "$set", Student.update_fields_file_student())
+            else:
+                _log.info("Insert")
+                db.student.update_auto(student_model)
+
+    def __create_new_df(self, df: pd.DataFrame) -> pd.DataFrame:
+        new_df = pd.DataFrame()
 
         name_cl_df = df.columns
 
@@ -81,49 +123,7 @@ class UFileStudent(UFile):
         new_df["in_db"] = numbers.apply(
             lambda x: db.student.is_in(personal_number=x))
 
-        self._add_sheet(name, new_df)
-
-    def filter(self, filter: FilterStudent) -> list[RespStudent] | None:
-        df = self._get_sheet(self.__name)
-
-        if df is None:
-            return None
-        name_cl = df.columns
-        _log.info(name_cl)
-
-        filter_df = df[
-            (df[name_cl[1]].str.contains(filter.name_student)) &
-            (df[name_cl[6]].str.contains(filter.number_group)) &
-            (df[name_cl[7]].apply(str).str.contains(filter.number_course)) &
-            (df[name_cl[10]].str.contains(filter.form_education))
-        ]
-
-        students = self._slice(
-            filter_df, filter).reset_index().to_dict("records")
-
-        md_students: list[RespStudent] = [
-            RespStudent.model_validate(student) for student in students]
-
-        return md_students
-
-    def save(self, ids: list[int | str]):
-        df = self.df
-        int_ids = [int(id) for id in ids]
-
-        if len(ids) == 1 and ids[0] == -1:
-            students = df
-        else:
-            students = df.iloc[int_ids]
-
-        for student in students.to_dict("records"):
-            student_model = Student.model_validate(student)
-            if student["in_db"] == True:
-                _log.info("Update")
-                db.student.update_auto(
-                    student_model, "$set", Student.update_fields_file_student())
-            else:
-                _log.info("Insert")
-                db.student.update_auto(student_model)
+        return new_df
 
     @property
     def df(self):
@@ -136,21 +136,81 @@ class UFileModeus(UFile):
     def __init__(self, name: str | int, df: pd.DataFrame):
         super().__init__(TypeFile.MODEUS)
         self.__name = name
-        self._add_sheet(name, df)
+        new_df = self.__create_new_df(df)
+        self._add_sheet(name, new_df)
 
-    def filter(self, filter: FilterModeus) -> dict:
+    def filter(self, filter: FilterModeus) -> list[RespModeus]:
         df = self._get_sheet(self.__name)
 
         if df is None:
-            return {}
+            return []
+        name_cl = df.columns
 
         filter_df = df[
-            (df['Студент'].str.contains(filter.name_student)) &
-            (df['РМУП название'].str.contains(filter.subject)) &
-            (df['Группа название'].str.contains(filter.team))
+            (df[name_cl[0]].str.contains(filter.name_student)) &
+            (df[name_cl[3]].str.contains(filter.subject)) &
+            (df[name_cl[4]].str.contains(filter.team))
         ]
 
-        return self._slice(filter_df, filter).to_dict()
+        students = self._slice(
+            filter_df, filter).reset_index().to_dict("records")
+
+        md_students: list[RespModeus] = [
+            RespModeus.model_validate(student) for student in students]
+
+        return md_students
+
+    def save(self, ids: list[int | str]) -> dict | None:
+        df = self.df
+
+        if df is None:
+            _log.warning("Not found sheet %s", self.__name)
+            return None
+
+        df = df[df[df.columns[-1]] == InDB.IN_DB.value]
+        int_ids = [int(id) for id in ids]
+
+        if len(ids) == 1 and ids[0] == -1:
+            students = df
+        else:
+            students = df.iloc[int_ids]
+
+        subject_group: dict[str, dict[str, dict]] = students.groupby(
+            [students.columns[3]]
+        ).apply(self.__group_team).to_dict()
+
+        for name_subject, teams in subject_group.items():
+            for name_team, st_and_tch in teams.items():
+                students = st_and_tch["students"]
+                teachers = st_and_tch["teachers"]
+
+        return subject_group
+
+    def __create_new_df(self, df: pd.DataFrame) -> pd.DataFrame:
+        new_df = pd.DataFrame()
+
+        name_cl_df = df.columns
+
+        new_df["full_name"] = df[name_cl_df[1]]
+        new_df[["direction_code", "name_speciality"]
+               ] = df[name_cl_df[3]].str.extract(r"(\d\d.\d\d.\d\d)\s*(.*)")
+        new_df[["subject_name", "team_name", "teacher"]] = df[[
+            name_cl_df[5], name_cl_df[8], name_cl_df[9]]]
+        new_df["in_db"] = df[name_cl_df[1]].apply(
+            lambda x: db.student.is_in(full_name=x).value)
+
+        return new_df
+
+    def __group_team(self, df: pd.DataFrame):
+        d = df.groupby(
+            df.columns[-3]).apply(self.__get_students_teachers).to_dict()
+
+        return d
+
+    def __get_students_teachers(self, df: pd.DataFrame) -> dict:
+        students = df[df.columns[:3].to_list()].to_dict("records")
+        teachers = set(df[df.columns[-2]])
+        return {"students": students, "teachers": list(teachers)}
 
     @property
     def df(self):
@@ -246,3 +306,34 @@ class UFileOnline(UFile):
     def save(self, ids: list[int]):
         pass
         # df = self.__cache_group_df.iloc[ids]
+
+
+class UpFile:
+    def __init__(self, dfs: list[pd.DataFrame]) -> None:
+        self.__dfs = dfs
+        self.__structure: StuctureExcelInDB
+
+    def add_structure(self, structure: StuctureExcelInDB) -> None:
+        self.__structure = structure
+
+    def get_base_structure(self) -> StuctureExcel:
+        struc_excel = []
+        for df in self.__dfs:
+            list_cols = []
+            columns = df.columns.to_list()
+            for i in range(len(columns)):
+                m_cl = ColsExcel(
+                    number_col=i,
+                    name_col_excel=columns[i],
+                )
+                list_cols.append(m_cl)
+
+            list_excel = ListExcel(
+                cols=list_cols
+            )
+
+            struc_excel.append(list_excel)
+
+        return StuctureExcel(
+            lists=struc_excel
+        )

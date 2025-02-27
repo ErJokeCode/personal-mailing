@@ -15,4 +15,4 @@ class EBaseModel(BaseModel):
 
 class BaseModelInDB(EBaseModel):
     id: Optional[PyObjectId] = Field(alias="_id", default=None)
-    version: int
+    version: int = 1
