@@ -5,15 +5,15 @@
     } from "flowbite-svelte-icons";
     import { DarkMode, Navbar, ToolbarButton } from "flowbite-svelte";
     import { goto, route } from "@mateothegreat/svelte5-router";
-    import { me } from "./stores/me.svelte";
-    import { serverUrl } from "./stores/server.svelte";
+    import { me } from "/src/stores/me.svelte";
+    import { AdminsApi } from "/src/lib/server";
 
     function login() {
         goto("/login");
     }
 
     async function signout() {
-        await fetch(`${serverUrl}/core/admins/signout`, {
+        await fetch(`${AdminsApi}/signout`, {
             credentials: "include",
             method: "POST",
         });

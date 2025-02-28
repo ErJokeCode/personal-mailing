@@ -59,7 +59,6 @@
     <Route path="/groups" component={AssignGroup} />
 
     <Route path="/faq" component={Faq} />
-  import {registry} from "@mateothegreat/svelte5-router/registry.js";
 </main>
 
 <style>

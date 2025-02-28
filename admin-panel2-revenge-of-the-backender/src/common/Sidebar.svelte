@@ -1,7 +1,7 @@
 <script lang="ts">
     import { active, route } from "@mateothegreat/svelte5-router";
     import { Sidebar, SidebarWrapper } from "flowbite-svelte";
-    import { CogOutline } from "flowbite-svelte-icons";
+    import { CogOutline, UserSettingsOutline } from "flowbite-svelte-icons";
     import { type Component } from "svelte";
 </script>
 
@@ -9,6 +9,7 @@
     class="overflow-hidden border-r-gray-200 dark:border-r-gray-600 border-r h-screen">
     <SidebarWrapper class="h-full rounded-none list-none flex flex-col gap-2">
         {@render sidebarItem("Профиль", "/profile", CogOutline)}
+        {@render sidebarItem("Админы", "/admins", UserSettingsOutline)}
     </SidebarWrapper>
 </Sidebar>
 

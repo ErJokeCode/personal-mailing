@@ -7,7 +7,8 @@
         Label,
         type InputType,
     } from "flowbite-svelte";
-    import { serverUrl } from "/src/stores/server.svelte";
+    import { AdminsApi } from "/src/lib/server";
+    import { GeneralError } from "/src/lib/errors";
 
     let form = $state({ Email: "", Password: "" });
     let errors = $state({ Email: "", Password: "" });
@@ -21,7 +22,7 @@
 
     async function login() {
         try {
-            let res = await fetch(`${serverUrl}/core/admins/login`, {
+            let res = await fetch(`${AdminsApi}/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -41,7 +42,7 @@
                 status = body.detail;
             }
         } catch {
-            status = "Что-то пошло не так...";
+            status = GeneralError;
         }
     }
 </script>
