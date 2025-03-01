@@ -1,6 +1,6 @@
 <script lang="ts">
-    import { PageNotFound } from "/src/lib/errors";
-    import { Heading } from "flowbite-svelte";
+    import { GeneralError, PageNotFound } from "/src/lib/errors";
+    import ErrorAlert from "/src/lib/components/ErrorAlert.svelte";
 </script>
 
-<Heading class="text-center m-4">{PageNotFound}</Heading>
+<ErrorAlert class="m-4" title="404">{PageNotFound}</ErrorAlert>

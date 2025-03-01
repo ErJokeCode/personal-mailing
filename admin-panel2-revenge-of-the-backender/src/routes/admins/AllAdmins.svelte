@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Paged from "/src/lib/components/Paged.svelte";
     import {
         Button,
         Heading,
@@ -11,12 +12,20 @@
         TableHeadCell,
     } from "flowbite-svelte";
     import { goto } from "@mateothegreat/svelte5-router";
-    import { ClipboardOutline } from "flowbite-svelte-icons";
+    import { ClipboardOutline, SearchOutline } from "flowbite-svelte-icons";
     import { GeneralError } from "/src/lib/errors";
-    import { AdminsApi } from "/src/lib/server";
+    import { AdminsApi, PageSize } from "/src/lib/server";
+    import ErrorAlert from "/src//lib/components/ErrorAlert.svelte";
+    import { AllAdmins } from "/src/stores/admins/AllAdmins.svelte";
+    import Search from "/src/lib/components/Search.svelte";
 
     async function get() {
-        let res = await fetch(`${AdminsApi}`, {
+        let url = new URL(AdminsApi);
+        url.searchParams.append("search", AllAdmins.search);
+        url.searchParams.append("page", AllAdmins.page.toString());
+        url.searchParams.append("pageSize", PageSize.toString());
+
+        let res = await fetch(url, {
             credentials: "include",
         });
 
@@ -30,10 +39,23 @@
     }
 </script>
 
+<Heading tag="h2" class="m-4">Админы</Heading>
+
+<Search
+    bind:page={AllAdmins.page}
+    class="m-4"
+    value={AllAdmins.search}
+    bind:search={AllAdmins.search} />
+
 {#await get()}
     <Spinner size="8" class="m-4" />
 {:then body}
-    <Heading tag="h2" class="m-4">Админы</Heading>
+    <Paged
+        class="m-4"
+        bind:page={AllAdmins.page}
+        totalPages={body.totalPages}
+        hasNextPage={body.hasNextPage}
+        hasPreviousPage={body.hasPreviousPage} />
 
     <Table>
         <TableHead>
@@ -56,5 +78,5 @@
         </TableBody>
     </Table>
 {:catch}
-    <Heading tag="h2" class="m-4">{GeneralError}</Heading>
+    <ErrorAlert class="m-4" title="Ошибка">{GeneralError}</ErrorAlert>
 {/await}

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { me } from "./stores/me.svelte";
+    import { Me } from "./stores/Me.svelte";
     import Header from "./common/Header.svelte";
     import Sidebar from "./common/Sidebar.svelte";
     import Main from "./common/Main.svelte";
@@ -9,7 +9,7 @@
     <Header />
 
     <div class="h-full flex overflow-hidden">
-        {#if me.value !== null}
+        {#if Me.value !== null}
             <Sidebar />
         {/if}
 

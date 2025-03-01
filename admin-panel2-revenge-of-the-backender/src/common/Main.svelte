@@ -1,6 +1,6 @@
 <script lang="ts">
     import { goto, Router, type Route } from "@mateothegreat/svelte5-router";
-    import { me } from "/src/stores/me.svelte";
+    import { Me } from "../stores/Me.svelte";
     import { AdminsApi } from "/src//lib/server";
 
     import Login from "/src/routes/admins/Login.svelte";
@@ -24,7 +24,7 @@
             }
 
             let body = await res.json();
-            me.value = body;
+            Me.value = body;
             return true;
         } catch {
             goto("/login");

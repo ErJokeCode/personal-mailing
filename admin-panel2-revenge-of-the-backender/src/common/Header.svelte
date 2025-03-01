@@ -5,7 +5,7 @@
     } from "flowbite-svelte-icons";
     import { DarkMode, Navbar, ToolbarButton } from "flowbite-svelte";
     import { goto, route } from "@mateothegreat/svelte5-router";
-    import { me } from "/src/stores/me.svelte";
+    import { Me } from "/src/stores/Me.svelte";
     import { AdminsApi } from "/src/lib/server";
 
     function login() {
@@ -31,7 +31,7 @@
         </a>
 
         <div>
-            {#if me.value !== null}
+            {#if Me.value !== null}
                 <ToolbarButton class="mr-2" on:click={signout}>
                     <ArrowRightToBracketOutline size="lg" />
                 </ToolbarButton>

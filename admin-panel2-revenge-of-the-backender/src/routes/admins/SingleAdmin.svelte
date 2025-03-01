@@ -5,6 +5,7 @@
     import { ArrowLeftOutline } from "flowbite-svelte-icons";
     import { GeneralError } from "/src/lib/errors";
     import { AdminsApi } from "/src/lib/server";
+    import ErrorAlert from "/src/lib/components/ErrorAlert.svelte";
 
     let { route }: { route: Route } = $props();
     let adminId = route.params["adminId"];
@@ -31,30 +32,18 @@
     }
 </script>
 
+<Button class="m-4 mr-2 align-middle" on:click={returnBack}>
+    <ArrowLeftOutline />
+</Button>
+
 {#await get()}
     <Spinner size="8" class="m-4" />
 {:then body}
-    <div class="m-4">
-        {@render backButton()}
-
-        <Heading class="inline align-middle" tag="h2">
-            Профиль {body.email}
-        </Heading>
-    </div>
+    <Heading class="inline align-middle" tag="h2">
+        Профиль {body.email}
+    </Heading>
 
     <AdminInfo {body} />
 {:catch}
-    <div class="m-4">
-        {@render backButton()}
-    </div>
-
-    <Heading tag="h2" class="m-4">
-        {errorMessage}
-    </Heading>
+    <ErrorAlert class="m-4" title="Ошибка">{errorMessage}</ErrorAlert>
 {/await}
-
-{#snippet backButton()}
-    <Button class="mr-2 align-middle" on:click={returnBack}>
-        <ArrowLeftOutline />
-    </Button>
-{/snippet}
