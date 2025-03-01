@@ -5,6 +5,8 @@
     import { type Component } from "svelte";
 </script>
 
+<!-- TODO Remake this with dropdown menus -->
+
 <Sidebar
     class="overflow-hidden border-r-gray-200 dark:border-r-gray-600 border-r h-screen">
     <SidebarWrapper class="h-full rounded-none list-none flex flex-col gap-2">

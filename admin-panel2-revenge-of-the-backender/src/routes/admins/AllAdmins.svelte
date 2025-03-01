@@ -3,6 +3,8 @@
     import {
         Button,
         Heading,
+        SpeedDial,
+        SpeedDialButton,
         Spinner,
         Table,
         TableBody,
@@ -12,7 +14,7 @@
         TableHeadCell,
     } from "flowbite-svelte";
     import { goto } from "@mateothegreat/svelte5-router";
-    import { ClipboardOutline, SearchOutline } from "flowbite-svelte-icons";
+    import { CirclePlusOutline, ClipboardOutline } from "flowbite-svelte-icons";
     import { GeneralError } from "/src/lib/errors";
     import { AdminsApi, PageSize } from "/src/lib/server";
     import ErrorAlert from "/src//lib/components/ErrorAlert.svelte";
@@ -37,7 +39,17 @@
     async function single(adminId: string) {
         goto(`/admins/${adminId}`);
     }
+
+    async function create() {
+        goto("/create-admin");
+    }
 </script>
+
+<SpeedDial>
+    <SpeedDialButton name="Создать" on:click={create}>
+        <CirclePlusOutline />
+    </SpeedDialButton>
+</SpeedDial>
 
 <Heading tag="h2" class="m-4">Админы</Heading>
 
@@ -65,7 +77,7 @@
         </TableHead>
         <TableBody tableBodyClass="divide-y">
             {#each body.items as admin (admin.id)}
-                <TableBodyRow>
+                <TableBodyRow class="text-lg">
                     <TableBodyCell>{admin.email}</TableBodyCell>
                     <TableBodyCell>{admin.createdAt}</TableBodyCell>
                     <TableBodyCell>

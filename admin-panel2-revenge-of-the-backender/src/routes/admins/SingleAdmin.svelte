@@ -1,15 +1,14 @@
 <script lang="ts">
-    import { goto, type Route } from "@mateothegreat/svelte5-router";
-    import { Button, Heading, Spinner, TabItem, Tabs } from "flowbite-svelte";
+    import BackButton from "/src/lib/components/BackButton.svelte";
+    import { type Route } from "@mateothegreat/svelte5-router";
+    import { Heading, Spinner } from "flowbite-svelte";
     import AdminInfo from "./shared/AdminInfo.svelte";
-    import { ArrowLeftOutline } from "flowbite-svelte-icons";
     import { GeneralError } from "/src/lib/errors";
     import { AdminsApi } from "/src/lib/server";
     import ErrorAlert from "/src/lib/components/ErrorAlert.svelte";
 
     let { route }: { route: Route } = $props();
     let adminId = route.params["adminId"];
-    let returnUrl = route.query === undefined ? null : route.query["returnUrl"];
     let errorMessage = $state(GeneralError);
 
     async function get() {
@@ -26,15 +25,12 @@
 
         return body;
     }
-
-    async function returnBack() {
-        goto(returnUrl ?? "/admins");
-    }
 </script>
 
-<Button class="m-4 mr-2 align-middle" on:click={returnBack}>
-    <ArrowLeftOutline />
-</Button>
+<BackButton
+    fallback="/admins"
+    {route}
+    class="inline-block m-4 mr-0 align-middle" />
 
 {#await get()}
     <Spinner size="8" class="m-4" />

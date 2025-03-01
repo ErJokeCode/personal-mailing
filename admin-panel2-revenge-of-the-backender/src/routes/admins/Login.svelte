@@ -1,24 +1,12 @@
 <script lang="ts">
-    import {
-        Button,
-        Card,
-        Helper,
-        Input,
-        Label,
-        type InputType,
-    } from "flowbite-svelte";
+    import InputHelper from "/src/lib/components/InputHelper.svelte";
+    import { Button, Card, Helper } from "flowbite-svelte";
     import { AdminsApi } from "/src/lib/server";
     import { GeneralError } from "/src/lib/errors";
 
     let form = $state({ Email: "", Password: "" });
     let errors = $state({ Email: "", Password: "" });
     let status = $state("");
-
-    async function keypress(event) {
-        if (event.key == "Enter") {
-            await login();
-        }
-    }
 
     async function login() {
         try {
@@ -49,8 +37,25 @@
 
 <div class="flex h-full items-center justify-center">
     <Card class="max-w-lg">
-        {@render input("Email", "email", "Почта", "example@mail.com")}
-        {@render input("Password", "password", "Пароль", "••••••••")}
+        <InputHelper
+            enterPressed={login}
+            bind:error={errors["Email"]}
+            bind:value={form["Email"]}
+            label="Почта"
+            name="Email"
+            placeholder="example@mail.com"
+            type="email"
+            required />
+
+        <InputHelper
+            enterPressed={login}
+            bind:error={errors["Password"]}
+            bind:value={form["Password"]}
+            label="Пароль"
+            name="Password"
+            placeholder="••••••••"
+            type="password"
+            required />
 
         <Button class="max-w-fit" size="lg" on:click={login}>Войти</Button>
 
@@ -59,27 +64,3 @@
         </Helper>
     </Card>
 </div>
-
-{#snippet input(
-    name: string,
-    type: InputType,
-    content: string,
-    placeholder: string,
-)}
-    <div class="mb-6">
-        <Label for={name} class="mb-2 text-xl">{content}</Label>
-        <Input
-            on:keypress={keypress}
-            bind:value={form[name]}
-            size="lg"
-            id={name}
-            {type}
-            {name}
-            {placeholder}
-            required />
-
-        <Helper class="mt-2 text-lg" color="red">
-            {errors[name]}
-        </Helper>
-    </div>
-{/snippet}

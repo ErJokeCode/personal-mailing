@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { GeneralError, PageNotFound } from "/src/lib/errors";
+    import { PageNotFound } from "/src/lib/errors";
     import ErrorAlert from "/src/lib/components/ErrorAlert.svelte";
 </script>
 

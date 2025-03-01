@@ -25,7 +25,7 @@
     let baseClass = "flex gap-1";
     let contentClass = $derived(twMerge([baseClass, restProps.class]));
     let disabledClass =
-        "hover:bg-transparent hover:text-gray-500 dark:hover:bg-transparent dark:hover:text-gray-400";
+        "hover:bg-white hover:text-gray-500 dark:hover:bg-gray-800 dark:hover:text-gray-400";
 
     function getPages(totalPages: number) {
         let pages = [];

@@ -1,6 +1,7 @@
 <script lang="ts">
+    import CreateAdmin from "/src/routes/admins/CreateAdmin.svelte";
     import { goto, Router, type Route } from "@mateothegreat/svelte5-router";
-    import { Me } from "../stores/Me.svelte";
+    import { Me } from "/src/stores/Me.svelte";
     import { AdminsApi } from "/src//lib/server";
 
     import Login from "/src/routes/admins/Login.svelte";
@@ -44,6 +45,10 @@
         {
             path: "profile",
             component: Profile,
+        },
+        {
+            path: "create-admin",
+            component: CreateAdmin,
         },
         {
             path: "admins/(?<adminId>.*)",
