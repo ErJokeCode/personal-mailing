@@ -6,6 +6,7 @@ import logging
 
 from config import settings
 from upload_file.router import router_upload
+from test_pages.router import router as router_test
 # from src.student.router import router_user
 # from src.online_course.router import router_course
 # from src.subject.router import router_subject
@@ -40,6 +41,7 @@ app.add_middleware(
 )
 
 app.include_router(router_upload)
+app.include_router(router_test)
 # app.include_router(router_user)
 # app.include_router(router_course)
 # app.include_router(router_subject)

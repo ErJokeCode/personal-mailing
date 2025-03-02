@@ -291,6 +291,10 @@ class ECollectV3(Generic[I, O]):
         self.__cls = cls
         self.__cls_db = cls_db
 
+    @property
+    def collect(self) -> Collection:
+        return self.__collect
+
     def insert_one(self, item: I, look_for: bool = False) -> None | O:
         id = self.__collect.insert_one(
             {**item.model_dump(), "version": 1}).inserted_id
@@ -317,7 +321,8 @@ class ECollectV3(Generic[I, O]):
         item: I | None = None,
         filter: dict | None = None,
         query: dict = {},
-        look_for: bool = False
+        look_for: bool = False,
+        upsert: bool = False
     ) -> None | O:
 
         if filter is None:
@@ -335,7 +340,7 @@ class ECollectV3(Generic[I, O]):
             queries = query
 
         self.__collect.update_one(
-            filter, queries)
+            filter, queries, upsert=upsert)
 
         item_db = self.__collect.find_one(filter)
         if item_db is None:
@@ -365,16 +370,27 @@ class ECollectV3(Generic[I, O]):
     def find(self, filter: dict) -> list[O]:
         return [self.__cls_db(**item) for item in self.__collect.find(filter)]
 
+    def find_one(self, **kwargs) -> O | None:
+        if kwargs.get("id") != None:
+            kwargs["_id"] = ObjectId(kwargs["id"])
+            del kwargs["id"]
+
+        item = self.__collect.find_one(kwargs)
+        if item == None:
+            return None
+
+        return self.__cls_db(**item)
+
 
 class EDataBase():
-    student: ECollectV2[Student, StudentInDB]
+    student: ECollectV3[Student, StudentInDB]
     structure: ECollectV3[StuctureExcel, StuctureExcelInDB]
 
     def __init__(self, host: str, port: int, name_db: str):
         self.__db: database.Database = MongoClient(
             host=host, port=port)[name_db]
 
-        self.student = ECollectV2(
+        self.student = ECollectV3(
             self.__db, Student, StudentInDB)
 
         self.structure = ECollectV3(

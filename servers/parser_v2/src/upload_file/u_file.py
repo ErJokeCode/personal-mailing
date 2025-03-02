@@ -312,6 +312,7 @@ class UpFile:
     def __init__(self, dfs: list[pd.DataFrame]) -> None:
         self.__dfs = dfs
         self.__structure: StuctureExcelInDB
+        self.__df: pd.DataFrame
 
     def add_structure(self, structure: StuctureExcelInDB) -> None:
         self.__structure = structure
@@ -337,3 +338,84 @@ class UpFile:
         return StuctureExcel(
             lists=struc_excel
         )
+
+    def get_info(self):
+        struct = self.__structure
+        if struct is None:
+            raise Exception("Not found structure")
+
+        dfs = self.__get_info(struct)
+        df = self.__from_dfs_to_df(dfs)
+        return df.to_dict("records")
+
+    def __get_info(self, struct: StuctureExcelInDB):
+        new_dfs = []
+        for i in range(len(struct.lists)):
+            df = self.__dfs[i].copy()
+
+            for cl in struct.lists[i].cols:
+                if cl.split is not None:
+                    sp = df[cl.name_col_excel].str.split(
+                        cl.split.by_split, expand=True)
+
+                    _log.info(sp)
+
+                    m = sp.shape[1]
+                    n = len(cl.split.name_col_db) - 1
+                    if m > n:
+                        _log.info(sp.iloc[:, n:])
+                        combined_col = sp.iloc[:, n:].fillna(
+                            '').agg(' '.join, axis=1).str.strip()
+                        _log.info(combined_col)
+                    df[[*cl.split.name_col_db[:-1]]
+                       ] = sp[[i for i in range(n)]]
+                    df[cl.split.name_col_db[-1]] = combined_col
+
+                if cl.name_col_db is None:
+                    df = df.drop(cl.name_col_excel, axis=1)
+                else:
+                    df[cl.name_col_db] = df[cl.name_col_excel].copy()
+                    df = df.drop(cl.name_col_excel, axis=1)
+
+            new_dfs.append(df.reset_index())
+        self.__dfs = new_dfs.copy()
+        return new_dfs
+
+    def __from_dfs_to_df(self, dfs: list[pd.DataFrame]) -> pd.DataFrame:
+        self.__df = pd.concat(dfs, ignore_index=True)
+        return self.__df.copy()
+
+    def save(self, ids: list[int]):
+        items = self.__df.iloc[ids]
+
+        student = {}
+        for item in items.to_dict("records"):
+            for key in item.keys():
+                if "student__" in str(key):
+                    new_key = str(key).replace("student__", "")
+                    val = item[key]
+
+                    if new_key == "status":
+                        if item[key] == "Активный":
+                            val = True
+                        else:
+                            val = False
+
+                    if new_key == "personal_number":
+                        val = "0" * (8 - len(str(val))) + str(val)
+
+                    student[new_key] = val
+
+            student_model = Student.model_validate(student)
+
+            try:
+                db.student.update_one(
+                    student_model,
+                    filter={"personal_number": student_model.personal_number},
+                    upsert=True
+                )
+            except Exception as e:
+                if str(e) == "Item not found":
+                    db.student.insert_one(student_model)
+                else:
+                    _log.error(e)

@@ -9,7 +9,7 @@ from models.student.db_student import Student, StudentInDB
 from models.student.db_group import InfoGroupInStudent
 from models.upload_files.resp_student import RespStudent
 from models.upload_files.resp_modeus import RespModeus
-from models.file.stucture import ColsExcel, ListExcel, StuctureExcel, StuctureExcelInDB
+from models.file.stucture import ColsExcel, ListExcel, Split, StuctureExcel, StuctureExcelInDB
 
 from upload_file.u_file import UFileOnline, UFileModeus, UFileStudent
 from upload_file.manager import manager_files, ManagerFiles
@@ -25,7 +25,7 @@ router_upload = APIRouter(
 
 
 @router_upload.post("/file")
-async def upload_file(file: UploadFile) -> list[StuctureExcelInDB] | StuctureExcelInDB | StuctureExcel:
+async def upload_file(file: UploadFile) -> dict[str, list[StuctureExcelInDB] | StuctureExcel | str]:
     _log.info("Upload file")
     key = await manager_files.add(file)
 
@@ -38,11 +38,36 @@ async def upload_file(file: UploadFile) -> list[StuctureExcelInDB] | StuctureExc
         )
 
     if len(structures) == 0:
-        return manager_files.get(key).get_base_structure()
-    elif len(structures) == 1:
-        return structures[0]
+        return {"key": key, "structures": manager_files.get(key).get_base_structure()}
 
-    return structures
+    return {"key": key, "structures": structures}
+
+
+@router_upload.post("/file/{key}")
+async def get_info_file(key: str, id_structure: str):
+    _log.info("Get info about file %s", key)
+
+    file = manager_files.get(key)
+    structure = db.structure.find_one(id=id_structure)
+
+    if structure is None:
+        raise HTTPException(
+            status_code=404,
+            detail="Structure not found"
+        )
+
+    file.add_structure(structure)
+
+    return file.get_info()
+
+
+@router_upload.post("/file/{key}/save")
+async def save_file(key: str, ids: list[int] = [-1]):
+    _log.info("Get info about file %s", key)
+
+    file = manager_files.get(key)
+
+    return file.save(ids)
 
 
 @router_upload.post("/student/{key}")
@@ -200,14 +225,13 @@ async def create_structure(structure: StuctureExcel) -> StuctureExcelInDB:
                     ColsExcel(
                         number_col=1,
                         name_col_excel="Фамилия, имя, отчество",
-                        name_col_db=["full_name"]
+                        name_col_db="student__full_name",
+                        split=Split(
+                            name_col_db=["student__surname",
+                                         "student__name", "student__patronymic"],
+                            by_split=" "
+                        )
                     ),
-                    # ColsExcel(
-                    #     number_col=1,
-                    #     name_col_excel="Фамилия, имя, отчество",
-                    #     name_col_db=["surname", "name", "patronymic"],
-                    #     split=" "
-                    # ),
                     ColsExcel(
                         number_col=2,
                         name_col_excel="Форм. факультет"
@@ -223,37 +247,107 @@ async def create_structure(structure: StuctureExcel) -> StuctureExcelInDB:
                     ColsExcel(
                         number_col=5,
                         name_col_excel="Курс",
-                        name_col_db=["number_course"]
+                        name_col_db="student__number_course"
                     ),
                     ColsExcel(
                         number_col=6,
                         name_col_excel="Группа",
-                        name_col_db=["number_group"]
+                        name_col_db="student__number_group"
                     ),
                     ColsExcel(
                         number_col=7,
                         name_col_excel="Состояние",
-                        name_col_db=["status"]
+                        name_col_db="student__status"
                     ),
                     ColsExcel(
                         number_col=8,
                         name_col_excel="Вид возм. затрат",
-                        name_col_db=["type_of_cost"]
+                        name_col_db="student__type_of_cost"
                     ),
                     ColsExcel(
                         number_col=9,
                         name_col_excel="Форма освоения",
-                        name_col_db=["type_of_education"]
+                        name_col_db="student__type_of_education"
                     ),
                     ColsExcel(
                         number_col=10,
                         name_col_excel="Дата рождения",
-                        name_col_db=["date_of_birth"]
+                        name_col_db="student__date_of_birth"
                     ),
                     ColsExcel(
                         number_col=11,
                         name_col_excel="Личный №",
-                        name_col_db=["personal_number"]
+                        name_col_db="student__personal_number"
+                    )
+                ]
+            ),
+
+        ]
+    )
+
+    structure_modeus = StuctureExcel(
+        type_file=TypeFile.MODEUS,
+        lists=[
+            ListExcel(
+                cols=[
+                    ColsExcel(
+                        number_col=0,
+                        name_col_excel="Учебный год"
+                    ),
+                    ColsExcel(
+                        number_col=1,
+                        name_col_excel="Студент",
+                        name_col_db="student__full_name",
+                        split=Split(
+                            name_col_db=["student__surname",
+                                         "student__name", "student__patronymic"],
+                            by_split=" "
+                        )
+                    ),
+                    ColsExcel(
+                        number_col=2,
+                        name_col_excel="Поток"
+                    ),
+                    ColsExcel(
+                        number_col=3,
+                        name_col_excel="Специальность",
+                        split=Split(
+                            name_col_db=["student__direction_code",
+                                         "student__name_speciality"],
+                            by_split=" "
+                        )
+                    ),
+                    ColsExcel(
+                        number_col=4,
+                        name_col_excel="Профиль"
+                    ),
+                    ColsExcel(
+                        number_col=5,
+                        name_col_excel="РМУП название",
+                        name_col_db="subject__full_name"
+                    ),
+                    ColsExcel(
+                        number_col=6,
+                        name_col_excel="Unnamed: 6"
+                    ),
+                    ColsExcel(
+                        number_col=7,
+                        name_col_excel="Частный план название"
+                    ),
+                    ColsExcel(
+                        number_col=8,
+                        name_col_excel="Группа название",
+                        name_col_db="subject__team__name"
+                    ),
+                    ColsExcel(
+                        number_col=9,
+                        name_col_excel="Сотрудники",
+                        name_col_db="subject__team__teachers"
+                    ),
+                    ColsExcel(
+                        number_col=10,
+                        name_col_excel="МУП или УК",
+                        name_col_db="subject__name"
                     )
                 ]
             ),
@@ -263,6 +357,7 @@ async def create_structure(structure: StuctureExcel) -> StuctureExcelInDB:
 
     try:
         structure_db = db.structure.insert_one(structure, look_for=True)
+        st = db.structure.insert_one(structure_modeus, look_for=True)
     except Exception as e:
         _log.warning(e)
         raise HTTPException(

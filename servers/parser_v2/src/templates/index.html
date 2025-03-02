@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <main>
+        <input id="file" type="file">
+        <button onclick="uploadFile()">Upload</button>
+    </main>
+</body>
+
+<script>
+    async function uploadFile() {
+        let file = document.getElementById('file').files[0];
+        let formData = new FormData();
+        formData.append('file', file);
+
+        let response = await fetch('http://localhost:8000/upload/file', {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (response.ok) {
+            let data = await response.json();
+            console.log(data);
+        }
+    }
+</script>
+
+</html>

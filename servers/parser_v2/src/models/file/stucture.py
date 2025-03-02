@@ -28,11 +28,20 @@ class ListExcel(BaseModel):
     cols: list["ColsExcel"]
 
 
+class Split(BaseModel):
+    name_col_db: list[str]
+    by_split: str
+
+    @computed_field
+    def count_col(self) -> int:
+        return len(self.name_col_db)
+
+
 class ColsExcel(BaseModel):
     number_col: int
     name_col_excel: str
-    name_col_db: list[str] | None = None
-    split: str | None = None
+    name_col_db: str | None = None
+    split: Split | None = None
 
 
 class StuctureExcelInDB(StuctureExcel, BaseModelInDB):
