@@ -1,4 +1,5 @@
 <script lang="ts">
+    import AllGroups from "/src//routes/groups/AllGroups.svelte";
     import CreateAdmin from "/src/routes/admins/CreateAdmin.svelte";
     import { goto, Router, type Route } from "@mateothegreat/svelte5-router";
     import { Me } from "/src/stores/Me.svelte";
@@ -57,6 +58,10 @@
         {
             path: "admins",
             component: AllAdmins,
+        },
+        {
+            path: "groups",
+            component: AllGroups,
         },
         {
             path: ".+",

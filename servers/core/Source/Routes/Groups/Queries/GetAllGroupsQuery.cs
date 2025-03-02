@@ -39,6 +39,7 @@ public class GetAllGroupsQueryHandler : IRequestHandler<GetAllGroupsQuery, Paged
     {
         var groups = await _db.GroupAssignments
             .Include(g => g.Admin)
+            .OrderBy(g => g.Name)
             .ToListAsync();
 
         groups = FilterGroups(groups, request).ToList();

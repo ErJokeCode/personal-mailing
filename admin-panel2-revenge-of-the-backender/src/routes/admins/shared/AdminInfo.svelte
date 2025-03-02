@@ -53,10 +53,11 @@
                 bind:page
                 hasNextPage={groups.hasNextPage}
                 hasPreviousPage={groups.hasPreviousPage}
+                totalCount={groups.totalCount}
                 totalPages={groups.totalPages} />
 
             <ul>
-                {#each groups.items as group}
+                {#each groups.items as group (group.id)}
                     <li class="dark:text-white text-xl p-4">{group.name}</li>
                 {/each}
             </ul>

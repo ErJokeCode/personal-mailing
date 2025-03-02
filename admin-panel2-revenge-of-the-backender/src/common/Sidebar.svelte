@@ -1,7 +1,11 @@
 <script lang="ts">
     import { active, route } from "@mateothegreat/svelte5-router";
     import { Sidebar, SidebarWrapper } from "flowbite-svelte";
-    import { CogOutline, UserSettingsOutline } from "flowbite-svelte-icons";
+    import {
+        CogOutline,
+        UserSettingsOutline,
+        UsersGroupOutline,
+    } from "flowbite-svelte-icons";
     import { type Component } from "svelte";
 </script>
 
@@ -12,6 +16,7 @@
     <SidebarWrapper class="h-full rounded-none list-none flex flex-col gap-2">
         {@render sidebarItem("Профиль", "/profile", CogOutline)}
         {@render sidebarItem("Админы", "/admins", UserSettingsOutline)}
+        {@render sidebarItem("Группы", "/groups", UsersGroupOutline)}
     </SidebarWrapper>
 </Sidebar>
 

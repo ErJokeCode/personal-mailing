@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Builder;
 
 namespace Core;
 
-// TODO add optional pagination to all methods returning collections
+// TODO add a default sorting method to all methods returning collections
 
 public class Program
 {

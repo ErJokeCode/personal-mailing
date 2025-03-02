@@ -13,7 +13,7 @@
             <Sidebar />
         {/if}
 
-        <div class="h-full flex-col flex-1 overflow-scroll">
+        <div class="h-full flex-col flex-1 overflow-scroll overflow-x-hidden">
             <Main />
         </div>
     </div>

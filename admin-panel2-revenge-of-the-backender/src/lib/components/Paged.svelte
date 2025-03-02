@@ -9,6 +9,7 @@
     interface Props {
         page: number;
         totalPages: number;
+        totalCount: number;
         hasPreviousPage: boolean;
         hasNextPage: boolean;
         class?: string;
@@ -17,12 +18,13 @@
     let {
         page = $bindable(),
         totalPages,
+        totalCount,
         hasPreviousPage,
         hasNextPage,
         ...restProps
     }: Props = $props();
 
-    let baseClass = "flex gap-1";
+    let baseClass = "flex gap-1 items-center";
     let contentClass = $derived(twMerge([baseClass, restProps.class]));
     let disabledClass =
         "hover:bg-white hover:text-gray-500 dark:hover:bg-gray-800 dark:hover:text-gray-400";
@@ -70,4 +72,6 @@
         on:click={nextPage}>
         <ChevronRightOutline />
     </PaginationItem>
+
+    <span class="dark:text-white text-lg">Кол-во: {totalCount}</span>
 </div>

@@ -65,6 +65,7 @@
     <Paged
         class="m-4"
         bind:page={AllAdmins.page}
+        totalCount={body.totalCount}
         totalPages={body.totalPages}
         hasNextPage={body.hasNextPage}
         hasPreviousPage={body.hasPreviousPage} />
