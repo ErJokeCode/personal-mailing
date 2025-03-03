@@ -1,13 +1,17 @@
 <script lang="ts">
     import ErrorAlert from "/src//lib/components/ErrorAlert.svelte";
-    import { Input, Spinner, TabItem, Tabs } from "flowbite-svelte";
+    import { Button, Spinner, TabItem, Tabs } from "flowbite-svelte";
     import { GeneralError } from "/src/lib/errors";
     import { GroupsApi, PageSize } from "/src/lib/server";
     import Paged from "/src/lib/components/Paged.svelte";
-    import { SearchOutline } from "flowbite-svelte-icons";
     import Search from "/src/lib/components/Search.svelte";
+    import {
+        goto,
+        QueryString,
+        type Route,
+    } from "@mateothegreat/svelte5-router";
 
-    let { body } = $props();
+    let { body }: { body: any } = $props();
 
     let page = $state(1);
     let search = $state("");
@@ -24,6 +28,14 @@
         let groups = await res.json();
 
         return groups;
+    }
+
+    function changeGroups() {
+        let query = new QueryString();
+        query.set("adminId", body.id);
+        query.set("returnUrl", window.location.pathname);
+
+        goto(`/groups?${query.toString()}`);
     }
 </script>
 
@@ -55,6 +67,8 @@
                 hasPreviousPage={groups.hasPreviousPage}
                 totalCount={groups.totalCount}
                 totalPages={groups.totalPages} />
+
+            <Button on:click={changeGroups} class="ml-4">Привязки</Button>
 
             <ul>
                 {#each groups.items as group (group.id)}

@@ -1,5 +1,6 @@
 <script lang="ts">
     import {
+        Badge,
         Button,
         Checkbox,
         Heading,
@@ -12,62 +13,72 @@
         TableHeadCell,
     } from "flowbite-svelte";
     import Panel from "/src/lib/components/Panel.svelte";
-    import { AdminsApi, GroupsApi, PageSize } from "/src/lib/server";
+    import { GroupsApi, PageSize } from "/src/lib/server";
     import Search from "/src/lib/components/Search.svelte";
     import Paged from "/src/lib/components/Paged.svelte";
     import ErrorAlert from "/src/lib/components/ErrorAlert.svelte";
     import { GeneralError } from "/src/lib/errors";
-    import { ClipboardOutline, LinkOutline } from "flowbite-svelte-icons";
-    import { goto, QueryString } from "@mateothegreat/svelte5-router";
+    import {
+        ClipboardOutline,
+        FilterOutline,
+        LinkOutline,
+    } from "flowbite-svelte-icons";
+    import {
+        goto,
+        QueryString,
+        type Route,
+    } from "@mateothegreat/svelte5-router";
+    import AllAdminsInfo from "../admins/shared/AllAdminsInfo.svelte";
+    import ToastNotifications from "/src/lib/components/ToastNotifications.svelte";
+    import BackButton from "/src/lib/components/BackButton.svelte";
+    import { fade } from "svelte/transition";
 
-    let status = $state("");
-    let trigger = $state(false);
+    let admins = $state({
+        search: "",
+        page: 1,
+    });
 
-    let searchAdmins = $state("");
-    let pageAdmins = $state(1);
+    let groups = $state({
+        adminId: null,
+        search: "",
+        page: 1,
+        trigger: false,
+    });
 
-    let searchGroups = $state("");
-    let pageGroups = $state(1);
+    let { route }: { route: Route } = $props();
+    groups.adminId = route.query?.["adminId"] ?? null;
 
-    let selectedGroups: Map<string, object> = new Map();
+    let selected: Map<string, object> = new Map();
+
+    let notifications: ToastNotifications;
 
     async function getGroups(_) {
         let url = new URL(GroupsApi);
-        url.searchParams.append("search", searchGroups);
-        url.searchParams.append("page", pageGroups.toString());
+        if (groups.adminId) {
+            url.searchParams.append("adminId", groups.adminId);
+        }
+        url.searchParams.append("search", groups.search);
+        url.searchParams.append("page", groups.page.toString());
         url.searchParams.append("pageSize", PageSize.toString());
 
         let res = await fetch(url);
-
-        let groups = await res.json();
-
-        return groups;
-    }
-
-    async function getAdmins() {
-        let url = new URL(AdminsApi);
-        url.searchParams.append("search", searchAdmins);
-        url.searchParams.append("page", pageAdmins.toString());
-        url.searchParams.append("pageSize", PageSize.toString());
-
-        let res = await fetch(url, {
-            credentials: "include",
-        });
 
         let body = await res.json();
 
         return body;
     }
 
-    function selectGroup(group, checked) {
+    function select(group, checked) {
         if (checked) {
-            selectedGroups.set(group.id, group);
+            selected.set(group.id, group);
         } else {
-            selectedGroups.delete(group.id);
+            selected.delete(group.id);
         }
     }
 
     async function assign(adminId: string) {
+        let status = "";
+
         try {
             let res = await fetch(GroupsApi, {
                 method: "PATCH",
@@ -76,53 +87,91 @@
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    groupIds: selectedGroups.keys().toArray(),
+                    groupIds: selected.keys().toArray(),
                     adminId: adminId,
                 }),
             });
 
-            // TODO think of how to properly display these errors
-
             if (!res.ok) {
                 let body = await res.json();
+
                 if (body.errors) {
                     status = body.errors["GroupIds"];
                 } else {
                     status = body.detail;
                 }
             } else {
-                status = "";
-                trigger = !trigger;
+                groups.trigger = !groups.trigger;
+
+                notifications.add({
+                    type: "ok",
+                    text: "Группы успешно привязаны",
+                });
             }
         } catch {
             status = GeneralError;
         }
+
+        if (status != "") {
+            notifications.add({
+                type: "error",
+                text: status,
+            });
+        }
+    }
+
+    function filterByAdmin(adminId) {
+        groups.adminId = adminId;
+        groups.page = 1;
+    }
+
+    function dismissBadge() {
+        groups.adminId = null;
+        groups.page = 1;
     }
 
     function single(adminId) {
         let query = new QueryString();
-        query.set("returnUrl", "/groups");
+        query.set("returnUrl", window.location.pathname);
 
         goto(`/admins/${adminId}?${query.toString()}`);
     }
 </script>
 
-<Heading tag="h2" class="m-4">Группы {status}</Heading>
+<ToastNotifications bind:this={notifications} />
+
+<div class="m-4">
+    <BackButton {route} class="inline-block align-middle" />
+
+    <Heading tag="h2" class="inline align-middle">Группы</Heading>
+</div>
 
 <div class="flex m-4 gap-4">
     <Panel class="flex-1">
-        <Search class="m-4" bind:page={pageGroups} bind:search={searchGroups} />
+        {#if groups.adminId}
+            <Badge
+                on:close={dismissBadge}
+                dismissable
+                large
+                color="dark"
+                class="text-lg">{groups.adminId}</Badge>
+        {/if}
 
-        {#await getGroups(trigger)}
-            <Spinner size="8" />
-        {:then groups}
+        <Search
+            class="m-4"
+            bind:page={groups.page}
+            bind:search={groups.search} />
+
+        {#await getGroups(groups.trigger)}
+            <Spinner size="8" class="m-4" />
+        {:then body}
             <Paged
                 class="m-4"
-                bind:page={pageGroups}
-                hasNextPage={groups.hasNextPage}
-                hasPreviousPage={groups.hasPreviousPage}
-                totalCount={groups.totalCount}
-                totalPages={groups.totalPages} />
+                bind:page={groups.page}
+                hasNextPage={body.hasNextPage}
+                hasPreviousPage={body.hasPreviousPage}
+                totalCount={body.totalCount}
+                totalPages={body.totalPages} />
 
             <ul>
                 <Table>
@@ -133,13 +182,13 @@
                     </TableHead>
 
                     <TableBody tableBodyClass="divide-y">
-                        {#each groups.items as group (group.id)}
+                        {#each body.items as group (group.id)}
                             <TableBodyRow class="text-lg">
                                 <TableBodyCell>
                                     <Checkbox
-                                        checked={selectedGroups.has(group.id)}
+                                        checked={selected.has(group.id)}
                                         on:change={(event) =>
-                                            selectGroup(
+                                            select(
                                                 group,
                                                 // @ts-ignore
                                                 event.target.checked,
@@ -163,50 +212,45 @@
     </Panel>
 
     <Panel class="flex-1">
-        <Search
-            bind:page={pageAdmins}
-            class="m-4"
-            value={searchAdmins}
-            bind:search={searchAdmins} />
+        <AllAdminsInfo
+            bind:search={admins.search}
+            bind:page={admins.page}
+            pageSize={PageSize}>
+            {#snippet children(body)}
+                <Table>
+                    <TableHead>
+                        <TableHeadCell>Почта</TableHeadCell>
+                        <TableHeadCell>Привязать</TableHeadCell>
+                        <TableHeadCell>Детали</TableHeadCell>
+                        <TableHeadCell>Фильтр</TableHeadCell>
+                    </TableHead>
 
-        {#await getAdmins()}
-            <Spinner size="8" class="m-4" />
-        {:then body}
-            <Paged
-                class="m-4"
-                bind:page={pageAdmins}
-                totalPages={body.totalPages}
-                totalCount={body.totalCount}
-                hasNextPage={body.hasNextPage}
-                hasPreviousPage={body.hasPreviousPage} />
-
-            <Table>
-                <TableHead>
-                    <TableHeadCell>Почта</TableHeadCell>
-                    <TableHeadCell>Привязать</TableHeadCell>
-                    <TableHeadCell>Детали</TableHeadCell>
-                </TableHead>
-
-                <TableBody tableBodyClass="divide-y">
-                    {#each body.items as admin (admin.id)}
-                        <TableBodyRow class="text-lg">
-                            <TableBodyCell>{admin.email}</TableBodyCell>
-                            <TableBodyCell>
-                                <Button on:click={() => assign(admin.id)}>
-                                    <LinkOutline />
-                                </Button>
-                            </TableBodyCell>
-                            <TableBodyCell>
-                                <Button on:click={() => single(admin.id)}>
-                                    <ClipboardOutline />
-                                </Button>
-                            </TableBodyCell>
-                        </TableBodyRow>
-                    {/each}
-                </TableBody>
-            </Table>
-        {:catch}
-            <ErrorAlert class="m-4" title="Ошибка">{GeneralError}</ErrorAlert>
-        {/await}
+                    <TableBody tableBodyClass="divide-y">
+                        {#each body.items as admin (admin.id)}
+                            <TableBodyRow class="text-lg">
+                                <TableBodyCell>{admin.email}</TableBodyCell>
+                                <TableBodyCell>
+                                    <Button on:click={() => assign(admin.id)}>
+                                        <LinkOutline />
+                                    </Button>
+                                </TableBodyCell>
+                                <TableBodyCell>
+                                    <Button on:click={() => single(admin.id)}>
+                                        <ClipboardOutline />
+                                    </Button>
+                                </TableBodyCell>
+                                <TableBodyCell>
+                                    <Button
+                                        on:click={() =>
+                                            filterByAdmin(admin.id)}>
+                                        <FilterOutline />
+                                    </Button>
+                                </TableBodyCell>
+                            </TableBodyRow>
+                        {/each}
+                    </TableBody>
+                </Table>
+            {/snippet}
+        </AllAdminsInfo>
     </Panel>
 </div>

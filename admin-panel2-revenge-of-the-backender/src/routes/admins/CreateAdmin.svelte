@@ -10,13 +10,13 @@
         type Route,
     } from "@mateothegreat/svelte5-router";
     import InputHelper from "/src/lib/components/InputHelper.svelte";
-    import { CheckOutline } from "flowbite-svelte-icons";
+    import ToastNotifications from "/src/lib/components/ToastNotifications.svelte";
 
+    let notifications: ToastNotifications;
     let form = $state({ Email: "", Password: "" });
     let errors = $state({ Email: "", Password: "" });
-    let status = $state("");
-    let createdId: string = $state(null);
 
+    let status = $state("");
     let buttonText = $state("Создать");
 
     let { route }: { route: Route } = $props();
@@ -27,10 +27,6 @@
         status = "";
         buttonText = "Создать";
     }
-
-    const delay = (delayInms) => {
-        return new Promise((resolve) => setTimeout(resolve, delayInms));
-    };
 
     async function create() {
         try {
@@ -54,7 +50,14 @@
                 errors = body.errors ?? {};
                 status = body.detail;
             } else {
-                createdId = body.id;
+                notifications.add({
+                    type: "ok",
+                    text: `Админ ${body.email} создан`,
+                    content: notification,
+                    params: body.id,
+                    autohide: false,
+                });
+
                 clear();
             }
         } catch {
@@ -64,21 +67,19 @@
         buttonText = "Создать";
     }
 
-    function single() {
+    function single(id) {
         let query = new QueryString();
-        query.set("returnUrl", "/create-admin");
+        query.set("returnUrl", window.location.pathname);
 
-        goto(`/admins/${createdId}?${query.toString()}`);
+        goto(`/admins/${id}?${query.toString()}`);
     }
 </script>
 
-{#if createdId}
-    <Toast position="bottom-right" align={false} color="green">
-        <CheckOutline slot="icon" />
-        <div class="font-semibold text-md mb-3">Админ создан успешно</div>
-        <Button color="green" size="sm" on:click={single}>Профиль</Button>
-    </Toast>
-{/if}
+<ToastNotifications bind:this={notifications} />
+
+{#snippet notification(id)}
+    <Button color="green" size="sm" on:click={() => single(id)}>Профиль</Button>
+{/snippet}
 
 <BackButton fallback="/admins" title="Создать админа" {route} class="m-4" />
 

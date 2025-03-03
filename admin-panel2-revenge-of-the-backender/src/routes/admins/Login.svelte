@@ -1,15 +1,18 @@
 <script lang="ts">
     import InputHelper from "/src/lib/components/InputHelper.svelte";
-    import { Button, Card, Helper } from "flowbite-svelte";
+    import { Button, Card, Helper, Spinner } from "flowbite-svelte";
     import { AdminsApi } from "/src/lib/server";
     import { GeneralError } from "/src/lib/errors";
 
     let form = $state({ Email: "", Password: "" });
     let errors = $state({ Email: "", Password: "" });
     let status = $state("");
+    let buttonText = $state("Войти");
 
     async function login() {
         try {
+            buttonText = null;
+
             let res = await fetch(`${AdminsApi}/login`, {
                 method: "POST",
                 headers: {
@@ -32,6 +35,8 @@
         } catch {
             status = GeneralError;
         }
+
+        buttonText = "Войти";
     }
 </script>
 
@@ -57,7 +62,13 @@
             type="password"
             required />
 
-        <Button class="max-w-fit" size="lg" on:click={login}>Войти</Button>
+        <Button class="max-w-fit" size="lg" on:click={login}>
+            {#if buttonText}
+                {buttonText}
+            {:else}
+                <Spinner size="6" color="white" />
+            {/if}
+        </Button>
 
         <Helper class="mt-2 text-lg" color="red">
             {status}

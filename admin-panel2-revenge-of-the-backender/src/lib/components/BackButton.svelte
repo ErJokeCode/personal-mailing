@@ -6,13 +6,13 @@
 
     interface Props {
         route: Route;
-        fallback: string;
+        fallback?: string;
         title?: string;
         class?: string;
     }
 
     let { route, fallback, title, ...restProps }: Props = $props();
-    let returnUrl = route.query === undefined ? null : route.query["returnUrl"];
+    let returnUrl = route.query?.["returnUrl"] ?? null;
 
     let baseClass = "flex items-center";
     let contentClass = $derived(twMerge([baseClass, restProps.class]));
@@ -22,12 +22,14 @@
     }
 </script>
 
-<div class={contentClass}>
-    <Button class="mr-2" on:click={returnBack}>
-        <ArrowLeftOutline />
-    </Button>
+{#if returnUrl || fallback}
+    <div class={contentClass}>
+        <Button class="mr-2" on:click={returnBack}>
+            <ArrowLeftOutline />
+        </Button>
 
-    {#if title}
-        <Heading tag="h2">{title}</Heading>
-    {/if}
-</div>
+        {#if title}
+            <Heading tag="h2">{title}</Heading>
+        {/if}
+    </div>
+{/if}
