@@ -6,6 +6,7 @@
     import { GeneralError } from "/src/lib/errors";
     import { AdminsApi } from "/src/lib/server";
     import ErrorAlert from "/src/lib/components/ErrorAlert.svelte";
+    import Get from "/src/lib/components/Get.svelte";
 
     let { route }: { route: Route } = $props();
     let adminId = route.params["adminId"];
@@ -29,14 +30,12 @@
 
 <BackButton class="inline-block m-4 mr-0 align-middle" />
 
-{#await get()}
-    <Spinner size="8" class="m-4" />
-{:then body}
-    <Heading class="inline align-middle" tag="h2">
-        Профиль {body.email}
-    </Heading>
+<Get {get} bind:error={errorMessage}>
+    {#snippet children(body)}
+        <Heading class="inline align-middle" tag="h2">
+            Профиль {body.email}
+        </Heading>
 
-    <AdminInfo {body} />
-{:catch}
-    <ErrorAlert class="m-4" title="Ошибка">{errorMessage}</ErrorAlert>
-{/await}
+        <AdminInfo {body} />
+    {/snippet}
+</Get>

@@ -31,6 +31,10 @@ public class PagedList<T>
         {
             items = original.Skip(((int)page - 1) * (int)pageSize).Take((int)pageSize);
         }
+        else
+        {
+            page = 1;
+        }
 
         return new PagedList<T>()
         {

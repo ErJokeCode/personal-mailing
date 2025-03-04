@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { AllGroups, AllAdmins } from "/src/stores/groups/AllGroups.svelte";
     import {
         Badge,
         Button,
@@ -14,64 +15,84 @@
     } from "flowbite-svelte";
     import Panel from "/src/lib/components/Panel.svelte";
     import { GroupsApi, PageSize } from "/src/lib/server";
-    import Search from "/src/lib/components/Search.svelte";
-    import Paged from "/src/lib/components/Paged.svelte";
-    import ErrorAlert from "/src/lib/components/ErrorAlert.svelte";
     import { GeneralError } from "/src/lib/errors";
     import {
         ClipboardOutline,
         FilterOutline,
         LinkOutline,
     } from "flowbite-svelte-icons";
-    import {
-        goto,
-        QueryString,
-        type Route,
-    } from "@mateothegreat/svelte5-router";
+    import { goto, type Route } from "@mateothegreat/svelte5-router";
     import AllAdminsInfo from "../admins/shared/AllAdminsInfo.svelte";
     import ToastNotifications from "/src/lib/components/ToastNotifications.svelte";
     import BackButton from "/src/lib/components/BackButton.svelte";
-
-    let admins = $state({
-        search: "",
-        page: 1,
-    });
-
-    let groups = $state({
-        adminId: null,
-        search: "",
-        page: 1,
-        trigger: false,
-    });
+    import PagedList from "/src/lib/components/PagedList.svelte";
 
     let { route }: { route: Route } = $props();
-    groups.adminId = route.query?.["adminId"] ?? null;
-
-    let selected: Map<string, object> = new Map();
+    AllGroups.adminId = route.query?.["adminId"] ?? AllGroups.adminId;
 
     let notifications: ToastNotifications;
 
+    $effect(() => {
+        let _ = AllGroups.search;
+        AllGroups.selectAll = false;
+    });
+
     async function getGroups(_) {
         let url = new URL(GroupsApi);
-        if (groups.adminId) {
-            url.searchParams.append("adminId", groups.adminId);
+
+        if (AllGroups.adminId) {
+            url.searchParams.append("adminId", AllGroups.adminId);
         }
-        url.searchParams.append("search", groups.search);
-        url.searchParams.append("page", groups.page.toString());
+        url.searchParams.append("search", AllGroups.search);
+        url.searchParams.append("page", AllGroups.paged.page.toString());
         url.searchParams.append("pageSize", PageSize.toString());
 
         let res = await fetch(url);
-
         let body = await res.json();
+
+        Object.assign(AllGroups.paged, body);
 
         return body;
     }
 
     function select(group, checked) {
         if (checked) {
-            selected.set(group.id, group);
+            AllGroups.selected.set(group.id, group);
         } else {
-            selected.delete(group.id);
+            AllGroups.selected.delete(group.id);
+        }
+    }
+
+    async function selectAll(checked: boolean) {
+        try {
+            let url = new URL(GroupsApi);
+
+            if (AllGroups.adminId) {
+                url.searchParams.append("adminId", AllGroups.adminId);
+            }
+            url.searchParams.append("search", AllGroups.search);
+            url.searchParams.append("page", AllGroups.paged.page.toString());
+            url.searchParams.append("pageSize", "-1");
+
+            let res = await fetch(url);
+            let body = await res.json();
+
+            if (checked) {
+                for (let item of body.items) {
+                    AllGroups.selected.set(item.id, item);
+                }
+            } else {
+                for (let item of body.items) {
+                    AllGroups.selected.delete(item.id);
+                }
+            }
+
+            AllGroups.trigger = !AllGroups.trigger;
+        } catch {
+            notifications.add({
+                type: "error",
+                text: "Ошибка при выборе всех групп",
+            });
         }
     }
 
@@ -86,7 +107,7 @@
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    groupIds: selected.keys().toArray(),
+                    groupIds: AllGroups.selected.keys().toArray(),
                     adminId: adminId,
                 }),
             });
@@ -100,7 +121,7 @@
                     status = body.detail;
                 }
             } else {
-                groups.trigger = !groups.trigger;
+                AllGroups.trigger = !AllGroups.trigger;
 
                 notifications.add({
                     type: "ok",
@@ -120,17 +141,23 @@
     }
 
     function filterByAdmin(adminId) {
-        groups.adminId = adminId;
-        groups.page = 1;
+        AllGroups.adminId = adminId;
+        AllGroups.paged.page = 1;
     }
 
     function dismissBadge() {
-        groups.adminId = null;
-        groups.page = 1;
+        AllGroups.adminId = null;
+        AllGroups.paged.page = 1;
     }
 
     function single(adminId) {
         goto(`/admins/${adminId}`);
+    }
+
+    function clearSelection() {
+        AllGroups.selectAll = false;
+        AllGroups.selected.clear();
+        AllGroups.trigger = !AllGroups.trigger;
     }
 </script>
 
@@ -144,45 +171,46 @@
 
 <div class="flex m-4 gap-4">
     <Panel class="flex-1">
-        {#if groups.adminId}
+        {#if AllGroups.adminId}
             <Badge
                 on:close={dismissBadge}
                 dismissable
                 large
                 color="dark"
-                class="text-lg">{groups.adminId}</Badge>
+                class="text-lg">{AllGroups.adminId}</Badge>
         {/if}
 
-        <Search
-            class="m-4"
-            bind:page={groups.page}
-            bind:search={groups.search} />
+        <PagedList
+            get={() => getGroups(AllGroups.trigger)}
+            bind:paged={AllGroups.paged}
+            bind:search={AllGroups.search}>
+            {#snippet before()}
+                <div class="ml-4 mb-4 flex gap-2">
+                    <Button on:click={clearSelection}>Очистить</Button>
+                </div>
+            {/snippet}
 
-        {#await getGroups(groups.trigger)}
-            <Spinner size="8" class="m-4" />
-        {:then body}
-            <Paged
-                class="m-4"
-                bind:page={groups.page}
-                hasNextPage={body.hasNextPage}
-                hasPreviousPage={body.hasPreviousPage}
-                totalCount={body.totalCount}
-                totalPages={body.totalPages} />
-
-            <ul>
+            {#snippet children(body)}
                 <Table>
                     <TableHead>
-                        <TableHeadCell>Выбрать</TableHeadCell>
+                        <TableHeadCell>
+                            <Checkbox
+                                bind:checked={AllGroups.selectAll}
+                                on:change={(event) =>
+                                    // @ts-ignore
+                                    selectAll(event.target.checked)} />
+                        </TableHeadCell>
                         <TableHeadCell>Группа</TableHeadCell>
                         <TableHeadCell>Админ</TableHeadCell>
                     </TableHead>
-
                     <TableBody tableBodyClass="divide-y">
                         {#each body.items as group (group.id)}
                             <TableBodyRow class="text-lg">
                                 <TableBodyCell>
                                     <Checkbox
-                                        checked={selected.has(group.id)}
+                                        checked={AllGroups.selected.has(
+                                            group.id,
+                                        )}
                                         on:change={(event) =>
                                             select(
                                                 group,
@@ -201,16 +229,14 @@
                         {/each}
                     </TableBody>
                 </Table>
-            </ul>
-        {:catch}
-            <ErrorAlert title="Ошибка">{GeneralError}</ErrorAlert>
-        {/await}
+            {/snippet}
+        </PagedList>
     </Panel>
 
     <Panel class="flex-1">
         <AllAdminsInfo
-            bind:search={admins.search}
-            bind:page={admins.page}
+            bind:search={AllAdmins.search}
+            bind:paged={AllAdmins.paged}
             pageSize={PageSize}>
             {#snippet children(body)}
                 <Table>

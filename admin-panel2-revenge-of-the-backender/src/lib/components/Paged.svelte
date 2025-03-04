@@ -1,3 +1,23 @@
+<script lang="ts" module>
+    export interface IPaged {
+        page: number;
+        totalPages: number;
+        totalCount: number;
+        hasPreviousPage: boolean;
+        hasNextPage: boolean;
+    }
+
+    export function createPaged(): IPaged {
+        return {
+            page: 1,
+            totalPages: 1,
+            totalCount: 0,
+            hasPreviousPage: false,
+            hasNextPage: false,
+        };
+    }
+</script>
+
 <script lang="ts">
     import { twMerge } from "tailwind-merge";
     import { PaginationItem, Select } from "flowbite-svelte";
@@ -7,22 +27,11 @@
     } from "flowbite-svelte-icons";
 
     interface Props {
-        page: number;
-        totalPages: number;
-        totalCount: number;
-        hasPreviousPage: boolean;
-        hasNextPage: boolean;
+        paged: IPaged;
         class?: string;
     }
 
-    let {
-        page = $bindable(),
-        totalPages,
-        totalCount,
-        hasPreviousPage,
-        hasNextPage,
-        ...restProps
-    }: Props = $props();
+    let { paged = $bindable(), ...restProps }: Props = $props();
 
     let baseClass = "flex gap-1 items-center";
     let contentClass = $derived(twMerge([baseClass, restProps.class]));
@@ -40,14 +49,14 @@
     }
 
     const previousPage = () => {
-        if (hasPreviousPage) {
-            page -= 1;
+        if (paged.hasPreviousPage) {
+            paged.page -= 1;
         }
     };
 
     const nextPage = () => {
-        if (hasNextPage) {
-            page += 1;
+        if (paged.hasNextPage) {
+            paged.page += 1;
         }
     };
 </script>
@@ -56,22 +65,22 @@
     <Select
         placeholder=""
         class="max-w-fit pr-8"
-        items={getPages(totalPages)}
-        bind:value={page} />
+        items={getPages(paged.totalPages)}
+        bind:value={paged.page} />
 
     <PaginationItem
-        class={hasPreviousPage ? "" : disabledClass}
+        class={paged.hasPreviousPage ? "" : disabledClass}
         large
         on:click={previousPage}>
         <ChevronLeftOutline />
     </PaginationItem>
 
     <PaginationItem
-        class={hasNextPage ? "" : disabledClass}
+        class={paged.hasNextPage ? "" : disabledClass}
         large
         on:click={nextPage}>
         <ChevronRightOutline />
     </PaginationItem>
 
-    <span class="dark:text-white text-lg">Кол-во: {totalCount}</span>
+    <span class="dark:text-white text-lg">Кол-во: {paged.totalCount}</span>
 </div>

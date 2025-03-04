@@ -1,31 +1,27 @@
 <script lang="ts">
-    import ErrorAlert from "/src//lib/components/ErrorAlert.svelte";
-    import { Button, Spinner, TabItem, Tabs } from "flowbite-svelte";
-    import { GeneralError } from "/src/lib/errors";
+    import { Button, TabItem, Tabs } from "flowbite-svelte";
     import { GroupsApi, PageSize } from "/src/lib/server";
-    import Paged from "/src/lib/components/Paged.svelte";
-    import Search from "/src/lib/components/Search.svelte";
-    import {
-        goto,
-        QueryString,
-        type Route,
-    } from "@mateothegreat/svelte5-router";
+    import Paged, { createPaged } from "/src/lib/components/Paged.svelte";
+    import { goto, QueryString } from "@mateothegreat/svelte5-router";
+    import PagedList from "/src/lib/components/PagedList.svelte";
 
     let { body }: { body: any } = $props();
 
-    let page = $state(1);
+    let paged = $state(createPaged());
     let search = $state("");
 
     async function getGroups() {
         let url = new URL(GroupsApi);
         url.searchParams.append("adminId", body.id);
         url.searchParams.append("search", search);
-        url.searchParams.append("page", page.toString());
+        url.searchParams.append("page", paged.page.toString());
         url.searchParams.append("pageSize", PageSize.toString());
 
         let res = await fetch(url);
 
         let groups = await res.json();
+
+        Object.assign(paged, groups);
 
         return groups;
     }
@@ -54,28 +50,20 @@
     </TabItem>
 
     <TabItem title="Группы">
-        <Search class="m-4" bind:page bind:search />
+        <PagedList bind:paged bind:search get={getGroups}>
+            {#snippet before()}
+                <Button on:click={changeGroups} class="ml-4">Привязки</Button>
+            {/snippet}
 
-        {#await getGroups()}
-            <Spinner size="8" />
-        {:then groups}
-            <Paged
-                class="m-4"
-                bind:page
-                hasNextPage={groups.hasNextPage}
-                hasPreviousPage={groups.hasPreviousPage}
-                totalCount={groups.totalCount}
-                totalPages={groups.totalPages} />
-
-            <Button on:click={changeGroups} class="ml-4">Привязки</Button>
-
-            <ul>
-                {#each groups.items as group (group.id)}
-                    <li class="dark:text-white text-xl p-4">{group.name}</li>
-                {/each}
-            </ul>
-        {:catch}
-            <ErrorAlert title="Ошибка">{GeneralError}</ErrorAlert>
-        {/await}
+            {#snippet children(groups)}
+                <ul>
+                    {#each groups.items as group (group.id)}
+                        <li class="dark:text-white text-xl p-4">
+                            {group.name}
+                        </li>
+                    {/each}
+                </ul>
+            {/snippet}
+        </PagedList>
     </TabItem>
 </Tabs>

@@ -35,7 +35,7 @@
 <Heading tag="h2" class="m-4">Админы</Heading>
 
 <AllAdminsInfo
-    bind:page={AllAdmins.page}
+    bind:paged={AllAdmins.paged}
     bind:search={AllAdmins.search}
     pageSize={PageSize}>
     {#snippet children(body)}
