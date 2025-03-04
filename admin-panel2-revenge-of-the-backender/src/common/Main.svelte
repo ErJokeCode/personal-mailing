@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { RouteHistory } from "/src/stores/RouteHistory.svelte";
     import AllGroups from "/src//routes/groups/AllGroups.svelte";
     import CreateAdmin from "/src/routes/admins/CreateAdmin.svelte";
     import { goto, Router, type Route } from "@mateothegreat/svelte5-router";
@@ -32,6 +33,22 @@
             goto("/login");
             return false;
         }
+    };
+
+    const globalPostHook = async (route: Route): Promise<void> => {
+        if (RouteHistory.isReturn) {
+            RouteHistory.isReturn = false;
+            RouteHistory.values.pop();
+            RouteHistory.current -= 1;
+            return;
+        } else if (RouteHistory.isClear) {
+            RouteHistory.isClear = false;
+            RouteHistory.values = [];
+            RouteHistory.current = -1;
+        }
+
+        RouteHistory.values.push(window.location.pathname);
+        RouteHistory.current += 1;
     };
 
     const routes: Route[] = [
@@ -70,4 +87,7 @@
     ];
 </script>
 
-<Router hooks={{ pre: authPreHook }} basePath="/" {routes} />
+<Router
+    hooks={{ pre: authPreHook, post: globalPostHook }}
+    basePath="/"
+    {routes} />

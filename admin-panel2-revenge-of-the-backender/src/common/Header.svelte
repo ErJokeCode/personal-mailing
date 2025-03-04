@@ -7,6 +7,7 @@
     import { goto, route } from "@mateothegreat/svelte5-router";
     import { Me } from "/src/stores/Me.svelte";
     import { AdminsApi } from "/src/lib/server";
+    import { RouteHistory } from "/src/stores/RouteHistory.svelte";
 
     function login() {
         goto("/login");
@@ -20,11 +21,15 @@
 
         window.location.replace("/");
     }
+
+    function resetHistory() {
+        RouteHistory.isClear = true;
+    }
 </script>
 
 <header class="border-b border-b-gray-200 dark:border-b-gray-600">
     <Navbar fluid={true}>
-        <a use:route href="/">
+        <a use:route on:click={resetHistory} href="/">
             <span class="text-xl font-semibold dark:text-white">
                 Админ панель
             </span>

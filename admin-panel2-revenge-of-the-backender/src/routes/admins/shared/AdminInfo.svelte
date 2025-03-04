@@ -33,7 +33,6 @@
     function changeGroups() {
         let query = new QueryString();
         query.set("adminId", body.id);
-        query.set("returnUrl", window.location.pathname);
 
         goto(`/groups?${query.toString()}`);
     }

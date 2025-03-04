@@ -27,10 +27,7 @@
     }
 </script>
 
-<BackButton
-    fallback="/admins"
-    {route}
-    class="inline-block m-4 mr-0 align-middle" />
+<BackButton class="inline-block m-4 mr-0 align-middle" />
 
 {#await get()}
     <Spinner size="8" class="m-4" />

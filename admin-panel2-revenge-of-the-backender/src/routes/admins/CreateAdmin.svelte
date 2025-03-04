@@ -68,10 +68,7 @@
     }
 
     function single(id) {
-        let query = new QueryString();
-        query.set("returnUrl", window.location.pathname);
-
-        goto(`/admins/${id}?${query.toString()}`);
+        goto(`/admins/${id}`);
     }
 </script>
 
@@ -81,7 +78,7 @@
     <Button color="green" size="sm" on:click={() => single(id)}>Профиль</Button>
 {/snippet}
 
-<BackButton fallback="/admins" title="Создать админа" {route} class="m-4" />
+<BackButton title="Создать админа" class="m-4" />
 
 <Panel class="m-4">
     <InputHelper

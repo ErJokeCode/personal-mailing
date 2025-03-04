@@ -7,6 +7,11 @@
         UsersGroupOutline,
     } from "flowbite-svelte-icons";
     import { type Component } from "svelte";
+    import { RouteHistory } from "/src/stores/RouteHistory.svelte";
+
+    function resetHistory() {
+        RouteHistory.isClear = true;
+    }
 </script>
 
 <!-- TODO Remake this with dropdown menus -->
@@ -28,6 +33,7 @@
                 active: { class: ["bg-gray-100", "dark:bg-gray-700"] },
             }}
             use:route
+            on:click={resetHistory}
             {href}>
             <Icon class="w-6 h-6" />
             <span class="ms-3">{label}</span>

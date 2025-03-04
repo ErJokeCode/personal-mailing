@@ -31,7 +31,6 @@
     import AllAdminsInfo from "../admins/shared/AllAdminsInfo.svelte";
     import ToastNotifications from "/src/lib/components/ToastNotifications.svelte";
     import BackButton from "/src/lib/components/BackButton.svelte";
-    import { fade } from "svelte/transition";
 
     let admins = $state({
         search: "",
@@ -131,17 +130,14 @@
     }
 
     function single(adminId) {
-        let query = new QueryString();
-        query.set("returnUrl", window.location.pathname);
-
-        goto(`/admins/${adminId}?${query.toString()}`);
+        goto(`/admins/${adminId}`);
     }
 </script>
 
 <ToastNotifications bind:this={notifications} />
 
 <div class="m-4">
-    <BackButton {route} class="inline-block align-middle" />
+    <BackButton class="inline-block align-middle" />
 
     <Heading tag="h2" class="inline align-middle">Группы</Heading>
 </div>
