@@ -47,7 +47,7 @@
         url.searchParams.append("page", AllGroups.paged.page.toString());
         url.searchParams.append("pageSize", PageSize.toString());
 
-        let res = await fetch(url);
+        let res = await fetch(url, { credentials: "include" });
         let body = await res.json();
 
         Object.assign(AllGroups.paged, body);
@@ -74,7 +74,7 @@
             url.searchParams.append("page", AllGroups.paged.page.toString());
             url.searchParams.append("pageSize", "-1");
 
-            let res = await fetch(url);
+            let res = await fetch(url, { credentials: "include" });
             let body = await res.json();
 
             if (checked) {

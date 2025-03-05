@@ -2,7 +2,12 @@
     import { active, route } from "@mateothegreat/svelte5-router";
     import { Sidebar, SidebarWrapper } from "flowbite-svelte";
     import {
+        ClipboardListSolid,
         CogOutline,
+        EditOutline,
+        FileOutline,
+        QuestionCircleOutline,
+        TableRowOutline,
         UserSettingsOutline,
         UsersGroupOutline,
     } from "flowbite-svelte-icons";
@@ -22,6 +27,11 @@
         {@render sidebarItem("Профиль", "/profile", CogOutline)}
         {@render sidebarItem("Админы", "/admins", UserSettingsOutline)}
         {@render sidebarItem("Группы", "/groups", UsersGroupOutline)}
+        {@render sidebarItem("Рассылки", "/notifications", ClipboardListSolid)}
+        {@render sidebarItem("Загрузить файлы", "/upload", FileOutline)}
+        {@render sidebarItem("Соотношения", "/subjects", TableRowOutline)}
+        {@render sidebarItem("Редактор FAQ", "/faq", QuestionCircleOutline)}
+        {@render sidebarItem("Конструктор онбординга", "/builder", EditOutline)}
     </SidebarWrapper>
 </Sidebar>
 

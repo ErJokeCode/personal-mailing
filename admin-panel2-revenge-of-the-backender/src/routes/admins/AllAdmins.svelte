@@ -26,7 +26,7 @@
     }
 </script>
 
-<SpeedDial>
+<SpeedDial class="z-10">
     <SpeedDialButton name="Создать" on:click={create}>
         <CirclePlusOutline />
     </SpeedDialButton>

@@ -26,7 +26,7 @@
     let files: FileList;
     let ids = [];
 
-    let activeStudents = [];
+    let activeStudents = $state([]);
 
     onMount(async () => {
         load_students();
@@ -34,9 +34,9 @@
 
     const load_students = async () => {
         let response;
-        let url = new URL(`${server_url}/core/student?`);
-        url.searchParams.append("notOnCourse", notOnCourse);
-        url.searchParams.append("lowScore", lowScore);
+        let url = new URL(`${server_url}/core/students?`);
+        // url.searchParams.append("notOnCourse", notOnCourse);
+        // url.searchParams.append("lowScore", lowScore);
         if (course !== "Выберите курс") {
             url.searchParams.append("course", course);
         }
@@ -58,6 +58,8 @@
         if (team !== "") {
             url.searchParams.append("team", team);
         }
+
+        console.log(url);
 
         try {
             response = await fetch(url, {
@@ -252,28 +254,29 @@
     let subject = "";
     let team = "";
 
-    $: if (
-        notOnCourse === false &&
-        lowScore === false &&
-        course === "Выберите курс" &&
-        group === "" &&
-        typeOfEducation === "Выберите форму" &&
-        typeOfCost === "Выберите тип" &&
-        onlineCourse === "" &&
-        subject === "" &&
-        team === ""
-    ) {
-        is_disabled = true;
-    } else {
-        is_disabled = false;
-    }
+    is_disabled = false;
+
+    // $: if (
+    //     notOnCourse === false &&
+    //     lowScore === false &&
+    //     course === "Выберите курс" &&
+    //     group === "" &&
+    //     typeOfEducation === "Выберите форму" &&
+    //     typeOfCost === "Выберите тип" &&
+    //     onlineCourse === "" &&
+    //     subject === "" &&
+    //     team === ""
+    // ) {
+    //     is_disabled = true;
+    // } else {
+    //     is_disabled = false;
+    // }
 </script>
 
 <div class="overflow-hidden lg:flex">
     <div class="relative h-full w-full overflow-y-auto lg:ml-64 pt-[70px]">
         <div
-            class="relative h-full w-full overflow-y-auto bg-white dark:bg-gray-800"
-        >
+            class="relative h-full w-full overflow-y-auto bg-white dark:bg-gray-800">
             <div class="p-4 px-6">
                 <Breadcrumb class="mb-5">
                     <li class="inline-flex items-center">
@@ -284,41 +287,36 @@
                                 class="w-4 h-4 me-2"
                                 fill="currentColor"
                                 viewBox="0 0 20 20"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
+                                xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 01
                         1 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"
-                                ></path></svg
-                            >Главная</Link
-                        >
+                                ></path
+                                ></svg
+                            >Главная</Link>
                     </li>
                     <li class="inline-flex items-center">
                         <svg
                             class="w-6 h-6 text-gray-400 rtl:-scale-x-100"
                             fill="currentColor"
                             viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
+                            xmlns="http://www.w3.org/2000/svg">
                             <path
                                 fill-rule="evenodd"
                                 d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0
                         z"
-                                clip-rule="evenodd"
-                            ></path></svg
-                        >
+                                clip-rule="evenodd"></path
+                            ></svg>
                         <Link
                             class="ml-0 ms-1 text-sm font-medium text-gray-700 hover:text-gray-900 md:ms-2 dark:text-gray-400 dark:hover:text-white"
-                            to="/notifications">Рассылки</Link
-                        >
+                            to="/notifications">Рассылки</Link>
                     </li>
                     <BreadcrumbItem>Отправить рассылку</BreadcrumbItem>
                 </Breadcrumb>
                 <div class="mb-4 flex">
                     <form class="w-full">
                         <div
-                            class="items-center px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700"
-                        >
+                            class="items-center px-3 py-2 rounded-lg bg-gray-50 dark:bg-gray-700">
                             <Dropzone
                                 class="mb-4"
                                 id="dropzone"
@@ -328,8 +326,7 @@
                                 }}
                                 on:change={handleChange}
                                 multiple
-                                bind:files
-                            >
+                                bind:files>
                                 <svg
                                     aria-hidden="true"
                                     class="mb-3 w-10 h-10 text-gray-400"
@@ -341,26 +338,20 @@
                                         stroke-linecap="round"
                                         stroke-linejoin="round"
                                         stroke-width="2"
-                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                                    /></svg
-                                >
+                                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
                                 {#if value.length === 0}
                                     <p
-                                        class="mb-2 text-sm text-gray-500 dark:text-gray-400"
-                                    >
+                                        class="mb-2 text-sm text-gray-500 dark:text-gray-400">
                                         <span class="font-semibold"
-                                            >Перетащите сюда файлы</span
-                                        >
+                                            >Перетащите сюда файлы</span>
                                     </p>
                                     <p
-                                        class="text-xs text-gray-500 dark:text-gray-400"
-                                    >
+                                        class="text-xs text-gray-500 dark:text-gray-400">
                                         Либо нажмите, чтобы загрузить
                                     </p>
                                 {:else}
                                     <p
-                                        class="text-xs text-gray-500 dark:text-gray-400"
-                                    >
+                                        class="text-xs text-gray-500 dark:text-gray-400">
                                         {showFiles(value)}
                                     </p>
                                 {/if}
@@ -370,20 +361,16 @@
                                 rows="6"
                                 class="mb-2 bg-white dark:bg-gray-800"
                                 placeholder="Введите текст"
-                                bind:value={content}
-                            ></Textarea>
+                                bind:value={content}></Textarea>
                             <div>
                                 <Button class="mb-2" on:click={send}
-                                    >Отправить рассылку</Button
-                                >
+                                    >Отправить рассылку</Button>
                                 <Button
                                     class="mb-2 ml-3"
                                     disabled={is_empty}
-                                    on:click={clear}>Сбросить вложения</Button
-                                >
+                                    on:click={clear}>Сбросить вложения</Button>
                                 <Button class="mb-2 ml-3" on:click={clear_all}
-                                    >Очистить всё</Button
-                                >
+                                    >Очистить всё</Button>
                             </div>
                             <Helper>{send_status}</Helper>
                         </div>
@@ -391,30 +378,25 @@
                     <div class="w-1/2 ml-6">
                         <Heading
                             tag="h1"
-                            class="mb-4 text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl"
-                        >
+                            class="mb-4 text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
                             Фильтры
                         </Heading>
                         <div class="ml-2 flex">
                             <Checkbox
                                 class="mb-4 mr-5 w-fit"
                                 bind:checked={notOnCourse}
-                                >Нет на курсе</Checkbox
-                            >
+                                >Нет на курсе</Checkbox>
                             <Checkbox class="mb-4 w-fit" bind:checked={lowScore}
-                                >Низкий балл</Checkbox
-                            >
+                                >Низкий балл</Checkbox>
                         </div>
                         <div class="ml-2 mb-4 flex">
                             <div class="mr-6 w-full space-y-4">
                                 <form>
                                     <Label class="space-y-2 mb-2"
-                                        >Номер курса</Label
-                                    >
+                                        >Номер курса</Label>
                                     <select
                                         bind:value={course}
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500"
-                                    >
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500">
                                         <option selected>Выберите курс</option>
                                         <option value="1">1</option>
                                         <option value="2">2</option>
@@ -426,32 +408,26 @@
                                 </form>
                                 <form>
                                     <Label class="space-y-2 mb-2"
-                                        >Тип затрат</Label
-                                    >
+                                        >Тип затрат</Label>
                                     <select
                                         bind:value={typeOfCost}
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500"
-                                    >
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500">
                                         <option selected>Выберите тип</option>
                                         <option value="бюджет">Бюджет</option>
                                         <option value="контракт"
-                                            >Контракт</option
-                                        >
+                                            >Контракт</option>
                                     </select>
                                 </form>
                                 <form>
                                     <Label class="space-y-2 mb-2"
-                                        >Форма обучения</Label
-                                    >
+                                        >Форма обучения</Label>
                                     <select
                                         bind:value={typeOfEducation}
-                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500"
-                                    >
+                                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500">
                                         <option selected>Выберите форму</option>
                                         <option value="Очная">Очная</option>
                                         <option value="Очно-заочная"
-                                            >Очно-заочная</option
-                                        >
+                                            >Очно-заочная</option>
                                         <option value="Заочная">Заочная</option>
                                     </select>
                                 </form>
@@ -464,8 +440,7 @@
                                         type="text"
                                         placeholder="РИ-123456"
                                         size="md"
-                                        on:keypress={handle_keypress}
-                                    />
+                                        on:keypress={handle_keypress} />
                                 </Label>
                                 <Label class="space-y-2">
                                     <span>Онлайн курс</span>
@@ -474,8 +449,7 @@
                                         type="text"
                                         placeholder="Введите название курса"
                                         size="md"
-                                        on:keypress={handle_keypress}
-                                    />
+                                        on:keypress={handle_keypress} />
                                 </Label>
                                 <Label class="space-y-2">
                                     <span>Предмет</span>
@@ -484,8 +458,7 @@
                                         type="text"
                                         placeholder="Введите название предмета"
                                         size="md"
-                                        on:keypress={handle_keypress}
-                                    />
+                                        on:keypress={handle_keypress} />
                                 </Label>
                             </div>
                         </div>
@@ -496,67 +469,52 @@
                                 type="text"
                                 placeholder="Введите название команды"
                                 size="md"
-                                on:keypress={handle_keypress}
-                            />
+                                on:keypress={handle_keypress} />
                         </Label>
                         <div class="flex">
                             <Button
                                 class="ml-2"
                                 disabled={is_disabled}
-                                on:click={load_students}>Применить</Button
-                            >
+                                on:click={load_students}>Применить</Button>
                             <Button
                                 class="ml-4"
                                 disabled={is_disabled}
-                                on:click={cancel}>Сбросить</Button
-                            >
+                                on:click={cancel}>Сбросить</Button>
                         </div>
                     </div>
                 </div>
                 <Heading
                     tag="h1"
-                    class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl"
-                >
+                    class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
                     Все студенты
                 </Heading>
             </div>
             <Table id="table">
                 <TableHead
-                    class="border-y border-gray-200 bg-gray-100 dark:border-gray-700"
-                >
+                    class="border-y border-gray-200 bg-gray-100 dark:border-gray-700">
                     <TableHeadCell class="w-4 p-4 pl-8 font-medium"
                         ><Checkbox
                             id="check"
-                            on:click={(e) => toggle(e.target)}
-                        /></TableHeadCell
-                    >
+                            on:click={(e) =>
+                                toggle(e.target)} /></TableHeadCell>
                     <TableHeadCell class="w-4 p-4 font-medium"
-                        >Курс</TableHeadCell
-                    >
+                        >Курс</TableHeadCell>
                     <TableHeadCell class="w-4 p-4 font-medium"
-                        >Фамилия</TableHeadCell
-                    >
+                        >Фамилия</TableHeadCell>
                     <TableHeadCell class="w-4 p-4 font-medium"
-                        >Имя</TableHeadCell
-                    >
+                        >Имя</TableHeadCell>
                     <TableHeadCell class="w-4 p-4 font-medium"
-                        >Отчество</TableHeadCell
-                    >
+                        >Отчество</TableHeadCell>
                     <TableHeadCell class="w-1/12 p-4 font-medium"
-                        >Группа</TableHeadCell
-                    >
+                        >Группа</TableHeadCell>
                     <TableHeadCell class="w-1/6 p-4 font-medium"
-                        >Направление</TableHeadCell
-                    >
+                        >Направление</TableHeadCell>
                     <TableHeadCell class="w-1/12 p-4 font-medium"
-                        >Форма</TableHeadCell
-                    >
+                        >Форма</TableHeadCell>
                     <TableHeadCell class="w-1/12 p-4 font-medium"
-                        >Тип</TableHeadCell
-                    >
+                        >Тип</TableHeadCell>
                     <TableHeadCell class="w-4 p-4 font-medium"
-                        >Электронная почта</TableHeadCell
-                    >
+                        >Электронная почта</TableHeadCell>
                 </TableHead>
                 <TableBody>
                     {#each activeStudents as student}
@@ -564,59 +522,48 @@
                             <TableBodyCell class="p-4 pl-8"
                                 ><Checkbox
                                     value={student.id}
-                                    on:click={remove}
-                                /></TableBodyCell
-                            >
+                                    on:click={remove} /></TableBodyCell>
                             <TableBodyCell
-                                class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs"
-                            >
+                                class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
                                 {student.info !== null
                                     ? student.info.group.numberCourse
                                     : ""}
                             </TableBodyCell>
                             <TableBodyCell
-                                class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs"
-                            >
+                                class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
                                 {student.info !== null
                                     ? student.info.surname
                                     : ""}
                             </TableBodyCell>
                             <TableBodyCell
-                                class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs"
-                            >
+                                class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
                                 {student.info !== null ? student.info.name : ""}
                             </TableBodyCell>
                             <TableBodyCell
-                                class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs"
-                            >
+                                class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
                                 {student.info !== null
                                     ? student.info.patronymic
                                     : ""}
                             </TableBodyCell>
                             <TableBodyCell
-                                class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs"
-                            >
+                                class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
                                 {student.info !== null
                                     ? student.info.group.number
                                     : ""}
                             </TableBodyCell>
                             <TableBodyCell
-                                class="max-w-sm flex items-center space-x-6 whitespace-nowrap p-4"
-                            >
+                                class="max-w-sm flex items-center space-x-6 whitespace-nowrap p-4">
                                 <div
-                                    class="text-sm font-normal text-gray-500 dark:text-gray-400"
-                                >
+                                    class="text-sm font-normal text-gray-500 dark:text-gray-400">
                                     <div
-                                        class="text-base font-semibold text-gray-900 dark:text-white"
-                                    >
+                                        class="text-base font-semibold text-gray-900 dark:text-white">
                                         {student.info !== null
                                             ? student.info.group.directionCode
                                             : ""}
                                     </div>
                                     <div
                                         class="text-sm font-normal text-gray-500 dark:text-gray-400 overflow-hidden text-ellipsis"
-                                        style="max-width: 15dvw"
-                                    >
+                                        style="max-width: 15dvw">
                                         {student.info !== null
                                             ? student.info.group.nameSpeciality
                                             : ""}
@@ -624,22 +571,19 @@
                                 </div>
                             </TableBodyCell>
                             <TableBodyCell
-                                class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs"
-                            >
+                                class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
                                 {student.info !== null
                                     ? student.info.typeOfEducation
                                     : ""}
                             </TableBodyCell>
                             <TableBodyCell
-                                class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs"
-                            >
+                                class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
                                 {student.info !== null
                                     ? student.info.typeOfCost
                                     : ""}
                             </TableBodyCell>
                             <TableBodyCell
-                                class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs"
-                            >
+                                class="max-w-sm overflow-hidden truncate p-4 text-base font-normal text-gray-500 dark:text-gray-400 xl:max-w-xs">
                                 {student.email}
                             </TableBodyCell>
                         </TableBodyRow>

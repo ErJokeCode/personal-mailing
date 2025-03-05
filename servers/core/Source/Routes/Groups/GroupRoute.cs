@@ -19,7 +19,8 @@ public class GroupRoute : IRoute
 {
     public void MapRoutes(WebApplication app)
     {
-        var group = app.MapGroup("/core/groups");
+        var group = app.MapGroup("/core/groups")
+            .RequireAuthorization();
 
         group.MapGet("/", GetAllGroups)
             .WithDescription("Получет все привязывания групп");

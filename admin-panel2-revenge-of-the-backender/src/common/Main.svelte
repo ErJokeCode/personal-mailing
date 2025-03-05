@@ -11,6 +11,13 @@
     import NotFound from "/src/routes/NotFound.svelte";
     import SingleAdmin from "/src/routes/admins/SingleAdmin.svelte";
     import Profile from "/src/routes/admins/Profile.svelte";
+    import Edit from "/src/routes/subjects/Edit.svelte";
+    import Faq from "/src/routes/faq/Faq.svelte";
+    import Builder from "/src/routes/onboarding/Builder.svelte";
+    import AllNotifications from "../routes/notifications/AllNotifications.svelte";
+    import UploadFiles from "../routes/uploads/UploadFiles.svelte";
+    import SingleNotification from "../routes/notifications/SingleNotification.svelte";
+    import SendNotification from "../routes/notifications/SendNotification.svelte";
 
     const authPreHook = async (route: Route): Promise<boolean> => {
         if (route.path == "login") {
@@ -79,6 +86,34 @@
         {
             path: "groups",
             component: AllGroups,
+        },
+        {
+            path: "notifications/(?<notificationId>.*)",
+            component: SingleNotification,
+        },
+        {
+            path: "notifications",
+            component: AllNotifications,
+        },
+        {
+            path: "send-notification",
+            component: SendNotification,
+        },
+        {
+            path: "upload",
+            component: UploadFiles,
+        },
+        {
+            path: "subjects",
+            component: Edit,
+        },
+        {
+            path: "faq",
+            component: Faq,
+        },
+        {
+            path: "builder",
+            component: Builder,
         },
         {
             path: ".+",

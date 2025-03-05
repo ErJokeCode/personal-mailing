@@ -17,7 +17,7 @@
         url.searchParams.append("page", paged.page.toString());
         url.searchParams.append("pageSize", PageSize.toString());
 
-        let res = await fetch(url);
+        let res = await fetch(url, { credentials: "include" });
 
         let groups = await res.json();
 
