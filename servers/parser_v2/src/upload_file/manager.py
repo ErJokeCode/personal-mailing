@@ -38,11 +38,11 @@ class ManagerFiles:
             excel = pd.ExcelFile(BytesIO(await file.read()))
             sheet_names = excel.sheet_names
 
-            dfs = []
+            dfs = {}
             str_hash = ""
             for shn in sheet_names:
                 df = excel.parse(shn)
-                dfs.append(df)
+                dfs[shn] = df
 
                 columns = df.columns.to_list()
                 int_hash = 0

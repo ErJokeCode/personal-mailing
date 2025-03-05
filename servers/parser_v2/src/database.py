@@ -367,8 +367,25 @@ class ECollectV3(Generic[I, O]):
             return {"status": "success"}
         return {"status": "error"}
 
-    def find(self, filter: dict) -> list[O]:
-        return [self.__cls_db(**item) for item in self.__collect.find(filter)]
+    def find(self, filter: dict = {}, start: int = 0, limit: int = -1) -> list[O]:
+        res = []
+        i = 0
+
+        if limit == -1:
+            for item in self.__collect.find(filter):
+                if i >= start:
+                    res.append(self.__cls_db(**item))
+                i += 1
+            return res
+
+        for item in self.__collect.find(filter):
+            if i >= start:
+                res.append(self.__cls_db(**item))
+            if i == start + limit:
+                break
+            i += 1
+
+        return res
 
     def find_one(self, **kwargs) -> O | None:
         if kwargs.get("id") != None:
@@ -380,6 +397,19 @@ class ECollectV3(Generic[I, O]):
             return None
 
         return self.__cls_db(**item)
+
+    def is_in(self, query: dict | None = None, **kwargs) -> InDB:
+        if query is not None:
+            kwargs = {**kwargs, **query}
+
+        ln = len(self.__collect.find(kwargs).to_list())
+
+        if ln == 0:
+            return InDB.NOT_IN_DB
+        elif ln == 1:
+            return InDB.IN_DB
+        else:
+            return InDB.MANY
 
 
 class EDataBase():

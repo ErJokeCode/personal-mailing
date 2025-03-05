@@ -62,6 +62,29 @@ class Student(EBaseModel):
     # def modeus_update_fields(self) -> list[str]:
     #     return ["group.direction_code", "group.name_speciality", "subjects"]
 
+    @classmethod
+    def get_names_col_db(self) -> list[str]:
+        return [
+            "student__personal_number",
+            "student__full_name",
+            "student__name",
+            "student__surname",
+            "student__patronymic",
+            "student__email",
+            "student__date_of_birth",
+            "student__number_group",
+            "student__number_course",
+            "student__direction_code",
+            "student__name_speciality",
+            "student__status",
+            "student__type_of_cost",
+            "student__type_of_education",
+            "subject__full_name",
+            "subject__name",
+            "subject__team__name",
+            "subject__team__teachers"
+        ]
+
 
 class StudentInDB(Student, BaseModelInDB):
     pass

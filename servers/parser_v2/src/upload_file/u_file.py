@@ -309,17 +309,17 @@ class UFileOnline(UFile):
 
 
 class UpFile:
-    def __init__(self, dfs: list[pd.DataFrame]) -> None:
-        self.__dfs = dfs
+    def __init__(self, dfs: dict[str, pd.DataFrame]) -> None:
+        self.__dfs: dict[str, pd.DataFrame] = dfs
         self.__structure: StuctureExcelInDB
-        self.__df: pd.DataFrame
+        self.__grouped_dfs: dict[str, list] | None = None
 
     def add_structure(self, structure: StuctureExcelInDB) -> None:
         self.__structure = structure
 
     def get_base_structure(self) -> StuctureExcel:
         struc_excel = []
-        for df in self.__dfs:
+        for df in self.__dfs.values():
             list_cols = []
             columns = df.columns.to_list()
             for i in range(len(columns)):
@@ -339,55 +339,166 @@ class UpFile:
             lists=struc_excel
         )
 
-    def get_info(self):
-        struct = self.__structure
-        if struct is None:
-            raise Exception("Not found structure")
+    def group_df(self, df: pd.DataFrame, groups: dict[int, list[str]], cols: dict[int, list[str]], index: int, max_level: int):
+        n_group = groups.get(index)
+        n_cols: list[str] = []
+        for i in range(index, max_level + 1):
+            cols_before = cols.get(i)
+            if cols_before is not None:
+                n_cols = [*n_cols, *cols_before]
+            group__before = groups.get(i)
+            if group__before is not None:
+                n_cols = [*n_cols, *group__before]
 
-        dfs = self.__get_info(struct)
-        df = self.__from_dfs_to_df(dfs)
-        return df.to_dict("records")
+        if n_group is None:
+            return df[n_cols].to_dict("records")
 
-    def __get_info(self, struct: StuctureExcelInDB):
+        if index == max_level:
+            return df[n_group].to_dict("list")
+
+        if n_cols is None:
+            group_df = df.groupby(n_group)
+        else:
+            group_df = group_df = df.groupby(n_group)[n_cols]
+
         new_dfs = []
-        for i in range(len(struct.lists)):
-            df = self.__dfs[i].copy()
+        for key_group, value_group in group_df:
+            new_one = self.group_df(value_group, groups,
+                                    cols, index + 1, max_level)
 
-            for cl in struct.lists[i].cols:
-                if cl.split is not None:
-                    sp = df[cl.name_col_excel].str.split(
-                        cl.split.by_split, expand=True)
+            d = {}
+            i = 0
+            for c in n_group:
+                d[c] = key_group[i]
+                i += 1
+            d["data"] = new_one
 
-                    _log.info(sp)
+            new_dfs.append(d)
 
-                    m = sp.shape[1]
-                    n = len(cl.split.name_col_db) - 1
-                    if m > n:
-                        _log.info(sp.iloc[:, n:])
-                        combined_col = sp.iloc[:, n:].fillna(
-                            '').agg(' '.join, axis=1).str.strip()
-                        _log.info(combined_col)
-                    df[[*cl.split.name_col_db[:-1]]
-                       ] = sp[[i for i in range(n)]]
-                    df[cl.split.name_col_db[-1]] = combined_col
+            # _log.info("%s %s", key_group, new_one_df)
 
-                if cl.name_col_db is None:
-                    df = df.drop(cl.name_col_excel, axis=1)
-                else:
-                    df[cl.name_col_db] = df[cl.name_col_excel].copy()
-                    df = df.drop(cl.name_col_excel, axis=1)
-
-            new_dfs.append(df.reset_index())
-        self.__dfs = new_dfs.copy()
         return new_dfs
 
+    def get_info_with_group(self, start_index: int, lenght: int) -> dict:
+        if self.__grouped_dfs is None:
+            structure = self.__structure
+
+            grouped_dfs: dict = {}
+
+            i = 0
+            for key, val in self.__dfs.items():
+                new_df = self.__rename_df(val, structure, i)
+                groups, cols, max_level = self.__create_group_level(
+                    structure.lists[i])
+                res = self.group_df(new_df, groups, cols, 0, max_level)
+                grouped_dfs[key] = res
+                i += 1
+
+            self.__grouped_dfs = grouped_dfs
+
+        res = {}
+        for key, val in self.__grouped_dfs.items():
+            res[key] = val[start_index:start_index + lenght]
+
+        return res
+
+    def __rename_df(
+        self,
+        df: pd.DataFrame,
+        structure: StuctureExcelInDB,
+        index: int
+    ) -> pd.DataFrame:
+        for cl in structure.lists[index].cols:
+            if cl.split is not None:
+                sp = df[cl.name_col_excel].str.split(
+                    cl.split.by_split, expand=True)
+
+                _log.info(sp)
+
+                m = sp.shape[1]
+                n = len(cl.split.name_col_db) - 1
+                if m > n:
+                    _log.info(sp.iloc[:, n:])
+                    combined_col = sp.iloc[:, n:].fillna(
+                        '').agg(' '.join, axis=1).str.strip()
+                    _log.info(combined_col)
+
+                df[[*cl.split.name_col_db[:-1]]
+                   ] = sp[[i for i in range(n)]]
+                df[cl.split.name_col_db[-1]] = combined_col
+
+            if cl.name_col_db is None:
+                df = df.drop(cl.name_col_excel, axis=1)
+            else:
+                df[cl.name_col_db] = df[cl.name_col_excel].copy()
+                df = df.drop(cl.name_col_excel, axis=1)
+        return df.copy()
+
+    def __create_group_level(self, _list: ListExcel):
+        groups: dict[int, list[str]] = {}
+        cols: dict[int, list[str]] = {}
+        max_level = 0
+
+        for col in _list.cols:
+            if col.group_by:
+                if col.level_group not in groups:
+                    groups[col.level_group] = []
+
+                if col.name_col_db is not None:
+                    groups[col.level_group].append(col.name_col_db)
+                if col.split is not None and col.split.name_col_db != []:
+                    groups[col.level_group] = [
+                        *groups[col.level_group],
+                        *col.split.name_col_db
+                    ]
+            else:
+                if col.level_group not in cols:
+                    cols[col.level_group] = []
+
+                if col.name_col_db is not None:
+                    cols[col.level_group].append(col.name_col_db)
+                if col.split is not None and col.split.name_col_db != []:
+                    cols[col.level_group] = [
+                        *cols[col.level_group],
+                        *col.split.name_col_db
+                    ]
+            max_level = max(max_level, col.level_group)
+
+        groups = dict(sorted(groups.items()))
+        cols = dict(sorted(cols.items()))
+
+        return (groups, cols, max_level)
+
+    def get_concat_dfs(self):
+        return pd.concat(self.__dfs)[:100].to_dict("records")
+
     def __from_dfs_to_df(self, dfs: list[pd.DataFrame]) -> pd.DataFrame:
-        self.__df = pd.concat(dfs, ignore_index=True)
-        return self.__df.copy()
+        if len(dfs) == 0:
+            return pd.DataFrame()
+
+        if len(dfs) == 1:
+            self.__df = dfs[0].copy()
+            return dfs[0]
+        else:
+            raise Exception("Not implemented")
 
     def save(self, ids: list[int]):
-        items = self.__df.iloc[ids]
+        self.__save_student(ids)
+        # if self.__structure.type_file == TypeFile.STUDENT:
+        #     self.__save_student(ids)
+        # elif self.__structure.type_file == TypeFile.MODEUS:
+        #     self.__save_modeus(ids)
 
+    def __save_student(self, ids: list[int]) -> None:
+        if self.__df is None:
+            raise Exception("First get info")
+
+        if len(ids) == 1 and ids[0] == -1:
+            items = self.__df
+        else:
+            items = self.__df.iloc[ids]
+
+        _log.info(items)
         student = {}
         for item in items.to_dict("records"):
             for key in item.keys():
@@ -401,8 +512,12 @@ class UpFile:
                         else:
                             val = False
 
-                    if new_key == "personal_number":
+                    elif new_key == "personal_number":
                         val = "0" * (8 - len(str(val))) + str(val)
+
+                    elif new_key == "date_of_birth":
+                        if isinstance(val, datetime):
+                            val = val.strftime("%d.%m.%Y")
 
                     student[new_key] = val
 
@@ -412,6 +527,7 @@ class UpFile:
                 db.student.update_one(
                     student_model,
                     filter={"personal_number": student_model.personal_number},
+                    query={"$inc": {"version": 1}},
                     upsert=True
                 )
             except Exception as e:
