@@ -49,9 +49,6 @@
         { name: "Заочная", value: "Заочная" },
     ];
 
-    // TODO add load indication on send
-    // Push error or success notification as well
-
     let notifications: ToastNotifications;
     let files: FileList = $state(null);
     let errors = $state({ Content: null, StudentIds: null });

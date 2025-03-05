@@ -13,7 +13,7 @@
     } from "flowbite-svelte";
     import { createPaged } from "/src/lib/components/Paged.svelte";
     import PagedList from "/src/lib/components/PagedList.svelte";
-    import { NotificationsApi, PageSize } from "/src/lib/server";
+    import { NotificationsApi, PageSize, StudentsApi } from "/src/lib/server";
     import { goto, QueryString } from "@mateothegreat/svelte5-router";
     import { CirclePlusOutline, ClipboardOutline } from "flowbite-svelte-icons";
 
@@ -23,7 +23,7 @@
     });
 
     async function get() {
-        let url = new URL(NotificationsApi);
+        let url = new URL(StudentsApi);
 
         url.searchParams.append("search", state.search);
         url.searchParams.append("page", state.paged.page.toString());
@@ -37,55 +37,48 @@
         return body;
     }
 
-    function singleAdmin(adminId) {
-        goto(`/admins/${adminId}`);
-    }
-
-    function single(id) {
-        goto(`/notifications/${id}`);
-    }
-
-    function send() {
-        goto("/send-notification");
+    function single(email) {
+        goto(`/students/${email}`);
     }
 </script>
 
-<SpeedDial class="z-10">
-    <SpeedDialButton name="Отправить" on:click={send}>
-        <CirclePlusOutline />
-    </SpeedDialButton>
-</SpeedDial>
-
-<Heading tag="h2" class="m-4">Рассылки</Heading>
+<Heading tag="h2" class="m-4">Активные студенты</Heading>
 
 <PagedList {get} bind:paged={state.paged} bind:search={state.search}>
     {#snippet children(body)}
         <Table>
             <TableHead>
-                <TableHeadCell>Содержание</TableHeadCell>
-                <TableHeadCell>Дата</TableHeadCell>
-                <TableHeadCell>Админ</TableHeadCell>
+                <TableHeadCell>Почта</TableHeadCell>
+                <TableHeadCell>Группа</TableHeadCell>
+                <TableHeadCell>Курс</TableHeadCell>
+                <TableHeadCell>Фамилия</TableHeadCell>
+                <TableHeadCell>Имя</TableHeadCell>
+                <TableHeadCell>Отчество</TableHeadCell>
                 <TableHeadCell>Детали</TableHeadCell>
             </TableHead>
 
             <TableBody tableBodyClass="divide-y">
-                {#each body.items as notification}
+                {#each body.items as student}
                     <TableBodyRow class="text-lg">
                         <TableBodyCell>
-                            {notification.content.length > 50
-                                ? notification.content.slice(0, 50)
-                                : notification.content}
+                            {student.info.email}
                         </TableBodyCell>
-                        <TableBodyCell>{notification.createdAt}</TableBodyCell>
+                        <TableBodyCell
+                            >{student.info.group.number}</TableBodyCell>
                         <TableBodyCell>
-                            <Button
-                                on:click={() =>
-                                    singleAdmin(notification.admin.id)}>
-                                {notification.admin.email}
-                            </Button>
+                            {student.info.group.numberCourse}
                         </TableBodyCell>
                         <TableBodyCell>
-                            <Button on:click={() => single(notification.id)}>
+                            {student.info.surname}
+                        </TableBodyCell>
+                        <TableBodyCell>
+                            {student.info.name}
+                        </TableBodyCell>
+                        <TableBodyCell>
+                            {student.info.patronymic}
+                        </TableBodyCell>
+                        <TableBodyCell>
+                            <Button on:click={() => single(student.email)}>
                                 <ClipboardOutline />
                             </Button>
                         </TableBodyCell>

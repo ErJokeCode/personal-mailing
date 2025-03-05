@@ -18,6 +18,9 @@
     import UploadFiles from "../routes/uploads/UploadFiles.svelte";
     import SingleNotification from "../routes/notifications/SingleNotification.svelte";
     import SendNotification from "../routes/notifications/SendNotification.svelte";
+    import AllStudents from "../routes/students/AllStudents.svelte";
+    import ActiveStudents from "../routes/students/ActiveStudents.svelte";
+    import SingleStudent from "../routes/students/SingleStudent.svelte";
 
     const authPreHook = async (route: Route): Promise<boolean> => {
         if (route.path == "login") {
@@ -98,6 +101,18 @@
         {
             path: "send-notification",
             component: SendNotification,
+        },
+        {
+            path: "students/(?<email>.*)",
+            component: SingleStudent,
+        },
+        {
+            path: "students",
+            component: AllStudents,
+        },
+        {
+            path: "active-students",
+            component: ActiveStudents,
         },
         {
             path: "upload",
