@@ -59,7 +59,7 @@ class StuctureExcelInDB(StuctureExcel, BaseModelInDB):
 
 class ConstructorCols(BaseModel):
     number_col: str = ":"
-    name_col_db: str
+    name_col_db: str | None = None
     split: Split | None = None
     is_key: bool = False
     group_by: bool = False
@@ -79,7 +79,7 @@ class ConstructorCols(BaseModel):
             start, end = 0, len(base)
 
         for cl in base:
-            if cl.number_col >= int(start) and cl.number_col <= int(end):
+            if cl.number_col >= int(start) and cl.number_col < int(end):
                 cols.append(
                     ColsExcel(
                         number_col=cl.number_col,
