@@ -21,6 +21,8 @@
     import AllStudents from "../routes/students/AllStudents.svelte";
     import ActiveStudents from "../routes/students/ActiveStudents.svelte";
     import SingleStudent from "../routes/students/SingleStudent.svelte";
+    import Chats from "../routes/chats/Chats.svelte";
+    import SingleChat from "../routes/chats/SingleChat.svelte";
 
     const authPreHook = async (route: Route): Promise<boolean> => {
         if (route.path == "login") {
@@ -113,6 +115,14 @@
         {
             path: "active-students",
             component: ActiveStudents,
+        },
+        {
+            path: "chats/(?<studentId>.*)",
+            component: SingleChat,
+        },
+        {
+            path: "chats",
+            component: Chats,
         },
         {
             path: "upload",

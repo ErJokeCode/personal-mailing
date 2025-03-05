@@ -11,6 +11,7 @@
         CogOutline,
         EditOutline,
         FileOutline,
+        MessagesOutline,
         QuestionCircleOutline,
         TableRowOutline,
         UserSettingsOutline,
@@ -34,6 +35,7 @@
         {@render sidebarItem("Админы", "/admins", UserSettingsOutline)}
         {@render sidebarItem("Группы", "/groups", UsersGroupOutline)}
         {@render sidebarItem("Рассылки", "/notifications", ClipboardListSolid)}
+        {@render sidebarItem("Чаты", "/chats", MessagesOutline)}
 
         <SidebarDropdownWrapper label="Студенты">
             <svelte:component this={UsersOutline} slot="icon" />

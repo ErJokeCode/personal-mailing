@@ -16,23 +16,19 @@
     import { NotificationsApi, PageSize } from "/src/lib/server";
     import { goto, QueryString } from "@mateothegreat/svelte5-router";
     import { CirclePlusOutline, ClipboardOutline } from "flowbite-svelte-icons";
-
-    let state = $state({
-        paged: createPaged(),
-        search: "",
-    });
+    import { AllNotifications } from "/src/stores/notifications/AllNotifications.svelte";
 
     async function get() {
         let url = new URL(NotificationsApi);
 
-        url.searchParams.append("search", state.search);
-        url.searchParams.append("page", state.paged.page.toString());
+        url.searchParams.append("search", AllNotifications.search);
+        url.searchParams.append("page", AllNotifications.paged.page.toString());
         url.searchParams.append("pageSize", PageSize.toString());
 
         let res = await fetch(url, { credentials: "include" });
         let body = await res.json();
 
-        Object.assign(state.paged, body);
+        Object.assign(AllNotifications.paged, body);
 
         return body;
     }
@@ -58,7 +54,10 @@
 
 <Heading tag="h2" class="m-4">Рассылки</Heading>
 
-<PagedList {get} bind:paged={state.paged} bind:search={state.search}>
+<PagedList
+    {get}
+    bind:paged={AllNotifications.paged}
+    bind:search={AllNotifications.search}>
     {#snippet children(body)}
         <Table>
             <TableHead>

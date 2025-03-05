@@ -1,10 +1,19 @@
 <script lang="ts">
     import BackButton from "/src/lib/components/BackButton.svelte";
-    import { goto, type Route } from "@mateothegreat/svelte5-router";
+    import {
+        goto,
+        QueryString,
+        type Route,
+    } from "@mateothegreat/svelte5-router";
     import { GeneralError } from "/src/lib/errors";
-    import { AdminsApi, NotificationsApi, StudentsApi } from "/src/lib/server";
+    import {
+        AdminsApi,
+        DocumentsApi,
+        NotificationsApi,
+        StudentsApi,
+    } from "/src/lib/server";
     import Get from "/src/lib/components/Get.svelte";
-    import { Button, Heading, TabItem, Tabs } from "flowbite-svelte";
+    import { A, Button, Heading, TabItem, Tabs } from "flowbite-svelte";
 
     let { route }: { route: Route } = $props();
     let notificationId = route.params["notificationId"];
@@ -29,8 +38,8 @@
         goto(`/admins/${adminId}`);
     }
 
-    function singleStudent(studentId) {
-        goto(`/students/${studentId}`);
+    function singleStudent(email) {
+        goto(`/students/${email}`);
     }
 </script>
 
@@ -71,11 +80,24 @@
                 </p>
             </TabItem>
 
+            {#if body.documents.length > 0}
+                <TabItem title="Вложения">
+                    <div class="flex gap-1 flex-col items-baseline">
+                        {#each body.documents as document}
+                            <A href={`${DocumentsApi}/${document.blobId}`}>
+                                {document.name}
+                            </A>
+                        {/each}
+                    </div>
+                </TabItem>
+            {/if}
+
             <TabItem title="Студенты">
                 <ul class="flex flex-col gap-4">
                     {#each body.students as student}
                         <li>
-                            <Button on:click={() => singleStudent(student.id)}>
+                            <Button
+                                on:click={() => singleStudent(student.email)}>
                                 {student.email}
                             </Button>
                         </li>

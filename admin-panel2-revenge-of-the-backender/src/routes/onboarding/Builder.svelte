@@ -1,4 +1,5 @@
 <script lang="ts">
+    import Panel from "/src/lib/components/Panel.svelte";
     import {
         Breadcrumb,
         BreadcrumbItem,
@@ -211,13 +212,13 @@
     };
 </script>
 
-<div class="pt-4 px-6">
+<Panel class="m-4">
     <Heading
         tag="h1"
         class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl mb-4">
         Конструктор онбординга
     </Heading>
-    <Button on:click={add_course}>Добавить курс</Button>
+    <Button on:click={add_course} class="max-w-fit">Добавить курс</Button>
     <Helper class="mb-4 mt-1"></Helper>
     {#each courses as course, course_index}
         <Accordion class="mb-5">
@@ -369,7 +370,7 @@
             </AccordionItem>
         </Accordion>
     {/each}
-</div>
+</Panel>
 
 <style>
 </style>
