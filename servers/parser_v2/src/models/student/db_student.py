@@ -1,5 +1,5 @@
 from datetime import datetime
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from models.base.base import BaseModelInDB, EBaseModel
 from models.student.db_group import InfoGroupInStudent
 from models.student.db_subject import SubjectInStudent
@@ -25,6 +25,24 @@ class Student(EBaseModel):
     online_course: list[InfoOnlineCourseInStudent] = []
 
     date_set: datetime = datetime.now()
+
+    @field_validator("personal_number", mode="before")
+    def personal_number_valid(cls, v: str | int) -> str:
+        return (8 - len(str(v))) * "0" + str(v)
+
+    @field_validator("status", mode="before")
+    def status_valid(cls, v: str | bool) -> bool:
+        if isinstance(v, bool):
+            return v
+        if v == "Активный":
+            return True
+        return False
+
+    @field_validator("date_of_birth", mode="before")
+    def date_of_birth_valid(cls, v: datetime | str) -> str:
+        if isinstance(v, str):
+            return v
+        return v.strftime("%d.%m.%Y")
 
     @classmethod
     def primary_keys(self) -> list[str]:
@@ -79,10 +97,12 @@ class Student(EBaseModel):
             "student__status",
             "student__type_of_cost",
             "student__type_of_education",
-            "subject__full_name",
-            "subject__name",
-            "subject__team__name",
-            "subject__team__teachers"
+            "subjects__full_name",
+            "subjects__name",
+            "teams__name",
+            "teachers_name",
+            "online_course__name",
+            "online_course__score"
         ]
 
 

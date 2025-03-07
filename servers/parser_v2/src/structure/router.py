@@ -165,7 +165,7 @@ async def create_base_structure() -> dict:
                     ColsExcel(
                         number_col=5,
                         name_col_excel="РМУП название",
-                        name_col_db="subject__full_name",
+                        name_col_db="subjects__full_name",
                         group_by=True,
                         level_group=1
                     ),
@@ -180,21 +180,21 @@ async def create_base_structure() -> dict:
                     ColsExcel(
                         number_col=8,
                         name_col_excel="Группа название",
-                        name_col_db="subject__team__name",
+                        name_col_db="teams__name",
                         group_by=True,
                         level_group=2
                     ),
                     ColsExcel(
                         number_col=9,
                         name_col_excel="Сотрудники",
-                        name_col_db="subject__team__teachers",
+                        name_col_db="teachers_name",
                         group_by=True,
                         level_group=3
                     ),
                     ColsExcel(
                         number_col=10,
                         name_col_excel="МУП или УК",
-                        name_col_db="subject__name",
+                        name_col_db="subjects__name",
                         group_by=True,
                         level_group=1
                     )

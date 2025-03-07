@@ -91,7 +91,7 @@ async def add_structure(key: str, structure: ConstructorStuctureExcel) -> Stuctu
 
 
 @router_upload.post("/file/{key}/save")
-async def save_file(key: str, ids: list[int] = [-1]):
+async def save_file(key: str, ids: dict[str, list[int]]):
     _log.info("Get info about file %s", key)
 
     file = manager_files.get(key)

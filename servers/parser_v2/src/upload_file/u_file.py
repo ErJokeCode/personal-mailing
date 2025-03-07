@@ -1,5 +1,6 @@
 from datetime import datetime
 import logging
+from fastapi import HTTPException
 import pandas as pd
 
 from models.upload_files.resp_upload import InDB, TypeFile
@@ -7,11 +8,13 @@ from models.upload_files.filters import FilterModeus, FilterOnline, FilterOnline
 from pandas.core.groupby.generic import DataFrameGroupBy
 
 from database import db
-from models.student.db_student import Student
+from models.student.db_student import Student, StudentInDB
 from models.student.db_group import InfoGroupInStudent
 from models.upload_files.resp_student import RespStudent
 from models.upload_files.resp_modeus import RespModeus
 from models.file.stucture import ColsExcel, ListExcel, StuctureExcel, StuctureExcelInDB
+from models.student.db_online_course import InfoOnlineCourseInStudent
+from models.student.db_subject import SubjectInStudent, TeamInSubjectInStudent
 
 _log = logging.getLogger(__name__)
 
@@ -313,6 +316,7 @@ class UpFile:
         self.__dfs: dict[str, pd.DataFrame] = dfs
         self.__structure: StuctureExcelInDB
         self.__grouped_dfs: dict[str, list] | None = None
+        self.__keys: list[str] = []
 
     def add_structure(self, structure: StuctureExcelInDB) -> None:
         self.__structure = structure
@@ -351,10 +355,24 @@ class UpFile:
                 n_cols = [*n_cols, *group__before]
 
         if n_group is None:
-            return df[n_cols].to_dict("records")
+            res_df = df[n_cols]
+            res_df = res_df.rename(
+                columns={key: key.split("__")[-1] for key in n_cols})
+            _log.info(res_df)
+            return res_df.to_dict("records")
 
         if index == max_level:
-            return df[n_group].to_dict("list")
+            res_df = df[n_group]
+            res_df = res_df.rename(
+                columns={key: key.split("__")[-1] for key in n_group})
+            _log.info(res_df)
+            dict_res_df = res_df.to_dict("list")
+            for k, v in dict_res_df.items():
+                if isinstance(v, list):
+                    set_v = set(v)
+                    dict_res_df[k] = list(set_v)[0] if len(
+                        set_v) == 1 else set_v
+            return dict_res_df
 
         if n_cols is None:
             group_df = df.groupby(n_group)
@@ -369,9 +387,11 @@ class UpFile:
             d = {}
             i = 0
             for c in n_group:
-                d[c] = key_group[i]
+                value_group = key_group[i]
+                d[c.split("__")[-1]] = value_group
                 i += 1
-            d["data"] = new_one
+            name_dict = groups[index+1][0].split("__")[0]
+            d[name_dict] = new_one
 
             new_dfs.append(d)
 
@@ -427,11 +447,18 @@ class UpFile:
                    ] = sp[[i for i in range(n)]]
                 df[cl.split.name_col_db[-1]] = combined_col
 
+                if cl.is_key:
+                    for split_name_col_db in cl.split.name_col_db:
+                        self.__keys.append(split_name_col_db.split("__")[-1])
+
             if cl.name_col_db is None:
                 df = df.drop(cl.name_col_excel, axis=1)
             else:
                 df[cl.name_col_db] = df[cl.name_col_excel].copy()
                 df = df.drop(cl.name_col_excel, axis=1)
+
+                if cl.is_key:
+                    self.__keys.append(cl.name_col_db.split("__")[-1])
         return df.copy()
 
     def __create_group_level(self, _list: ListExcel):
@@ -482,12 +509,66 @@ class UpFile:
         else:
             raise Exception("Not implemented")
 
-    def save(self, ids: list[int]):
-        self.__save_student(ids)
-        # if self.__structure.type_file == TypeFile.STUDENT:
-        #     self.__save_student(ids)
-        # elif self.__structure.type_file == TypeFile.MODEUS:
-        #     self.__save_modeus(ids)
+    def save(self, ids: dict[str, list[int]]):
+        if self.__grouped_dfs is None:
+            raise Exception("Not found grouped dfs")
+
+        for name_table, list_ids in ids.items():
+            table = self.__grouped_dfs.get(name_table)
+
+            if table is None:
+                raise Exception("Not found sheet %s", name_table)
+
+            if len(list_ids) == 1 and list_ids[0] == -1:
+                list_ids = [i for i in range(len(table))]
+
+            self.__save(table, list_ids)
+
+    def __save(self, info: list[dict], ids: list[int]):
+        for id in ids:
+            row = info[id]
+
+            filter = {key: row[key] for key in self.__keys}
+
+            try:
+                student = Student.model_validate(row)
+                try:
+                    db.student.update_one(
+                        student, filter, {"$inc": {"version": 1}})
+                except:
+                    db.student.insert_one(student)
+            except Exception as e:
+                _log.info(e)
+                self.__structure
+                student_db = db.student.find_one(
+                    **filter)
+
+                if student_db is None:
+                    raise HTTPException(
+                        status_code=404,
+                        detail="Student not found",
+                    )
+
+                d_student_db = student_db.model_dump()
+                for key, val in row.items():
+                    d_student_db[key] = val
+
+                student = Student.model_validate(d_student_db)
+
+                db.student.update_one(
+                    student, filter, {"$inc": {"version": 1}})
+
+            _log.info(student)
+
+            # if len(student) != 0:
+            #     student_model = Student.model_validate(student)
+            #     _log.info(student_model)
+            # if len(subject) != 0:
+            #     subject_model = SubjectInStudent.model_validate(subject)
+            #     _log.info(subject_model)
+            # if len(online) != 0:
+            #     online_model = InfoOnlineCourseInStudent.model_validate(online)
+            #     _log.info(online_model)
 
     def __save_student(self, ids: list[int]) -> None:
         if self.__df is None:
