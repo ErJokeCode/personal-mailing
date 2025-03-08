@@ -16,13 +16,26 @@
     import { NotificationsApi, PageSize, StudentsApi } from "/src/lib/server";
     import { goto, QueryString } from "@mateothegreat/svelte5-router";
     import { CirclePlusOutline, ClipboardOutline } from "flowbite-svelte-icons";
+    import { signal } from "/src/lib/utils/signal";
+    import { onDestroy } from "svelte";
 
     let state = $state({
         paged: createPaged(),
         search: "",
+        trigger: false,
     });
 
-    async function get() {
+    signal.on("StudentAuthed", handleStudentAuthed);
+
+    onDestroy(() => {
+        signal.on("StudentAuthed", handleStudentAuthed);
+    });
+
+    function handleStudentAuthed(message) {
+        state.trigger = !state.trigger;
+    }
+
+    async function get(_) {
         let url = new URL(StudentsApi);
 
         url.searchParams.append("search", state.search);
@@ -44,7 +57,10 @@
 
 <Heading tag="h2" class="m-4">Активные студенты</Heading>
 
-<PagedList {get} bind:paged={state.paged} bind:search={state.search}>
+<PagedList
+    get={() => get(state.trigger)}
+    bind:paged={state.paged}
+    bind:search={state.search}>
     {#snippet children(body)}
         <Table>
             <TableHead>

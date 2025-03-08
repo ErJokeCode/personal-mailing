@@ -20,6 +20,8 @@ public class GetChatsQuery : IRequest<PagedList<ChatDto>>
     public string? Search { get; set; }
     public int? Page { get; set; }
     public int? PageSize { get; set; }
+
+    public bool? OnlyUnread { get; set; } = false;
 }
 
 public class GetChatsQueryHandler : IRequestHandler<GetChatsQuery, PagedList<ChatDto>>
@@ -70,6 +72,11 @@ public class GetChatsQueryHandler : IRequestHandler<GetChatsQuery, PagedList<Cha
                     FuzzySearch.Contains(ch.Student!.Email, request.Search)
                     || FuzzySearch.Contains(getFullName(ch.Student), request.Search)
                 );
+        }
+
+        if (request.OnlyUnread is not null && request.OnlyUnread is true)
+        {
+            chats = chats.Where(ch => ch.UnreadCount > 0);
         }
 
         return chats;

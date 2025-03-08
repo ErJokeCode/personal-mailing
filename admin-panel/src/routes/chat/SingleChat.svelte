@@ -129,33 +129,29 @@
                                 class="w-4 h-4 me-2"
                                 fill="currentColor"
                                 viewBox="0 0 20 20"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
+                                xmlns="http://www.w3.org/2000/svg">
                                 <path
                                     d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 01
                         1 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"
-                                ></path></svg
-                            >Главная</Link
-                        >
+                                ></path
+                                ></svg
+                            >Главная</Link>
                     </li>
                     <li class="inline-flex items-center">
                         <svg
                             class="w-6 h-6 text-gray-400 rtl:-scale-x-100"
                             fill="currentColor"
                             viewBox="0 0 20 20"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
+                            xmlns="http://www.w3.org/2000/svg">
                             <path
                                 fill-rule="evenodd"
                                 d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0
                         z"
-                                clip-rule="evenodd"
-                            ></path></svg
-                        >
+                                clip-rule="evenodd"></path
+                            ></svg>
                         <Link
                             class="ml-0 ms-1 text-sm font-medium text-gray-700 hover:text-gray-900 md:ms-2 dark:text-gray-400 dark:hover:text-white"
-                            to="/">Все чаты</Link
-                        >
+                            to="/">Все чаты</Link>
                     </li>
                     <BreadcrumbItem>Чат</BreadcrumbItem>
                 </Breadcrumb>
@@ -164,44 +160,37 @@
                 <div
                     class="mb-5 flex w-full flex-col divide-gray-200 overflow-auto rounded-lg border
                             border-gray-200 bg-gray-50 p-4 text-gray-500 shadow-md sm:p-6 dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-900 dark:text-gray-400"
-                    bind:this={chatArea}
-                >
+                    bind:this={chatArea}>
                     <div class="h-s">
                         {#each messages.reverse() as message}
                             {#if message.admin != null}
                                 <article class="flex justify-end space-y-3">
                                     <div
                                         class="mb-5 flex w-full max-w-xl flex-col divide-gray-200 rounded-lg border
-                                                border-gray-200 bg-white p-4 text-gray-500 shadow-md sm:px-5 dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400"
-                                    >
+                                                border-gray-200 bg-white p-4 text-gray-500 shadow-md sm:px-5 dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
                                         <p
-                                            class="text-sm font-semibold text-gray-900 dark:text-white"
-                                        >
+                                            class="text-sm font-semibold text-gray-900 dark:text-white">
                                             {message.admin.email}
                                         </p>
                                         <div
-                                            class="mt-1 flex space-y-2 break-all text-gray-900 dark:text-white"
-                                        >
+                                            class="mt-1 flex space-y-2 break-all text-gray-900 dark:text-white">
                                             {message.content}
                                         </div>
                                         {#each message.documents as document}
                                             <hr
-                                                class="my-1 h-px border-0 bg-gray-200 dark:bg-gray-700"
-                                            />
+                                                class="my-1 h-px border-0 bg-gray-200 dark:bg-gray-700" />
                                             {#if document.mimeType.includes("image")}
                                                 <img
                                                     class="mb-1"
-                                                    src={`${server_url}/core/document/${document.id}/download`}
-                                                    alt=""
-                                                />
+                                                    src={`${server_url}/core/documents/${document.blobId}`}
+                                                    alt="" />
                                             {/if}
                                             <div class="flex items-center">
                                                 <Helper>{document.name}</Helper>
                                                 <a
                                                     class="ml-3"
                                                     href={`${server_url}/core/document/${document.id}/download`}
-                                                    >Скачать</a
-                                                >
+                                                    >Скачать</a>
                                             </div>
                                         {/each}
                                     </div>
@@ -210,36 +199,30 @@
                                 <article class="flex space-y-3">
                                     <div
                                         class="mb-5 flex w-full max-w-xl flex-col divide-gray-200 rounded-lg border
-                                                border-gray-200 bg-white p-4 text-gray-500 shadow-md sm:px-5 dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400"
-                                    >
+                                                border-gray-200 bg-white p-4 text-gray-500 shadow-md sm:px-5 dark:divide-gray-700 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-400">
                                         <p
-                                            class="text-sm font-semibold text-gray-900 dark:text-white"
-                                        >
+                                            class="text-sm font-semibold text-gray-900 dark:text-white">
                                             {student.email}
                                         </p>
                                         <div
-                                            class="mt-1 flex space-y-2 break-all text-gray-900 dark:text-white"
-                                        >
+                                            class="mt-1 flex space-y-2 break-all text-gray-900 dark:text-white">
                                             {message.content}
                                         </div>
                                         {#each message.documents as document}
                                             <hr
-                                                class="my-1 h-px border-0 bg-gray-200 dark:bg-gray-700"
-                                            />
+                                                class="my-1 h-px border-0 bg-gray-200 dark:bg-gray-700" />
                                             {#if document.mimeType.includes("image")}
                                                 <img
                                                     class="mb-1"
                                                     src={`${server_url}/core/document/${document.id}/download`}
-                                                    alt=""
-                                                />
+                                                    alt="" />
                                             {/if}
                                             <div class="flex items-center">
                                                 <Helper>{document.name}</Helper>
                                                 <a
                                                     class="ml-3"
                                                     href={`${server_url}/core/document/${document.id}/download`}
-                                                    >Скачать</a
-                                                >
+                                                    >Скачать</a>
                                             </div>
                                         {/each}
                                     </div>
@@ -258,22 +241,19 @@
                             type="file"
                             multiple
                             bind:files
-                            on:change={handleChange}
-                        />
+                            on:change={handleChange} />
                     </ToolbarButton>
                     <Textarea
                         rows={1}
                         placeholder="Введите текст"
                         bind:value={content}
                         on:keypress={handle_keypress}
-                        class="bg-gray-50 dark:bg-gray-900"
-                    />
+                        class="bg-gray-50 dark:bg-gray-900" />
                     <ToolbarButton
                         type="submit"
                         color="default"
                         class="p-2 text-primary-600 hover:bg-primary-100"
-                        on:click={send_message}
-                    >
+                        on:click={send_message}>
                         <svg
                             aria-hidden="true"
                             class="h-6 w-6 rotate-90"
@@ -281,8 +261,8 @@
                             viewBox="0 0 20 20"
                             ><path
                                 d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"
-                            ></path></svg
-                        >
+                            ></path
+                            ></svg>
                         <span class="sr-only">Send message</span>
                     </ToolbarButton>
                 </div>

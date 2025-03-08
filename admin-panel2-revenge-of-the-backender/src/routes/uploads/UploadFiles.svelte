@@ -23,6 +23,7 @@
     import { onDestroy, onMount } from "svelte";
     import http from "/src/lib/utils/http";
     import { ServerUrl } from "/src/lib/server";
+    import { signal } from "/src/lib/utils/signal";
 
     let student_files;
     let student_success = "";
@@ -52,9 +53,13 @@
             curPage = 1;
         }
         maxPage = Math.ceil(history.length / amountPage);
+
+        signal.on("FileUploaded", handleUploadDone);
     });
 
-    onDestroy(async () => {});
+    onDestroy(async () => {
+        signal.off("FileUploaded", handleUploadDone);
+    });
 
     async function handleUploadDone(message) {
         status = status.start_load();

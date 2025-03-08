@@ -4,8 +4,11 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Data;
+using Core.Routes.Chats.Maps;
+using Core.Signal;
 using FluentResults;
 using MediatR;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Core.Routes.Groups.Commands;
@@ -19,10 +22,14 @@ public class AssignGroupsCommand : IRequest<Result>
 public class AssignGroupsCommandHandler : IRequestHandler<AssignGroupsCommand, Result>
 {
     private readonly AppDbContext _db;
+    private readonly IHubContext<SignalHub> _hub;
+    private readonly ChatMapper _chatMapper;
 
-    public AssignGroupsCommandHandler(AppDbContext db)
+    public AssignGroupsCommandHandler(AppDbContext db, IHubContext<SignalHub> hub)
     {
         _db = db;
+        _hub = hub;
+        _chatMapper = new ChatMapper();
     }
 
     public async Task<Result> Handle(AssignGroupsCommand request, CancellationToken cancellationToken)
@@ -43,6 +50,11 @@ public class AssignGroupsCommandHandler : IRequestHandler<AssignGroupsCommand, R
             foreach (var chat in chats)
             {
                 chat.AdminId = request.AdminId;
+
+                if (chat.UnreadCount > 0)
+                {
+                    await _hub.NotifyOfChatRead(request.AdminId, _chatMapper.Map(chat));
+                }
             }
 
             group.AdminId = request.AdminId;

@@ -8,6 +8,7 @@
     import { Me } from "/src/stores/Me.svelte";
     import { AdminsApi } from "/src/lib/server";
     import { RouteHistory } from "/src/stores/RouteHistory.svelte";
+    import NotificationList from "./NotificationList.svelte";
 
     function login() {
         goto("/login");
@@ -45,6 +46,8 @@
                     <ArrowLeftToBracketOutline size="lg" />
                 </ToolbarButton>
             {/if}
+
+            <NotificationList />
 
             <DarkMode size="lg" />
         </div>

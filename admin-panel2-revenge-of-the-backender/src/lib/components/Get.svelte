@@ -1,8 +1,9 @@
 <script lang="ts">
-    import { Spinner } from "flowbite-svelte";
+    import { ListPlaceholder, Spinner } from "flowbite-svelte";
     import type { Snippet } from "svelte";
     import ErrorAlert from "./ErrorAlert.svelte";
     import { GeneralError } from "../errors";
+    import { fade } from "svelte/transition";
 
     interface Props {
         get: () => void;
@@ -20,7 +21,10 @@
 </script>
 
 {#await get()}
-    <Spinner size="8" class="m-4 block" />
+    <div in:fade>
+        <ListPlaceholder class="max-w-full" />
+        <ListPlaceholder class="max-w-full" />
+    </div>
 {:then body}
     {@render children(body)}
 {:catch}

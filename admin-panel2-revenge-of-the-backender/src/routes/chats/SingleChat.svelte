@@ -15,7 +15,7 @@
         ToolbarButton,
     } from "flowbite-svelte";
     import { createPaged } from "/src/lib/components/Paged.svelte";
-    import { onMount } from "svelte";
+    import { onDestroy, onMount } from "svelte";
     import {
         CloseOutline,
         PaperClipOutline,
@@ -24,6 +24,8 @@
     import ErrorAlert from "/src/lib/components/ErrorAlert.svelte";
     import { GeneralError } from "/src/lib/errors";
     import ToastNotifications from "/src/lib/components/ToastNotifications.svelte";
+    import { signal } from "/src/lib/utils/signal";
+    import BackButton from "/src/lib/components/BackButton.svelte";
 
     let { route }: { route: Route } = $props();
     let studentId = route.params?.["studentId"] ?? "";
@@ -38,15 +40,30 @@
     let sendText: boolean = $state(true);
     let notifications: ToastNotifications;
 
-    // svelte-ignore non_reactive_update
-    let chatArea;
+    signal.on("MessageReceived", handleMessageReceived);
 
     onMount(async () => {
         await getChat();
         await getMessages();
-
-        chatArea.scrollTo(0, chatArea.scrollHeight);
+        await makeRead();
     });
+
+    onDestroy(() => {
+        signal.off("MessageReceived", handleMessageReceived);
+    });
+
+    async function handleMessageReceived(message) {
+        messages = [message, ...messages];
+
+        await makeRead();
+    }
+
+    async function makeRead() {
+        await fetch(`${ChatsApi}/${studentId}/read`, {
+            method: "PATCH",
+            credentials: "include",
+        });
+    }
 
     async function getChat() {
         try {
@@ -177,13 +194,12 @@
         <p class="text-lg mb-2 text-center">{chat.student?.email}</p>
 
         <div
-            bind:this={chatArea}
-            class="bg-gray-50 dark:bg-gray-900 rounded-md p-4 overflow-scroll h-full flex flex-col-reverse gap-4">
+            class="bg-gray-50 dark:bg-gray-900 rounded-md p-4 overflow-scroll overflow-x-hidden h-full flex flex-col-reverse gap-4">
             {#each messages as message}
                 <Card
                     class={"relative max-w-fit sm:p-3 sm:pr-12" +
                         (Me.value.email == message.admin?.email
-                            ? " dark:bg-sky-900"
+                            ? " bg-sky-100 dark:bg-sky-900"
                             : "")}>
                     <p class="font-bold">
                         {message.admin?.email ?? chat.student.email}
@@ -194,6 +210,13 @@
                     {#if message.documents.length > 0}
                         <div class="flex gap-1 flex-col items-baseline">
                             {#each message.documents as document}
+                                {#if document.mimeType.includes("image")}
+                                    <img
+                                        class="mb-1"
+                                        src={`${DocumentsApi}/${document.blobId}`}
+                                        alt="" />
+                                {/if}
+
                                 <A href={`${DocumentsApi}/${document.blobId}`}>
                                     {document.name}
                                 </A>
