@@ -1,5 +1,5 @@
 <script lang="ts">
-    import type { Route } from "@mateothegreat/svelte5-router";
+    import { route } from "@mateothegreat/svelte5-router";
     import { ChatsApi, DocumentsApi, PageSize } from "/src/lib/server";
     import Panel from "/src/lib/components/Panel.svelte";
     import { Me } from "/src/stores/Me.svelte";
@@ -10,6 +10,8 @@
         Fileupload,
         Input,
         Spinner,
+        Breadcrumb,
+        BreadcrumbItem,
     } from "flowbite-svelte";
     import { createPaged } from "/src/lib/components/Paged.svelte";
     import { onDestroy, onMount } from "svelte";
@@ -22,10 +24,9 @@
     import { GeneralError } from "/src/lib/errors";
     import ToastNotifications from "/src/lib/components/ToastNotifications.svelte";
     import { signal } from "/src/lib/utils/signal";
-    import BackButton from "/src/lib/components/BackButton.svelte";
 
-    let { route }: { route: Route } = $props();
-    let studentId = route.params?.["studentId"] ?? "";
+    let props= $props();
+    let studentId = props.route.params?.["studentId"] ?? "";
     let errorMessage = $state("");
 
     let chat: any = $state({});
@@ -188,8 +189,20 @@
     <ErrorAlert title="Ошибка">{errorMessage}</ErrorAlert>
 {:else}
     <Panel class="rounded-none border-l-0 border-t-0 h-full">
-        <p class="text-lg mb-2 text-center">{chat.student?.email}</p>
-
+        <Breadcrumb class="mb-5">
+            <li class="inline-flex items-center">
+                <a class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+                use:route href="/"><svg class="w-4 h-4 me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 01
+                1 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>Главная</a></li>
+            <li class="inline-flex items-center">
+                <svg class="w-6 h-6 text-gray-400 rtl:-scale-x-100" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0
+                z" clip-rule="evenodd"></path></svg>
+            <a class="ml-0 ms-1 text-sm font-medium text-gray-700 hover:text-gray-900 md:ms-2 dark:text-gray-400 dark:hover:text-white"
+                use:route href="/chats">Чаты</a></li>
+            <BreadcrumbItem>{chat.student?.email}</BreadcrumbItem>
+        </Breadcrumb>
         <div
             class="bg-gray-50 dark:bg-gray-900 rounded-md p-4 overflow-auto overflow-x-hidden h-full flex flex-col-reverse gap-4">
             {#each messages as message}

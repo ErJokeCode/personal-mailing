@@ -27,8 +27,8 @@
     import BaseAdd from "../routes/base/BaseAdd.svelte";
     import BaseEdit from "../routes/base/BaseEdit.svelte";
 
-    const authPreHook = async (route: Route): Promise<boolean> => {
-        if (route.path == "login") {
+    const authPreHook = async (router: Route): Promise<boolean> => {
+        if (router.path == "login") {
             return true;
         }
 

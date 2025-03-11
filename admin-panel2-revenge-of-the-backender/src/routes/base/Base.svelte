@@ -71,7 +71,7 @@
                 <Button on:click={() => (deleteOpen = true)}>Удалить категорию</Button>
             </div>
             <Modal title="Редактировать категорию" bind:open={editOpen} autoclose>
-                <Label class="space-y-2">
+                <Label class="flex flex-col space-y-2">
                     <span>Название категории</span>
                     <Input bind:value={topic} type="text" placeholder="Введите название" size="md" />
                 </Label>
@@ -107,7 +107,7 @@
     <div class='absolute bottom-6 right-6'>
         <Button on:click={() => (addOpen = true)} size='lg'>Добавить категорию</Button>
         <Modal title="Добавить категорию" bind:open={addOpen} autoclose>
-            <Label class="space-y-2">
+            <Label class="flex flex-col space-y-2">
                 <span>Название категории</span>
                 <Input bind:value={newTopic} type="text" placeholder="Введите название" size="md" />
             </Label>

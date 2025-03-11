@@ -35,7 +35,7 @@
 <Sidebar
     class={drawerHidden ? '' : 'hidden'}
     asideClass="flex-none h-full w-64 lg:h-auto border-e border-gray-200 dark:border-gray-600 lg:overflow-y-visible lg:block">
-    <SidebarWrapper class="h-full rounded-none list-none flex flex-col gap-2">
+    <SidebarWrapper class="bg-white scrolling-touch h-full rounded-none list-none flex flex-col gap-2">
         {@render sidebarItem("Профиль", "/profile", CogOutline)}
         {@render sidebarItem("Админы", "/admins", UserSettingsOutline)}
         {@render sidebarItem("Группы", "/groups", UsersGroupOutline)}

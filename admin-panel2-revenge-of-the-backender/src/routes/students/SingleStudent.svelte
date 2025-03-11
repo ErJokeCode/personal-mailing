@@ -26,7 +26,7 @@
 </script>
 
 <BackButton
-    title={`${student.name} ${student.surname} ${student.patronymic}`}
+    title={`${student.surname} ${student.name} ${student.patronymic}`}
     class="m-4 mb-0" />
 
 <div class="p-4 px-6">
@@ -110,9 +110,9 @@
             </ul>
         </TabItem>
         <TabItem title="Предметы">
-            {#each student.subjects as subject}
-                <Accordion class="mb-5">
-                    <AccordionItem>
+            <Accordion class='mb-5' multiple classActive='dark:bg-gray-600 dark:focus:ring-gray-700'>
+                {#each student.subjects as subject}
+                    <AccordionItem borderOpenClass='border-s border-e border-b border-gray-200 dark:border-gray-700'>
                         <span slot="header">{subject.name}</span>
                         <ul>
                             <li>
@@ -183,13 +183,13 @@
                             </li>
                         </ul>
                     </AccordionItem>
-                </Accordion>
-            {/each}
+                {/each}
+            </Accordion>
         </TabItem>
         <TabItem title="Онлайн курсы">
-            {#each student.online_course as course}
-                <Accordion class="mb-5">
-                    <AccordionItem>
+            <Accordion class='mb-5' multiple classActive='dark:bg-gray-600 dark:focus:ring-gray-700'>
+                {#each student.online_course as course}
+                    <AccordionItem borderOpenClass='border-s border-e border-b border-gray-200 dark:border-gray-700'>
                         <span slot="header">{course.name}</span>
                         <ul>
                             <li>
@@ -252,8 +252,8 @@
                             </ul>
                         </ul>
                     </AccordionItem>
-                </Accordion>
-            {/each}
+                {/each}
+            </Accordion>
         </TabItem>
     </Tabs>
 </div>

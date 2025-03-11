@@ -5,6 +5,7 @@
     import { ExclamationCircleOutline } from "flowbite-svelte-icons";
     import { onMount } from "svelte";
     import Panel from "/src/lib/components/Panel.svelte";
+    import http from '/src/lib/utils/http';
 
     let topic;
     let email;
@@ -15,14 +16,13 @@
     let sendOpen = false;
     let deleteOpen = false;
     
-
+    let status = http.status();
     let chats = [];
 
     onMount(async () => {
-        // status = status.start_load();
-        // chats = (await http.get("/core/admin/chats", status)).items ?? [];
-        // status = status.end_load();
-        // console.log(chats)
+        status = status.start_load();
+        chats = (await http.get("/core/chats", status)).items ?? [];
+        status = status.end_load();
     });
 </script>
 
@@ -60,7 +60,7 @@
         </div>
         <Modal title="Отправить ответ на вопрос студенту" bind:open={sendOpen} autoclose>
             <form>
-                <Label class="space-y-2 mb-2">Выберите чат</Label>
+                <Label class="mb-2">Выберите чат</Label>
                 <select bind:value={email} class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
                         focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600
                         dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500">
