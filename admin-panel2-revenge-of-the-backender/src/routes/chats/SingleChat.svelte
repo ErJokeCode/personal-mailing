@@ -8,11 +8,8 @@
         Button,
         Card,
         Fileupload,
-        Helper,
         Input,
         Spinner,
-        Textarea,
-        ToolbarButton,
     } from "flowbite-svelte";
     import { createPaged } from "/src/lib/components/Paged.svelte";
     import { onDestroy, onMount } from "svelte";
@@ -194,7 +191,7 @@
         <p class="text-lg mb-2 text-center">{chat.student?.email}</p>
 
         <div
-            class="bg-gray-50 dark:bg-gray-900 rounded-md p-4 overflow-scroll overflow-x-hidden h-full flex flex-col-reverse gap-4">
+            class="bg-gray-50 dark:bg-gray-900 rounded-md p-4 overflow-auto overflow-x-hidden h-full flex flex-col-reverse gap-4">
             {#each messages as message}
                 <Card
                     class={"relative max-w-fit sm:p-3 sm:pr-12" +
@@ -246,6 +243,7 @@
             </Button>
             <Input
                 type="text"
+                placeholder="Введите текст"
                 on:keypress={keypress}
                 bind:value={content}
                 class="bg-dark-50 dark:bg-gray-900" />

@@ -17,6 +17,7 @@
         UserSettingsOutline,
         UsersGroupOutline,
         UsersOutline,
+        ChartPieOutline,
     } from "flowbite-svelte-icons";
     import { type Component } from "svelte";
     import { RouteHistory } from "/src/stores/RouteHistory.svelte";
@@ -24,12 +25,16 @@
     function resetHistory() {
         RouteHistory.isClear = true;
     }
+
+	export let drawerHidden = false;
+
+    let iconClass = "flex-shrink-0 w-6 h-6 text-gray-500 transition duration-75 group-hover:text-gray-900 dark:text-gray-400 dark:group-hover:text-white"
+    let itemClass = "flex items-center p-2 text-base text-gray-900 transition duration-75 rounded-lg hover:bg-gray-100 group dark:text-gray-200 dark:hover:bg-gray-700"
 </script>
 
-<!-- TODO Remake this with dropdown menus -->
-
 <Sidebar
-    class="overflow-hidden border-r-gray-200 dark:border-r-gray-600 border-r h-screen">
+    class={drawerHidden ? '' : 'hidden'}
+    asideClass="flex-none h-full w-64 lg:h-auto border-e border-gray-200 dark:border-gray-600 lg:overflow-y-visible lg:block">
     <SidebarWrapper class="h-full rounded-none list-none flex flex-col gap-2">
         {@render sidebarItem("Профиль", "/profile", CogOutline)}
         {@render sidebarItem("Админы", "/admins", UserSettingsOutline)}
@@ -38,20 +43,16 @@
         {@render sidebarItem("Чаты", "/chats", MessagesOutline)}
 
         <SidebarDropdownWrapper label="Студенты">
-            <svelte:component this={UsersOutline} slot="icon" />
-            {@render sidebarItem("Все студенты", "/students", null, "ps-12")}
-            {@render sidebarItem(
-                "Активные студенты",
-                "/active-students",
-                null,
-                "ps-12",
-            )}
+            <svelte:component this={UsersOutline} slot="icon" class={iconClass} />
+            {@render sidebarItem("Все студенты", "/students", null, "ps-8")}
+            {@render sidebarItem("Активные студенты", "/active-students", null, "ps-8")}
         </SidebarDropdownWrapper>
 
         {@render sidebarItem("Загрузить файлы", "/upload", FileOutline)}
         {@render sidebarItem("Соотношения", "/subjects", TableRowOutline)}
         {@render sidebarItem("Редактор FAQ", "/faq", QuestionCircleOutline)}
         {@render sidebarItem("Конструктор онбординга", "/builder", EditOutline)}
+        {@render sidebarItem("База знаний", "/base", ChartPieOutline)}
     </SidebarWrapper>
 </Sidebar>
 
@@ -63,9 +64,7 @@
 )}
     <li>
         <a
-            class={"flex items-center p-2 text-base font-normal text-gray-900 rounded-lg dark:text-white hover:bg-gray-100 dark:hover:bg-gray-700" +
-                " " +
-                aClass}
+            class={ `${itemClass} ${aClass}`}
             use:active={{
                 active: { class: ["bg-gray-100", "dark:bg-gray-700"] },
             }}
@@ -73,7 +72,7 @@
             on:click={resetHistory}
             {href}>
             {#if Icon}
-                <Icon class="w-6 h-6" />
+                <Icon class={iconClass} />
             {/if}
             <span class="ms-3">{label}</span>
         </a>

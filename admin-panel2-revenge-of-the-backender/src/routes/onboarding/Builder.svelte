@@ -13,6 +13,7 @@
         Checkbox,
     } from "flowbite-svelte";
     import { onMount } from "svelte";
+    import { route } from "@mateothegreat/svelte5-router";
     import { ServerUrl } from "/src/lib/server";
 
     let courses = $state([]);
@@ -213,6 +214,13 @@
 </script>
 
 <Panel class="m-4">
+    <Breadcrumb class="mb-5">
+        <a class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
+            use:route href="/"><svg class="w-4 h-4 me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 01
+            1 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>Главная</a>
+        <BreadcrumbItem>База знаний</BreadcrumbItem>
+    </Breadcrumb>
     <Heading
         tag="h1"
         class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl mb-4">
@@ -220,9 +228,9 @@
     </Heading>
     <Button on:click={add_course} class="max-w-fit">Добавить курс</Button>
     <Helper class="mb-4 mt-1"></Helper>
-    {#each courses as course, course_index}
-        <Accordion class="mb-5">
-            <AccordionItem>
+    <Accordion class='mb-5' multiple classActive='dark:bg-gray-600 dark:focus:ring-gray-700'>
+        {#each courses as course, course_index}
+            <AccordionItem borderOpenClass='border-s border-e border-b border-gray-200 dark:border-gray-700'>
                 <span slot="header">{course.name}</span>
                 <Label class="space-y-2 mb-5">
                     <span>Название</span>
@@ -250,9 +258,9 @@
                     <Button on:click={() => delete_course(course._id)}
                         >Удалить курс</Button>
                 </div>
-                {#each course.sections as section, section_index}
-                    <Accordion class="mb-3">
-                        <AccordionItem>
+                <Accordion class='mb-5' multiple classActive='dark:bg-gray-600 dark:focus:ring-gray-700'>
+                    {#each course.sections as section, section_index}
+                        <AccordionItem borderOpenClass='border-s border-e border-b border-gray-200 dark:border-gray-700'>
                             <span slot="header">{section.name}</span>
                             <Label class="space-y-2 mb-3 w-full mr-5">
                                 <span>Название</span>
@@ -292,9 +300,9 @@
                                             section_index,
                                         )}>Удалить раздел</Button>
                             </div>
-                            {#each section.topics as topic, topic_index}
-                                <Accordion class="mb-3">
-                                    <AccordionItem>
+                            <Accordion class='mb-5' multiple classActive='dark:bg-gray-600 dark:focus:ring-gray-700'>
+                                {#each section.topics as topic, topic_index}
+                                    <AccordionItem borderOpenClass='border-s border-e border-b border-gray-200 dark:border-gray-700'>
                                         <span slot="header">{topic.name}</span>
                                         <Label
                                             class="space-y-2 mb-5 w-full mr-5">
@@ -354,11 +362,11 @@
                                                 size="md" />
                                         </Label>
                                     </AccordionItem>
-                                </Accordion>
-                            {/each}
+                                {/each}
+                            </Accordion>
                         </AccordionItem>
-                    </Accordion>
-                {/each}
+                    {/each}
+                </Accordion>
                 <div class="w-full">
                     <Button
                         class="mt-5 flex justify-end"
@@ -368,8 +376,8 @@
                     <Helper class="mt-1">{success}</Helper>
                 </div>
             </AccordionItem>
-        </Accordion>
-    {/each}
+        {/each}
+    </Accordion>
 </Panel>
 
 <style>

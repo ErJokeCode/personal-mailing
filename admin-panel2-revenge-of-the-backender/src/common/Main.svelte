@@ -23,6 +23,9 @@
     import SingleStudent from "../routes/students/SingleStudent.svelte";
     import Chats from "../routes/chats/Chats.svelte";
     import SingleChat from "../routes/chats/SingleChat.svelte";
+    import Base from "../routes/base/Base.svelte";
+    import BaseAdd from "../routes/base/BaseAdd.svelte";
+    import BaseEdit from "../routes/base/BaseEdit.svelte";
 
     const authPreHook = async (route: Route): Promise<boolean> => {
         if (route.path == "login") {
@@ -139,6 +142,18 @@
         {
             path: "builder",
             component: Builder,
+        },
+        {
+            path: "base",
+            component: Base,
+        },
+        {
+            path: "base-add",
+            component: BaseAdd,
+        },
+        {
+            path: "base-edit",
+            component: BaseEdit,
         },
         {
             path: ".+",
