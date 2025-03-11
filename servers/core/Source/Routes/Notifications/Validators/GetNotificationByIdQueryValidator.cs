@@ -7,6 +7,8 @@ public class GetNotificationByIdQueryValidator : AbstractValidator<GetNotificati
 {
     public GetNotificationByIdQueryValidator()
     {
-        RuleFor(x => x.NotificationId).NotEmpty();
+        RuleFor(x => x.NotificationId)
+            .NotEmpty()
+            .WithName("Рассылка");
     }
 }

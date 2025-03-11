@@ -7,7 +7,8 @@ public class AssignGroupsCommandValidator : AbstractValidator<AssignGroupsComman
 {
     public AssignGroupsCommandValidator()
     {
-        RuleFor(x => x.GroupIds).NotEmpty();
-        RuleForEach(x => x.GroupIds).NotEmpty();
+        RuleFor(x => x.GroupIds)
+            .NotEmpty()
+            .WithName("Группы");
     }
 }

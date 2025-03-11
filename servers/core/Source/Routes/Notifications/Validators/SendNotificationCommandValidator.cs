@@ -8,7 +8,13 @@ public class SendNotificationCommandValidator : AbstractValidator<SendNotificati
 {
     public SendNotificationCommandValidator()
     {
-        RuleFor(x => x.Content).NotEmpty().When(x => !x.FormFiles?.Any() ?? true);
-        RuleFor(x => x.StudentIds).NotEmpty();
+        RuleFor(x => x.Content)
+            .NotEmpty()
+            .When(x => !x.FormFiles?.Any() ?? true)
+            .WithName("Содержание");
+
+        RuleFor(x => x.StudentIds)
+            .NotEmpty()
+            .WithName("Студенты");
     }
 }

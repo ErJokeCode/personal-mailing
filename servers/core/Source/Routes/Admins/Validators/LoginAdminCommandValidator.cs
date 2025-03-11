@@ -8,7 +8,12 @@ public class LoginAdminCommandValidator : AbstractValidator<LoginAdminCommand>
 {
     public LoginAdminCommandValidator()
     {
-        RuleFor(x => x.Email).NotEmpty();
-        RuleFor(x => x.Password).NotEmpty();
+        RuleFor(x => x.Email)
+            .NotEmpty()
+            .WithName("Почта");
+
+        RuleFor(x => x.Password)
+            .NotEmpty()
+            .WithName("Пароль");
     }
 }
