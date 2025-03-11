@@ -1,7 +1,6 @@
 <script>
     import { Route } from "svelte-routing"
     
-    import Home from './routes/home/Home.svelte'
     import Login from "./routes/login/Login.svelte";
     import Profile from "./routes/login/Profile.svelte";
 
@@ -26,12 +25,14 @@
     import Edit from "./routes/subjects/Edit.svelte";
 
     import AssignGroup from "./routes/groups/AssignGroup.svelte";
-  import { compile } from "svelte/compiler";
-  import Faq from "./routes/faq/Faq.svelte";
+    import Faq from "./routes/faq/Faq.svelte";
+
+    import Base from "./routes/base/Base.svelte";
+    import BaseAdd from "./routes/base/BaseAdd.svelte";
+    import BaseEdit from "./routes/base/BaseEdit.svelte";
 </script>
 
-<main>
-    <Route path="/" component={Chats} />
+<main class="h-full">
     <Route path="/login" component={Login} />
     <Route path="/profile" component={Profile} />
 
@@ -49,16 +50,18 @@
     <Route path="/admin/create" component={CreateAdmin} />
     <Route path="/admin/:id" component={SingleAdmin} />
 
-    <!-- <Route path="/chats" component={Chats} /> -->
+    <Route path="/" component={Chats} />
     <Route path="/chat/:studentId" component={SingleChat} />
 
     <Route path="/builder" component={Builder} />
-    
     <Route path="/names" component={Edit} />
 
     <Route path="/groups" component={AssignGroup} />
-
     <Route path="/faq" component={Faq} />
+
+    <Route path="/base" component={Base} />
+    <Route path="/base/add" component={BaseAdd} />
+    <Route path="/base/edit" component={BaseEdit} />
 </main>
 
 <style>
