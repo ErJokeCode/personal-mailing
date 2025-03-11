@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
@@ -39,8 +40,11 @@ public class BlobStorage : IFileStorage
             }
         }, cancellationToken);
 
+        var nameBytes = Encoding.UTF8.GetBytes(data.Name);
+        var name = Convert.ToBase64String(nameBytes);
+
         await blob.SetMetadataAsync(new Dictionary<string, string> {
-            {"name", data.Name},
+            {"name",  name},
         }, cancellationToken: cancellationToken);
 
         return new Document()
@@ -62,11 +66,14 @@ public class BlobStorage : IFileStorage
 
         var response = await blob.DownloadContentAsync(cancellationToken: cancellationToken);
 
+        var nameBytes = Convert.FromBase64String(response.Value.Details.Metadata["name"]);
+        var name = Encoding.UTF8.GetString(nameBytes);
+
         return new BlobData()
         {
             Stream = response.Value.Content.ToStream(),
             ContentType = response.Value.Details.ContentType,
-            Name = response.Value.Details.Metadata["name"],
+            Name = name,
         };
     }
 
