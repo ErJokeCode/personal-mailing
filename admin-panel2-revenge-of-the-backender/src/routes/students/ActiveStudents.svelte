@@ -18,12 +18,7 @@
     import { CirclePlusOutline, ClipboardOutline } from "flowbite-svelte-icons";
     import { signal } from "/src/lib/utils/signal";
     import { onDestroy } from "svelte";
-
-    let state = $state({
-        paged: createPaged(),
-        search: "",
-        trigger: false,
-    });
+    import { ActiveStudents } from "/src/stores/students/ActiveStudents.svelte";
 
     signal.on("StudentAuthed", handleStudentAuthed);
 
@@ -32,20 +27,20 @@
     });
 
     function handleStudentAuthed(message) {
-        state.trigger = !state.trigger;
+        ActiveStudents.trigger = !ActiveStudents.trigger;
     }
 
     async function get(_) {
         let url = new URL(StudentsApi);
 
-        url.searchParams.append("search", state.search);
-        url.searchParams.append("page", state.paged.page.toString());
+        url.searchParams.append("search", ActiveStudents.search);
+        url.searchParams.append("page", ActiveStudents.paged.page.toString());
         url.searchParams.append("pageSize", PageSize.toString());
 
         let res = await fetch(url, { credentials: "include" });
         let body = await res.json();
 
-        Object.assign(state.paged, body);
+        Object.assign(ActiveStudents.paged, body);
 
         return body;
     }
@@ -58,9 +53,9 @@
 <Heading tag="h2" class="m-4">Активные студенты</Heading>
 
 <PagedList
-    get={() => get(state.trigger)}
-    bind:paged={state.paged}
-    bind:search={state.search}>
+    get={() => get(ActiveStudents.trigger)}
+    bind:paged={ActiveStudents.paged}
+    bind:search={ActiveStudents.search}>
     {#snippet children(body)}
         <Table>
             <TableHead>
