@@ -12,4 +12,4 @@ COPY . .
 
 EXPOSE 5015
 
-CMD ["pnpm", "dev"]
+CMD ["pnpm", "run"]

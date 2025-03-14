@@ -13,4 +13,4 @@ COPY . .
 
 EXPOSE 5000
 
-CMD ["dotnet", "watch", "--no-hot-reload"]
+CMD ["dotnet", "run"]

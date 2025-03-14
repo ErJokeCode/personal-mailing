@@ -11,6 +11,11 @@ export default defineConfig({
         port: 5020,
     },
 
+    preview: {
+        host: "0.0.0.0",
+        port: 5020,
+    },
+
     resolve: {
         alias: {
             src: path.resolve('src/'),

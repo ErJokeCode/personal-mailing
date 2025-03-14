@@ -12,4 +12,5 @@ COPY . .
 
 EXPOSE 5020
 
+# CMD pnpm run build;pnpm run preview
 CMD ["pnpm", "dev"]

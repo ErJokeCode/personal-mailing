@@ -1,4 +1,4 @@
-export const ServerUrl = "http://localhost:5000";
+export const ServerUrl = "http://193.108.115.129:5000";
 export const PageSize = 10;
 
 export const AdminsApi = `${ServerUrl}/core/admins`;

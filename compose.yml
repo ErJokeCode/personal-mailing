@@ -10,19 +10,6 @@ services:
     volumes:
       - coredata:/var/lib/core/data
 
-  pgadmin:
-    image: dpage/pgadmin4
-    ports:
-      - 5401:80
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@domain.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    depends_on:
-      coredb:
-        condition: service_started
-    volumes:
-      - pgadmindata:/var/lib/pgadmin/data
-
   blob-storage:
     image: mcr.microsoft.com/azure-storage/azurite
     command: "azurite-blob --blobHost 0.0.0.0 -l /var/lib/blob/data"
@@ -34,7 +21,7 @@ services:
   core:
     build: ./servers/core/Source
     ports:
-      - 5000:5000
+      - 193.108.115.129:5000:5000
     depends_on:
       coredb:
         condition: service_started
@@ -43,7 +30,7 @@ services:
     env_file:
       - .env
     healthcheck:
-      test: "curl --fail http://localhost:5000/healthy || exit"
+      test: "curl --fail http://193.108.115.129:5000/healthy || exit"
       interval: 10s
       timeout: 30s
       retries: 10
@@ -52,21 +39,10 @@ services:
       - '/app/bin'
       - '/app/obj'
 
-  admin-panel:
-    build: ./admin-panel
-    ports:
-      - 5015:5015
-    depends_on:
-      core:
-        condition: service_healthy
-    volumes:
-      - './admin-panel:/app:z'
-      - '/app/node_modules'
-
   admin-panel2:
     build: ./admin-panel2-revenge-of-the-backender
     ports:
-      - 5020:5020
+      - 193.108.115.129:80:5020
     depends_on:
       core:
         condition: service_healthy
@@ -80,16 +56,6 @@ services:
       - 6397:6379
     volumes:
       - redisdata:/var/lib/redis/data
-
-  redis-insight:
-    image: redislabs/redisinsight
-    ports:
-      - 6398:5540
-    depends_on:
-      redis:
-        condition: service_started
-    volumes:
-      - redisinsightdata:/var/lib/redisinsight/data
 
   bot:
     build: ./telegram-bot
@@ -113,20 +79,6 @@ services:
     volumes:
       - parserdata:/var/lib/parser/data
 
-  monogo-express:
-    image: mongo-express
-    ports:
-      - 27072:8081
-    environment:
-      ME_CONFIG_MONGODB_SERVER: parserdb
-      ME_CONFIG_BASICAUTH_USERNAME: user
-      ME_CONFIG_BASICAUTH_PASSWORD: pass
-    depends_on:
-      parserdb:
-        condition: service_started
-    volumes:
-      - mongoexpressdata:/var/lib/mongoexpress/data
-
   parser:
     build: ./servers/parser
     ports:
@@ -149,6 +101,3 @@ volumes:
   parserdata:
   coredata:
   blobdata:
-  pgadmindata:
-  redisinsightdata:
-  mongoexpressdata:
