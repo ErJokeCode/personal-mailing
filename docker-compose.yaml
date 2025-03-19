@@ -1,0 +1,81 @@
+services:
+  app:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    container_name: knowledge-base
+    depends_on:
+      postgres:
+        condition: service_healthy
+      elasticsearch:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/knowledge-base/app
+    networks:
+      - knowledge-base-network
+    restart: always
+    env_file:
+      - .env
+
+  postgres:
+    image: postgres:latest
+    container_name: knowledge-base-postgres
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${POSTGRES_DATABASE:-knowledge-base}
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER:-postgres} -d $${POSTGRES_DATABASE:-knowledge-base}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - knowledge-base-network
+    env_file:
+      - .env
+    restart: always
+
+  elasticsearch:
+    image: elasticsearch:8.17.3
+    container_name: knowledge-base-elasticsearch
+    environment:
+      - cluster.name=docker-cluster
+      - bootstrap.memory_lock=true
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - ELASTIC_USERNAME=${ELASTIC_USERNAME:-elastic}
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD:-elastic}
+      - xpack.security.http.ssl.enabled=${ELASTIC_VERIFY_CERTS:-false}
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - logger.level=ERROR
+      - logger.org.elasticsearch=ERROR
+      - logger.org.apache.lucene=ERROR
+    ports:
+      - "9200:9200"
+    # volumes:
+    #   - ./elasticsearch-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ["CMD-SHELL", "curl -s -k -u $${ELASTIC_USERNAME:-elastic}:$${ELASTIC_PASSWORD:-elastic} http://localhost:9200/_cluster/health | grep -q '\"status\":\"green\"\\|\"status\":\"yellow\"'"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+    networks:
+      - knowledge-base-network
+    env_file:
+      - .env
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  knowledge-base-network:
+    driver: bridge
