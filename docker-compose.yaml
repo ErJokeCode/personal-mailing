@@ -10,7 +10,7 @@ services:
       elasticsearch:
         condition: service_healthy
     ports:
-      - "8000:8000"
+      - "8080:8080"
     volumes:
       - ./app:/knowledge-base/app
     networks:

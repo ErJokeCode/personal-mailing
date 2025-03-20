@@ -29,7 +29,7 @@ COPY alembic.ini ./
 # Копирование скрипта для наполнения базы тестовыми данными
 COPY seed.py ./
 
-EXPOSE 8000
+EXPOSE 8080
 
 # Запуск миграций и приложения
-CMD alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000
+CMD alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8080
