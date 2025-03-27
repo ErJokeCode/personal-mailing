@@ -1,0 +1,128 @@
+{
+  "categories": [
+    {"name": "Python", "tutor_id": 1},
+    {"name": "JavaScript", "tutor_id": 2},
+    {"name": "Базы данных", "tutor_id": 3},
+    {"name": "Git VCS", "tutor_id": 1},
+    {"name": "Docker", "tutor_id": 2},
+    {"name": "Алгоритмы", "tutor_id": 3},
+    {"name": "Сети IT", "tutor_id": 1},
+    {"name": "Операционные системы", "tutor_id": 2}
+  ],
+  "knowledge_items": [
+    {
+      "question": "Как установить Python?",
+      "answer": "Скачайте установщик с официального сайта python.org и следуйте инструкциям. Для Linux можно использовать команду `sudo apt install python3` (Ubuntu/Debian) или `sudo dnf install python3` (Fedora).",
+      "tutor_id": 1,
+      "category_name": "Python"
+    },
+    {
+      "question": "Как создать виртуальное окружение в Python?",
+      "answer": "Используйте команду `python -m venv venv` для создания виртуального окружения. Затем активируйте его: на Windows `venv\\Scripts\\activate`, на Linux/Mac `source venv/bin/activate`.",
+      "tutor_id": 1,
+      "category_name": "Python"
+    },
+    {
+      "question": "Как установить пакеты через pip?",
+      "answer": "Используйте команду `pip install имя_пакета`. Для установки из файла requirements.txt используйте `pip install -r requirements.txt`.",
+      "tutor_id": 1,
+      "category_name": "Python"
+    },
+    {
+      "question": "Как инициализировать Git репозиторий?",
+      "answer": "Используйте команду `git init` в директории проекта. Это создаст скрытую папку .git с настройками репозитория.",
+      "tutor_id": 1,
+      "category_name": "Git VCS"
+    },
+    {
+      "question": "Как добавить файлы в Git?",
+      "answer": "Используйте команду `git add имя_файла` для добавления конкретного файла или `git add .` для добавления всех файлов. Затем сделайте коммит: `git commit -m \"Сообщение коммита\"`.",
+      "tutor_id": 1,
+      "category_name": "Git VCS"
+    },
+    {
+      "question": "Как создать ветку в Git?",
+      "answer": "Используйте команду `git branch имя_ветки` для создания ветки и `git checkout имя_ветки` для переключения на неё. Или используйте `git checkout -b имя_ветки` для создания и переключения одной командой.",
+      "tutor_id": 1,
+      "category_name": "Git VCS"
+    },
+    {
+      "question": "Как запустить Docker контейнер?",
+      "answer": "Используйте команду `docker run имя_образа`. Для запуска в фоновом режиме добавьте флаг `-d`: `docker run -d имя_образа`.",
+      "tutor_id": 2,
+      "category_name": "Docker"
+    },
+    {
+      "question": "Как создать Docker образ из Dockerfile?",
+      "answer": "Используйте команду `docker build -t имя_образа:тег .` в директории с Dockerfile.",
+      "tutor_id": 2,
+      "category_name": "Docker"
+    },
+    {
+      "question": "Как запустить несколько Docker контейнеров с помощью Docker Compose?",
+      "answer": "Создайте файл docker-compose.yml с описанием сервисов, затем выполните команду `docker-compose up -d`.",
+      "tutor_id": 2,
+      "category_name": "Docker"
+    },
+    {
+      "question": "Как создать таблицу в PostgreSQL?",
+      "answer": "Используйте SQL-запрос: `CREATE TABLE имя_таблицы (id SERIAL PRIMARY KEY, name VARCHAR(255), ...);`",
+      "tutor_id": 3,
+      "category_name": "Базы данных"
+    },
+    {
+      "question": "Как выполнить JOIN в SQL?",
+      "answer": "Пример JOIN-запроса: `SELECT a.name, b.value FROM table_a a JOIN table_b b ON a.id = b.a_id;`",
+      "tutor_id": 3,
+      "category_name": "Базы данных"
+    },
+    {
+      "question": "Как создать индекс в PostgreSQL?",
+      "answer": "Используйте SQL-запрос: `CREATE INDEX idx_name ON table_name(column_name);`",
+      "tutor_id": 3,
+      "category_name": "Базы данных"
+    },
+    {
+      "question": "Как использовать async/await в JavaScript?",
+      "answer": "Пример использования: ```javascript\nasync function fetchData() {\n  try {\n    const response = await fetch('https://api.example.com/data');\n    const data = await response.json();\n    return data;\n  } catch (error) {\n    console.error('Error:', error);\n  }\n}```",
+      "tutor_id": 2,
+      "category_name": "JavaScript"
+    },
+    {
+      "question": "Как работает замыкание в JavaScript?",
+      "answer": "Замыкание - это функция, которая запоминает свое лексическое окружение даже после выполнения. Пример: ```javascript\nfunction createCounter() {\n  let count = 0;\n  return function() {\n    return ++count;\n  };\n}\nconst counter = createCounter();\nconsole.log(counter()); // 1\nconsole.log(counter()); // 2```",
+      "tutor_id": 2,
+      "category_name": "JavaScript"
+    },
+    {
+      "question": "Как реализовать алгоритм бинарного поиска?",
+      "answer": "```python\ndef binary_search(arr, target):\n    left, right = 0, len(arr) - 1\n    while left <= right:\n        mid = (left + right) // 2\n        if arr[mid] == target:\n            return mid\n        elif arr[mid] < target:\n            left = mid + 1\n        else:\n            right = mid - 1\n    return -1  # Элемент не найден\n```",
+      "tutor_id": 3,
+      "category_name": "Алгоритмы"
+    },
+    {
+      "question": "Как настроить SSH-ключи для безопасного подключения?",
+      "answer": "1. Сгенерируйте ключи: `ssh-keygen -t rsa -b 4096`\n2. Скопируйте публичный ключ на сервер: `ssh-copy-id user@server`\n3. Теперь вы можете подключаться без пароля: `ssh user@server`",
+      "tutor_id": 1,
+      "category_name": "Сети IT"
+    },
+    {
+      "question": "Как проверить открытые порты на сервере?",
+      "answer": "Используйте команду `netstat -tuln` для просмотра открытых портов на Linux. Для сканирования портов удаленного сервера можно использовать `nmap hostname`.",
+      "tutor_id": 1,
+      "category_name": "Сети IT"
+    },
+    {
+      "question": "Как посмотреть список процессов в Linux?",
+      "answer": "Используйте команду `ps aux` для просмотра всех процессов. Для интерактивного просмотра используйте `top` или `htop`.",
+      "tutor_id": 2,
+      "category_name": "Операционные системы"
+    },
+    {
+      "question": "Как изменить права доступа к файлу в Linux?",
+      "answer": "Используйте команду `chmod`. Например, `chmod 755 file.txt` даст владельцу полные права, а группе и остальным - только чтение и выполнение.",
+      "tutor_id": 2,
+      "category_name": "Операционные системы"
+    }
+  ]
+} 

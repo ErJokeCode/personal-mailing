@@ -1,0 +1,4 @@
+# Директории данных и миграций
+**/postgres-data/
+**/elasticsearch-data/
+**/elasticsearch-setup/

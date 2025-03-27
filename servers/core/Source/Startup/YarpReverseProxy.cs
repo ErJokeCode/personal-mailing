@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Yarp.ReverseProxy.Configuration;
+using Yarp.ReverseProxy.Transforms;
 
 namespace Core;
 
@@ -18,7 +19,16 @@ public static class YarpReverseProxy
                 {
                     Path = "/parser/{**catch-all}"
                 },
-            }
+            },
+            new RouteConfig()
+            {
+                RouteId = "base-route",
+                ClusterId = "base-cluster",
+                Match = new RouteMatch
+                {
+                    Path = "/base/{**catch-all}"
+                },
+            }.WithTransformPathRouteValues("/api/v1/{**catch-all}")
         ];
     }
 
@@ -37,6 +47,21 @@ public static class YarpReverseProxy
                         new DestinationConfig()
                         {
                             Address = "http://parser:8000"
+                        }
+                    },
+                }
+            },
+            new ClusterConfig()
+            {
+                ClusterId = "base-cluster",
+
+                Destinations = new Dictionary<string, DestinationConfig>(StringComparer.OrdinalIgnoreCase)
+                {
+                    {
+                        "destination",
+                        new DestinationConfig()
+                        {
+                            Address = "http://base:8080"
                         }
                     },
                 }

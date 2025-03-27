@@ -3,3 +3,4 @@ include:
   - ./telegram-bot/compose.yml
   - ./servers/core/Source/compose.yml
   - ./servers/parser/compose.yml
+  - ./servers/knowledge-base/compose.yml
