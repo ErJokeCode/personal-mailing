@@ -1,38 +1,13 @@
 <script>
-    import {
-        Breadcrumb,
-        BreadcrumbItem,
-        Heading,
-        Button,
-        Table,
-        TableBodyRow,
-        TableBody,
-        TableBodyCell,
-        Label,
-    } from "flowbite-svelte";
-    import {
-        Accordion,
-        AccordionItem,
-        Modal,
-        Search,
-        Input,
-    } from "flowbite-svelte";
-    import {
-        ArrowRightOutline,
-        ExclamationCircleOutline,
-        GoToPrevCellOutline,
-    } from "flowbite-svelte-icons";
-    import { goto, route } from "@mateothegreat/svelte5-router";
-    import Panel from "/src/lib/components/Panel.svelte";
-    import Breadcrumbs from "/src/lib/components/Breadcrumbs.svelte";
+	import { Breadcrumb, BreadcrumbItem, Heading, Button, Table, TableBodyRow, TableBody, TableBodyCell, Label } from 'flowbite-svelte';
+	import { Accordion, AccordionItem, Modal, Search, Input } from 'flowbite-svelte';
+    import { ArrowRightOutline, ExclamationCircleOutline, GoToPrevCellOutline } from 'flowbite-svelte-icons';
+    import { Link, navigate } from "svelte-routing";
+    import { onMount } from "svelte";
+    import { server_url } from "../../utils/store";
 
-    let topics = [
-        "Общие вопросы",
-        "Технические вопросы",
-        "Административные вопросы",
-        "Безопасность",
-    ];
-    let searchTerm = "";
+    let topics = ['Общие вопросы', 'Технические вопросы', 'Административные вопросы', 'Безопасность'];
+    let searchTerm = '';
 
     // onMount(async () => {
     //     let response;
@@ -46,19 +21,17 @@
     //     topics = json.items;
     // });
 
-    $: filtered = topics.filter(
-        (item) => item.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1,
-    );
+    $: filtered = topics.filter((item) => item.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1);
 
     function fullInfo(id) {
-        goto(`/${id}`);
+        navigate(`/base/${id}`);
     }
-
+    
     let addOpen = false;
     let editOpen = false;
     let deleteOpen = false;
 
-    let name = "Уаэуауаээуауэ";
+    let name = 'Уаэуауаээуауэ';
     let newTopic;
 
     const add = () => {
@@ -180,4 +153,4 @@
             </svelte:fragment>
         </Modal>
     </div>
-</Panel>
+</div>
