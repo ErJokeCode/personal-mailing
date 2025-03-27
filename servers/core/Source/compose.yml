@@ -1,0 +1,44 @@
+services:
+  core-db:
+    image: postgres
+    ports:
+      - 5400:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: coredb
+    volumes:
+      - core-db-data:/var/lib/core-db-data
+
+  core-storage:
+    image: mcr.microsoft.com/azure-storage/azurite
+    command: "azurite-blob --blobHost 0.0.0.0 -l /var/lib/core-storage-data"
+    ports:
+      - 10000:10000
+    volumes:
+      - core-storage-data:/var/lib/core-storage-data
+
+  core:
+    build: ./
+    ports:
+      - 5000:5000
+    depends_on:
+      core-db:
+        condition: service_started
+      parser:
+        condition: service_healthy
+      core-storage:
+        condition: service_started
+    healthcheck:
+      test: "curl --fail http://localhost:5000/healthy || exit"
+      interval: 10s
+      timeout: 30s
+      retries: 10
+    volumes:
+      - './:/app:z'
+      - '/app/bin'
+      - '/app/obj'
+
+volumes:
+  core-db-data:
+  core-storage-data:

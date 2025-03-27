@@ -46,7 +46,12 @@ public class GetMessagesQueryHandler : IRequestHandler<GetMessagesQuery, PagedLi
             .Include(ch => ch.Messages)
             .ThenInclude(m => m.Admin)
             .AsSplitQuery()
-            .SingleAsync(ch => ch.AdminId == admin.Id && ch.StudentId == request.StudentId);
+            .SingleOrDefaultAsync(ch => ch.AdminId == admin.Id && ch.StudentId == request.StudentId);
+
+        if (chat is null)
+        {
+            return PagedList<MessageDto>.Create([], request.Page, request.PageSize);
+        }
 
         chat.Messages = chat.Messages.OrderByDescending(m => m.CreatedAt).ToList();
 

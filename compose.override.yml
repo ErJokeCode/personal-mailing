@@ -1,0 +1,12 @@
+services:
+  bot:
+    env_file:
+      - .env
+
+  parser:
+    env_file:
+      - .env
+
+  core:
+    env_file:
+      - .env
