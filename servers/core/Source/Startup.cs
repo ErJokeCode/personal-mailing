@@ -50,7 +50,7 @@ public static class Startup
 
         builder.Services.AddCors(
             (o) => o.AddDefaultPolicy(
-                p => p.WithOrigins("http://localhost:5015", "http://localhost:5020")
+                p => p.WithOrigins("http://localhost:5020")
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials()

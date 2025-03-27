@@ -1,17 +1,22 @@
-<script>
-    import { Router } from "svelte-routing";
-    import "./app.css";
-    import Sidebar from './Sidebar.svelte'
-    import Navbar from './Navbar.svelte'
-    import Main from './Main.svelte'
-
-    export let url = "";
+<script lang="ts">
+    import { Me } from "./stores/Me.svelte";
+    import Header from "./common/Header.svelte";
+    import Sidebar from "./common/Sidebar.svelte";
+    import Main from "./common/Main.svelte";
 
 	let drawerHidden = false;
 </script>
 
-<Router {url}>
-	<Navbar bind:drawerHidden />
-	<Sidebar bind:drawerHidden />
-    <Main />
-</Router>
+<div class="h-full flex flex-col">
+    <Header bind:drawerHidden />
+
+    <div class="h-full flex overflow-hidden">
+        {#if Me.value !== null}
+            <Sidebar bind:drawerHidden />
+        {/if}
+
+        <div class="h-full flex-col flex-1 overflow-auto overflow-x-hidden">
+            <Main />
+        </div>
+    </div>
+</div>

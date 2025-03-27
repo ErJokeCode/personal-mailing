@@ -55,23 +55,12 @@ services:
   admin-panel:
     build: ./admin-panel
     ports:
-      - 5015:5015
-    depends_on:
-      core:
-        condition: service_healthy
-    volumes:
-      - './admin-panel:/app:z'
-      - '/app/node_modules'
-
-  admin-panel2:
-    build: ./admin-panel2-revenge-of-the-backender
-    ports:
       - 5020:5020
     depends_on:
       core:
         condition: service_healthy
     volumes:
-      - './admin-panel2-revenge-of-the-backender:/app:z'
+      - './admin-panel:/app:z'
       - '/app/node_modules'
 
   redis:
