@@ -30,6 +30,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Minio;
 using Scalar.AspNetCore;
 
 namespace Core;
@@ -133,12 +134,19 @@ public static class Startup
         });
         builder.Services.AddScoped<IMailService, TelegramBot>();
 
+        builder.Services.AddMinio(
+            configureClient => configureClient
+                .WithEndpoint(builder.Configuration.GetConnectionString("FileStorage"))
+                .WithCredentials(builder.Configuration["FileStorage:AccessKey"]!, builder.Configuration["FileStorage:SecretKey"])
+                .WithSSL(false)
+                .Build()
+        );
+
         builder.Services.Configure<FileStorageOptions>(o =>
         {
-            o.ContainerName = builder.Configuration["FileStorage:ContainerName"]!;
+            o.BucketName = builder.Configuration["FileStorage:BucketName"]!;
         });
-        builder.Services.AddSingleton(_ => new BlobServiceClient(builder.Configuration.GetConnectionString("BlobStorage")));
-        builder.Services.AddSingleton<IFileStorage, BlobStorage>();
+        builder.Services.AddSingleton<IFileStorage, MinioStorage>();
     }
 
     public static async Task InitialzieServices(this WebApplication app)

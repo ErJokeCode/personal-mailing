@@ -8,7 +8,7 @@ namespace Core.Abstractions.FileStorage;
 
 public class FileStorageOptions
 {
-    public required string ContainerName { get; set; }
+    public required string BucketName { get; set; }
 }
 
 public interface IFileStorage

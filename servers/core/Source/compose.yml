@@ -11,12 +11,16 @@ services:
       - core-db-data:/var/lib/core-db-data
 
   core-storage:
-    image: mcr.microsoft.com/azure-storage/azurite
-    command: "azurite-blob --blobHost 0.0.0.0 -l /var/lib/core-storage-data"
+    image: minio/minio
+    command: server --console-address ":9001" /var/lib/core-storage-data
     ports:
-      - 10000:10000
+      - 9001:9001
+      - 9000:9000
     volumes:
       - core-storage-data:/var/lib/core-storage-data
+    environment:
+      - MINIO_ROOT_USER=minio
+      - MINIO_ROOT_PASSWORD=password
 
   core:
     build: ./
@@ -25,9 +29,11 @@ services:
     depends_on:
       core-db:
         condition: service_started
+      core-storage:
+        condition: service_started
       parser:
         condition: service_healthy
-      core-storage:
+      base:
         condition: service_started
     healthcheck:
       test: "curl --fail http://localhost:5000/healthy || exit"
