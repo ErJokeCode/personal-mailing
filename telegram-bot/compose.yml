@@ -2,7 +2,7 @@ services:
   bot-db:
     image: redis
     ports:
-      - 6397:6379
+      - 3001:6379
     volumes:
       - bot-db-data:/var/lib/bot-db-data
 
@@ -10,12 +10,16 @@ services:
     build: ./
     command: bash start.sh
     ports:
-      - 8001:8000
+      - 3000:8000
     depends_on:
       bot-db:
         condition: service_started
       core:
         condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      - SECRET_TOKEN=${SECRET_TOKEN}
     volumes:
       - './:/app:z'
 

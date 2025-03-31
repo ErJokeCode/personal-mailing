@@ -51,14 +51,19 @@ public static class Startup
 
         builder.Services.AddCors(
             (o) => o.AddDefaultPolicy(
-                p => p.WithOrigins("http://localhost:5020")
+                p => p.WithOrigins("http://localhost:4000")
                     .AllowAnyHeader()
                     .AllowAnyMethod()
                     .AllowCredentials()
             )
         );
 
-        var connection = builder.Configuration.GetConnectionString("Database");
+        var host = Environment.GetEnvironmentVariable("POSTGRES_URL");
+        var database = Environment.GetEnvironmentVariable("POSTGRES_DB");
+        var password = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD");
+        var user = Environment.GetEnvironmentVariable("POSTGRES_USER");
+
+        var connection = $"Host={host};Port={5432};Database={database};Username={user};Password={password};Include Error Detail=True";
         builder.Services.AddDbContext<AppDbContext>(o =>
         {
             o.UseNpgsql(connection);
@@ -124,27 +129,27 @@ public static class Startup
 
         builder.Services.Configure<ParserOptions>(o =>
         {
-            o.ParserUrl = builder.Configuration.GetConnectionString("Parser")!;
+            o.ParserUrl = Environment.GetEnvironmentVariable("PARSER_URL")!;
         });
         builder.Services.AddScoped<IParser, Parser>();
 
         builder.Services.Configure<MailServiceOptions>(o =>
         {
-            o.MailServiceUrl = builder.Configuration.GetConnectionString("TelegramBot")!;
+            o.MailServiceUrl = Environment.GetEnvironmentVariable("BOT_URL")!;
         });
         builder.Services.AddScoped<IMailService, TelegramBot>();
 
         builder.Services.AddMinio(
             configureClient => configureClient
-                .WithEndpoint(builder.Configuration.GetConnectionString("FileStorage"))
-                .WithCredentials(builder.Configuration["FileStorage:AccessKey"]!, builder.Configuration["FileStorage:SecretKey"])
+                .WithEndpoint(Environment.GetEnvironmentVariable("MINIO_URL"))
+                .WithCredentials(Environment.GetEnvironmentVariable("MINIO_ACCESS_KEY"), Environment.GetEnvironmentVariable("MINIO_SECRET_KEY"))
                 .WithSSL(false)
                 .Build()
         );
 
         builder.Services.Configure<FileStorageOptions>(o =>
         {
-            o.BucketName = builder.Configuration["FileStorage:BucketName"]!;
+            o.BucketName = Environment.GetEnvironmentVariable("MINIO_BUCKET")!;
         });
         builder.Services.AddSingleton<IFileStorage, MinioStorage>();
     }
@@ -228,8 +233,8 @@ public static class Startup
 
         var command = new CreateAdminCommand()
         {
-            Email = app.Configuration["MainAdmin:Name"]!,
-            Password = app.Configuration["MainAdmin:Password"]!
+            Email = Environment.GetEnvironmentVariable("MAIN_ADMIN_EMAIL")!,
+            Password = Environment.GetEnvironmentVariable("MAIN_ADMIN_PASSWORD")!
         };
 
         await mediator.Send(command);

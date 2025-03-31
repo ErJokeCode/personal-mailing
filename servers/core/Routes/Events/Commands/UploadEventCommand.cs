@@ -40,7 +40,7 @@ public class UploadEventCommandHandler : IRequestHandler<UploadEventCommand, Uni
 
         if (groups is not null)
         {
-            var mainAdmin = await _db.Users.SingleAsync(a => a.Email == _configuration["MainAdmin:Name"]);
+            var mainAdmin = await _db.Users.SingleAsync(a => a.Email == Environment.GetEnvironmentVariable("MAIN_ADMIN_EMAIL"));
 
             foreach (var group in groups)
             {

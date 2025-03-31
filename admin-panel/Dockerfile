@@ -10,6 +10,6 @@ COPY package.json .
 RUN pnpm install
 COPY . .
 
-EXPOSE 5020
+EXPOSE 4000
 
 CMD ["pnpm", "dev"]

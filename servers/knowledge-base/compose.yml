@@ -9,11 +9,15 @@ services:
       base-search:
         condition: service_healthy
     ports:
-      - "8082:8080"
+      - "5020:8080"
     volumes:
       - './app:/knowledge-base/app:z'
     env_file:
       - .env
+    environment:
+      - SECRET_TOKEN=${SECRET_TOKEN}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
 
   base-db:
     image: postgres:latest
@@ -22,7 +26,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DATABASE:-knowledge-base}
     ports:
-      - "5402:5432"
+      - "5021:5432"
     volumes:
       - base-db-data:/var/lib/base-db-data
     healthcheck:
@@ -48,7 +52,7 @@ services:
       - logger.org.elasticsearch=ERROR
       - logger.org.apache.lucene=ERROR
     ports:
-      - "9200:9200"
+      - "5022:9200"
     volumes:
       - base-search-data:/var/lib/base-search-data
     healthcheck:

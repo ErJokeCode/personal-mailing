@@ -2,25 +2,13 @@ services:
   core-db:
     image: postgres
     ports:
-      - 5400:5432
+      - 5001:5432
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: coredb
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     volumes:
       - core-db-data:/var/lib/core-db-data
-
-  core-storage:
-    image: minio/minio
-    command: server --console-address ":9001" /var/lib/core-storage-data
-    ports:
-      - 9001:9001
-      - 9000:9000
-    volumes:
-      - core-storage-data:/var/lib/core-storage-data
-    environment:
-      - MINIO_ROOT_USER=minio
-      - MINIO_ROOT_PASSWORD=password
 
   core:
     build: ./
@@ -29,12 +17,18 @@ services:
     depends_on:
       core-db:
         condition: service_started
-      core-storage:
+      minio:
         condition: service_started
       parser:
         condition: service_healthy
       base:
         condition: service_started
+    env_file:
+      - .env
+    environment:
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - SECRET_TOKEN=${SECRET_TOKEN}
     healthcheck:
       test: "curl --fail http://localhost:5000/healthy || exit"
       interval: 10s
@@ -47,4 +41,3 @@ services:
 
 volumes:
   core-db-data:
-  core-storage-data:

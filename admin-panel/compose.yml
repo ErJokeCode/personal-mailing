@@ -2,7 +2,7 @@ services:
   admin-panel:
     build: ./
     ports:
-      - 5020:5020
+      - 4000:4000
     depends_on:
       core:
         condition: service_healthy

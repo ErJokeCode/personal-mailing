@@ -1,6 +1,37 @@
 include:
   - ./admin-panel/compose.yml
-  - ./telegram-bot/compose.yml
-  - ./servers/parser/compose.yml
-  - ./servers/core/Source/compose.yml
-  - ./servers/knowledge-base/compose.yml
+
+  - path: ./telegram-bot/compose.yml
+    env_file:
+      - .env
+      - ./telegram-bot/.env
+
+  - path: ./servers/parser/compose.yml
+    env_file:
+      - .env
+      - ./servers/parser/.env
+
+  - path: ./servers/core/compose.yml
+    env_file:
+      - .env
+      - ./servers/core/.env
+
+  - path: ./servers/knowledge-base/compose.yml
+    env_file:
+      - .env
+      - ./servers/knowledge-base/.env
+
+services:
+  minio:
+    image: minio/minio
+    command: server --console-address ":9001" /var/lib/minio-data
+    ports:
+      - 6000:9001
+    volumes:
+      - minio-data:/var/lib/minio-data
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ACCESS_KEY}
+      - MINIO_ROOT_PASSWORD=${MINIO_ACCESS_KEY}
+
+volumes:
+  minio-data:
