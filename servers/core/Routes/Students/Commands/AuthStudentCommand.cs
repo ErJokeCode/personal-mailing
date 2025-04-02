@@ -3,12 +3,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Abstractions.Parser;
 using Core.Data;
+using Core.Messages.Students;
 using Core.Models;
 using Core.Routes.Students.Dtos;
 using Core.Routes.Students.Errors;
 using Core.Routes.Students.Maps;
 using Core.Signal;
 using FluentResults;
+using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -28,13 +30,15 @@ public class AuthStudentCommandHandler : IRequestHandler<AuthStudentCommand, Res
     private readonly IParser _parser;
     private readonly StudentMapper _mapper;
     private readonly IHubContext<SignalHub> _hub;
+    private readonly ITopicProducer<StudentAuthedMessage> _topicProducer;
 
-    public AuthStudentCommandHandler(AppDbContext db, IParser parser, IHubContext<SignalHub> hub)
+    public AuthStudentCommandHandler(AppDbContext db, IParser parser, IHubContext<SignalHub> hub, ITopicProducer<StudentAuthedMessage> topicProducer)
     {
         _db = db;
         _parser = parser;
         _mapper = new StudentMapper();
         _hub = hub;
+        _topicProducer = topicProducer;
     }
 
     public async Task<Result<StudentDto>> Handle(AuthStudentCommand request, CancellationToken cancellationToken)
@@ -82,6 +86,11 @@ public class AuthStudentCommandHandler : IRequestHandler<AuthStudentCommand, Res
 
         var dto = _mapper.Map(student);
         await _hub.NotifyOfStudentAuth(dto);
+
+        await _topicProducer.Produce(new StudentAuthedMessage()
+        {
+            Student = dto
+        });
 
         return Result.Ok(dto);
     }

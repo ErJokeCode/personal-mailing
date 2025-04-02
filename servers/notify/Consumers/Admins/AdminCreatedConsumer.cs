@@ -30,6 +30,13 @@ class AdminCreatedConsumer : IConsumer<AdminCreatedMessage>
 
     public async Task Consume(ConsumeContext<AdminCreatedMessage> context)
     {
+        var exists = await _db.Users.FindAsync(context.Message.Admin.Id);
+
+        if (exists != null)
+        {
+            return;
+        }
+
         var adminDto = context.Message.Admin;
 
         var admin = new Admin()

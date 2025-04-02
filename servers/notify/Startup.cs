@@ -16,6 +16,7 @@ using Notify.Abstractions.FileStorage;
 using Notify.Abstractions.MailService;
 using Notify.Abstractions.UserAccessor;
 using Notify.Consumers.Admins;
+using Notify.Consumers.Students;
 using Notify.Data;
 using Notify.Infrastructure.Handlers;
 using Notify.Infrastructure.Services;
@@ -80,6 +81,8 @@ public static class Startup
             x.AddRider(rider =>
             {
                 rider.AddConsumer<AdminCreatedConsumer>();
+                rider.AddConsumer<StudentAuthedConsumer>();
+                rider.AddConsumer<StudentsUpdatedConsumer>();
 
                 rider.UsingKafka((context, k) =>
                 {
@@ -87,7 +90,20 @@ public static class Startup
 
                     k.TopicEndpoint<AdminCreatedMessage>("admin-created", "notify-admin-created", e =>
                     {
+                        e.CreateIfMissing();
                         e.ConfigureConsumer<AdminCreatedConsumer>(context);
+                    });
+
+                    k.TopicEndpoint<StudentAuthedMessage>("student-authed", "notify-student-authed", e =>
+                    {
+                        e.CreateIfMissing();
+                        e.ConfigureConsumer<StudentAuthedConsumer>(context);
+                    });
+
+                    k.TopicEndpoint<StudentsUpdatedMessage>("students-updated", "notify-students-updated", e =>
+                    {
+                        e.CreateIfMissing();
+                        e.ConfigureConsumer<StudentsUpdatedConsumer>(context);
                     });
                 });
             });

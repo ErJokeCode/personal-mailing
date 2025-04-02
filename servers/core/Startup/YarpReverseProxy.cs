@@ -22,6 +22,15 @@ public static class YarpReverseProxy
             },
             new RouteConfig()
             {
+                RouteId = "notify-route",
+                ClusterId = "notify-cluster",
+                Match = new RouteMatch
+                {
+                    Path = "/core/notifications/{**catch-all}"
+                },
+            },
+            new RouteConfig()
+            {
                 RouteId = "base-route",
                 ClusterId = "base-cluster",
                 Match = new RouteMatch
@@ -47,6 +56,21 @@ public static class YarpReverseProxy
                         new DestinationConfig()
                         {
                             Address = "http://parser:8000"
+                        }
+                    },
+                }
+            },
+            new ClusterConfig
+            {
+                ClusterId = "notify-cluster",
+
+                Destinations = new Dictionary<string, DestinationConfig>(StringComparer.OrdinalIgnoreCase)
+                {
+                    {
+                        "destination",
+                        new DestinationConfig()
+                        {
+                            Address = "http://notify:5030"
                         }
                     },
                 }

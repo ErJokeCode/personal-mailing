@@ -3,8 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Core.Infrastructure.Errors;
-using Core.Infrastructure.Rest;
 using Core.Routes.Notifications.Commands;
 using Core.Routes.Notifications.Dtos;
 using Core.Routes.Notifications.Maps;
@@ -15,6 +13,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Notify.Infrastructure.Errors;
+using Notify.Infrastructure.Rest;
+using Notify.Routes;
 
 namespace Core.Routes.Notifications;
 
@@ -22,18 +23,17 @@ class NotificationRoute : IRoute
 {
     public void MapRoutes(WebApplication app)
     {
-        // var group = app.MapGroup("/core/notifications")
-        //     .RequireAuthorization();
+        var group = app.MapGroup("/core/notifications");
 
-        // group.MapGet("/", GetAllNotifications)
-        //     .WithDescription("Получает все рассылки");
+        group.MapGet("/", GetAllNotifications)
+            .WithDescription("Получает все рассылки");
 
-        // group.MapPost("/", SendNotification)
-        //     .WithDescription("Отправляет рассылку")
-        //     .DisableAntiforgery();
+        group.MapPost("/", SendNotification)
+            .WithDescription("Отправляет рассылку")
+            .DisableAntiforgery();
 
-        // group.MapGet("/{notificationId}", GetNotificationById)
-        //     .WithDescription("Получает рассылку по айди");
+        group.MapGet("/{notificationId}", GetNotificationById)
+            .WithDescription("Получает рассылку по айди");
     }
 
     public async Task<Results<Ok<NotificationDto>, NotFound<ProblemDetails>, ValidationProblem>> GetNotificationById(

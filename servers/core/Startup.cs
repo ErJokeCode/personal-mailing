@@ -14,6 +14,7 @@ using Core.Identity;
 using Core.Infrastructure.Handlers;
 using Core.Infrastructure.Services;
 using Core.Messages.Admins;
+using Core.Messages.Students;
 using Core.Models;
 using Core.Routes;
 using Core.Routes.Admins.Commands;
@@ -163,13 +164,14 @@ public static class Startup
             x.AddRider(rider =>
             {
                 rider.AddProducer<AdminCreatedMessage>("admin-created");
+                rider.AddProducer<StudentAuthedMessage>("student-authed");
+                rider.AddProducer<StudentsUpdatedMessage>("students-updated");
 
                 rider.UsingKafka((context, k) =>
                 {
                     k.Host(Environment.GetEnvironmentVariable("KAFKA_URL"));
                 });
             });
-
         });
     }
 

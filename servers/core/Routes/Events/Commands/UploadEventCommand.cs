@@ -6,8 +6,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Abstractions.Parser;
 using Core.Data;
+using Core.Messages.Students;
 using Core.Models;
+using Core.Routes.Students.Maps;
 using Core.Signal;
+using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.SignalR;
@@ -24,13 +27,17 @@ public class UploadEventCommandHandler : IRequestHandler<UploadEventCommand, Uni
     private readonly IParser _parser;
     private readonly IConfiguration _configuration;
     private readonly IHubContext<SignalHub> _hub;
+    private readonly ITopicProducer<StudentsUpdatedMessage> _topicProducer;
+    private readonly StudentMapper _studentMapper;
 
-    public UploadEventCommandHandler(AppDbContext db, IParser parser, IConfiguration configuration, IHubContext<SignalHub> hub)
+    public UploadEventCommandHandler(AppDbContext db, IParser parser, IConfiguration configuration, IHubContext<SignalHub> hub, ITopicProducer<StudentsUpdatedMessage> topicProducer)
     {
+        _studentMapper = new StudentMapper();
         _db = db;
         _parser = parser;
         _configuration = configuration;
         _hub = hub;
+        _topicProducer = topicProducer;
     }
 
     public async Task<Unit> Handle(UploadEventCommand request, CancellationToken cancellationToken)
@@ -82,6 +89,11 @@ public class UploadEventCommandHandler : IRequestHandler<UploadEventCommand, Uni
         await _db.SaveChangesAsync();
 
         await _hub.NotifyOfFileUpload();
+
+        await _topicProducer.Produce(new StudentsUpdatedMessage()
+        {
+            Students = _studentMapper.Map(students).ToList()
+        });
 
         return Unit.Value;
     }

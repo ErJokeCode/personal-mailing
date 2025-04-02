@@ -84,7 +84,7 @@
                 <TabItem title="Вложения">
                     <div class="flex gap-1 flex-col items-baseline">
                         {#each body.documents as document}
-                            <A href={`${DocumentsApi}/${document.blobId}`}>
+                            <A href={`${NotificationsApi}/documents/${document.blobId}`}>
                                 {document.name}
                             </A>
                         {/each}
