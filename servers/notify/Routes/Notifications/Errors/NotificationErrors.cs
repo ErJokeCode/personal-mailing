@@ -1,4 +1,4 @@
-namespace Core.Routes.Notifications.Errors;
+namespace Notify.Routes.Notifications.Errors;
 
 public static class NotificationErrors
 {

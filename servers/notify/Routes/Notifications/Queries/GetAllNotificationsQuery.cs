@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Core.Routes.Notifications.Dtos;
-using Core.Routes.Notifications.Maps;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Notify.Data;
 using Notify.Infrastructure.Rest;
 using Notify.Models;
+using Notify.Routes.Notifications.DTOs;
+using Notify.Routes.Notifications.Maps;
 
-namespace Core.Routes.Notifications.Queries;
+namespace Notify.Routes.Notifications.Queries;
 
 public class GetAllNotificationsQuery : IRequest<PagedList<NotificationDto>>
 {

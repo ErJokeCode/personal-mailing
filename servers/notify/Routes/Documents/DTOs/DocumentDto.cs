@@ -1,6 +1,6 @@
 using System;
 
-namespace Core.Routes.Documents.DTOs;
+namespace Notify.Routes.Documents.DTOs;
 
 public class DocumentDto
 {

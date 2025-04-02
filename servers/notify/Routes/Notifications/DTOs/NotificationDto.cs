@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
-using Core.Routes.Documents.DTOs;
 using Microsoft.EntityFrameworkCore;
 using Notify.Consumers.Admins;
 using Notify.Consumers.Students;
+using Notify.Messages.Admins;
+using Notify.Messages.Students;
+using Notify.Routes.Documents.DTOs;
 using Riok.Mapperly.Abstractions;
 
-namespace Core.Routes.Notifications.Dtos;
+namespace Notify.Routes.Notifications.DTOs;
 
 public class NotificationErrorDto
 {

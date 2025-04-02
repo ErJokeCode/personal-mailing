@@ -20,6 +20,8 @@ using Notify.Consumers.Students;
 using Notify.Data;
 using Notify.Infrastructure.Handlers;
 using Notify.Infrastructure.Services;
+using Notify.Messages.Admins;
+using Notify.Messages.Students;
 using Notify.Routes;
 using Scalar.AspNetCore;
 

@@ -2,9 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Core.Routes.Notifications.Dtos;
-using Core.Routes.Notifications.Errors;
-using Core.Routes.Notifications.Maps;
 using FluentResults;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -14,9 +11,11 @@ using Notify.Abstractions.MailService;
 using Notify.Abstractions.UserAccessor;
 using Notify.Data;
 using Notify.Models;
+using Notify.Routes.Notifications.DTOs;
 using Notify.Routes.Notifications.Errors;
+using Notify.Routes.Notifications.Maps;
 
-namespace Core.Routes.Notifications.Commands;
+namespace Notify.Routes.Notifications.Commands;
 
 public class SendNotificationCommand : IRequest<Result<NotificationDto>>
 {

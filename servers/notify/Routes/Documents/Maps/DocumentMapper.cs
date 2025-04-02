@@ -1,9 +1,9 @@
 using System.Collections.Generic;
-using Core.Routes.Documents.DTOs;
 using Notify.Models;
+using Notify.Routes.Documents.DTOs;
 using Riok.Mapperly.Abstractions;
 
-namespace Core.Routes.Documents.Maps;
+namespace Notify.Routes.Documents.Maps;
 
 [Mapper]
 public partial class DocumentMapper

@@ -3,10 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Core.Routes.Notifications.Commands;
-using Core.Routes.Notifications.Dtos;
-using Core.Routes.Notifications.Maps;
-using Core.Routes.Notifications.Queries;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -16,8 +12,12 @@ using Microsoft.AspNetCore.Mvc;
 using Notify.Infrastructure.Errors;
 using Notify.Infrastructure.Rest;
 using Notify.Routes;
+using Notify.Routes.Notifications.Commands;
+using Notify.Routes.Notifications.DTOs;
+using Notify.Routes.Notifications.Maps;
+using Notify.Routes.Notifications.Queries;
 
-namespace Core.Routes.Notifications;
+namespace Notify.Routes.Notifications;
 
 class NotificationRoute : IRoute
 {

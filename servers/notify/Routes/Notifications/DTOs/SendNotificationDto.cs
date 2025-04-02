@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Core.Routes.Notifications.DTOs;
+namespace Notify.Routes.Notifications.DTOs;
 
 public class SendNotificationDto
 {

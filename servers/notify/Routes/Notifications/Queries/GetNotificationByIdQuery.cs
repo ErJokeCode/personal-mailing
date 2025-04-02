@@ -1,14 +1,14 @@
 using System.Threading;
 using System.Threading.Tasks;
-using Core.Routes.Notifications.Dtos;
-using Core.Routes.Notifications.Errors;
-using Core.Routes.Notifications.Maps;
 using FluentResults;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Notify.Data;
+using Notify.Routes.Notifications.DTOs;
+using Notify.Routes.Notifications.Errors;
+using Notify.Routes.Notifications.Maps;
 
-namespace Core.Routes.Notifications.Queries;
+namespace Notify.Routes.Notifications.Queries;
 
 public class GetNotificationByIdQuery : IRequest<Result<NotificationDto>>
 {

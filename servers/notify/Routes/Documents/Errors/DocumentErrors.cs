@@ -1,6 +1,6 @@
 using System;
 
-namespace Core.Routes.Documents.Errors;
+namespace Notify.Routes.Documents.Errors;
 
 public static class DocumentErrors
 {

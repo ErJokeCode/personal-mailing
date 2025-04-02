@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Core.Routes.Documents.Commands;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -9,8 +8,9 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Notify.Infrastructure.Errors;
 using Notify.Routes;
+using Notify.Routes.Documents.Commands;
 
-namespace Core.Routes.Documents;
+namespace Notify.Routes.Documents;
 
 public class DocumentRoute : IRoute
 {

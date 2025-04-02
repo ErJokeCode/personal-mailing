@@ -5,22 +5,21 @@ using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Notify.Abstractions.Parser;
 using Notify.Data;
+using Notify.Messages.Students;
 using Notify.Models;
+using Notify.Routes.Notifications.Maps;
 
 namespace Notify.Consumers.Students;
-
-public class StudentsUpdatedMessage
-{
-    public required List<StudentDto> Students { get; set; }
-}
 
 class StudentsUpdatedConsumer : IConsumer<StudentsUpdatedMessage>
 {
     private readonly AppDbContext _db;
+    private readonly NotificationMapper _notificationMapper;
 
     public StudentsUpdatedConsumer(AppDbContext db)
     {
         _db = db;
+        _notificationMapper = new NotificationMapper();
     }
 
     public async Task Consume(ConsumeContext<StudentsUpdatedMessage> context)
@@ -31,28 +30,14 @@ class StudentsUpdatedConsumer : IConsumer<StudentsUpdatedMessage>
 
             if (student is null)
             {
-                var newStudent = new Student()
-                {
-                    CreatedAt = studentDto.CreatedAt,
-                    Email = studentDto.Email,
-                    Id = studentDto.Id,
-                    ChatId = studentDto.ChatId,
-                    Info = studentDto.Info,
-                    Active = studentDto.Active,
-                    DeactivatedAt = studentDto.DeactivatedAt,
-                };
+                var newStudent = _notificationMapper.Map(studentDto);
 
                 await _db.Students.AddAsync(newStudent);
             }
             else
             {
-                student.CreatedAt = studentDto.CreatedAt;
-                student.Email = studentDto.Email;
-                student.Id = studentDto.Id;
-                student.ChatId = studentDto.ChatId;
-                student.Info = studentDto.Info;
-                student.Active = studentDto.Active;
-                student.DeactivatedAt = studentDto.DeactivatedAt;
+                student = _notificationMapper.Map(studentDto);
+                _db.Students.Update(student);
             }
         }
 

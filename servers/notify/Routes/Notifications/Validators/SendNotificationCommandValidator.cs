@@ -1,8 +1,8 @@
 using System.Linq;
-using Core.Routes.Notifications.Commands;
 using FluentValidation;
+using Notify.Routes.Notifications.Commands;
 
-namespace Core.Routes.Notifications.Validators;
+namespace Notify.Routes.Notifications.Validators;
 
 public class SendNotificationCommandValidator : AbstractValidator<SendNotificationCommand>
 {

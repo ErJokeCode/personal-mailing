@@ -1,15 +1,21 @@
 using System.Collections.Generic;
 using System.Text.Json;
-using Core.Routes.Notifications.Dtos;
-using Core.Routes.Notifications.DTOs;
+using Notify.Consumers.Admins;
+using Notify.Consumers.Students;
+using Notify.Messages.Admins;
+using Notify.Messages.Students;
 using Notify.Models;
+using Notify.Routes.Notifications.DTOs;
 using Riok.Mapperly.Abstractions;
 
-namespace Core.Routes.Notifications.Maps;
+namespace Notify.Routes.Notifications.Maps;
 
 [Mapper]
 public partial class NotificationMapper
 {
+    public partial Admin Map(AdminDto adminDto);
+    public partial Student Map(StudentDto adminDto);
+
     public partial NotificationDto Map(Notification notification);
     public partial IEnumerable<NotificationDto> Map(IEnumerable<Notification> notification);
 

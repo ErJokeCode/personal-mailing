@@ -3,12 +3,12 @@ using System.IO;
 using System.Reflection.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
-using Core.Routes.Documents.Errors;
 using FluentResults;
 using MediatR;
 using Notify.Abstractions.FileStorage;
+using Notify.Routes.Documents.Errors;
 
-namespace Core.Routes.Documents.Commands;
+namespace Notify.Routes.Documents.Commands;
 
 public class DownloadDocumentCommand : IRequest<Result<BlobData>>
 {

@@ -1,7 +1,7 @@
-using Core.Routes.Notifications.Queries;
 using FluentValidation;
+using Notify.Routes.Notifications.Queries;
 
-namespace Core.Routes.Notifications.Validators;
+namespace Notify.Routes.Notifications.Validators;
 
 public class GetNotificationByIdQueryValidator : AbstractValidator<GetNotificationByIdQuery>
 {
