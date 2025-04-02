@@ -1,32 +1,26 @@
 services:
-  core-db:
+  notify-db:
     image: postgres
     ports:
-      - 5001:5432
+      - 5031:5432
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - core-db-data:/var/lib/core-db-data
+      - notify-db-data:/var/lib/notify-db-data
 
-  core:
+  notify:
     build: ./
     ports:
-      - 5000:5000
+      - 5030:5030
     depends_on:
-      core-db:
+      notify-db:
         condition: service_started
       minio:
         condition: service_started
       kafka:
         condition: service_started
-      parser:
-        condition: service_healthy
-      base:
-        condition: service_started
-      notify:
-        condition: service_healthy
     env_file:
       - .env
     environment:
@@ -36,7 +30,7 @@ services:
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
       - KAFKA_URL=${KAFKA_URL}
     healthcheck:
-      test: "curl --fail http://localhost:5000/healthy || exit"
+      test: "curl --fail http://localhost:5030/healthy || exit"
       interval: 10s
       timeout: 30s
       retries: 10
@@ -46,4 +40,4 @@ services:
       - '/app/obj'
 
 volumes:
-  core-db-data:
+  notify-db-data:

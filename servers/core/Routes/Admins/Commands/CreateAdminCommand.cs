@@ -4,11 +4,13 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Core.Messages.Admins;
 using Core.Models;
 using Core.Routes.Admins.Dtos;
 using Core.Routes.Admins.Errors;
 using Core.Routes.Admins.Maps;
 using FluentResults;
+using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
 
@@ -24,11 +26,13 @@ public class CreateAdminCommandHandler : IRequestHandler<CreateAdminCommand, Res
 {
     private readonly UserManager<Admin> _userManager;
     private readonly AdminMapper _mapper;
+    private readonly ITopicProducer<AdminCreatedMessage> _topicProducer;
 
-    public CreateAdminCommandHandler(UserManager<Admin> userManager)
+    public CreateAdminCommandHandler(UserManager<Admin> userManager, ITopicProducer<AdminCreatedMessage> topicProducer)
     {
         _userManager = userManager;
         _mapper = new AdminMapper();
+        _topicProducer = topicProducer;
     }
 
     public async Task<Result<AdminDto>> Handle(CreateAdminCommand request, CancellationToken cancellationToken)
@@ -54,6 +58,13 @@ public class CreateAdminCommandHandler : IRequestHandler<CreateAdminCommand, Res
             return Result.Fail(AdminErrors.RegisterError(result.Errors));
         }
 
-        return Result.Ok(_mapper.Map(newUser));
+        var dto = _mapper.Map(newUser);
+
+        await _topicProducer.Produce(new AdminCreatedMessage()
+        {
+            Admin = dto
+        });
+
+        return Result.Ok(dto);
     }
 }

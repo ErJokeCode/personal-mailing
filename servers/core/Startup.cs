@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
 using Core.Abstractions.FileStorage;
@@ -12,12 +13,14 @@ using Core.Data;
 using Core.Identity;
 using Core.Infrastructure.Handlers;
 using Core.Infrastructure.Services;
+using Core.Messages.Admins;
 using Core.Models;
 using Core.Routes;
 using Core.Routes.Admins.Commands;
 using Core.Routes.Events.Commands;
 using Core.Signal;
 using FluentValidation;
+using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -152,10 +155,29 @@ public static class Startup
             o.BucketName = Environment.GetEnvironmentVariable("MINIO_BUCKET")!;
         });
         builder.Services.AddSingleton<IFileStorage, MinioStorage>();
+
+        builder.Services.AddMassTransit(x =>
+        {
+            x.UsingInMemory();
+
+            x.AddRider(rider =>
+            {
+                rider.AddProducer<AdminCreatedMessage>("admin-created");
+
+                rider.UsingKafka((context, k) =>
+                {
+                    k.Host(Environment.GetEnvironmentVariable("KAFKA_URL"));
+                });
+            });
+
+        });
     }
 
     public static async Task InitialzieServices(this WebApplication app)
     {
+        var busControl = app.Services.GetRequiredService<IBusControl>();
+        await busControl.StartAsync(new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token);
+
         app.UseRequestLocalization((o) => o.SetDefaultCulture("ru"));
 
         if (app.Environment.IsDevelopment())
