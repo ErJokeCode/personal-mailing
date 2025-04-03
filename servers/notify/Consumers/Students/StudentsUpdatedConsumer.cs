@@ -5,9 +5,9 @@ using MassTransit;
 using Microsoft.EntityFrameworkCore;
 using Notify.Abstractions.Parser;
 using Notify.Data;
-using Notify.Messages.Students;
 using Notify.Models;
 using Notify.Routes.Notifications.Maps;
+using Shared.Messages.Students;
 
 namespace Notify.Consumers.Students;
 
@@ -37,7 +37,6 @@ class StudentsUpdatedConsumer : IConsumer<StudentsUpdatedMessage>
             else
             {
                 student = _notificationMapper.Map(studentDto);
-                _db.Students.Update(student);
             }
         }
 

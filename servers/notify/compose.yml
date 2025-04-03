@@ -11,7 +11,9 @@ services:
       - notify-db-data:/var/lib/notify-db-data
 
   notify:
-    build: ./
+    build:
+      context: ../
+      dockerfile: ./notify/Dockerfile
     ports:
       - 5030:5030
     depends_on:
@@ -20,7 +22,7 @@ services:
       minio:
         condition: service_started
       kafka:
-        condition: service_started
+        condition: service_healthy
     env_file:
       - .env
     environment:
@@ -35,7 +37,10 @@ services:
       timeout: 30s
       retries: 10
     volumes:
+      - '../shared:/shared:z'
       - './:/app:z'
+      - '/shared/bin'
+      - '/shared/obj'
       - '/app/bin'
       - '/app/obj'
 

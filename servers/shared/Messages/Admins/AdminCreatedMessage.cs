@@ -1,6 +1,6 @@
 using System;
 
-namespace Notify.Messages.Admins;
+namespace Shared.Messages.Admins;
 
 public class AdminDto
 {
@@ -12,5 +12,7 @@ public class AdminDto
 
 public class AdminCreatedMessage
 {
+    public static string TopicName => "admin-created";
+
     public required AdminDto Admin { get; set; }
 }

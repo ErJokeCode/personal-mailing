@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace Notify.Abstractions.FileStorage;
+namespace Shared.Abstractions.FileStorage;
 
 public class BlobData
 {

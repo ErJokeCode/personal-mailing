@@ -8,10 +8,10 @@ using Microsoft.Extensions.Options;
 using Minio;
 using Minio.DataModel;
 using Minio.DataModel.Args;
-using Notify.Abstractions.FileStorage;
-using Notify.Models;
+using Shared.Abstractions.FileStorage;
+using Shared.Models;
 
-namespace Notify.Infrastructure.Services;
+namespace Shared.Infrastructure.Services;
 
 public class MinioStorage : IFileStorage
 {

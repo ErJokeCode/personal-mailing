@@ -1,7 +1,7 @@
 using System;
-using Notify.Abstractions.Parser;
+using Shared.Models;
 
-namespace Notify.Messages.Students;
+namespace Notify.Routes.Notifications.DTOs;
 
 public class StudentDto
 {
@@ -14,9 +14,4 @@ public class StudentDto
 
     public bool Active { get; set; }
     public DateOnly? DeactivatedAt { get; set; }
-}
-
-public class StudentAuthedMessage
-{
-    public required StudentDto Student { get; set; }
 }

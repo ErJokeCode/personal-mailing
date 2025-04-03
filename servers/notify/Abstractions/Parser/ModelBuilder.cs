@@ -3,6 +3,7 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using Notify.Models;
+using Shared.Models;
 
 namespace Notify.Abstractions.Parser;
 

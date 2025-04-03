@@ -1,7 +1,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 
-namespace Notify.Models;
+namespace Shared.Models;
 
 [Owned]
 public class Document

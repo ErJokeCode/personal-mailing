@@ -5,8 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentResults;
 using MediatR;
-using Notify.Abstractions.FileStorage;
 using Notify.Routes.Documents.Errors;
+using Shared.Abstractions.FileStorage;
 
 namespace Notify.Routes.Documents.Commands;
 

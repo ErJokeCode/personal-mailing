@@ -7,9 +7,10 @@ using System.Net.Http.Json;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
-using Notify.Abstractions.FileStorage;
 using Notify.Abstractions.MailService;
 using Notify.Models;
+using Shared.Abstractions.FileStorage;
+using Shared.Models;
 
 namespace Notify.Infrastructure.Services;
 

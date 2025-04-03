@@ -3,9 +3,9 @@ using System.Threading.Tasks;
 using MassTransit;
 using Notify.Abstractions.Parser;
 using Notify.Data;
-using Notify.Messages.Students;
 using Notify.Models;
 using Notify.Routes.Notifications.Maps;
+using Shared.Messages.Students;
 
 namespace Notify.Consumers.Students;
 

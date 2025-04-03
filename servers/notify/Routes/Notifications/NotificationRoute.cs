@@ -9,13 +9,13 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Notify.Infrastructure.Errors;
-using Notify.Infrastructure.Rest;
 using Notify.Routes;
 using Notify.Routes.Notifications.Commands;
 using Notify.Routes.Notifications.DTOs;
 using Notify.Routes.Notifications.Maps;
 using Notify.Routes.Notifications.Queries;
+using Shared.Infrastructure.Errors;
+using Shared.Infrastructure.Rest;
 
 namespace Notify.Routes.Notifications;
 

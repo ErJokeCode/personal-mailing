@@ -1,6 +1,6 @@
 using FuzzySharp;
 
-namespace Notify.Infrastructure.Rest;
+namespace Shared.Infrastructure.Rest;
 
 public static class FuzzySearch
 {

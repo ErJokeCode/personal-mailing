@@ -6,7 +6,6 @@ using FluentResults;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Notify.Abstractions.FileStorage;
 using Notify.Abstractions.MailService;
 using Notify.Abstractions.UserAccessor;
 using Notify.Data;
@@ -14,6 +13,7 @@ using Notify.Models;
 using Notify.Routes.Notifications.DTOs;
 using Notify.Routes.Notifications.Errors;
 using Notify.Routes.Notifications.Maps;
+using Shared.Abstractions.FileStorage;
 
 namespace Notify.Routes.Notifications.Commands;
 

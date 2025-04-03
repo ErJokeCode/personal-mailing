@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Notify.Data;
-using Notify.Infrastructure.Rest;
 using Notify.Models;
 using Notify.Routes.Notifications.DTOs;
 using Notify.Routes.Notifications.Maps;
+using Shared.Infrastructure.Rest;
 
 namespace Notify.Routes.Notifications.Queries;
 

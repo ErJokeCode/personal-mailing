@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace Notify.Abstractions.Parser;
+namespace Shared.Models;
 
 [Owned]
 public class Team

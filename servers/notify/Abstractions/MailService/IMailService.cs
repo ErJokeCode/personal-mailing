@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Notify.Models;
+using Shared.Models;
 
 namespace Notify.Abstractions.MailService;
 

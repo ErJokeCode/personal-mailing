@@ -12,18 +12,19 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Minio;
-using Notify.Abstractions.FileStorage;
 using Notify.Abstractions.MailService;
 using Notify.Abstractions.UserAccessor;
 using Notify.Consumers.Admins;
 using Notify.Consumers.Students;
 using Notify.Data;
-using Notify.Infrastructure.Handlers;
 using Notify.Infrastructure.Services;
-using Notify.Messages.Admins;
-using Notify.Messages.Students;
 using Notify.Routes;
 using Scalar.AspNetCore;
+using Shared.Abstractions.FileStorage;
+using Shared.Infrastructure.Handlers;
+using Shared.Infrastructure.Services;
+using Shared.Messages.Admins;
+using Shared.Messages.Students;
 
 namespace Notify;
 

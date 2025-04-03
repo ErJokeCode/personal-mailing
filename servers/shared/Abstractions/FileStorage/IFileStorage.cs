@@ -1,10 +1,9 @@
 using System;
-using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Notify.Models;
+using Shared.Models;
 
-namespace Notify.Abstractions.FileStorage;
+namespace Shared.Abstractions.FileStorage;
 
 public class FileStorageOptions
 {

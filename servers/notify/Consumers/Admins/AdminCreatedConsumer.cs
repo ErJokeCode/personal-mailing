@@ -1,11 +1,8 @@
-using System;
-using System.Reactive;
 using System.Threading.Tasks;
 using MassTransit;
 using Notify.Data;
-using Notify.Messages.Admins;
-using Notify.Models;
 using Notify.Routes.Notifications.Maps;
+using Shared.Messages.Admins;
 
 namespace Notify.Consumers.Admins;
 

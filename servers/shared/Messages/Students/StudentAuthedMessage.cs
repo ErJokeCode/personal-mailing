@@ -1,11 +1,9 @@
 using System;
-using System.Collections.Generic;
-using Riok.Mapperly.Abstractions;
 using Shared.Models;
 
-namespace Notify.Models;
+namespace Shared.Messages.Students;
 
-public class Student
+public class StudentDto
 {
     public Guid Id { get; set; }
     public required string Email { get; set; }
@@ -14,9 +12,13 @@ public class Student
 
     public required ParserStudent Info { get; set; }
 
-    public bool Active { get; set; } = true;
+    public bool Active { get; set; }
     public DateOnly? DeactivatedAt { get; set; }
+}
 
-    [MapperIgnore]
-    public ICollection<Notification> Notifications { get; set; } = [];
+public class StudentAuthedMessage
+{
+    public static string TopicName => "student-authed";
+
+    public required StudentDto Student { get; set; }
 }

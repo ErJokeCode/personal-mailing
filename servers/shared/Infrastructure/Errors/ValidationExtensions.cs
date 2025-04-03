@@ -3,7 +3,7 @@ using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 
-namespace Notify.Infrastructure.Errors;
+namespace Shared.Infrastructure.Errors;
 
 public static class ValidationExtensions
 {

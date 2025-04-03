@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using Notify.Infrastructure.Errors;
 using Notify.Routes;
 using Notify.Routes.Documents.Commands;
+using Shared.Infrastructure.Errors;
 
 namespace Notify.Routes.Documents;
 

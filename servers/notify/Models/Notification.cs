@@ -1,8 +1,8 @@
-
 using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Riok.Mapperly.Abstractions;
+using Shared.Models;
 
 namespace Notify.Models;
 

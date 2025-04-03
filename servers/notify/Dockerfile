@@ -5,10 +5,15 @@ RUN apt-get install -yqq dotnet-sdk-9.0
 RUN apt-get install -yqq aspnetcore-runtime-9.0
 RUN apt-get install -yqq curl
 
-WORKDIR /app
-COPY Notify.csproj .
+WORKDIR /shared
+COPY ./shared/Shared.csproj .
 RUN dotnet restore
-COPY . .
+COPY ./shared .
+
+WORKDIR /app
+COPY ./notify/Notify.csproj .
+RUN dotnet restore
+COPY ./notify .
 
 EXPOSE 5030
 

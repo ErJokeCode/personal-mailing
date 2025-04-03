@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Notify.Consumers.Admins;
 using Notify.Consumers.Students;
-using Notify.Messages.Admins;
-using Notify.Messages.Students;
 using Notify.Routes.Documents.DTOs;
 using Riok.Mapperly.Abstractions;
 

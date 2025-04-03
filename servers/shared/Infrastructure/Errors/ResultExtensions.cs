@@ -1,11 +1,10 @@
 using System.Linq;
 using FluentResults;
-using FluentValidation.Results;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Notify.Infrastructure.Errors;
+namespace Shared.Infrastructure.Errors;
 
 public static class ResultExtensions
 {
