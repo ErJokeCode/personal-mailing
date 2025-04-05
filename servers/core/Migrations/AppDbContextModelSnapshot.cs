@@ -17,7 +17,7 @@ namespace Core.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.1")
+                .HasAnnotation("ProductVersion", "9.0.3")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -194,31 +194,6 @@ namespace Core.Migrations
                     b.ToTable("Messages");
                 });
 
-            modelBuilder.Entity("Core.Models.Notification", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<Guid>("AdminId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Content")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AdminId");
-
-                    b.ToTable("Notifications");
-                });
-
             modelBuilder.Entity("Core.Models.Student", b =>
                 {
                     b.Property<Guid>("Id")
@@ -381,21 +356,6 @@ namespace Core.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("NotificationStudent", b =>
-                {
-                    b.Property<int>("NotificationsId")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("StudentsId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("NotificationsId", "StudentsId");
-
-                    b.HasIndex("StudentsId");
-
-                    b.ToTable("NotificationStudent");
-                });
-
             modelBuilder.Entity("Core.Identity.AdminAuthTicket", b =>
                 {
                     b.HasOne("Core.Models.Admin", "Admin")
@@ -449,7 +409,7 @@ namespace Core.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsMany("Core.Models.Document", "Documents", b1 =>
+                    b.OwnsMany("Shared.Models.Document", "Documents", b1 =>
                         {
                             b1.Property<int>("MessageId")
                                 .HasColumnType("integer");
@@ -473,7 +433,7 @@ namespace Core.Migrations
 
                             b1.HasKey("MessageId", "Id");
 
-                            b1.ToTable("Messages_Documents");
+                            b1.ToTable("Document");
 
                             b1.WithOwner()
                                 .HasForeignKey("MessageId");
@@ -484,77 +444,6 @@ namespace Core.Migrations
                     b.Navigation("Chat");
 
                     b.Navigation("Documents");
-                });
-
-            modelBuilder.Entity("Core.Models.Notification", b =>
-                {
-                    b.HasOne("Core.Models.Admin", "Admin")
-                        .WithMany("Notifications")
-                        .HasForeignKey("AdminId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.OwnsMany("Core.Models.Document", "Documents", b1 =>
-                        {
-                            b1.Property<int>("NotificationId")
-                                .HasColumnType("integer");
-
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("integer");
-
-                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
-
-                            b1.Property<Guid>("BlobId")
-                                .HasColumnType("uuid");
-
-                            b1.Property<string>("MimeType")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.Property<string>("Name")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.HasKey("NotificationId", "Id");
-
-                            b1.ToTable("Notifications_Documents");
-
-                            b1.WithOwner()
-                                .HasForeignKey("NotificationId");
-                        });
-
-                    b.OwnsMany("Core.Models.NotificationError", "Errors", b1 =>
-                        {
-                            b1.Property<int>("NotificationId")
-                                .HasColumnType("integer");
-
-                            b1.Property<int>("Id")
-                                .ValueGeneratedOnAdd()
-                                .HasColumnType("integer");
-
-                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
-
-                            b1.Property<string>("Message")
-                                .IsRequired()
-                                .HasColumnType("text");
-
-                            b1.Property<Guid>("StudentId")
-                                .HasColumnType("uuid");
-
-                            b1.HasKey("NotificationId", "Id");
-
-                            b1.ToTable("NotificationError");
-
-                            b1.WithOwner()
-                                .HasForeignKey("NotificationId");
-                        });
-
-                    b.Navigation("Admin");
-
-                    b.Navigation("Documents");
-
-                    b.Navigation("Errors");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
@@ -608,28 +497,11 @@ namespace Core.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("NotificationStudent", b =>
-                {
-                    b.HasOne("Core.Models.Notification", null)
-                        .WithMany()
-                        .HasForeignKey("NotificationsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Core.Models.Student", null)
-                        .WithMany()
-                        .HasForeignKey("StudentsId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("Core.Models.Admin", b =>
                 {
                     b.Navigation("Chats");
 
                     b.Navigation("Groups");
-
-                    b.Navigation("Notifications");
                 });
 
             modelBuilder.Entity("Core.Models.Chat", b =>

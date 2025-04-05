@@ -6,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Abstractions.Parser;
 using Core.Data;
-using Core.Messages.Students;
 using Core.Models;
 using Core.Routes.Students.Maps;
 using Core.Signal;
@@ -16,6 +15,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Shared.Messages.Groups;
+using Shared.Messages.Students;
 
 namespace Core.Routes.Events.Commands;
 
@@ -28,9 +29,10 @@ public class UploadEventCommandHandler : IRequestHandler<UploadEventCommand, Uni
     private readonly IConfiguration _configuration;
     private readonly IHubContext<SignalHub> _hub;
     private readonly ITopicProducer<StudentsUpdatedMessage> _topicProducer;
+    private readonly ITopicProducer<GroupsAddedMessage> _groupTopicProducer;
     private readonly StudentMapper _studentMapper;
 
-    public UploadEventCommandHandler(AppDbContext db, IParser parser, IConfiguration configuration, IHubContext<SignalHub> hub, ITopicProducer<StudentsUpdatedMessage> topicProducer)
+    public UploadEventCommandHandler(AppDbContext db, IParser parser, IConfiguration configuration, IHubContext<SignalHub> hub, ITopicProducer<StudentsUpdatedMessage> topicProducer, ITopicProducer<GroupsAddedMessage> groupTopicProducer)
     {
         _studentMapper = new StudentMapper();
         _db = db;
@@ -38,6 +40,7 @@ public class UploadEventCommandHandler : IRequestHandler<UploadEventCommand, Uni
         _configuration = configuration;
         _hub = hub;
         _topicProducer = topicProducer;
+        _groupTopicProducer = groupTopicProducer;
     }
 
     public async Task<Unit> Handle(UploadEventCommand request, CancellationToken cancellationToken)
@@ -45,6 +48,7 @@ public class UploadEventCommandHandler : IRequestHandler<UploadEventCommand, Uni
         var groups = await _parser.GetAsync<IEnumerable<string>>("/student/number_groups", []);
         var groupAssignments = await _db.GroupAssignments.Select(g => g.Name).ToHashSetAsync();
 
+        List<GroupAssignment> newGroups = new();
         if (groups is not null)
         {
             var mainAdmin = await _db.Users.SingleAsync(a => a.Email == Environment.GetEnvironmentVariable("MAIN_ADMIN_EMAIL"));
@@ -53,16 +57,25 @@ public class UploadEventCommandHandler : IRequestHandler<UploadEventCommand, Uni
             {
                 if (!groupAssignments.Contains(group))
                 {
-                    await _db.GroupAssignments.AddAsync(new Models.GroupAssignment()
+                    var newGroup = new Models.GroupAssignment()
                     {
                         Name = group,
                         AdminId = mainAdmin.Id,
-                    });
+                    };
+
+                    newGroups.Add(newGroup);
+
+                    await _db.GroupAssignments.AddAsync(newGroup);
                 }
             }
         }
 
         await _db.SaveChangesAsync();
+
+        await _groupTopicProducer.Produce(new GroupsAddedMessage()
+        {
+            GroupAssignments = _studentMapper.Map(newGroups).ToList()
+        });
 
         var students = await _db.Students.ToListAsync();
 
@@ -92,7 +105,7 @@ public class UploadEventCommandHandler : IRequestHandler<UploadEventCommand, Uni
 
         await _topicProducer.Produce(new StudentsUpdatedMessage()
         {
-            Students = _studentMapper.Map(students).ToList()
+            Students = _studentMapper.MapToMessage(students).ToList()
         });
 
         return Unit.Value;

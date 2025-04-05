@@ -1,0 +1,48 @@
+services:
+  chat-db:
+    image: postgres
+    ports:
+      - 5041:5432
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - chat-db-data:/var/lib/postgresql/data
+
+  chat:
+    build:
+      context: ../
+      dockerfile: ./chat/Dockerfile
+    ports:
+      - 5040:5040
+    depends_on:
+      chat-db:
+        condition: service_started
+      minio:
+        condition: service_started
+      kafka:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      - SECRET_TOKEN=${SECRET_TOKEN}
+      - MINIO_URL=${MINIO_URL}
+      - MINIO_ACCESS_KEY=${MINIO_ACCESS_KEY}
+      - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
+      - KAFKA_URL=${KAFKA_URL}
+    healthcheck:
+      test: "curl --fail http://localhost:5040/healthy || exit"
+      interval: 10s
+      timeout: 30s
+      retries: 10
+    volumes:
+      - '../shared:/shared:z'
+      - './:/app:z'
+      - '/shared/bin'
+      - '/shared/obj'
+      - '/app/bin'
+      - '/app/obj'
+
+volumes:
+  chat-db-data:

@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Core.Abstractions.FileStorage;
 using Core.Abstractions.MailService;
 using Core.Data;
 using Core.Models;
@@ -13,6 +12,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Shared.Abstractions.FileStorage;
 
 namespace Core.Routes.Chats.Commands;
 

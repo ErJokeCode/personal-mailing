@@ -5,8 +5,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Notify.Data;
 using Notify.Routes.Notifications.DTOs;
-using Notify.Routes.Notifications.Errors;
 using Notify.Routes.Notifications.Maps;
+using Shared.Infrastructure.Errors.Notifications;
 
 namespace Notify.Routes.Notifications.Queries;
 

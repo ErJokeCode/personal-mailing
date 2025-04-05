@@ -2,20 +2,20 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Core.Abstractions.FileStorage;
 using Core.Abstractions.MailService;
 using Core.Abstractions.UserAccesor;
 using Core.Data;
 using Core.Models;
-using Core.Routes.Admins.Errors;
 using Core.Routes.Chats.DTOs;
-using Core.Routes.Chats.Errors;
 using Core.Routes.Chats.Maps;
-using Core.Routes.Groups.Errors;
 using FluentResults;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Shared.Abstractions.FileStorage;
+using Shared.Infrastructure.Errors.Admins;
+using Shared.Infrastructure.Errors.Chats;
+using Shared.Infrastructure.Errors.Groups;
 
 namespace Core.Routes.Chats.Commands;
 

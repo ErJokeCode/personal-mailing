@@ -3,11 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Core.Identity;
-using Core.Infrastructure.Errors;
-// using Core.Infrastructure.Metadata;
-using Core.Infrastructure.Rest;
 using Core.Routes.Admins.Queries;
-using Core.Routes.Notifications.Dtos;
 using Core.Routes.Students.Commands;
 using Core.Routes.Students.Dtos;
 using Core.Routes.Students.Queries;
@@ -18,6 +14,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Infrastructure.Errors;
+using Shared.Infrastructure.Rest;
 
 namespace Core.Routes.Students;
 

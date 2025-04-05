@@ -19,8 +19,5 @@ public class Student
     public DateOnly? DeactivatedAt { get; set; }
 
     [MapperIgnore]
-    public ICollection<Notification> Notifications { get; set; } = [];
-
-    [MapperIgnore]
     public ICollection<Chat> Chats { get; set; } = [];
 }

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using Core.Models;
 using Core.Routes.Documents.DTOs;
 using Riok.Mapperly.Abstractions;
+using Shared.Models;
 
 namespace Core.Routes.Documents.Maps;
 

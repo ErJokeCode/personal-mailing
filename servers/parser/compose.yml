@@ -4,7 +4,7 @@ services:
     ports:
       - 5011:27017
     volumes:
-      - parser-db-data:/var/lib/parser-db-data
+      - parser-db-data:/data/db
 
   parser:
     build: ./

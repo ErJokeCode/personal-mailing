@@ -10,4 +10,6 @@ public partial class AdminMapper
 {
     public partial AdminDto Map(Admin admin);
     public partial IEnumerable<AdminDto> Map(IEnumerable<Admin> admins);
+
+    public partial Shared.Messages.Admins.AdminDto MapToMessage(Admin admin);
 }

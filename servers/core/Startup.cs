@@ -5,16 +5,12 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Azure.Storage.Blobs;
-using Core.Abstractions.FileStorage;
 using Core.Abstractions.MailService;
 using Core.Abstractions.Parser;
 using Core.Abstractions.UserAccesor;
 using Core.Data;
 using Core.Identity;
-using Core.Infrastructure.Handlers;
 using Core.Infrastructure.Services;
-using Core.Messages.Admins;
-using Core.Messages.Students;
 using Core.Models;
 using Core.Routes;
 using Core.Routes.Admins.Commands;
@@ -36,6 +32,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Minio;
 using Scalar.AspNetCore;
+using Shared.Abstractions.FileStorage;
+using Shared.Infrastructure.Handlers;
+using Shared.Infrastructure.Services;
+using Shared.Messages.Admins;
+using Shared.Messages.Groups;
+using Shared.Messages.Students;
 
 namespace Core;
 
@@ -137,12 +139,6 @@ public static class Startup
         });
         builder.Services.AddScoped<IParser, Parser>();
 
-        builder.Services.Configure<MailServiceOptions>(o =>
-        {
-            o.MailServiceUrl = Environment.GetEnvironmentVariable("BOT_URL")!;
-        });
-        builder.Services.AddScoped<IMailService, TelegramBot>();
-
         builder.Services.AddMinio(
             configureClient => configureClient
                 .WithEndpoint(Environment.GetEnvironmentVariable("MINIO_URL"))
@@ -157,15 +153,22 @@ public static class Startup
         });
         builder.Services.AddSingleton<IFileStorage, MinioStorage>();
 
+        builder.Services.Configure<MailServiceOptions>(o =>
+        {
+            o.MailServiceUrl = Environment.GetEnvironmentVariable("BOT_URL")!;
+        });
+        builder.Services.AddScoped<IMailService, TelegramBot>();
+
         builder.Services.AddMassTransit(x =>
         {
             x.UsingInMemory();
 
             x.AddRider(rider =>
             {
-                rider.AddProducer<AdminCreatedMessage>("admin-created");
-                rider.AddProducer<StudentAuthedMessage>("student-authed");
-                rider.AddProducer<StudentsUpdatedMessage>("students-updated");
+                rider.AddProducer<AdminCreatedMessage>(AdminCreatedMessage.TopicName);
+                rider.AddProducer<StudentAuthedMessage>(StudentAuthedMessage.TopicName);
+                rider.AddProducer<StudentsUpdatedMessage>(StudentsUpdatedMessage.TopicName);
+                rider.AddProducer<GroupsAddedMessage>(GroupsAddedMessage.TopicName);
 
                 rider.UsingKafka((context, k) =>
                 {

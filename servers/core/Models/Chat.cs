@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Riok.Mapperly.Abstractions;
+using Shared.Models;
 
 namespace Core.Models;
 

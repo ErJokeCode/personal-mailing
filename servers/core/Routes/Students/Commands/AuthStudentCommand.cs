@@ -3,10 +3,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Abstractions.Parser;
 using Core.Data;
-using Core.Messages.Students;
 using Core.Models;
 using Core.Routes.Students.Dtos;
-using Core.Routes.Students.Errors;
 using Core.Routes.Students.Maps;
 using Core.Signal;
 using FluentResults;
@@ -14,17 +12,19 @@ using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
+using Shared.Infrastructure.Errors.Students;
+using Shared.Messages.Students;
 
 namespace Core.Routes.Students.Commands;
 
-public class AuthStudentCommand : IRequest<Result<StudentDto>>
+public class AuthStudentCommand : IRequest<Result<Dtos.StudentDto>>
 {
     public required string Email { get; set; }
     public required string PersonalNumber { get; set; }
     public required string ChatId { get; set; }
 }
 
-public class AuthStudentCommandHandler : IRequestHandler<AuthStudentCommand, Result<StudentDto>>
+public class AuthStudentCommandHandler : IRequestHandler<AuthStudentCommand, Result<Dtos.StudentDto>>
 {
     private readonly AppDbContext _db;
     private readonly IParser _parser;
@@ -41,7 +41,7 @@ public class AuthStudentCommandHandler : IRequestHandler<AuthStudentCommand, Res
         _topicProducer = topicProducer;
     }
 
-    public async Task<Result<StudentDto>> Handle(AuthStudentCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Dtos.StudentDto>> Handle(AuthStudentCommand request, CancellationToken cancellationToken)
     {
         var student = await _db.Students.SingleOrDefaultAsync(s => s.Email == request.Email, cancellationToken);
 
@@ -49,7 +49,7 @@ public class AuthStudentCommandHandler : IRequestHandler<AuthStudentCommand, Res
         {
             if (!student.Active || !CanAuth(request, student))
             {
-                return Result.Fail<StudentDto>(StudentErrors.AuthError());
+                return Result.Fail<Dtos.StudentDto>(StudentErrors.AuthError());
             }
 
             if (student.ChatId != request.ChatId)
@@ -65,7 +65,7 @@ public class AuthStudentCommandHandler : IRequestHandler<AuthStudentCommand, Res
 
         if (info is null)
         {
-            return Result.Fail<StudentDto>(StudentErrors.AuthError());
+            return Result.Fail<Dtos.StudentDto>(StudentErrors.AuthError());
         }
 
         student = new Student()
@@ -78,7 +78,7 @@ public class AuthStudentCommandHandler : IRequestHandler<AuthStudentCommand, Res
 
         if (!CanAuth(request, student))
         {
-            return Result.Fail<StudentDto>(StudentErrors.AuthError());
+            return Result.Fail<Dtos.StudentDto>(StudentErrors.AuthError());
         }
 
         await _db.Students.AddAsync(student, cancellationToken);
@@ -89,7 +89,7 @@ public class AuthStudentCommandHandler : IRequestHandler<AuthStudentCommand, Res
 
         await _topicProducer.Produce(new StudentAuthedMessage()
         {
-            Student = dto
+            Student = _mapper.MapToMessage(student)
         });
 
         return Result.Ok(dto);

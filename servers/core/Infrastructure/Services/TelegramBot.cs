@@ -5,12 +5,11 @@ using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
-using Core.Abstractions;
-using Core.Abstractions.FileStorage;
 using Core.Abstractions.MailService;
-using Core.Models;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
+using Shared.Abstractions.FileStorage;
+using Shared.Models;
 
 namespace Core.Infrastructure.Services;
 

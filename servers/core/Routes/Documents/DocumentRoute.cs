@@ -1,6 +1,5 @@
 using System;
 using System.Threading.Tasks;
-using Core.Infrastructure.Errors;
 using Core.Routes.Documents.Commands;
 using FluentValidation;
 using MediatR;
@@ -8,6 +7,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Infrastructure.Errors;
 
 namespace Core.Routes.Documents;
 

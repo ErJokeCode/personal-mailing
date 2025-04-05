@@ -87,23 +87,25 @@ public static class Startup
                 rider.AddConsumer<StudentAuthedConsumer>();
                 rider.AddConsumer<StudentsUpdatedConsumer>();
 
+                const string ServiceName = "notify-";
+
                 rider.UsingKafka((context, k) =>
                 {
                     k.Host(Environment.GetEnvironmentVariable("KAFKA_URL"));
 
-                    k.TopicEndpoint<AdminCreatedMessage>("admin-created", "notify-admin-created", e =>
+                    k.TopicEndpoint<AdminCreatedMessage>(AdminCreatedMessage.TopicName, ServiceName + AdminCreatedMessage.TopicName, e =>
                     {
                         e.CreateIfMissing();
                         e.ConfigureConsumer<AdminCreatedConsumer>(context);
                     });
 
-                    k.TopicEndpoint<StudentAuthedMessage>("student-authed", "notify-student-authed", e =>
+                    k.TopicEndpoint<StudentAuthedMessage>(StudentAuthedMessage.TopicName, ServiceName + StudentAuthedMessage.TopicName, e =>
                     {
                         e.CreateIfMissing();
                         e.ConfigureConsumer<StudentAuthedConsumer>(context);
                     });
 
-                    k.TopicEndpoint<StudentsUpdatedMessage>("students-updated", "notify-students-updated", e =>
+                    k.TopicEndpoint<StudentsUpdatedMessage>(StudentsUpdatedMessage.TopicName, ServiceName + StudentsUpdatedMessage.TopicName, e =>
                     {
                         e.CreateIfMissing();
                         e.ConfigureConsumer<StudentsUpdatedConsumer>(context);

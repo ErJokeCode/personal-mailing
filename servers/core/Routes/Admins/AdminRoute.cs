@@ -2,20 +2,19 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Core.Infrastructure.Errors;
-using Core.Infrastructure.Rest;
 using Core.Routes;
 using Core.Routes.Admins.Commands;
 using Core.Routes.Admins.Dtos;
 using Core.Routes.Admins.Queries;
 using Core.Routes.Admins.Validators;
-using Core.Routes.Notifications.Dtos;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Infrastructure.Errors;
+using Shared.Infrastructure.Rest;
 
 namespace Core.Routes.Admins;
 

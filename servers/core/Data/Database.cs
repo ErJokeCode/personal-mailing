@@ -11,7 +11,6 @@ namespace Core.Data;
 public class AppDbContext : IdentityDbContext<Admin, IdentityRole<Guid>, Guid>
 {
     public DbSet<Student> Students => Set<Student>();
-    public DbSet<Notification> Notifications => Set<Notification>();
     public DbSet<AdminAuthTicket> AdminAuthTickets => Set<AdminAuthTicket>();
     public DbSet<GroupAssignment> GroupAssignments => Set<GroupAssignment>();
     public DbSet<Chat> Chats => Set<Chat>();

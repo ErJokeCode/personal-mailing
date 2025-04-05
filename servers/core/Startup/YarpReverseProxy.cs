@@ -31,6 +31,24 @@ public static class YarpReverseProxy
             },
             new RouteConfig()
             {
+                RouteId = "chat-route",
+                ClusterId = "chat-cluster",
+                Match = new RouteMatch
+                {
+                    Path = "/core/chats/{**catch-all}"
+                },
+            },
+            new RouteConfig()
+            {
+                RouteId = "group-route",
+                ClusterId = "chat-cluster",
+                Match = new RouteMatch
+                {
+                    Path = "/core/groups/{**catch-all}"
+                },
+            },
+            new RouteConfig()
+            {
                 RouteId = "base-route",
                 ClusterId = "base-cluster",
                 Match = new RouteMatch
@@ -71,6 +89,21 @@ public static class YarpReverseProxy
                         new DestinationConfig()
                         {
                             Address = "http://notify:5030"
+                        }
+                    },
+                }
+            },
+            new ClusterConfig
+            {
+                ClusterId = "chat-cluster",
+
+                Destinations = new Dictionary<string, DestinationConfig>(StringComparer.OrdinalIgnoreCase)
+                {
+                    {
+                        "destination",
+                        new DestinationConfig()
+                        {
+                            Address = "http://chat:5040"
                         }
                     },
                 }

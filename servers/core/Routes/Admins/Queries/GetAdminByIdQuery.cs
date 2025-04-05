@@ -1,14 +1,13 @@
-
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Data;
 using Core.Routes.Admins.Dtos;
-using Core.Routes.Admins.Errors;
 using Core.Routes.Admins.Maps;
 using FluentResults;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Shared.Infrastructure.Errors.Admins;
 
 namespace Core.Routes.Admins.Queries;
 

@@ -8,7 +8,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - notify-db-data:/var/lib/notify-db-data
+      - notify-db-data:/var/lib/postgresql/data
 
   notify:
     build:

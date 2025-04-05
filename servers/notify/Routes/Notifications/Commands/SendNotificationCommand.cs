@@ -11,9 +11,11 @@ using Notify.Abstractions.UserAccessor;
 using Notify.Data;
 using Notify.Models;
 using Notify.Routes.Notifications.DTOs;
-using Notify.Routes.Notifications.Errors;
 using Notify.Routes.Notifications.Maps;
 using Shared.Abstractions.FileStorage;
+using Shared.Infrastructure.Errors.Admins;
+using Shared.Infrastructure.Errors.Notifications;
+using Shared.Infrastructure.Errors.Students;
 
 namespace Notify.Routes.Notifications.Commands;
 

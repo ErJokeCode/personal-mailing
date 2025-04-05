@@ -4,14 +4,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Abstractions.UserAccesor;
 using Core.Data;
-using Core.Infrastructure.Rest;
 using Core.Models;
-using Core.Routes.Admins.Errors;
 using Core.Routes.Chats.DTOs;
 using Core.Routes.Chats.Maps;
 using FluentResults;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Shared.Infrastructure.Rest;
 
 namespace Core.Routes.Chats.Queries;
 

@@ -4,10 +4,10 @@ using System.Reflection.Metadata;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Abstractions;
-using Core.Abstractions.FileStorage;
-using Core.Routes.Documents.Errors;
 using FluentResults;
 using MediatR;
+using Shared.Abstractions.FileStorage;
+using Shared.Infrastructure.Errors.Documents;
 
 namespace Core.Routes.Documents.Commands;
 

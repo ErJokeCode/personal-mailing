@@ -2,10 +2,10 @@ using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Models;
-using Core.Routes.Admins.Errors;
 using FluentResults;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Shared.Infrastructure.Errors.Admins;
 
 namespace Core.Routes.Admins.Commands;
 

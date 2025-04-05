@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Core.Models;
+using Shared.Models;
 
 namespace Core.Abstractions.MailService;
 

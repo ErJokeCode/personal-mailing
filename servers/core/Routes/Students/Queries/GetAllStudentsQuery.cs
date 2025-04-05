@@ -5,12 +5,12 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Data;
-using Core.Infrastructure.Rest;
 using Core.Models;
 using Core.Routes.Students.Dtos;
 using Core.Routes.Students.Maps;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Shared.Infrastructure.Rest;
 
 namespace Core.Routes.Students.Queries;
 

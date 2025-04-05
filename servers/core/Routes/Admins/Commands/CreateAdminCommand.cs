@@ -4,25 +4,25 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Core.Messages.Admins;
 using Core.Models;
 using Core.Routes.Admins.Dtos;
-using Core.Routes.Admins.Errors;
 using Core.Routes.Admins.Maps;
 using FluentResults;
 using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Shared.Infrastructure.Errors.Admins;
+using Shared.Messages.Admins;
 
 namespace Core.Routes.Admins.Commands;
 
-public class CreateAdminCommand : IRequest<Result<AdminDto>>
+public class CreateAdminCommand : IRequest<Result<Dtos.AdminDto>>
 {
     public required string Email { get; init; }
     public required string Password { get; init; }
 }
 
-public class CreateAdminCommandHandler : IRequestHandler<CreateAdminCommand, Result<AdminDto>>
+public class CreateAdminCommandHandler : IRequestHandler<CreateAdminCommand, Result<Dtos.AdminDto>>
 {
     private readonly UserManager<Admin> _userManager;
     private readonly AdminMapper _mapper;
@@ -35,7 +35,7 @@ public class CreateAdminCommandHandler : IRequestHandler<CreateAdminCommand, Res
         _topicProducer = topicProducer;
     }
 
-    public async Task<Result<AdminDto>> Handle(CreateAdminCommand request, CancellationToken cancellationToken)
+    public async Task<Result<Dtos.AdminDto>> Handle(CreateAdminCommand request, CancellationToken cancellationToken)
     {
         var user = await _userManager.FindByNameAsync(request.Email);
 
@@ -62,7 +62,7 @@ public class CreateAdminCommandHandler : IRequestHandler<CreateAdminCommand, Res
 
         await _topicProducer.Produce(new AdminCreatedMessage()
         {
-            Admin = dto
+            Admin = _mapper.MapToMessage(newUser)
         });
 
         return Result.Ok(dto);

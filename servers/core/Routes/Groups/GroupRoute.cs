@@ -1,7 +1,5 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Core.Infrastructure.Errors;
-using Core.Infrastructure.Rest;
 using Core.Routes.Admins.Queries;
 using Core.Routes.Groups.Commands;
 using Core.Routes.Groups.DTOs;
@@ -12,6 +10,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Infrastructure.Errors;
+using Shared.Infrastructure.Rest;
 
 namespace Core.Routes.Groups;
 
@@ -19,14 +19,14 @@ public class GroupRoute : IRoute
 {
     public void MapRoutes(WebApplication app)
     {
-        var group = app.MapGroup("/core/groups")
-            .RequireAuthorization();
+        // var group = app.MapGroup("/core/groups")
+        //     .RequireAuthorization();
 
-        group.MapGet("/", GetAllGroups)
-            .WithDescription("Получет все привязывания групп");
+        // group.MapGet("/", GetAllGroups)
+        //     .WithDescription("Получет все привязывания групп");
 
-        group.MapPatch("/", AssignGroups)
-            .WithDescription("Привязывает группы к админу");
+        // group.MapPatch("/", AssignGroups)
+        //     .WithDescription("Привязывает группы к админу");
     }
 
     private async Task<Ok<PagedList<GroupAssignmentDto>>> GetAllGroups([AsParameters] GetAllGroupsQuery query, IMediator mediator)

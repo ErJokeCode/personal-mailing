@@ -4,14 +4,13 @@ using System.Threading.Tasks;
 using Core.Abstractions.UserAccesor;
 using Core.Data;
 using Core.Models;
-using Core.Routes.Admins.Errors;
 using Core.Routes.Chats.DTOs;
 using Core.Routes.Chats.Maps;
-using Core.Routes.Groups.Errors;
-using Core.Routes.Students.Errors;
 using FluentResults;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Shared.Infrastructure.Errors.Admins;
+using Shared.Infrastructure.Errors.Groups;
 
 public class GetChatById : IRequest<Result<ChatDto>>
 {

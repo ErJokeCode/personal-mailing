@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Core.Models;
-using Core.Routes.Notifications.Dtos;
 
 namespace Core.Routes.Admins.Dtos;
 

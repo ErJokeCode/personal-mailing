@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Core.Abstractions.Parser;
 using Core.Data;
 using Core.Routes.Students.Dtos;
-using Core.Routes.Students.Errors;
 using Core.Routes.Students.Maps;
 using FluentResults;
 using MediatR;
@@ -13,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Shared.Infrastructure.Errors.Students;
 
 namespace Core.Routes.Students.Queries;
 

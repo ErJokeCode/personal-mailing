@@ -4,7 +4,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Data;
-using Core.Infrastructure.Rest;
 using Core.Models;
 using Core.Routes.Admins.Dtos;
 using Core.Routes.Admins.Maps;
@@ -12,6 +11,7 @@ using Core.Routes.Groups.DTOs;
 using Core.Routes.Groups.Maps;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Shared.Infrastructure.Rest;
 
 namespace Core.Routes.Groups.Queries;
 

@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Core.Identity;
-using Core.Infrastructure.Errors;
-using Core.Infrastructure.Rest;
 using Core.Routes.Chats.Commands;
 using Core.Routes.Chats.DTOs;
 using Core.Routes.Chats.Maps;
@@ -16,6 +14,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using Shared.Infrastructure.Errors;
+using Shared.Infrastructure.Rest;
 
 namespace Core.Routes.Chats;
 
@@ -23,30 +23,30 @@ public class ChatRoute : IRoute
 {
     public void MapRoutes(WebApplication app)
     {
-        var group = app.MapGroup("/core/chats")
-            .RequireAuthorization();
+        // var group = app.MapGroup("/core/chats")
+        //     .RequireAuthorization();
 
-        group.MapGet("/", GetChats)
-            .WithDescription("Получает чаты админа");
+        // group.MapGet("/", GetChats)
+        //     .WithDescription("Получает чаты админа");
 
-        group.MapPost("/", SendMessage)
-            .WithDescription("Отправляет сообщение студенту")
-            .DisableAntiforgery();
+        // group.MapPost("/", SendMessage)
+        //     .WithDescription("Отправляет сообщение студенту")
+        //     .DisableAntiforgery();
 
-        group.MapPost("/from-student", SendMessageFromStudent)
-            .WithDescription("Отправляет сообщение админу")
-            .WithTags(SecretTokenAuthentication.Tag)
-            .RequireAuthorization(SecretTokenAuthentication.Policy)
-            .DisableAntiforgery();
+        // group.MapPost("/from-student", SendMessageFromStudent)
+        //     .WithDescription("Отправляет сообщение админу")
+        //     .WithTags(SecretTokenAuthentication.Tag)
+        //     .RequireAuthorization(SecretTokenAuthentication.Policy)
+        //     .DisableAntiforgery();
 
-        group.MapGet("/{studentId}", GetChatById)
-            .WithDescription("Получает чат со студентом по айди");
+        // group.MapGet("/{studentId}", GetChatById)
+        //     .WithDescription("Получает чат со студентом по айди");
 
-        group.MapPatch("/{studentId}/read", ReadChat)
-            .WithDescription("Делает чат прочитанным");
+        // group.MapPatch("/{studentId}/read", ReadChat)
+        //     .WithDescription("Делает чат прочитанным");
 
-        group.MapGet("/{studentId}/messages", GetMessages)
-            .WithDescription("Получает сообщения в чате");
+        // group.MapGet("/{studentId}/messages", GetMessages)
+        //     .WithDescription("Получает сообщения в чате");
     }
 
     private async Task<Results<Ok<PagedList<MessageDto>>, NotFound<ProblemDetails>>> GetMessages([AsParameters] GetMessagesQuery query, IMediator mediator)
