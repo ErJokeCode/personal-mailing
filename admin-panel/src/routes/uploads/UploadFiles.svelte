@@ -1,14 +1,10 @@
 <script lang="ts">
     import {
-        Breadcrumb,
-        BreadcrumbItem,
         Fileupload,
         Button,
         Helper,
         Heading,
         A,
-    } from "flowbite-svelte";
-    import {
         TableHeadCell,
         Table,
         TableBody,

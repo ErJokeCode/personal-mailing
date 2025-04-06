@@ -2,7 +2,6 @@
     import { active, route } from "@mateothegreat/svelte5-router";
     import {
         Sidebar,
-        SidebarDropdownItem,
         SidebarDropdownWrapper,
         SidebarWrapper,
     } from "flowbite-svelte";

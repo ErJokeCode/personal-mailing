@@ -1,7 +1,5 @@
 <script lang="ts">
     import {
-        Breadcrumb,
-        BreadcrumbItem,
         Heading,
         Accordion,
         AccordionItem,

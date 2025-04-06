@@ -7,4 +7,4 @@ export const StudentsApi = `${ServerUrl}/core/students`;
 export const NotificationsApi = `${ServerUrl}/core/notifications`;
 export const ChatsApi = `${ServerUrl}/core/chats`;
 export const DocumentsApi = `${ServerUrl}/core/documents`;
-
+export const Base = `${ServerUrl}/base`;

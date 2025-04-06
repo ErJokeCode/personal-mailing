@@ -26,17 +26,20 @@
     function resetHistory() {
         RouteHistory.isClear = true;
     }
-
-    export let fluid = true;
+    
     export let drawerHidden = false;
+
+    let fluid = true;
 </script>
 
 <header class="border-b border-b-gray-200 dark:border-b-gray-600">
     <Navbar {fluid} class="text-black">
-        <NavHamburger
-            onClick={() => (drawerHidden = !drawerHidden)}
-            class="m-0 me-3 md:block lg:hidden"
-        />
+        {#if Me.value !== null}
+            <NavHamburger
+                onClick={() => (drawerHidden = !drawerHidden)}
+                class="m-0 me-3 md:block lg:hidden"
+            />
+        {/if}
         <a use:route on:click={resetHistory} href="/" class="lg:w-60">
             <span class="ml-px self-center whitespace-nowrap text-xl font-semibold dark:text-white sm:text-2xl px-5">
                 Админ панель
@@ -48,15 +51,14 @@
                 <ToolbarButton class="mr-2 hover:text-gray-900 dark:hover:text-white" on:click={signout}>
                     <ArrowRightToBracketOutline size="lg" />
                 </ToolbarButton>
+                <NotificationList />
             {:else}
                 <ToolbarButton class="mr-2 hover:text-gray-900 dark:hover:text-white" on:click={login}>
                     <ArrowLeftToBracketOutline size="lg" />
                 </ToolbarButton>
             {/if}
 
-            <NotificationList />
-
-            <DarkMode size="lg" />
+            <DarkMode size="md" />
         </div>
     </Navbar>
 </header>

@@ -57,11 +57,10 @@
     }
 </script>
 
-<div class="p-4 px-6">
-    <Heading
-        tag="h1"
-        class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl flex justify-between items-end">
-        Студенты
+<div class="p-4 flex justify-between">
+    <Heading tag="h2">Все студенты</Heading>
+    <div
+        class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl px-6 ">
         <div class="flex space-x-2">
             <Button on:click={() => toPage(curPage - 1)}
                 ><ChevronLeftOutline size="lg" /></Button>
@@ -80,7 +79,7 @@
             <Button on:click={() => toPage(curPage + 1)}
                 ><ChevronRightOutline size="lg" /></Button>
         </div>
-    </Heading>
+    </div>
 </div>
 <Table hoverable={true}>
     <TableHead>

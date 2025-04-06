@@ -152,7 +152,7 @@
             component: BaseAdd,
         },
         {
-            path: "base-edit",
+            path: "base-edit/(?<itemId>.*)",
             component: BaseEdit,
         },
         {

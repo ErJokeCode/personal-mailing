@@ -2,8 +2,6 @@
     import {
         Button,
         Heading,
-        SpeedDial,
-        SpeedDialButton,
         Table,
         TableBody,
         TableBodyCell,
@@ -11,11 +9,10 @@
         TableHead,
         TableHeadCell,
     } from "flowbite-svelte";
-    import { createPaged } from "/src/lib/components/Paged.svelte";
     import PagedList from "/src/lib/components/PagedList.svelte";
-    import { NotificationsApi, PageSize, StudentsApi } from "/src/lib/server";
-    import { goto, QueryString } from "@mateothegreat/svelte5-router";
-    import { CirclePlusOutline, ClipboardOutline } from "flowbite-svelte-icons";
+    import { PageSize, StudentsApi } from "/src/lib/server";
+    import { goto } from "@mateothegreat/svelte5-router";
+    import { ClipboardOutline } from "flowbite-svelte-icons";
     import { signal } from "/src/lib/utils/signal";
     import { onDestroy } from "svelte";
     import { ActiveStudents } from "/src/stores/students/ActiveStudents.svelte";

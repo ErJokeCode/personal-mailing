@@ -5,7 +5,6 @@
         Button,
         Checkbox,
         Heading,
-        Spinner,
         Table,
         TableBody,
         TableBodyCell,

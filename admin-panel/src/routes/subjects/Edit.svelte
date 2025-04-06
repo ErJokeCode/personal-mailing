@@ -19,7 +19,6 @@
     import { CirclePlusOutline } from "flowbite-svelte-icons";
     import http from "/src/lib/utils/http";
     import { ServerUrl } from "/src/lib/server";
-    import { route } from "@mateothegreat/svelte5-router";
 
     let dictNames = $state([]);
     let allCourseNamesInFile = $state([]);
@@ -117,7 +116,7 @@
             <TableBodyRow>
                 <TableBodyCell class="px-8">
                     <select
-                        on:change={(event) =>
+                        onchange={(event) =>
                             // @ts-ignore
                             save(dict._id, event.target.value, "f")}
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500">
@@ -133,7 +132,7 @@
                 </TableBodyCell>
                 <TableBodyCell class="px-8">
                     <select
-                        on:change={(event) =>
+                        onchange={(event) =>
                             // @ts-ignore
                             save(dict._id, event.target.value, "s")}
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500">
@@ -149,7 +148,7 @@
                 </TableBodyCell>
                 <TableBodyCell class="px-8">
                     <select
-                        on:change={(event) =>
+                        onchange={(event) =>
                             // @ts-ignore
                             save(dict._id, event.target.value, "m")}
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500">

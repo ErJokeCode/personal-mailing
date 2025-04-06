@@ -13,7 +13,7 @@
         Checkbox,
     } from "flowbite-svelte";
     import { onMount } from "svelte";
-    import { route } from "@mateothegreat/svelte5-router";
+    import Breadcrumbs from "/src/lib/components/Breadcrumbs.svelte";
     import { ServerUrl } from "/src/lib/server";
 
     let courses = $state([]);
@@ -214,13 +214,7 @@
 </script>
 
 <Panel class="m-4">
-    <Breadcrumb class="mb-5">
-        <a class="inline-flex items-center text-sm font-medium text-gray-700 hover:text-gray-900 dark:text-gray-400 dark:hover:text-white"
-            use:route href="/"><svg class="w-4 h-4 me-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-            <path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 01
-            1 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"></path></svg>Главная</a>
-        <BreadcrumbItem>База знаний</BreadcrumbItem>
-    </Breadcrumb>
+    <Breadcrumbs pathItems={[{ isHome: true }, { name: "Конструктор онбординга" }]} />
     <Heading
         tag="h1"
         class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl mb-4">
@@ -232,11 +226,11 @@
         {#each courses as course, course_index}
             <AccordionItem borderOpenClass='border-s border-e border-b border-gray-200 dark:border-gray-700'>
                 <span slot="header">{course.name}</span>
-                <Label class="space-y-2 mb-5">
+                <Label class="mb-5">
                     <span>Название</span>
                     <Input
                         bind:value={course.name}
-                        class="border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700"
+                        class="border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 mt-2"
                         placeholder={course.name}
                         size="md" />
                 </Label>
@@ -252,48 +246,48 @@
                         on:click={() => (course.is_active = !course.is_active)}
                         >Активный курс</Checkbox>
                 </div>
-                <div class="mb-5 space-x-4">
-                    <Button on:click={() => add_section(course_index)}
+                <div class="space-x-4">
+                    <Button class='mb-5' on:click={() => add_section(course_index)}
                         >Добавить раздел</Button>
-                    <Button on:click={() => delete_course(course._id)}
+                    <Button class='mb-5' on:click={() => delete_course(course._id)}
                         >Удалить курс</Button>
                 </div>
                 <Accordion class='mb-5' multiple classActive='dark:bg-gray-600 dark:focus:ring-gray-700'>
                     {#each course.sections as section, section_index}
                         <AccordionItem borderOpenClass='border-s border-e border-b border-gray-200 dark:border-gray-700'>
                             <span slot="header">{section.name}</span>
-                            <Label class="space-y-2 mb-3 w-full mr-5">
+                            <Label class="mb-3 w-full mr-5">
                                 <span>Название</span>
                                 <Input
                                     bind:value={section.name}
-                                    class="border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700"
+                                    class="border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 mt-2"
                                     placeholder={section.name}
                                     size="md" />
                             </Label>
-                            <Label class="space-y-2 mb-5 w-full">
+                            <Label class="mb-5 w-full">
                                 <span>Callback data</span>
                                 <Input
                                     bind:value={section.callback_data}
-                                    class="border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700"
+                                    class="border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 mt-2"
                                     placeholder={section.callback_data}
                                     size="md" />
                             </Label>
-                            <div class="mb-5 space-x-4">
-                                <Button
+                            <div class="space-x-4">
+                                <Button class='mb-5'
                                     on:click={() =>
                                         add_topic(course_index, section_index)}
                                     >Добавить тему</Button>
-                                <Button
+                                <Button class='mb-5'
                                     on:click={() =>
                                         section_up(course_index, section_index)}
                                     >Раздел вверх</Button>
-                                <Button
+                                <Button class='mb-5'
                                     on:click={() =>
                                         section_down(
                                             course_index,
                                             section_index,
                                         )}>Раздел вниз</Button>
-                                <Button
+                                <Button class='mb-5'
                                     on:click={() =>
                                         delete_section(
                                             course_index,
@@ -305,30 +299,30 @@
                                     <AccordionItem borderOpenClass='border-s border-e border-b border-gray-200 dark:border-gray-700'>
                                         <span slot="header">{topic.name}</span>
                                         <Label
-                                            class="space-y-2 mb-5 w-full mr-5">
+                                            class="mb-5 w-full mr-5">
                                             <span>Название</span>
                                             <Input
                                                 bind:value={topic.name}
-                                                class="border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700"
+                                                class="border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 mt-2"
                                                 placeholder={topic.name}
                                                 size="md" />
                                         </Label>
-                                        <div class="mb-3 space-x-4">
-                                            <Button
+                                        <div class="space-x-4">
+                                            <Button class='mb-3'
                                                 on:click={() =>
                                                     topic_up(
                                                         course_index,
                                                         section_index,
                                                         topic_index,
                                                     )}>Тема вверх</Button>
-                                            <Button
+                                            <Button class='mb-3'
                                                 on:click={() =>
                                                     topic_down(
                                                         course_index,
                                                         section_index,
                                                         topic_index,
                                                     )}>Тема вниз</Button>
-                                            <Button
+                                            <Button class='mb-3'
                                                 on:click={() =>
                                                     delete_topic(
                                                         course_index,
@@ -336,28 +330,28 @@
                                                         topic_index,
                                                     )}>Удалить тему</Button>
                                         </div>
-                                        <Label class="space-y-2 mb-3 w-full">
+                                        <Label class="mb-3 w-full">
                                             <span>Текст</span>
                                             <Input
                                                 bind:value={topic.text}
-                                                class="border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700"
+                                                class="border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 mt-2"
                                                 placeholder={topic.text}
                                                 size="md" />
                                         </Label>
                                         <Label
-                                            class="space-y-2 mb-3 w-full mr-5">
+                                            class="mb-3 w-full mr-5">
                                             <span>Вопрос</span>
                                             <Input
                                                 bind:value={topic.question}
-                                                class="border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700"
+                                                class="border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 mt-2"
                                                 placeholder={topic.question}
                                                 size="md" />
                                         </Label>
-                                        <Label class="space-y-2 w-full">
+                                        <Label class="w-full">
                                             <span>Ответ</span>
                                             <Input
                                                 bind:value={topic.answer}
-                                                class="border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700"
+                                                class="border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 mt-2"
                                                 placeholder={topic.answer}
                                                 size="md" />
                                         </Label>

@@ -17,7 +17,7 @@
     }
 </script>
 
-<Alert class={restProps.class ?? ""}>
+<Alert class={restProps.class ?? "" + "m-4"}>
     <div class="flex items-center gap-2">
         <InfoCircleOutline class="w-6 h-6" />
         <span class="text-2xl font-medium">{title}</span>

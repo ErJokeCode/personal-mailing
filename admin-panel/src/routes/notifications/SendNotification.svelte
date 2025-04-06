@@ -37,13 +37,13 @@
     ];
 
     const costItems = [
-        { name: "", value: "" },
+        { name: "Не выбрано", value: "" },
         { name: "Бюджет", value: "Бюджет" },
         { name: "Контракт", value: "Контракт" },
     ];
 
     const educationItems = [
-        { name: "", value: "" },
+        { name: "Не выбрано", value: "" },
         { name: "Очная", value: "Очная" },
         { name: "Очно-заочная", value: "Очно-заочная" },
         { name: "Заочная", value: "Заочная" },
@@ -331,7 +331,7 @@
 
             {@render inputText(
                 "subject",
-                "Предмета",
+                "Предмет",
                 "subject",
                 "Название предмета",
             )}
