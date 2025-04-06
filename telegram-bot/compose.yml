@@ -18,6 +18,8 @@ services:
         condition: service_healthy
     volumes:
       - './:/app:z'
+    env_file:
+      - ../.env
 
 volumes:
   bot-db-data:

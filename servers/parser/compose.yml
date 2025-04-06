@@ -20,6 +20,8 @@ services:
       retries: 10
     volumes:
       - './:/app:z'
+    env_file:
+      - ../../.env
 
 volumes:
   parser-db-data:

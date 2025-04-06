@@ -29,6 +29,8 @@ services:
         condition: service_healthy
       core-storage:
         condition: service_started
+      base:
+        condition: service_started
     healthcheck:
       test: "curl --fail http://localhost:5000/healthy || exit"
       interval: 10s
@@ -38,6 +40,8 @@ services:
       - './:/app:z'
       - '/app/bin'
       - '/app/obj'
+    env_file:
+      - ../../../.env
 
 volumes:
   core-db-data:
