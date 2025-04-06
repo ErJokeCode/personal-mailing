@@ -3,3 +3,5 @@
 __pycache__
 .env
 venv
+/admin-panel/.pnpm-store
+/admin-panel2-revenge-of-the-backender/node_modules
