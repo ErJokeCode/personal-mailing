@@ -168,7 +168,7 @@
     <Heading tag="h2" class="inline align-middle">Группы</Heading>
 </div>
 
-<div class="flex m-4 gap-4">
+<div class="flex m-4 gap-4 flex-wrap">
     <Panel class="flex-1">
         {#if AllGroups.adminId}
             <Badge

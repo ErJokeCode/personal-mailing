@@ -27,8 +27,6 @@
     import ToastNotifications from "/src/lib/components/ToastNotifications.svelte";
     import { Base } from "/src/lib/server";
 
-    // let baseurl = 'http://localhost:8080/api/v1';
-
     let notifications: ToastNotifications;
 
     let categories = $state([]);

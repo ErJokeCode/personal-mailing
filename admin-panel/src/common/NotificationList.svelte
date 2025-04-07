@@ -49,7 +49,7 @@
     {/if}
 </ToolbarButton>
 
-<Popover title="Уведомления" triggeredBy="#bell" trigger="click">
+<Popover title="Уведомления" triggeredBy="#bell" trigger="click" class="z-[100]" arrow={false}>
     {#if chats.length <= 0}
         Нет уведомлений
     {:else}

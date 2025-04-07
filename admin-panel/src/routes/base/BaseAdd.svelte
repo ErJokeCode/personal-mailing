@@ -131,7 +131,7 @@
     </form>
 
     <div class="mb-5">
-        <Label for="textarea-id" class="mb-2">Вопрос</Label>
+        <Label class="mb-2">Вопрос</Label>
         <Textarea
             bind:value={question}
             placeholder="Введите текст"
@@ -139,7 +139,7 @@
     </div>
 
     <div class="mb-5">
-        <Label for="textarea-id" class="mb-2">Ответ (опционально)</Label>
+        <Label class="mb-2">Ответ (опционально)</Label>
         <Textarea
             bind:value={answer}
             placeholder="Введите текст"

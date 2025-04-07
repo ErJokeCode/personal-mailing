@@ -70,7 +70,6 @@
         if (!response.ok) {
             errorMessage = json.detail;
         }
-        console.log(json)
         knowledgeItem = json;
         question = knowledgeItem.question;
         answer = knowledgeItem.answer;
@@ -167,20 +166,17 @@
     }
 
     function filteredChats() {
-        return chats.filter(chat =>
-            chat.student.email.toLowerCase().includes(search.toLowerCase())
+        return chats.filter(chat => 
+                chat.student.email.toLowerCase().includes(search.toLowerCase())
+                    || chat.student.info.group.number.toLowerCase().includes(search.toLowerCase())
+                    || chat.student.info.surname.toLowerCase().includes(search.toLowerCase())
+                    || chat.student.info.name.toLowerCase().includes(search.toLowerCase())
+                    || chat.student.info.patronymic.toLowerCase().includes(search.toLowerCase())
         );
     }
 
     function toDate(rawDate) {
-        return new Date(rawDate).toLocaleString("ru-RU", {
-            day: "numeric",
-            month: "long",
-            year: "numeric",
-            hour: "2-digit",
-            minute: "2-digit",
-            second: "2-digit"
-        });
+        return new Date(rawDate).toLocaleString("ru");
     }
     
     function handleKeydown(event) {
@@ -268,7 +264,7 @@
             </div>
     
             <div class="mb-5">
-                <Label for="textarea-id" class="mb-2">Вопрос</Label>
+                <Label class="mb-2">Вопрос</Label>
                 <Textarea
                     bind:value={question}
                     placeholder="Введите текст"
@@ -276,7 +272,7 @@
             </div>
     
             <div class="mb-5">
-                <Label for="textarea-id" class="mb-2">Ответ</Label>
+                <Label class="mb-2">Ответ</Label>
                 <Textarea
                     bind:value={answer}
                     placeholder="Введите текст"
@@ -360,13 +356,21 @@
                             <ul class="max-h-60 overflow-y-auto" role="listbox">
                                 {#each filteredChats() as chat, index}
                                     <li
-                                        class="p-2 cursor-pointer {index === highlightedIndex ? 'bg-gray-200 dark:bg-gray-600' : 'hover:bg-gray-100 dark:hover:bg-gray-600'}"
+                                        class="py-2 px-3 cursor-pointer flex justify-between hover:rounded {index === highlightedIndex ? 'bg-gray-200 dark:bg-gray-600' : 'hover:bg-gray-100 dark:hover:bg-gray-600'}"
                                         onclick={() => selectChat(chat)}
                                         role="option"
                                         aria-selected={index === highlightedIndex}
                                         onkeydown={(e) => e.key === "Enter" && selectChat(chat)}
                                     >
-                                        {chat.student.email}
+                                        <div>
+                                            {chat.student.email}
+                                        </div>
+                                        <div >
+                                            {chat.student.info.surname} {chat.student.info.name[0]}. {chat.student.info.patronymic[0]}. 
+                                        </div>
+                                        <div>
+                                            {chat.student.info.group.number}
+                                        </div>
                                     </li>
                                 {/each}
                             </ul>

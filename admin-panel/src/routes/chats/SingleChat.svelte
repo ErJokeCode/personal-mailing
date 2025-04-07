@@ -38,14 +38,25 @@
 
     signal.on("MessageReceived", handleMessageReceived);
 
+    function handleKeyDown(event: KeyboardEvent) {
+        if (event.key === "Escape") {
+            closeImage();
+        }
+    }
+
     onMount(async () => {
         await getChat();
         await getMessages();
         await makeRead();
+        window.addEventListener("keydown", handleKeyDown);
+        if (paged.hasNextPage && container.scrollHeight <= container.clientHeight) {
+            await loadMore();
+        }
     });
 
     onDestroy(() => {
         signal.off("MessageReceived", handleMessageReceived);
+        window.removeEventListener("keydown", handleKeyDown);
     });
 
     async function handleMessageReceived(message) {
@@ -179,6 +190,29 @@
             await sendMessage();
         }
     }
+    
+    let modalImage: string = $state(null);
+
+    function openImage(src: string) {
+        modalImage = src;
+    }
+
+    function closeImage() {
+        modalImage = null;
+    }
+    
+    let container: HTMLDivElement = $state();
+    let isLoadingMore = $state(false);
+
+    async function handleScroll() {
+        if (container.scrollTop + container.scrollHeight - container.clientHeight < 3 && paged.hasNextPage && !isLoadingMore) {
+            isLoadingMore = true;
+
+            await loadMore();
+
+            isLoadingMore = false;
+        }
+    }
 </script>
 
 <ToastNotifications bind:this={notifications} />
@@ -186,18 +220,20 @@
 {#if errorMessage != ""}
     <ErrorAlert title="Ошибка">{errorMessage}</ErrorAlert>
 {:else}
-    <Panel class="rounded-none border-l-0 border-t-0 h-full">
+    <div class="bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 flex flex-col p-4 sm:p-6 h-full">
         <Breadcrumbs
             pathItems={[
                 { isHome: true },
                 { name: "Чаты", href: "/chats" },
-                { name: chat.student?.email },
+                { name: `${chat.student?.info.surname} ${chat.student?.info.name} ${chat.student?.info.patronymic}` },
             ]} />
         <div
-            class="bg-gray-50 dark:bg-gray-900 rounded-md p-4 overflow-auto overflow-x-hidden h-full flex flex-col-reverse gap-4">
+            class="bg-gray-50 dark:bg-gray-900 rounded-md p-4 overflow-auto overflow-x-hidden h-full flex flex-col-reverse gap-4"
+                bind:this={container}
+                on:scroll={handleScroll}>
             {#each messages as message}
                 <Card
-                    class={"relative max-w-fit sm:p-3 sm:pr-12" +
+                    class={"max-w-fit sm:p-4 break-all" +
                         (Me.value.email == message.admin?.email
                             ? " bg-sky-100 dark:bg-sky-900"
                             : "")}>
@@ -205,16 +241,17 @@
                         {message.admin?.email ?? chat.student.email}
                     </p>
 
-                    <p class="text-xl">{message.content}</p>
+                    <p class="text-xl mb-1">{message.content}</p>
 
                     {#if message.documents.length > 0}
                         <div class="flex gap-1 flex-col items-baseline">
                             {#each message.documents as document}
                                 {#if document.mimeType.includes("image")}
                                     <img
-                                        class="mb-1"
+                                        class="my-1 max-h-[25dvh] cursor-pointer"
                                         src={`${DocumentsApi}/${document.blobId}`}
-                                        alt="" />
+                                        alt=""
+                                        on:click={() => openImage(`${DocumentsApi}/${document.blobId}`)} />
                                 {/if}
 
                                 <A href={`${DocumentsApi}/${document.blobId}`}>
@@ -225,14 +262,15 @@
                     {/if}
 
                     <p
-                        class="ml-4 relative bottom-0 -right-10 text-sm text-end">
+                        class="relative bottom-0 right-0 text-sm text-end">
                         {new Date(message.createdAt).toLocaleTimeString("ru")}
                     </p>
                 </Card>
             {/each}
-
-            {#if paged.hasNextPage}
-                <Button on:click={loadMore}>Больше</Button>
+            {#if isLoadingMore}
+                <div class="flex justify-center p-2">
+                    <Spinner />
+                </div>
             {/if}
         </div>
 
@@ -272,5 +310,15 @@
                 </Button>
             {/each}
         </div>
-    </Panel>
+    {#if modalImage}
+        <div
+            class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+            on:click={closeImage}>
+            <img
+                src={modalImage}
+                class="w-auto h-auto max-w-[100vw] max-h-[100vh]"
+                on:click|stopPropagation />
+        </div>
+    {/if}
+    </div>
 {/if}
