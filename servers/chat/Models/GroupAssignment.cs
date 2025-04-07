@@ -10,6 +10,5 @@ public class GroupAssignment
     public required string Name { get; set; }
 
     public required Guid AdminId { get; set; }
-    [MapperIgnore]
     public Admin? Admin { get; set; }
 }

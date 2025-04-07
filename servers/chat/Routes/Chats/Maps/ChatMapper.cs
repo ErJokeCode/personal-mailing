@@ -11,6 +11,7 @@ namespace Core.Routes.Chats.Maps;
 [Mapper]
 public partial class ChatMapper
 {
+    [MapperIgnoreTarget(nameof(GroupAssignment.Admin))]
     public partial GroupAssignment Map(Shared.Messages.Groups.GroupAssignmentDto groupAssignmentDto);
 
     public partial StudentDto Map(Student student);

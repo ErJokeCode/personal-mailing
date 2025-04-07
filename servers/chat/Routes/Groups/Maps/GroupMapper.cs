@@ -12,6 +12,7 @@ public partial class GroupMapper
 {
     public partial AdminDto Map(Admin group);
 
+    [MapperIgnoreSource(nameof(GroupAssignment.AdminId))]
     public partial GroupAssignmentDto Map(GroupAssignment group);
     public partial IEnumerable<GroupAssignmentDto> Map(IEnumerable<GroupAssignment> groups);
 }
