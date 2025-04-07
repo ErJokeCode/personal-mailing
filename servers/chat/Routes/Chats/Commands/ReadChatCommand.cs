@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Core.Routes.Chats.Maps;
+using Core.Signal;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -17,19 +18,13 @@ public class ReadChatCommand : IRequest<Unit>
 public class ReadChatCommandHandler : IRequestHandler<ReadChatCommand, Unit>
 {
     private readonly AppDbContext _db;
-    // private readonly IHubContext<SignalHub> _hub;
+    private readonly IHubContext<SignalHub> _hub;
     private readonly ChatMapper _chatMapper;
 
-    // public ReadChatCommandHandler(AppDbContext db, IHubContext<SignalHub> hub)
-    // {
-    //     _db = db;
-    //     _hub = hub;
-    //     _chatMapper = new ChatMapper();
-    // }
-
-    public ReadChatCommandHandler(AppDbContext db)
+    public ReadChatCommandHandler(AppDbContext db, IHubContext<SignalHub> hub)
     {
         _db = db;
+        _hub = hub;
         _chatMapper = new ChatMapper();
     }
 
@@ -47,7 +42,7 @@ public class ReadChatCommandHandler : IRequestHandler<ReadChatCommand, Unit>
         await _db.SaveChangesAsync();
 
         var dto = _chatMapper.Map(chat);
-        // await _hub.NotifyOfChatRead(chat.AdminId, dto);
+        await _hub.NotifyOfChatRead(chat.AdminId, dto);
 
         return Unit.Value;
     }

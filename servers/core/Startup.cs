@@ -207,7 +207,7 @@ public static class Startup
         app.UseAuthorization();
         app.UseExceptionHandler();
         app.UseHealthChecks("/healthy");
-        app.MapHub<SignalHub>("/hub");
+        // app.MapHub<SignalHub>("/hub");
 
         app.MapReverseProxy(pipeline =>
         {

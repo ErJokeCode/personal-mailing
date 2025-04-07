@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Core.Signal;
 using dotenv.net;
 using FluentValidation;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
@@ -39,6 +41,7 @@ public static class Startup
         builder.Services.AddExceptionHandler<ExceptionHandler>();
         builder.Services.AddHttpClient();
         builder.Services.AddHealthChecks();
+        builder.Services.AddSignalR();
 
         builder.Services.AddOpenApi();
 
@@ -78,6 +81,8 @@ public static class Startup
             o.BucketName = Environment.GetEnvironmentVariable("MINIO_BUCKET")!;
         });
         builder.Services.AddSingleton<IFileStorage, MinioStorage>();
+
+        builder.Services.AddSingleton<IUserIdProvider, HttpContextUserIdProvider>();
 
         builder.Services.AddMassTransit(x =>
         {
@@ -144,6 +149,8 @@ public static class Startup
 
         app.UseExceptionHandler();
         app.UseHealthChecks("/healthy");
+
+        app.MapHub<SignalHub>("/hub");
     }
 
     public static void MapRoutes(this WebApplication app)
