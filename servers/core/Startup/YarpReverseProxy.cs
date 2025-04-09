@@ -118,7 +118,7 @@ public static class YarpReverseProxy
                         "destination",
                         new DestinationConfig()
                         {
-                            Address = "http://chat:5040"
+                            Address = "http://chatter:5040"
                         }
                     },
                 }

@@ -26,10 +26,10 @@ include:
       - .env
       - ./servers/notify/.env
 
-  - path: ./servers/chat/compose.yml
+  - path: ./servers/chatter/compose.yml
     env_file:
       - .env
-      - ./servers/chat/.env
+      - ./servers/chatter/.env
 
 services:
   minio:

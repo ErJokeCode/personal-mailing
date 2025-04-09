@@ -1,35 +1,27 @@
 services:
-  core-db:
+  chatter-db:
     image: postgres
     ports:
-      - 5001:5432
+      - 5041:5432
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     volumes:
-      - core-db-data:/var/lib/postgresql/data
+      - chatter-db-data:/var/lib/postgresql/data
 
-  core:
+  chatter:
     build:
       context: ../
-      dockerfile: ./core/Dockerfile
+      dockerfile: ./chatter/Dockerfile
     ports:
-      - 5000:5000
+      - 5040:5040
     depends_on:
-      core-db:
+      chatter-db:
         condition: service_started
       minio:
         condition: service_started
       kafka:
-        condition: service_started
-      parser:
-        condition: service_healthy
-      base:
-        condition: service_started
-      notify:
-        condition: service_healthy
-      chatter:
         condition: service_healthy
     env_file:
       - .env
@@ -40,7 +32,7 @@ services:
       - MINIO_SECRET_KEY=${MINIO_SECRET_KEY}
       - KAFKA_URL=${KAFKA_URL}
     healthcheck:
-      test: "curl --fail http://localhost:5000/healthy || exit"
+      test: "curl --fail http://localhost:5040/healthy || exit"
       interval: 10s
       timeout: 30s
       retries: 10
@@ -53,4 +45,4 @@ services:
       - '/app/obj'
 
 volumes:
-  core-db-data:
+  chatter-db-data:
