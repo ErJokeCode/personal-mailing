@@ -21,6 +21,7 @@
     import Get from "/src/lib/components/Get.svelte";
     import { signal } from "/src/lib/utils/signal";
     import { onDestroy } from "svelte";
+    import Breadcrumbs from "/src/lib/components/Breadcrumbs.svelte";
    
     signal.on("MessageReceived", get);
 
@@ -67,14 +68,21 @@
     }
 </script>
 
+<Breadcrumbs
+    class="m-4"
+    pathItems={[
+        { isHome: true },
+        { name: "Чаты" },
+    ]} />
+
 <Heading tag="h2" class="m-4">Чаты</Heading>
 
 <PagedList {get} bind:paged={Chats.paged} bind:search={Chats.search}>
-    {#snippet children(body)}
+    {#snippet children()}
         <Table>
             <TableHead>
                 <TableHeadCell>Студент</TableHeadCell>
-                <TableHeadCell class="p-4">Содержание</TableHeadCell>
+                <TableHeadCell class="px-4">Содержание</TableHeadCell>
                 <TableHeadCell>Детали</TableHeadCell>
                 <TableHeadCell>Непрочитанных</TableHeadCell>
             </TableHead>

@@ -10,12 +10,13 @@
 
     interface Props {
         pathItems: PathItem[];
+        class?: string;
     }
 
-    let { pathItems }: Props = $props();
+    let { pathItems, ...restProps }: Props = $props();
 </script>
 
-<Breadcrumb class="mb-5">
+<Breadcrumb class={restProps.class ?? "mb-5"}>
     {#each pathItems as item}
         {#if item.isHome}
             <li class="inline-flex items-center">
