@@ -20,6 +20,7 @@
     import http from "/src/lib/utils/http";
     import { ServerUrl } from "/src/lib/server";
     import { signal } from "/src/lib/utils/signal";
+    import Breadcrumbs from "/src/lib/components/Breadcrumbs.svelte";
 
     let student_files;
     let student_success = "";
@@ -209,7 +210,9 @@
     }
 </script>
 
-<div class="p-4 px-6">
+<Breadcrumbs pathItems={[{ isHome: true }, { name: "Загрузить файлы" }]} />
+
+<div class="pb-6 px-6">
     <div class="space-y-2 mb-6">
         <div
             style="display: flex; flex-direction: row; gap: 12px; align-items: baseline; margin-bottom: 20px">

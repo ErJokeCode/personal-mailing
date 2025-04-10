@@ -32,12 +32,12 @@
     let fluid = true;
 </script>
 
-<header class="border-b border-b-gray-200 dark:border-b-gray-600">
+<header class="border-b border-b-gray-200 dark:border-b-gray-600 z-50">
     <Navbar {fluid} class="text-black">
         {#if Me.value !== null}
             <NavHamburger
                 onClick={() => (drawerHidden = !drawerHidden)}
-                class="m-0 me-3 md:block lg:hidden"
+                class="m-0 sm:me-3 md:block lg:hidden"
             />
         {/if}
         <a use:route on:click={resetHistory} href="/" class="lg:w-60">

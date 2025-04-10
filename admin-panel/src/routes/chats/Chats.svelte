@@ -1,8 +1,10 @@
 <script lang="ts">
     import { Chats } from "/src/stores/chats/Chats.svelte";
     import {
+      Avatar,
         Button,
         Heading,
+        Indicator,
         Table,
         TableBody,
         TableBodyCell,
@@ -79,60 +81,61 @@
 
 <PagedList {get} bind:paged={Chats.paged} bind:search={Chats.search}>
     {#snippet children()}
-        <Table>
-            <TableHead>
-                <TableHeadCell>Студент</TableHeadCell>
-                <TableHeadCell class="px-4">Содержание</TableHeadCell>
-                <TableHeadCell>Детали</TableHeadCell>
-                <TableHeadCell>Непрочитанных</TableHeadCell>
-            </TableHead>
-
-            <TableBody tableBodyClass="divide-y">
+        {#if chats.length !== 0}
+            <div class="bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400
+                        rounded-lg border border-gray-200 dark:border-gray-700 divide-y
+                        divide-gray-200 dark:divide-gray-600 relative m-4 shadow-md">
                 {#each chats as chat}
-                    <TableBodyRow class="text-lg">
-                        <TableBodyCell class="w-1/12">
-                            <Button
-                                on:click={() =>
-                                    singleStudent(chat.student.email)}>
-                                {chat.student.email}
-                            </Button>
-                        </TableBodyCell>
-                        <TableBodyCell class="max-w-54 w-1/3 p-4">
-                            <div
-                                class="text-sm font-normal text-gray-500 dark:text-gray-400">
-                                <div
-                                    class="text-base font-semibold text-gray-900 dark:text-white flex justify-between">
+                    <div class="border-b last:border-b-0 bg-white dark:bg-gray-800
+                                border-gray-200 dark:border-gray-700 hover:bg-gray-50
+                                dark:hover:bg-gray-600 contrast text-lg first:rounded-t-lg
+                                last:rounded-b-lg flex gap-4 px-6 py-4 text-nowrap w-full">
+                        <div class="cursor-pointer" on:click={() => singleStudent(chat.student.email)}>
+                            <Avatar />
+                        </div>
+                    
+                        <div class="hidden md:block text-gray-900 dark:text-white">
+                            <p class="min-w-60 mt-1">{chat.student.email}</p>
+                        </div>
+                    
+                        <div class="cursor-pointer w-full overflow-hidden" on:click={() => single(chat.student.id)}>
+                            <div class="relative text-sm font-normal text-gray-500 dark:text-gray-400">
+                                <div class="text-base font-semibold text-gray-900 dark:text-white flex justify-between">
                                     {#if chat.messages[0].admin}
                                         Вы
                                     {:else}
-                                        <div class="hidden xl:block">{chat.student.info.surname} {chat.student.info.name} {chat.student.info.patronymic}</div>
-                                        <div class="block xl:hidden">{chat.student.info.surname} {chat.student.info.name[0]}. {chat.student.info.patronymic[0]}.</div>
+                                        <div class="hidden sm:block">{chat.student.info.surname} {chat.student.info.name} {chat.student.info.patronymic}</div>
+                                        <div class="block sm:hidden min-w-30">
+                                            {chat.student.info.surname} {chat.student.info.name[0]}. {chat.student.info.patronymic[0]}.
+                                        </div>
                                     {/if}
-                                    <div class="font-normal text-gray-500 dark:text-gray-400 ml-2">
+                                    <div class="font-normal text-gray-500 dark:text-gray-400">
                                         {new Date(chat.messages[0].createdAt).toLocaleTimeString("ru")}
                                     </div>
                                 </div>
-                                <div
-                                    class="text-sm font-normal text-gray-500 dark:text-gray-400 truncate">
-                                    {#if chat.messages[0].documents.length !== 0}
-                                        (Файл)
+                    
+                                <div class="text-sm font-normal text-gray-500 dark:text-gray-400 flex items-center gap-2">
+                                    <div class="truncate w-full">
+                                        {#if chat.messages[0].documents.length !== 0}
+                                            (Файл)
+                                        {/if}
+                                        {chat.messages[0].content}
+                                    </div>
+                                    
+                                    {#if chat.unreadCount !== 0}
+                                        <div class="relative">
+                                            <Indicator color="dark" size="xl" class="text-white">
+                                                {chat.unreadCount}
+                                            </Indicator>
+                                        </div>
                                     {/if}
-                                    {chat.messages[0].content}
                                 </div>
                             </div>
-                        </TableBodyCell>
-                        <TableBodyCell class="w-1/12">
-                            <Button on:click={() => single(chat.student.id)}>
-                                <ClipboardOutline />
-                            </Button>
-                        </TableBodyCell>
-                        <TableBodyCell class="w-1/12">
-                            {chat.unreadCount}
-                        </TableBodyCell>
-                    </TableBodyRow>
+                        </div>
+                    </div>
                 {/each}
-            </TableBody>
-        </Table>
+            </div>
+        {/if}
     {/snippet}
 </PagedList>
 

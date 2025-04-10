@@ -25,6 +25,7 @@
     import ToastNotifications from "/src/lib/components/ToastNotifications.svelte";
     import BackButton from "/src/lib/components/BackButton.svelte";
     import PagedList from "/src/lib/components/PagedList.svelte";
+    import Breadcrumbs from "/src/lib/components/Breadcrumbs.svelte";
 
     let { route }: { route: Route } = $props();
     AllGroups.adminId = route.query?.["adminId"] ?? AllGroups.adminId;
@@ -161,6 +162,13 @@
 </script>
 
 <ToastNotifications bind:this={notifications} />
+
+<Breadcrumbs
+    class="m-4"
+    pathItems={[
+        { isHome: true },
+        { name: "Группы" },
+    ]} />
 
 <div class="m-4">
     <BackButton class="inline-block align-middle" />

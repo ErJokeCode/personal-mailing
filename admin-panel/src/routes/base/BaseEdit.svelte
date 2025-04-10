@@ -211,15 +211,14 @@
 {#if errorMessage != ""}
     <ErrorAlert title="Ошибка">{errorMessage}</ErrorAlert>
 {:else}
-    <div class="flex flex-wrap md:flex-nowrap mr-4 mb-4">
-        <Panel class="mt-4 ml-4 w-full md:w-7/12">
-            <Breadcrumbs
-                pathItems={[
-                    { isHome: true },
-                    { name: "База знаний", href: "/base" },
-                    { name: "Детали" },
-                ]} />
-    
+    <Breadcrumbs
+        pathItems={[
+            { isHome: true },
+            { name: "База знаний", href: "/base" },
+            { name: "Детали" },
+        ]} />
+    <div class="flex flex-wrap md:flex-nowrap gap-4 m-4">
+        <Panel class="w-full md:w-7/12">
             <Heading
                 tag="h1"
                 class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl mb-4">
@@ -283,7 +282,7 @@
                 <Button on:click={() => update()} size="lg" class="mb-1 justify-center">Сохранить</Button>
             </div>
         </Panel>
-        <div class="w-full md:w-5/12 mt-4 ml-4">
+        <div class="w-full md:w-5/12">
             <Panel class="mb-4">
                 <Heading
                     tag="h2"

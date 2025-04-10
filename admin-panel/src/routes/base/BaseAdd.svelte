@@ -90,14 +90,14 @@
 
 <ToastNotifications bind:this={notifications} />
 
-<Panel class="m-4">
-    <Breadcrumbs
-        pathItems={[
-            { isHome: true },
-            { name: "База знаний", href: "/base" },
-            { name: "Добавить вопрос" },
-        ]} />
+<Breadcrumbs
+    pathItems={[
+        { isHome: true },
+        { name: "База знаний", href: "/base" },
+        { name: "Добавить вопрос" },
+    ]} />
 
+<Panel class="m-4">
     <Heading
         tag="h1"
         class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl mb-4">

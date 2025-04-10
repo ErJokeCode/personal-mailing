@@ -1,10 +1,7 @@
 <script lang="ts">
     import {
-        Breadcrumb,
-        BreadcrumbItem,
         Button,
         Heading,
-        Select,
     } from "flowbite-svelte";
     import {
         Table,
@@ -14,7 +11,7 @@
         TableHead,
     } from "flowbite-svelte";
     import { TableHeadCell } from "flowbite-svelte";
-
+    import Breadcrumbs from "/src/lib/components/Breadcrumbs.svelte";
     import { onMount } from "svelte";
     import { CirclePlusOutline } from "flowbite-svelte-icons";
     import http from "/src/lib/utils/http";
@@ -97,13 +94,14 @@
     }
 </script>
 
-<div class="p-4 px-6">
-    <Heading
-        tag="h1"
-        class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl">
-        Соотношения
-    </Heading>
-</div>
+<Breadcrumbs pathItems={[{ isHome: true }, { name: "Выбор соотношений" }]} />
+
+<Heading
+    tag="h2"
+    class="mb-4 mx-4">
+    Соотношения
+</Heading>
+
 <Table hoverable={true}>
     <TableHead>
         <TableHeadCell class="px-8">Название в файле</TableHeadCell>

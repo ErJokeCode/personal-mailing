@@ -11,12 +11,12 @@
         TableHead,
         TableHeadCell,
     } from "flowbite-svelte";
-    import { createPaged } from "/src/lib/components/Paged.svelte";
     import PagedList from "/src/lib/components/PagedList.svelte";
     import { NotificationsApi, PageSize } from "/src/lib/server";
-    import { goto, QueryString } from "@mateothegreat/svelte5-router";
+    import { goto } from "@mateothegreat/svelte5-router";
     import { CirclePlusOutline, ClipboardOutline } from "flowbite-svelte-icons";
     import { AllNotifications } from "/src/stores/notifications/AllNotifications.svelte";
+    import Breadcrumbs from "/src/lib/components/Breadcrumbs.svelte";
 
     async function get() {
         let url = new URL(NotificationsApi);
@@ -45,6 +45,13 @@
         goto("/send-notification");
     }
 </script>
+
+<Breadcrumbs
+    class="m-4"
+    pathItems={[
+        { isHome: true },
+        { name: "Рассылки" },
+    ]} />
 
 <SpeedDial class="z-10">
     <SpeedDialButton name="Отправить" on:click={send}>

@@ -61,7 +61,7 @@
                     <div><strong>{chat.student.email}:</strong></div>
                     <p>
                         "{chat.messages[0].content.length > 20
-                            ? chat.messages[0].content.slice(0, 20)
+                            ? chat.messages[0].content.slice(0, 20) + "..."
                             : chat.messages[0].content}"
                     </p>
                 </Card>

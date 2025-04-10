@@ -222,6 +222,7 @@
 {:else}
     <div class="bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 flex flex-col p-4 sm:p-6 h-full">
         <Breadcrumbs
+            class="mb-4"
             pathItems={[
                 { isHome: true },
                 { name: "Чаты", href: "/chats" },
@@ -233,7 +234,7 @@
                 on:scroll={handleScroll}>
             {#each messages as message}
                 <Card
-                    class={"max-w-fit sm:p-4 break-all" +
+                    class={"max-w-fit min-w-40 sm:p-4 break-all" +
                         (Me.value.email == message.admin?.email
                             ? " bg-sky-100 dark:bg-sky-900"
                             : "")}>

@@ -1,8 +1,6 @@
 <script lang="ts">
     import Panel from "/src/lib/components/Panel.svelte";
     import {
-        Breadcrumb,
-        BreadcrumbItem,
         Heading,
         Accordion,
         AccordionItem,
@@ -15,6 +13,9 @@
     import { onMount } from "svelte";
     import Breadcrumbs from "/src/lib/components/Breadcrumbs.svelte";
     import { ServerUrl } from "/src/lib/server";
+    import ToastNotifications from "/src/lib/components/ToastNotifications.svelte";
+
+    let notifications: ToastNotifications;
 
     let courses = $state([]);
     let success = $state("");
@@ -24,13 +25,14 @@
     });
 
     const load = async () => {
-        let response;
-        try {
-            response = await fetch(`${ServerUrl}/parser/bot/onboard/`, {
-                credentials: "include",
+        let response = await fetch(`${ServerUrl}/parser/bot/onboard/`, {
+            credentials: "include",
+        });
+        if (!response.ok) {
+            notifications.add({
+                type: "error",
+                text: response.status + ' ' + response.statusText,
             });
-        } catch (err) {
-            console.log(err);
         }
         let json = await response?.json();
         courses = json;
@@ -45,8 +47,6 @@
         }
         if (res === null) return;
 
-        console.log("Сохранение...");
-
         let body = JSON.stringify(res);
 
         let result = await fetch(`${ServerUrl}/parser/bot/onboard/${id}`, {
@@ -60,9 +60,15 @@
         });
 
         if (result.ok) {
-            console.log("Сохранено");
+            notifications.add({
+                type: "ok",
+                text: "Сохранено"
+            });
         } else {
-            console.log("Ошибка");
+            notifications.add({
+                type: "error",
+                text: "Ошибка"
+            });
         }
     }
 
@@ -91,7 +97,7 @@
         };
         let body = JSON.stringify(new_course);
 
-        let result = await fetch(`${ServerUrl}/parser/bot/onboard/one_course`, {
+        await fetch(`${ServerUrl}/parser/bot/onboard/one_course`, {
             method: "POST",
             headers: {
                 Accept: "application/json, */*",
@@ -104,7 +110,7 @@
     };
 
     const delete_course = async (id) => {
-        let result = await fetch(`${ServerUrl}/parser/bot/onboard/${id}`, {
+        await fetch(`${ServerUrl}/parser/bot/onboard/${id}`, {
             method: "DELETE",
             credentials: "include",
         });
@@ -213,8 +219,11 @@
     };
 </script>
 
+<ToastNotifications bind:this={notifications} />
+
+<Breadcrumbs pathItems={[{ isHome: true }, { name: "Конструктор онбординга" }]} />
+
 <Panel class="m-4">
-    <Breadcrumbs pathItems={[{ isHome: true }, { name: "Конструктор онбординга" }]} />
     <Heading
         tag="h1"
         class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl mb-4">
@@ -222,7 +231,7 @@
     </Heading>
     <Button on:click={add_course} class="max-w-fit">Добавить курс</Button>
     <Helper class="mb-4 mt-1"></Helper>
-    <Accordion class='mb-5' multiple classActive='dark:bg-gray-600 dark:focus:ring-gray-700'>
+    <Accordion class='mb-1' multiple classActive='dark:bg-gray-600 dark:focus:ring-gray-700'>
         {#each courses as course, course_index}
             <AccordionItem borderOpenClass='border-s border-e border-b border-gray-200 dark:border-gray-700'>
                 <span slot="header">{course.name}</span>

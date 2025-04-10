@@ -17,6 +17,9 @@
 
         <div class="h-full flex-col flex-1 overflow-auto overflow-x-hidden">
             <Main />
+            {#if drawerHidden}
+                <div class="fixed inset-0 z-20 bg-gray-900/50 dark:bg-gray-900/60"></div>
+            {/if}
         </div>
     </div>
 </div>

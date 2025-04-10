@@ -1,7 +1,5 @@
 <script>
     import {
-        Breadcrumb,
-        BreadcrumbItem,
         Button,
         Heading,
     } from "flowbite-svelte";
@@ -20,6 +18,7 @@
         ChevronLeftOutline,
     } from "flowbite-svelte-icons";
     import { goto } from "@mateothegreat/svelte5-router";
+    import Breadcrumbs from "/src/lib/components/Breadcrumbs.svelte";
 
     let status = http.status();
     let students = [];
@@ -57,7 +56,9 @@
     }
 </script>
 
-<div class="p-4 flex justify-between">
+<Breadcrumbs pathItems={[{ isHome: true }, { name: "Все студенты" }]} />
+
+<div class="px-4 pb-4 flex justify-between">
     <Heading tag="h2">Все студенты</Heading>
     <div
         class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl px-6 ">

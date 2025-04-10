@@ -16,7 +16,7 @@
     let { pathItems, ...restProps }: Props = $props();
 </script>
 
-<Breadcrumb class={restProps.class ?? "mb-5"}>
+<Breadcrumb class={restProps.class ?? "mx-5 my-4"}>
     {#each pathItems as item}
         {#if item.isHome}
             <li class="inline-flex items-center">

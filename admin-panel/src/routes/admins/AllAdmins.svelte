@@ -16,6 +16,7 @@
     import { PageSize } from "/src/lib/server";
     import { AllAdmins } from "/src/stores/admins/AllAdmins.svelte";
     import AllAdminsInfo from "./shared/AllAdminsInfo.svelte";
+    import Breadcrumbs from "/src/lib/components/Breadcrumbs.svelte";
 
     async function single(adminId: string) {
         goto(`/admins/${adminId}`);
@@ -25,6 +26,13 @@
         goto("/create-admin");
     }
 </script>
+
+<Breadcrumbs
+    class="m-4"
+    pathItems={[
+        { isHome: true },
+        { name: "Администраторы" },
+    ]} />
 
 <SpeedDial class="z-10">
     <SpeedDialButton name="Создать" on:click={create}>

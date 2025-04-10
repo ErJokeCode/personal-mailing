@@ -16,6 +16,7 @@
     import { signal } from "/src/lib/utils/signal";
     import { onDestroy } from "svelte";
     import { ActiveStudents } from "/src/stores/students/ActiveStudents.svelte";
+    import Breadcrumbs from "/src/lib/components/Breadcrumbs.svelte";
 
     signal.on("StudentAuthed", handleStudentAuthed);
 
@@ -47,7 +48,9 @@
     }
 </script>
 
-<Heading tag="h2" class="m-4">Активные студенты</Heading>
+<Breadcrumbs pathItems={[{ isHome: true }, { name: "Активные студенты" }]} />
+
+<Heading tag="h2" class="mx-4 mb-4">Активные студенты</Heading>
 
 <PagedList
     get={() => get(ActiveStudents.trigger)}
