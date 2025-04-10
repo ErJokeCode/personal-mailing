@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 using Core.Abstractions;
 using FluentResults;
 using MediatR;
-using Shared.Abstractions.FileStorage;
-using Shared.Infrastructure.Errors.Documents;
+using Shared.Context.Documents;
+using Shared.Services.FileStorage;
 
 namespace Core.Routes.Documents.Commands;
 

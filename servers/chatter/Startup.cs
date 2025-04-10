@@ -1,10 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Chatter.Signal;
-using dotenv.net;
 using FluentValidation;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
@@ -23,12 +20,10 @@ using Chatter.Data;
 using Chatter.Infrastructure.Services;
 using Chatter.Routes;
 using Scalar.AspNetCore;
-using Shared.Abstractions.FileStorage;
 using Shared.Infrastructure.Handlers;
-using Shared.Infrastructure.Services;
-using Shared.Messages.Admins;
-using Shared.Messages.Groups;
-using Shared.Messages.Students;
+using Shared.Services.FileStorage;
+using Shared.Context.Admins.Messages;
+using Shared.Context.Students.Messages;
 
 namespace Chatter;
 
@@ -150,7 +145,7 @@ public static class Startup
         app.UseExceptionHandler();
         app.UseHealthChecks("/healthy");
 
-        app.MapHub<SignalHub>("/hub");
+        app.MapHub<SignalHub>("/chat-hub");
     }
 
     public static void MapRoutes(this WebApplication app)

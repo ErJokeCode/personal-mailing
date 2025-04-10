@@ -32,12 +32,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Minio;
 using Scalar.AspNetCore;
-using Shared.Abstractions.FileStorage;
+using Shared.Context.Admins.Messages;
+using Shared.Context.Students.Messages;
 using Shared.Infrastructure.Handlers;
-using Shared.Infrastructure.Services;
-using Shared.Messages.Admins;
 using Shared.Messages.Groups;
-using Shared.Messages.Students;
+using Shared.Services.FileStorage;
 
 namespace Core;
 
@@ -207,7 +206,7 @@ public static class Startup
         app.UseAuthorization();
         app.UseExceptionHandler();
         app.UseHealthChecks("/healthy");
-        // app.MapHub<SignalHub>("/hub");
+        app.MapHub<SignalHub>("/core-hub");
 
         app.MapReverseProxy(pipeline =>
         {

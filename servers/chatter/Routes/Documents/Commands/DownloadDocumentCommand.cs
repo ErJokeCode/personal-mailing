@@ -5,8 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentResults;
 using MediatR;
-using Shared.Abstractions.FileStorage;
-using Shared.Infrastructure.Errors.Documents;
+using Shared.Context.Documents;
+using Shared.Services.FileStorage;
 
 namespace Chatter.Routes.Documents.Commands;
 

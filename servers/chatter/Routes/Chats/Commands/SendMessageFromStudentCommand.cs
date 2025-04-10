@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Chatter.Data;
-using Shared.Abstractions.FileStorage;
+using Shared.Services.FileStorage;
 
 namespace Chatter.Routes.Chats.Commands;
 

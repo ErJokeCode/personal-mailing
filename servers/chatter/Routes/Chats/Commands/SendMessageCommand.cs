@@ -12,10 +12,10 @@ using Microsoft.EntityFrameworkCore;
 using Chatter.Abstractions.MailService;
 using Chatter.Abstractions.UserAccessor;
 using Chatter.Data;
-using Shared.Abstractions.FileStorage;
-using Shared.Infrastructure.Errors.Admins;
-using Shared.Infrastructure.Errors.Chats;
-using Shared.Infrastructure.Errors.Groups;
+using Shared.Services.FileStorage;
+using Shared.Context.Admins;
+using Shared.Context.Chats;
+using Shared.Context.Groups;
 
 namespace Chatter.Routes.Chats.Commands;
 

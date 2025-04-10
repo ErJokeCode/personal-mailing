@@ -9,8 +9,8 @@ using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
 using Chatter.Abstractions.MailService;
 using Chatter.Models;
-using Shared.Abstractions.FileStorage;
 using Shared.Models;
+using Shared.Services.FileStorage;
 
 namespace Chatter.Infrastructure.Services;
 

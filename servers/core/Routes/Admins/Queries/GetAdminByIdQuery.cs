@@ -7,7 +7,7 @@ using Core.Routes.Admins.Maps;
 using FluentResults;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Shared.Infrastructure.Errors.Admins;
+using Shared.Context.Admins;
 
 namespace Core.Routes.Admins.Queries;
 

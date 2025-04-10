@@ -12,8 +12,8 @@ using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
-using Shared.Infrastructure.Errors.Students;
-using Shared.Messages.Students;
+using Shared.Context.Students;
+using Shared.Context.Students.Messages;
 
 namespace Core.Routes.Students.Commands;
 

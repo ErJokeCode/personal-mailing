@@ -1,6 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using Notify.Abstractions.Parser;
 using Notify.Models;
+using Notify.Services.Parser;
 
 namespace Notify.Data;
 

@@ -21,7 +21,6 @@ public class Notification
 
     public ICollection<Document> Documents { get; set; } = [];
 
-    [MapperIgnore]
     public required Guid AdminId { get; set; }
     public Admin? Admin { get; set; }
     public ICollection<Student> Students { get; set; } = [];

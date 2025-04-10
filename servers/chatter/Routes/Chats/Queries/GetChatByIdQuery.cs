@@ -9,8 +9,8 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Chatter.Abstractions.UserAccessor;
 using Chatter.Data;
-using Shared.Infrastructure.Errors.Admins;
-using Shared.Infrastructure.Errors.Groups;
+using Shared.Context.Admins;
+using Shared.Context.Groups;
 
 public class GetChatById : IRequest<Result<ChatDto>>
 {

@@ -49,11 +49,11 @@ public static class YarpReverseProxy
             },
             new RouteConfig()
             {
-                RouteId = "signal-route",
+                RouteId = "chat-hub-route",
                 ClusterId = "chat-cluster",
                 Match = new RouteMatch
                 {
-                    Path = "/hub/{**catch-all}"
+                    Path = "/chat-hub/{**catch-all}"
                 },
             },
             new RouteConfig()
@@ -104,12 +104,6 @@ public static class YarpReverseProxy
             },
             new ClusterConfig
             {
-                SessionAffinity = new SessionAffinityConfig()
-                {
-                    AffinityKeyName = "Yarp.Session",
-                    Enabled = true,
-                },
-
                 ClusterId = "chat-cluster",
 
                 Destinations = new Dictionary<string, DestinationConfig>(StringComparer.OrdinalIgnoreCase)

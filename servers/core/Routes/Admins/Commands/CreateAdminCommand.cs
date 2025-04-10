@@ -11,8 +11,8 @@ using FluentResults;
 using MassTransit;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Shared.Infrastructure.Errors.Admins;
-using Shared.Messages.Admins;
+using Shared.Context.Admins;
+using Shared.Context.Admins.Messages;
 
 namespace Core.Routes.Admins.Commands;
 

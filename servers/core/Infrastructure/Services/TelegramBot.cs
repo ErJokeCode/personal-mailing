@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 using Core.Abstractions.MailService;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.Extensions.Options;
-using Shared.Abstractions.FileStorage;
 using Shared.Models;
+using Shared.Services.FileStorage;
 
 namespace Core.Infrastructure.Services;
 

@@ -1,30 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using dotenv.net;
+using System.Reflection;
 using FluentValidation;
 using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Minio;
-using Notify.Abstractions.MailService;
-using Notify.Abstractions.UserAccessor;
-using Notify.Consumers.Admins;
-using Notify.Consumers.Students;
 using Notify.Data;
-using Notify.Infrastructure.Services;
-using Notify.Routes;
+using Notify.Features;
+using Notify.Setup;
+using Riok.Mapperly.Abstractions;
 using Scalar.AspNetCore;
-using Shared.Abstractions.FileStorage;
 using Shared.Infrastructure.Handlers;
-using Shared.Infrastructure.Services;
-using Shared.Messages.Admins;
-using Shared.Messages.Students;
 
 namespace Notify;
 
@@ -37,91 +26,24 @@ public static class Startup
         builder.Services.AddExceptionHandler<ExceptionHandler>();
         builder.Services.AddHttpClient();
         builder.Services.AddHealthChecks();
-
         builder.Services.AddOpenApi();
 
-        var host = Environment.GetEnvironmentVariable("POSTGRES_URL");
-        var database = Environment.GetEnvironmentVariable("POSTGRES_DB");
-        var password = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD");
-        var user = Environment.GetEnvironmentVariable("POSTGRES_USER");
-
-        var connection = $"Host={host};Port={5432};Database={database};Username={user};Password={password};Include Error Detail=True";
-        builder.Services.AddDbContext<AppDbContext>(o =>
-        {
-            o.UseNpgsql(connection);
-            o.ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning));
-        });
-
-        builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
+        builder.Services.AddMappers();
         builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
-        builder.Services.AddScoped<IUserAccessor, UserAccessor>();
+        builder.Services.SetupDatabase();
+        builder.Services.RegisterServices();
 
-        builder.Services.Configure<MailServiceOptions>(o =>
-        {
-            o.MailServiceUrl = Environment.GetEnvironmentVariable("BOT_URL")!;
-        });
-        builder.Services.AddScoped<IMailService, TelegramBot>();
-
-        builder.Services.AddMinio(
-            configureClient => configureClient
-                .WithEndpoint(Environment.GetEnvironmentVariable("MINIO_URL"))
-                .WithCredentials(Environment.GetEnvironmentVariable("MINIO_ACCESS_KEY"), Environment.GetEnvironmentVariable("MINIO_SECRET_KEY"))
-                .WithSSL(false)
-                .Build()
-        );
-
-        builder.Services.Configure<FileStorageOptions>(o =>
-        {
-            o.BucketName = Environment.GetEnvironmentVariable("MINIO_BUCKET")!;
-        });
-        builder.Services.AddSingleton<IFileStorage, MinioStorage>();
-
-        builder.Services.AddMassTransit(x =>
-        {
-            x.UsingInMemory();
-
-            x.AddRider(rider =>
-            {
-                rider.AddConsumer<AdminCreatedConsumer>();
-                rider.AddConsumer<StudentAuthedConsumer>();
-                rider.AddConsumer<StudentsUpdatedConsumer>();
-
-                const string ServiceName = "notify-";
-
-                rider.UsingKafka((context, k) =>
-                {
-                    k.Host(Environment.GetEnvironmentVariable("KAFKA_URL"));
-
-                    k.TopicEndpoint<AdminCreatedMessage>(AdminCreatedMessage.TopicName, ServiceName + AdminCreatedMessage.TopicName, e =>
-                    {
-                        e.CreateIfMissing();
-                        e.ConfigureConsumer<AdminCreatedConsumer>(context);
-                    });
-
-                    k.TopicEndpoint<StudentAuthedMessage>(StudentAuthedMessage.TopicName, ServiceName + StudentAuthedMessage.TopicName, e =>
-                    {
-                        e.CreateIfMissing();
-                        e.ConfigureConsumer<StudentAuthedConsumer>(context);
-                    });
-
-                    k.TopicEndpoint<StudentsUpdatedMessage>(StudentsUpdatedMessage.TopicName, ServiceName + StudentsUpdatedMessage.TopicName, e =>
-                    {
-                        e.CreateIfMissing();
-                        e.ConfigureConsumer<StudentsUpdatedConsumer>(context);
-                    });
-                });
-            });
-        });
+        builder.Services.SetupKafka();
     }
 
-    public static void InitialzieServices(this WebApplication app)
+    public static void InitializeServices(this WebApplication app)
     {
         app.UseRequestLocalization((o) => o.SetDefaultCulture("ru"));
+        app.MigrateDatabase();
 
         if (app.Environment.IsDevelopment())
         {
-            app.MigrateDatabase();
             app.MapOpenApi();
             app.MapScalarApiReference(o =>
             {
@@ -148,6 +70,18 @@ public static class Startup
         foreach (var route in routes)
         {
             route.MapRoutes(app);
+        }
+    }
+
+    public static void AddMappers(this IServiceCollection services)
+    {
+        IEnumerable<Type> mappers = typeof(Program).Assembly
+            .GetTypes()
+            .Where(t => t.GetCustomAttribute<MapperAttribute>() != null && !t.IsAbstract && !t.IsInterface);
+
+        foreach (var mapper in mappers)
+        {
+            services.AddTransient(mapper);
         }
     }
 

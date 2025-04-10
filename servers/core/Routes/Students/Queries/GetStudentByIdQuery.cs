@@ -12,7 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
-using Shared.Infrastructure.Errors.Students;
+using Shared.Context.Students;
 
 namespace Core.Routes.Students.Queries;
 

@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Chatter.Data;
 using Chatter.Routes.Notifications.DTOs;
-using Shared.Infrastructure.Errors.Students;
+using Shared.Context.Students;
 
 namespace Chatter.Routes.Students.Queries;
 

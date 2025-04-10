@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using Chatter.Routes.Chats.Maps;
 using MassTransit;
 using Chatter.Data;
-using Shared.Messages.Admins;
+using Shared.Context.Admins.Messages;
 
 namespace Chatter.Consumers.Admins;
 

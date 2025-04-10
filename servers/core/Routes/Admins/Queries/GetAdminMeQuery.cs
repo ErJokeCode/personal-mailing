@@ -8,7 +8,7 @@ using Core.Routes.Admins.Dtos;
 using Core.Routes.Admins.Maps;
 using FluentResults;
 using MediatR;
-using Shared.Infrastructure.Errors.Admins;
+using Shared.Context.Admins;
 
 namespace Core.Routes.Admins.Queries;
 

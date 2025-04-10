@@ -4,7 +4,7 @@ using Chatter.Routes.Chats.Maps;
 using MassTransit;
 using Chatter.Data;
 using Chatter.Models;
-using Shared.Messages.Students;
+using Shared.Context.Students.Messages;
 
 namespace Chatter.Consumers.Students;
 

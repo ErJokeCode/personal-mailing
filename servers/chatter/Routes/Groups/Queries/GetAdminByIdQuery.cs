@@ -7,7 +7,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Chatter.Data;
 using Chatter.Routes.Notifications.DTOs;
-using Shared.Infrastructure.Errors.Admins;
+using Shared.Context.Admins;
 
 namespace Chatter.Routes.Admins.Queries;
 

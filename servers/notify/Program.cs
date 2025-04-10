@@ -12,7 +12,7 @@ public class Program
         builder.ConfigureServices();
 
         var app = builder.Build();
-        app.InitialzieServices();
+        app.InitializeServices();
         app.MapRoutes();
 
         app.Run();

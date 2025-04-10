@@ -5,7 +5,7 @@ using Core.Models;
 using FluentResults;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Shared.Infrastructure.Errors.Admins;
+using Shared.Context.Admins;
 
 namespace Core.Routes.Admins.Commands;
 
