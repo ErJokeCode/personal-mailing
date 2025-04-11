@@ -1,15 +1,22 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using Riok.Mapperly.Abstractions;
 using Shared.Models;
 
 namespace Notify.Models;
 
+public enum NotificationState
+{
+    Lost,
+    Sent,
+    Read
+}
+
 [Owned]
-public class NotificationError
+public class NotificationStatus
 {
     public Guid StudentId { get; set; }
+    public required NotificationState State { get; set; }
     public required string Message { get; set; }
 }
 
@@ -25,5 +32,5 @@ public class Notification
     public Admin? Admin { get; set; }
     public ICollection<Student> Students { get; set; } = [];
 
-    public ICollection<NotificationError> Errors { get; set; } = [];
+    public ICollection<NotificationStatus> Statuses { get; set; } = [];
 }

@@ -23,6 +23,7 @@ public static class KafkaSetup
             {
                 rider.AddConsumer<AdminCreatedConsumer>();
                 rider.AddConsumer<StudentAuthedConsumer>();
+                rider.AddConsumer<StudentUpdatedConsumer>();
                 rider.AddConsumer<StudentsUpdatedBulkConsumer>();
 
                 rider.UsingKafka((context, k) =>

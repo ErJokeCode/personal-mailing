@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.EntityFrameworkCore;
 using Notify.Data;
+using Notify.Models;
 
 namespace Notify.Setup;
 
@@ -19,7 +20,7 @@ public static class DatabaseSetup
 
         services.AddDbContext<AppDbContext>(o =>
         {
-            o.UseNpgsql(connection);
+            o.UseNpgsql(connection, npgsql => npgsql.MapEnum<NotificationState>("NotificationState"));
             o.ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning));
         });
     }
