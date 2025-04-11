@@ -13,6 +13,7 @@ using Notify.Features;
 using Notify.Setup;
 using Riok.Mapperly.Abstractions;
 using Scalar.AspNetCore;
+using Shared.Infrastructure.Extensions;
 using Shared.Infrastructure.Handlers;
 
 namespace Notify;
@@ -57,32 +58,6 @@ public static class Startup
 
         app.UseExceptionHandler();
         app.UseHealthChecks("/healthy");
-    }
-
-    public static void MapRoutes(this WebApplication app)
-    {
-        IEnumerable<IRoute> routes = typeof(Program).Assembly
-            .GetTypes()
-            .Where(t => t.IsAssignableTo(typeof(IRoute)) && !t.IsAbstract && !t.IsInterface)
-            .Select(Activator.CreateInstance)
-            .Cast<IRoute>();
-
-        foreach (var route in routes)
-        {
-            route.MapRoutes(app);
-        }
-    }
-
-    public static void AddMappers(this IServiceCollection services)
-    {
-        IEnumerable<Type> mappers = typeof(Program).Assembly
-            .GetTypes()
-            .Where(t => t.GetCustomAttribute<MapperAttribute>() != null && !t.IsAbstract && !t.IsInterface);
-
-        foreach (var mapper in mappers)
-        {
-            services.AddTransient(mapper);
-        }
     }
 
     private static void MigrateDatabase(this WebApplication app)

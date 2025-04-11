@@ -109,12 +109,13 @@ public static class SendNotificationCommand
 
             if (student is null || !student.Active)
             {
-                var error = new NotificationError()
+                var error = new NotificationStatus()
                 {
                     StudentId = studentId,
                     Message = StudentErrors.NotFound(studentId),
+                    State = NotificationState.Lost,
                 };
-                notification.Errors.Add(error);
+                notification.Statuses.Add(error);
             }
             else
             {
@@ -128,12 +129,23 @@ public static class SendNotificationCommand
 
             if (!sent)
             {
-                var error = new NotificationError()
+                var error = new NotificationStatus()
                 {
                     StudentId = student.Id,
                     Message = NotificationErrors.CouldNotSend(student.Email),
+                    State = NotificationState.Lost
                 };
-                notification.Errors.Add(error);
+                notification.Statuses.Add(error);
+            }
+            else
+            {
+                var status = new NotificationStatus()
+                {
+                    StudentId = student.Id,
+                    Message = "Доставлено",
+                    State = NotificationState.Sent
+                };
+                notification.Statuses.Add(status);
             }
         }
 

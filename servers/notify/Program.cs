@@ -1,5 +1,6 @@
 using dotenv.net;
 using Microsoft.AspNetCore.Builder;
+using Shared.Infrastructure.Extensions;
 
 namespace Notify;
 

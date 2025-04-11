@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using Notify.Models;
 
 namespace Notify.Features.Notifications.DTOs;
 
-public class NotificationErrorDto
+public class NotificationStatusDto
 {
     public Guid StudentId { get; set; }
+    public required NotificationState State { get; set; }
     public required string Message { get; set; }
 }
 
@@ -20,5 +22,5 @@ public class NotificationDto
     public AdminDto? Admin { get; set; }
     public IEnumerable<StudentDto> Students { get; set; } = [];
 
-    public IEnumerable<NotificationErrorDto> Errors { get; set; } = [];
+    public IEnumerable<NotificationStatusDto> Statuses { get; set; } = [];
 }

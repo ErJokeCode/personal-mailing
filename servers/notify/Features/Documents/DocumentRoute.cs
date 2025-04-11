@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Notify.Features.Documents.Commands;
+using Shared.Infrastructure.Extensions;
 
 namespace Notify.Features.Documents;
 
