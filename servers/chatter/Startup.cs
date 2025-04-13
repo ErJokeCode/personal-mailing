@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using Chatter.Signal;
 using FluentValidation;
@@ -11,19 +10,17 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Minio;
-using Chatter.Abstractions.MailService;
-using Chatter.Abstractions.UserAccessor;
-using Chatter.Consumers.Admins;
-using Chatter.Consumers.Groups;
-using Chatter.Consumers.Students;
 using Chatter.Data;
-using Chatter.Infrastructure.Services;
-using Chatter.Routes;
 using Scalar.AspNetCore;
 using Shared.Infrastructure.Handlers;
 using Shared.Services.FileStorage;
 using Shared.Context.Admins.Messages;
 using Shared.Context.Students.Messages;
+using Chatter.Services.MailService;
+using Chatter.Services.UserAccessor;
+using Chatter.Features.Admins.Consumers;
+using Shared.Infrastructure.Extensions;
+using Chatter.Services;
 
 namespace Chatter;
 
@@ -40,6 +37,8 @@ public static class Startup
 
         builder.Services.AddOpenApi();
 
+        builder.Services.AddMappers(typeof(Program).Assembly);
+
         var host = Environment.GetEnvironmentVariable("POSTGRES_URL");
         var database = Environment.GetEnvironmentVariable("POSTGRES_DB");
         var password = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD");
@@ -52,8 +51,9 @@ public static class Startup
             o.ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning));
         });
 
-        builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
         builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
+
+        builder.Services.AddScoped<ChatService>();
 
         builder.Services.AddScoped<IUserAccessor, UserAccessor>();
 
@@ -146,20 +146,6 @@ public static class Startup
         app.UseHealthChecks("/healthy");
 
         app.MapHub<SignalHub>("/chat-hub");
-    }
-
-    public static void MapRoutes(this WebApplication app)
-    {
-        IEnumerable<IRoute> routes = typeof(Program).Assembly
-            .GetTypes()
-            .Where(t => t.IsAssignableTo(typeof(IRoute)) && !t.IsAbstract && !t.IsInterface)
-            .Select(Activator.CreateInstance)
-            .Cast<IRoute>();
-
-        foreach (var route in routes)
-        {
-            route.MapRoutes(app);
-        }
     }
 
     private static void MigrateDatabase(this WebApplication app)

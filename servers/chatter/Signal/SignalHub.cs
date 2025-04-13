@@ -5,10 +5,9 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Threading.Tasks;
-using Chatter.Routes.Chats.DTOs;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
-using Chatter.Routes.Notifications.DTOs;
+using Chatter.Features.Chats.DTOs;
 
 namespace Chatter.Signal;
 

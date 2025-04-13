@@ -1,5 +1,6 @@
 using dotenv.net;
 using Microsoft.AspNetCore.Builder;
+using Shared.Infrastructure.Extensions;
 
 namespace Chatter;
 
@@ -13,7 +14,7 @@ public class Program
 
         var app = builder.Build();
         app.InitialzieServices();
-        app.MapRoutes();
+        app.MapRoutes(typeof(Program).Assembly);
 
         app.Run();
     }
