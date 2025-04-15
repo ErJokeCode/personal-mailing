@@ -3,13 +3,14 @@ using System.Text.Json;
 using Chatter.Features.Chats.DTOs;
 using Chatter.Models;
 using Riok.Mapperly.Abstractions;
+using Shared.Infrastructure.Extensions;
 
 namespace Chatter.Features.Chats;
 
 [Mapper]
-public partial class ChatMapper
+public partial class ChatMapper : IMapper
 {
-    public partial ChatDto Map(Chatter.Models.Chat chat);
+    public partial ChatDto Map(Models.Chat chat);
     public partial IEnumerable<ChatDto> Map(IEnumerable<Chatter.Models.Chat> chats);
 
     public partial MessageDto Map(Message message);

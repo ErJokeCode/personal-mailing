@@ -9,7 +9,8 @@ public class DocumentRoute : IRoute
 {
     public void MapRoutes(WebApplication app)
     {
-        var group = app.MapGroup("/chatter/documents");
+        var group = app.MapGroup("/chatter/documents")
+            .WithTags("Документы");
 
         group.MapGet("/{blobId}", DownloadDocumentCommand.Handle)
             .WithDescription("Скачивает документ по айди");

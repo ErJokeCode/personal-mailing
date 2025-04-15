@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Chatter.Routes.Chats.Maps;
 using FluentResults;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
@@ -14,6 +13,7 @@ using Microsoft.AspNetCore.Mvc;
 using Shared.Infrastructure.Errors;
 using Shared.Context.Admins;
 using Microsoft.AspNetCore.Http;
+using Chatter.Features.Chats;
 
 namespace Chatter.Features.Groups.Commands;
 

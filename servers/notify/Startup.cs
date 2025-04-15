@@ -1,17 +1,11 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using FluentValidation;
-using MassTransit;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Notify.Data;
-using Notify.Features;
 using Notify.Setup;
-using Riok.Mapperly.Abstractions;
 using Scalar.AspNetCore;
 using Shared.Infrastructure.Extensions;
 using Shared.Infrastructure.Handlers;

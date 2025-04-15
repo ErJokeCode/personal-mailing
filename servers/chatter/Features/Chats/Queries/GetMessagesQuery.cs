@@ -60,6 +60,14 @@ public static class GetMessagesQuery
 
         chat.Messages = chat.Messages.OrderByDescending(m => m.CreatedAt).ToList();
 
+        // If we get this, it means we want to know the page, where we have an unread message
+        // In a chat, we should start from an unread message, instead of at the very bottom
+        if (request.Page == -1)
+        {
+            var firstUnread = chat.Messages.Index().FirstOrDefault(m => !m.Item.IsRead);
+            request.Page = firstUnread.Index / (request.PageSize ?? 1);
+        }
+
         var paged = PagedList<MessageDto>.Create(chatMapper.Map(chat.Messages), request.Page, request.PageSize);
 
         return TypedResults.Ok(paged);

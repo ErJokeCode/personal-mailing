@@ -10,7 +10,8 @@ public class GroupRoute : IRoute
 {
     public void MapRoutes(WebApplication app)
     {
-        var group = app.MapGroup("/chatter/groups");
+        var group = app.MapGroup("/chatter/groups")
+            .WithTags("Группы");
 
         group.MapGet("/", GetAllGroupsQuery.Handle)
             .WithDescription("Получет все привязывания групп");

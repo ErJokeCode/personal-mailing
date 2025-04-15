@@ -1,5 +1,4 @@
 using System.Threading.Tasks;
-using Chatter.Routes.Chats.Maps;
 using MassTransit;
 using Chatter.Data;
 using Shared.Context.Groups.Messages;

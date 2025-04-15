@@ -10,7 +10,8 @@ public class ChatRoute : IRoute
 {
     public void MapRoutes(WebApplication app)
     {
-        var group = app.MapGroup("/chatter/chats");
+        var group = app.MapGroup("/chatter/chats")
+            .WithTags("Чаты");
 
         group.MapGet("/", GetChatsQuery.Handle)
             .WithDescription("Получает чаты админа");
@@ -27,7 +28,7 @@ public class ChatRoute : IRoute
             .WithDescription("Получает чат со студентом по айди");
 
         group.MapPatch("/{studentId}/read", ReadChatCommand.Handle)
-            .WithDescription("Делает чат прочитанным");
+            .WithDescription("Делает сообщения чата прочитанными");
 
         group.MapGet("/{studentId}/messages", GetMessagesQuery.Handle)
             .WithDescription("Получает сообщения в чате");
