@@ -39,7 +39,7 @@
     }
 </script>
 
-<ToolbarButton class="mr-2 hover:text-gray-900 dark:hover:text-white relative" id="bell">
+<ToolbarButton class="hover:text-gray-900 dark:hover:text-white relative" id="bell">
     <BellSolid size="lg" />
 
     {#if chats.length > 0}

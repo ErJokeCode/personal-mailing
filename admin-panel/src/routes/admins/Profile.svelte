@@ -6,7 +6,6 @@
 </script>
 
 <Breadcrumbs
-    class="m-4"
     pathItems={[
         { isHome: true },
         { name: "Профиль" },

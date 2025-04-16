@@ -4,7 +4,7 @@
       Avatar,
         Button,
         Heading,
-        Indicator,
+        Badge,
         Table,
         TableBody,
         TableBodyCell,
@@ -71,7 +71,6 @@
 </script>
 
 <Breadcrumbs
-    class="m-4"
     pathItems={[
         { isHome: true },
         { name: "Чаты" },
@@ -88,10 +87,14 @@
                 {#each chats as chat}
                     <div class="border-b last:border-b-0 bg-white dark:bg-gray-800
                                 border-gray-200 dark:border-gray-700 hover:bg-gray-50
-                                dark:hover:bg-gray-600 contrast text-lg first:rounded-t-lg
+                                dark:hover:bg-gray-700 contrast text-lg first:rounded-t-lg
                                 last:rounded-b-lg flex gap-4 px-6 py-4 text-nowrap w-full">
                         <div class="cursor-pointer" on:click={() => singleStudent(chat.student.email)}>
-                            <Avatar />
+                            {#if chat.student.info.name && chat.student.info.surname}
+                                <Avatar>{chat.student.info.name[0]}{chat.student.info.surname[0]}</Avatar>
+                            {:else}
+                                <Avatar />
+                            {/if}
                         </div>
                     
                         <div class="hidden md:block text-gray-900 dark:text-white">
@@ -105,7 +108,7 @@
                                         Вы
                                     {:else}
                                         <div class="hidden sm:block">{chat.student.info.surname} {chat.student.info.name} {chat.student.info.patronymic}</div>
-                                        <div class="block sm:hidden min-w-30">
+                                        <div class="block sm:hidden">
                                             {chat.student.info.surname} {chat.student.info.name[0]}. {chat.student.info.patronymic[0]}.
                                         </div>
                                     {/if}
@@ -123,11 +126,9 @@
                                     </div>
                                     
                                     {#if chat.unreadCount !== 0}
-                                        <div class="relative">
-                                            <Indicator color="dark" size="xl" class="text-white">
-                                                {chat.unreadCount}
-                                            </Indicator>
-                                        </div>
+                                        <Badge rounded color="dark">
+                                            {chat.unreadCount}
+                                        </Badge>
                                     {/if}
                                 </div>
                             </div>

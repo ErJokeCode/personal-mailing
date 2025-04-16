@@ -4,3 +4,5 @@ export const Chats = $state({
     paged: createPaged(),
     search: "",
 });
+
+export let show = $state({value: false});

@@ -34,7 +34,7 @@
 
 <header class="border-b border-b-gray-200 dark:border-b-gray-600 z-50">
     <Navbar {fluid} class="text-black">
-        {#if Me.value !== null}
+        {#if Me.value}
             <NavHamburger
                 onClick={() => (drawerHidden = !drawerHidden)}
                 class="m-0 sm:me-3 md:block lg:hidden"
@@ -46,14 +46,14 @@
             </span>
         </a>
 
-        <div class="ms-auto flex items-center text-gray-500 dark:text-gray-400 sm:order-2">
+        <div class="ms-auto flex items-center text-gray-500 dark:text-gray-400 sm:gap-2">
             {#if Me.value !== null}
-                <ToolbarButton class="mr-2 hover:text-gray-900 dark:hover:text-white" on:click={signout}>
+                <ToolbarButton class="hover:text-gray-900 dark:hover:text-white" on:click={signout}>
                     <ArrowRightToBracketOutline size="lg" />
                 </ToolbarButton>
                 <NotificationList />
             {:else}
-                <ToolbarButton class="mr-2 hover:text-gray-900 dark:hover:text-white" on:click={login}>
+                <ToolbarButton class="hover:text-gray-900 dark:hover:text-white" on:click={login}>
                     <ArrowLeftToBracketOutline size="lg" />
                 </ToolbarButton>
             {/if}

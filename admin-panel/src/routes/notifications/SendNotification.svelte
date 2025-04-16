@@ -251,8 +251,8 @@
 
 <BackButton title="Отправить рассылку" class="m-4" />
 
-<div class="flex gap-4 mt-4">
-    <Panel class="flex-1 ml-4">
+<div class="mx-4 flex gap-4 mt-4 flex-wrap lg:flex-nowrap">
+    <Panel class="flex-1">
         <Dropzone bind:files multiple class="mb-4">
             {#if !files || files.length < 0}
                 <CloudArrowUpOutline class="dark:text-white" size="xl" />
@@ -296,7 +296,7 @@
         </div>
     </Panel>
 
-    <Panel class="flex-1 mr-4">
+    <Panel class="flex-1">
         <Heading tag="h3" class="mb-2">Фильтры</Heading>
 
         <div class="flex gap-4 mb-4">
@@ -339,7 +339,7 @@
 
         {@render inputText("team", "Команда", "team", "Название команды")}
 
-        <div class="flex gap-2">
+        <div class="flex gap-2 mt-4">
             <Button on:click={applyFilters}>Применить</Button>
             <Button on:click={clearFilters}>Сбросить</Button>
         </div>

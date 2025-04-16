@@ -10,7 +10,7 @@
         A,
     } from "flowbite-svelte";
     import { Label, Modal } from "flowbite-svelte";
-    import { ExclamationCircleOutline } from "flowbite-svelte-icons";
+    import { ExclamationCircleOutline, FileLinesOutline } from "flowbite-svelte-icons";
     import Panel from "/src/lib/components/Panel.svelte";
     import http from "/src/lib/utils/http";
     import Breadcrumbs from "/src/lib/components/Breadcrumbs.svelte";
@@ -298,7 +298,7 @@
                     {toDate(knowledgeItem?.updated_at)}
                 </p>
             </Panel>
-            <Panel class="mb-4">
+            <Panel class="mb-4 flex flex-column flex-1">
                 <Heading
                     tag="h2"
                     class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl mb-4">
@@ -315,6 +315,9 @@
                         </A>
                     {/each}
                 </div> -->
+                <div class="mr-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100 text-primary-600 dark:bg-primary-900 dark:text-primary-300">
+                    <FileLinesOutline size="lg" />
+                </div>
                 <A>bibabiba</A>
                 <A>bibabiba2</A>
                 <A>bibabiba3</A>
@@ -364,7 +367,7 @@
                                         <div>
                                             {chat.student.email}
                                         </div>
-                                        <div >
+                                        <div>
                                             {chat.student.info.surname} {chat.student.info.name[0]}. {chat.student.info.patronymic[0]}. 
                                         </div>
                                         <div>
