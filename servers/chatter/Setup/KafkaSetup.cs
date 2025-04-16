@@ -57,6 +57,7 @@ public static class KafkaSetup
         {
             e.CreateIfMissing();
             e.ConfigureConsumer<TConsumer>(context);
+            e.UseMessageRetry(r => r.Incremental(5, TimeSpan.FromSeconds(1), TimeSpan.FromSeconds(5)));
         });
     }
 }

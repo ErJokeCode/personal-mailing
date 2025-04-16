@@ -1,24 +1,17 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using Azure.Storage.Blobs;
-using Core.Abstractions.MailService;
-using Core.Abstractions.Parser;
-using Core.Abstractions.UserAccesor;
 using Core.Data;
+using Core.Features.Admins.Commands;
 using Core.Identity;
-using Core.Infrastructure.Services;
 using Core.Models;
-using Core.Routes;
-using Core.Routes.Admins.Commands;
-using Core.Routes.Events.Commands;
+using Core.Services.UserAccessor;
+using Core.Setup;
 using Core.Signal;
 using FluentValidation;
 using MassTransit;
-using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
@@ -27,16 +20,12 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Minio;
 using Scalar.AspNetCore;
 using Shared.Context.Admins.Messages;
-using Shared.Context.Students.Messages;
+using Shared.Infrastructure.Extensions;
 using Shared.Infrastructure.Handlers;
-using Shared.Messages.Groups;
-using Shared.Services.FileStorage;
 
 namespace Core;
 
@@ -130,33 +119,11 @@ public static class Startup
         builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
         builder.Services.AddReverseProxy().LoadFromMemory(YarpReverseProxy.GetRoutes(), YarpReverseProxy.GetClusters());
 
+        builder.Services.AddMappers(typeof(Program).Assembly);
+
+        builder.Services.AddScoped<AdminService>();
+
         builder.Services.AddScoped<IUserAccessor, UserAccessor>();
-
-        builder.Services.Configure<ParserOptions>(o =>
-        {
-            o.ParserUrl = Environment.GetEnvironmentVariable("PARSER_URL")!;
-        });
-        builder.Services.AddScoped<IParser, Parser>();
-
-        builder.Services.AddMinio(
-            configureClient => configureClient
-                .WithEndpoint(Environment.GetEnvironmentVariable("MINIO_URL"))
-                .WithCredentials(Environment.GetEnvironmentVariable("MINIO_ACCESS_KEY"), Environment.GetEnvironmentVariable("MINIO_SECRET_KEY"))
-                .WithSSL(false)
-                .Build()
-        );
-
-        builder.Services.Configure<FileStorageOptions>(o =>
-        {
-            o.BucketName = Environment.GetEnvironmentVariable("MINIO_BUCKET")!;
-        });
-        builder.Services.AddSingleton<IFileStorage, MinioStorage>();
-
-        builder.Services.Configure<MailServiceOptions>(o =>
-        {
-            o.MailServiceUrl = Environment.GetEnvironmentVariable("BOT_URL")!;
-        });
-        builder.Services.AddScoped<IMailService, TelegramBot>();
 
         builder.Services.AddMassTransit(x =>
         {
@@ -165,9 +132,6 @@ public static class Startup
             x.AddRider(rider =>
             {
                 rider.AddProducer<AdminCreatedMessage>(AdminCreatedMessage.TopicName);
-                rider.AddProducer<StudentAuthedMessage>(StudentAuthedMessage.TopicName);
-                rider.AddProducer<StudentsUpdatedMessage>(StudentsUpdatedMessage.TopicName);
-                rider.AddProducer<GroupsAddedMessage>(GroupsAddedMessage.TopicName);
 
                 rider.UsingKafka((context, k) =>
                 {
@@ -199,7 +163,6 @@ public static class Startup
         }
 
         await app.EnsureAdminCreated();
-        await app.UpdateStudentsInfo();
 
         app.UseCors();
         app.UseAuthentication();
@@ -227,20 +190,6 @@ public static class Startup
         .RequireAuthorization();
     }
 
-    public static void MapRoutes(this WebApplication app)
-    {
-        IEnumerable<IRoute> routes = typeof(Program).Assembly
-            .GetTypes()
-            .Where(t => t.IsAssignableTo(typeof(IRoute)) && !t.IsAbstract && !t.IsInterface)
-            .Select(Activator.CreateInstance)
-            .Cast<IRoute>();
-
-        foreach (var route in routes)
-        {
-            route.MapRoutes(app);
-        }
-    }
-
     private static void MigrateDatabase(this WebApplication app)
     {
         using var scope = app.Services.CreateScope();
@@ -255,24 +204,14 @@ public static class Startup
     private static async Task EnsureAdminCreated(this WebApplication app)
     {
         using var scope = app.Services.CreateScope();
-        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+        var adminService = scope.ServiceProvider.GetRequiredService<AdminService>();
 
-        var command = new CreateAdminCommand()
+        var request = new CreateAdminCommand.Request()
         {
             Email = Environment.GetEnvironmentVariable("MAIN_ADMIN_EMAIL")!,
             Password = Environment.GetEnvironmentVariable("MAIN_ADMIN_PASSWORD")!
         };
 
-        await mediator.Send(command);
-    }
-
-    private static async Task UpdateStudentsInfo(this WebApplication app)
-    {
-        using var scope = app.Services.CreateScope();
-        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-
-        var command = new UploadEventCommand();
-
-        await mediator.Send(command);
+        await adminService.CreateAdminAsync(request);
     }
 }

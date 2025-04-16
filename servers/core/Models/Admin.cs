@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Microsoft.AspNetCore.Identity;
 using Riok.Mapperly.Abstractions;
 
@@ -8,12 +7,6 @@ namespace Core.Models;
 public class Admin : IdentityUser<Guid>
 {
     public required DateOnly CreatedAt { get; set; }
-
-    [MapperIgnore]
-    public ICollection<GroupAssignment> Groups { get; set; } = [];
-
-    [MapperIgnore]
-    public ICollection<Chat> Chats { get; set; } = [];
 
     [MapperIgnore]
     public override DateTimeOffset? LockoutEnd { get; set; }

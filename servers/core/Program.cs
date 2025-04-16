@@ -1,6 +1,7 @@
 using System.Threading.Tasks;
 using dotenv.net;
 using Microsoft.AspNetCore.Builder;
+using Shared.Infrastructure.Extensions;
 
 namespace Core;
 
@@ -17,7 +18,7 @@ public class Program
 
         var app = builder.Build();
         await app.InitialzieServices();
-        app.MapRoutes();
+        app.MapRoutes(typeof(Program).Assembly);
 
         app.Run();
     }

@@ -19,8 +19,6 @@ services:
     depends_on:
       core-db:
         condition: service_started
-      minio:
-        condition: service_started
       kafka:
         condition: service_started
       parser:
