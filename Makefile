@@ -98,4 +98,8 @@ help:
 	@echo "  make stop-all        - Остановка всех контейнеров Docker в системе (Linux/WSL)"
 	@echo "  make stop-all-win    - Остановка всех контейнеров Docker в системе (Windows)"
 	@echo "  make prune-all       - Полная очистка системы Docker (образы, контейнеры, тома)"
-	@echo "  make help            - Справка" 
+	@echo "  make help            - Справка"
+
+# Дополнительная команда для Elasticsearch
+elasticsearch-disable-disk-threshold:
+	docker-compose exec elasticsearch curl -XPUT -H "Content-Type: application/json" http://localhost:9200/_cluster/settings -d '{"transient": {"cluster.routing.allocation.disk.threshold_enabled": false}}' 

@@ -1,77 +1,80 @@
 from sqlalchemy import inspect, select
 from sqlalchemy.engine import Result
 from sqlalchemy.ext.asyncio import AsyncSession
+import uuid
+from typing import Optional, List
 
 from app.models.category import Category
 from app.schemas.category import CategoryCreate, CategoryUpdate
+from app.models.version_types import ChangeType
+from app.crud.category_version import create_category_version
 
 
 async def get_categories(
     session: AsyncSession,
-    skip: int,
-    limit: int,
-) -> list[Category]:
-    stmt = select(Category).offset(skip).limit(limit).order_by(Category.id)
-    result: Result = await session.execute(stmt)
+    skip: int = 0,
+    limit: int = 100,
+) -> List[Category]:
+    stmt = select(Category).offset(skip).limit(limit)
+    result = await session.execute(stmt)
     return list(result.scalars().all())
 
 
 async def create_category(
-    category_in: CategoryCreate,
     session: AsyncSession,
+    name: str,
+    tutor_id: uuid.UUID,
 ) -> Category:
-    category = Category(**category_in.model_dump())
+    category = Category(name=name, tutor_id=tutor_id)
     session.add(category)
+    await session.flush()
+
+    await create_category_version(
+        session=session,
+        category=category,
+        change_type=ChangeType.CREATE,
+        tutor_id=tutor_id
+    )
+
     await session.commit()
     await session.refresh(category)
     return category
 
 
-async def get_category_by_id(
-    category_id: int,
+async def get_category(
     session: AsyncSession,
-) -> Category | None:
+    category_id: uuid.UUID,
+) -> Optional[Category]:
     stmt = select(Category).where(Category.id == category_id)
-    result: Result = await session.execute(stmt)
+    result = await session.execute(stmt)
     return result.scalar_one_or_none()
 
 
 async def update_category(
-    category_id: int,
-    category_in: CategoryUpdate,
     session: AsyncSession,
-    exclude_unset: bool,
-) -> Category | None:
-    category = await get_category_by_id(category_id, session)
+    category_id: uuid.UUID,
+    name: str,
+    tutor_id: uuid.UUID,
+) -> Optional[Category]:
+    category = await get_category(session, category_id)
     if not category:
         return None
 
-    update_data = category_in.model_dump(exclude_unset=exclude_unset)
 
-    # Получаем информацию о колонках модели
-    mapper = inspect(Category)
-    non_nullable_columns = [
-        c.key for c in mapper.columns if not c.nullable and c.key != "id"
-    ]
+    old_name = category.name
 
-    # Проверка tutor_id = 0
-    if "tutor_id" in update_data and update_data["tutor_id"] == 0:
-        raise ValueError("tutor_id не может быть равен 0")
 
-    # Для обязательных полей с NULL значениями:
-    for field in non_nullable_columns:
-        if field in update_data and update_data[field] is None:
-            if exclude_unset:
-                # Для PATCH - пропускаем NULL значения
-                del update_data[field]
-            else:
-                # Для PUT - выдаем ошибку, т.к. обязательные поля не могут быть NULL
-                raise ValueError(
-                    f"Поле '{field}' не может быть NULL при полном обновлении (PUT)"
-                )
+    old_version = await create_category_version(
+        session=session,
+        category=category,
+        change_type=ChangeType.UPDATE,
+        tutor_id=tutor_id
+    )
 
-    for field, value in update_data.items():
-        setattr(category, field, value)
+
+    category.name = name
+
+    await session.flush()
 
     await session.commit()
     await session.refresh(category)
@@ -79,13 +82,33 @@ async def update_category(
 
 
 async def delete_category(
-    category_id: int,
     session: AsyncSession,
+    category_id: uuid.UUID,
+    tutor_id: uuid.UUID,
 ) -> bool:
-    category = await get_category_by_id(category_id, session)
+    category = await get_category(session, category_id)
     if not category:
         return False
 
+
+    category_data = {
+        "category_id": category.id,
+        "name": category.name,
+        "tutor_id": tutor_id,
+        "change_type": ChangeType.DELETE
+    }
+
+
+    await create_category_version(
+        session=session,
+        category=category,
+        change_type=ChangeType.DELETE,
+        tutor_id=tutor_id
+    )
+
+    await session.flush()
+
+    # Удаляем категорию
     await session.delete(category)
     await session.commit()
     return True

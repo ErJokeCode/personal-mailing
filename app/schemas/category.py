@@ -1,16 +1,20 @@
 from datetime import datetime
+import uuid
 
 from pydantic import BaseModel, ConfigDict, Field
 
 
 class CategoryBase(BaseModel):
     name: str = Field(
-        min_length=5,
+        min_length=1,
         max_length=150,
         description="Category name",
         example="Python",
     )
-    tutor_id: int = Field(default=1, gt=0, description="Tutor id. Required to fill in")
+    tutor_id: uuid.UUID = Field(
+        default_factory=uuid.uuid4,
+        description="Tutor id. Required to fill in"
+    )
 
 
 class CategoryCreate(CategoryBase):
@@ -19,19 +23,22 @@ class CategoryCreate(CategoryBase):
 
 class CategoryUpdate(BaseModel):
     name: str | None = Field(
-        min_length=5,
+        min_length=1,
         max_length=150,
         description="Category name",
         example="Python",
         default=None,
     )
-    tutor_id: int | None = Field(default=None, gt=0, description="Tutor id")
+    tutor_id: uuid.UUID | None = Field(
+        default=None,
+        description="Tutor id"
+    )
 
 
 class CategoryResponse(CategoryBase):
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
+    id: uuid.UUID
     created_at: datetime = Field(
         description="Created at", default_factory=datetime.utcnow
     )
