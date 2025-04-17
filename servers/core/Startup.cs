@@ -5,25 +5,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using Core.Data;
 using Core.Features.Admins.Commands;
-using Core.Identity;
-using Core.Models;
 using Core.Services.UserAccessor;
 using Core.Setup;
 using Core.Signal;
 using FluentValidation;
 using MassTransit;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Scalar.AspNetCore;
-using Shared.Context.Admins.Messages;
 using Shared.Infrastructure.Extensions;
 using Shared.Infrastructure.Handlers;
 
@@ -40,7 +31,6 @@ public static class Startup
         builder.Services.AddHttpClient();
         builder.Services.AddHealthChecks();
         builder.Services.AddSignalR();
-
         builder.Services.AddOpenApi();
 
         builder.Services.AddCors(
@@ -52,93 +42,15 @@ public static class Startup
             )
         );
 
-        var host = Environment.GetEnvironmentVariable("POSTGRES_URL");
-        var database = Environment.GetEnvironmentVariable("POSTGRES_DB");
-        var password = Environment.GetEnvironmentVariable("POSTGRES_PASSWORD");
-        var user = Environment.GetEnvironmentVariable("POSTGRES_USER");
-
-        var connection = $"Host={host};Port={5432};Database={database};Username={user};Password={password};Include Error Detail=True";
-        builder.Services.AddDbContext<AppDbContext>(o =>
-        {
-            o.UseNpgsql(connection);
-            o.ConfigureWarnings(w => w.Throw(RelationalEventId.MultipleCollectionIncludeWarning));
-        });
-
-        builder.Services.AddAuthentication()
-            .AddScheme<AuthenticationSchemeOptions, SecretTokenAuthenticationHandler>("SecretTokenScheme", null);
-
-        builder.Services.AddAuthorization(o =>
-        {
-            o.AddPolicy(SecretTokenAuthentication.Policy, (p) =>
-            {
-                p.RequireClaim(SecretTokenAuthentication.Claim);
-            });
-
-            o.DefaultPolicy = new AuthorizationPolicyBuilder()
-                .AddAuthenticationSchemes("SecretTokenScheme", IdentityConstants.ApplicationScheme)
-                .RequireAuthenticatedUser()
-                .Build();
-        });
-
-        builder.Services.AddIdentity<Admin, IdentityRole<Guid>>((o) =>
-        {
-            o.Password.RequireDigit = false;
-            o.Password.RequireNonAlphanumeric = false;
-            o.Password.RequireLowercase = false;
-            o.Password.RequireUppercase = false;
-            o.Password.RequiredUniqueChars = 0;
-            o.Password.RequiredLength = 1;
-            // FIXME doesnt allow "admin" as email so comment out for now
-            // options.User.RequireUniqueEmail = true;
-        })
-        .AddEntityFrameworkStores<AppDbContext>()
-        .AddDefaultTokenProviders();
-
-        builder.Services.ConfigureApplicationCookie(o =>
-        {
-            o.SlidingExpiration = true;
-            o.SessionStore = new AdminTicketStore(builder.Services);
-
-            o.Events = new CookieAuthenticationEvents
-            {
-                OnRedirectToLogin = context =>
-                {
-                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                    return Task.CompletedTask;
-                },
-
-                OnRedirectToAccessDenied = context =>
-                {
-                    context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                    return Task.CompletedTask;
-                }
-            };
-        });
-
-        builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(Program).Assembly));
         builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
-        builder.Services.AddReverseProxy().LoadFromMemory(YarpReverseProxy.GetRoutes(), YarpReverseProxy.GetClusters());
-
+        builder.Services.AddReverseProxy().LoadFromMemory(ProxySetup.GetRoutes(), ProxySetup.GetClusters());
         builder.Services.AddMappers(typeof(Program).Assembly);
 
-        builder.Services.AddScoped<AdminService>();
+        builder.Services.RegisterServices();
 
-        builder.Services.AddScoped<IUserAccessor, UserAccessor>();
-
-        builder.Services.AddMassTransit(x =>
-        {
-            x.UsingInMemory();
-
-            x.AddRider(rider =>
-            {
-                rider.AddProducer<AdminCreatedMessage>(AdminCreatedMessage.TopicName);
-
-                rider.UsingKafka((context, k) =>
-                {
-                    k.Host(Environment.GetEnvironmentVariable("KAFKA_URL"));
-                });
-            });
-        });
+        builder.Services.SetupDatabase();
+        builder.Services.SetupIdentity();
+        builder.Services.SetupKafka();
     }
 
     public static async Task InitialzieServices(this WebApplication app)
