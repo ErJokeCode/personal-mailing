@@ -106,7 +106,7 @@
             tutor_id: Me.value.id,
         };
         let response = await fetch(`${Base}/categories/${id}`, {
-            method: 'PUT',
+            method: 'PATCH',
             headers: {
                 Accept: "application/json, */*",
                 "Content-Type": "application/json",

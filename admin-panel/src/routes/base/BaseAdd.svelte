@@ -57,10 +57,12 @@
             return;
         }
         let body = {
-            question: question,
             answer: answer,
-            tutor_id: 1,
-            category_id: Number(document.getElementById('topic').value),
+            answer_tags: [],
+            question: question,
+            question_tags: [],
+            tutor_id: Me.value.id,
+            category_id: document.getElementById('topic').value,
         };
             let response = await fetch(`${Base}/knowledge-items/`, {
                 method: 'POST',

@@ -76,16 +76,18 @@
     }
 
     const update = async () => {
-        let newId = Number(document.getElementById('topic').value);
+        let newId = document.getElementById('topic').value;
         if (question === knowledgeItem.question && answer === knowledgeItem.answer && newId === knowledgeItem.category_id) return;
         let body = {
             question: question,
+            question_tags: [],
             answer: answer,
-            tutor_id: 1,
+            answer_tags: [],
+            tutor_id: Me.value.id,
             category_id: newId,
         };
         let response = await fetch(`${Base}/knowledge-items/${id}`, {
-            method: 'PUT',
+            method: 'PATCH',
             headers: {
                 Accept: "application/json, */*",
                 "Content-Type": "application/json",
@@ -98,8 +100,13 @@
                 type: "ok",
                 text: "Успешно изменено",
             });
+        } else {
+            notifications.add({
+                type: "error",
+                text: response.statusText,
+            })
+            getKnowledgeItem();
         }
-        getKnowledgeItem();
     }
 
     const deleteItem = async () => {
@@ -129,7 +136,7 @@
             // }
 
             let res = await fetch(ChatsApi, {
-                method: "Post",
+                method: "POST",
                 body: data,
                 credentials: "include",
             });

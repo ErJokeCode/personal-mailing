@@ -5,3 +5,5 @@ __pycache__
 venv
 /admin-panel/.pnpm-store
 /admin-panel2-revenge-of-the-backender/node_modules
+/servers/knowledge-base/minio-data
+/servers/knowledge-base/minio-data/.minio.sys
