@@ -10,28 +10,21 @@ from app.core.elasticsearch import (
     index_existing_knowledge_items,
     init_elasticsearch,
 )
+from app.core.minio import init_minio
 from app.core.session import db_session
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
-    # startup
-
-    # Инициализация Elasticsearch
     await init_elasticsearch()
+    await init_minio()
 
-    # Индексация всех существующих элементов знаний
     async with db_session.session_factory() as session:
         await index_existing_knowledge_items(session)
 
     yield
-    # shutdown
-
-    # Закрываем пул соединений с базой данных и освобождаем все ресурсы,
-    # чтобы предотвратить утечки соединений с БД.
+    
     await db_session.dispose()
-
-    # Закрытие соединения с Elasticsearch
     await close_elasticsearch()
 
 

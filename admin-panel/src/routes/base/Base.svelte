@@ -70,14 +70,13 @@
     };
     
     const addCategory = async () => {
-        console.log(Me.value.id)
-        if (newCategory.length < 5) {
-            errAddCategory = 'Длина должна быть больше или равна 5';
+        if (newCategory.length < 1) {
+            errAddCategory = 'Длина должна быть больше или равна 1 символу';
             return;
         }
         let body = {
             name: newCategory,
-            tutor_id: 1,
+            tutor_id: Me.value.id,
         };
         let response = await fetch(`${Base}/categories/`, {
             method: 'POST',
@@ -98,14 +97,13 @@
     };
 
     const editCategory = async (id) => {
-        console.log(Me.value.id)
-        if (changeCategory.length < 5) {
-            errChangeCategory = 'Длина должна быть больше или равна 5';
+        if (changeCategory.length < 1) {
+            errChangeCategory = 'Длина должна быть больше или равна 1 символу';
             return;
         }
         let body = {
             name: changeCategory,
-            tutor_id: 1,
+            tutor_id: Me.value.id,
         };
         let response = await fetch(`${Base}/categories/${id}`, {
             method: 'PUT',
@@ -126,7 +124,7 @@
     };
     
     const deleteCategory = async (id) => {
-        let response = await fetch(`${Base}/categories/${id}`, {
+        await fetch(`${Base}/categories/${id}`, {
             method: 'DELETE',
             credentials: "include",
         });
@@ -148,13 +146,13 @@
         if (selected === 'Все категории') {
             body = {
                 query: searchTerm,
-                tutor_id: 1,
+                tutor_id: Me.value.id,
                 size: 100,
             };
         } else {
             body = {
                 query: searchTerm,
-                tutor_id: 1,
+                tutor_id: Me.value.id,
                 category_id: Number(document.getElementById('selected').value),
                 size: 100,
             };

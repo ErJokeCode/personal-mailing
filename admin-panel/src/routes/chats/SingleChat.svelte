@@ -10,7 +10,6 @@
         Spinner,
         Sidebar,
         SidebarWrapper,
-        Heading,
         Tabs,
         TabItem
     } from "flowbite-svelte";

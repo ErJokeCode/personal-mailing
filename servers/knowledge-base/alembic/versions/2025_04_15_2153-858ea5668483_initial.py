@@ -1,8 +1,8 @@
 """initial
 
-Revision ID: c4891780158a
+Revision ID: 858ea5668483
 Revises:
-Create Date: 2025-03-15 22:21:47.050560
+Create Date: 2025-04-15 21:53:36.291175
 
 """
 
@@ -13,7 +13,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = "c4891780158a"
+revision: str = "858ea5668483"
 down_revision: Union[str, None] = None
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
@@ -23,9 +23,11 @@ def upgrade() -> None:
     """Upgrade schema."""
     op.create_table(
         "categories",
-        sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("name", sa.String(length=150), nullable=False),
-        sa.Column("tutor_id", sa.Integer(), nullable=False),
+        sa.Column("tutor_id", sa.UUID(), nullable=False),
+        sa.Column(
+            "id", sa.UUID(), server_default=sa.text("gen_random_uuid()"), nullable=False
+        ),
         sa.Column(
             "created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
         ),
@@ -40,11 +42,13 @@ def upgrade() -> None:
     )
     op.create_table(
         "knowledge_items",
-        sa.Column("id", sa.Integer(), autoincrement=True, nullable=False),
         sa.Column("question", sa.Text(), server_default="", nullable=False),
         sa.Column("answer", sa.Text(), server_default="", nullable=False),
-        sa.Column("tutor_id", sa.Integer(), nullable=False),
-        sa.Column("category_id", sa.Integer(), nullable=False),
+        sa.Column("tutor_id", sa.UUID(), nullable=False),
+        sa.Column("category_id", sa.UUID(), nullable=False),
+        sa.Column(
+            "id", sa.UUID(), server_default=sa.text("gen_random_uuid()"), nullable=False
+        ),
         sa.Column(
             "created_at", sa.DateTime(), server_default=sa.text("now()"), nullable=False
         ),
@@ -63,10 +67,17 @@ def upgrade() -> None:
         ["category_id"],
         unique=False,
     )
+    op.create_index(
+        op.f("ix_knowledge_items_tutor_id"),
+        "knowledge_items",
+        ["tutor_id"],
+        unique=False,
+    )
 
 
 def downgrade() -> None:
     """Downgrade schema."""
+    op.drop_index(op.f("ix_knowledge_items_tutor_id"), table_name="knowledge_items")
     op.drop_index(op.f("ix_knowledge_items_category_id"), table_name="knowledge_items")
     op.drop_table("knowledge_items")
     op.drop_index(op.f("ix_categories_tutor_id"), table_name="categories")

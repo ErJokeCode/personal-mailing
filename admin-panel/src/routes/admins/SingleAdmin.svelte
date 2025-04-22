@@ -1,11 +1,10 @@
 <script lang="ts">
     import BackButton from "/src/lib/components/BackButton.svelte";
     import { type Route } from "@mateothegreat/svelte5-router";
-    import { Heading, Spinner } from "flowbite-svelte";
+    import { Heading } from "flowbite-svelte";
     import AdminInfo from "./shared/AdminInfo.svelte";
     import { GeneralError } from "/src/lib/errors";
     import { AdminsApi } from "/src/lib/server";
-    import ErrorAlert from "/src/lib/components/ErrorAlert.svelte";
     import Get from "/src/lib/components/Get.svelte";
 
     let { route }: { route: Route } = $props();

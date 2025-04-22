@@ -1,14 +1,10 @@
 <script lang="ts">
     import { GeneralError } from "/src/lib/errors";
-    import { Button, Helper, Spinner, Toast } from "flowbite-svelte";
+    import { Button, Helper, Spinner } from "flowbite-svelte";
     import Panel from "/src/lib/components/Panel.svelte";
     import { AdminsApi } from "/src/lib/server";
     import BackButton from "/src/lib/components/BackButton.svelte";
-    import {
-        goto,
-        QueryString,
-        type Route,
-    } from "@mateothegreat/svelte5-router";
+    import { goto } from "@mateothegreat/svelte5-router";
     import InputHelper from "/src/lib/components/InputHelper.svelte";
     import ToastNotifications from "/src/lib/components/ToastNotifications.svelte";
 
@@ -18,8 +14,6 @@
 
     let status = $state("");
     let buttonText = $state("Создать");
-
-    let { route }: { route: Route } = $props();
 
     function clear() {
         form = { Email: "", Password: "" };

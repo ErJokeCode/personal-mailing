@@ -1,7 +1,7 @@
 FROM python:3.13-slim
 
-ENV PYTHONUNBUFFERED 1
-ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
 
 WORKDIR /knowledge-base
 
@@ -32,4 +32,4 @@ COPY seed.py ./
 EXPOSE 8080
 
 # Запуск миграций и приложения
-CMD alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8080
+CMD ["sh", "-c", "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8080"]

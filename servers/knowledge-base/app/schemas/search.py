@@ -1,4 +1,6 @@
 from pydantic import BaseModel, Field
+import uuid
+from typing import Any, Dict, List, Optional
 
 
 class SearchHighlight(BaseModel):
@@ -11,11 +13,11 @@ class SearchHighlight(BaseModel):
 class SearchHit(BaseModel):
     """Схема для одного результата поиска."""
 
-    id: int
+    id: uuid.UUID
     question: str
     answer: str
-    tutor_id: int
-    category_id: int
+    tutor_id: uuid.UUID
+    category_id: uuid.UUID
     created_at: str
     updated_at: str
     score: float
@@ -37,7 +39,15 @@ class SearchRequest(BaseModel):
     """Схема для поискового запроса."""
 
     query: str = Field(..., description="Поисковый запрос")
-    category_id: int | None = Field(None, description="ID категории для фильтрации")
-    tutor_id: int | None = Field(None, description="ID тьютора для фильтрации")
+    category_id: uuid.UUID | None = Field(None, description="ID категории для фильтрации")
+    tutor_id: uuid.UUID | None = Field(None, description="ID тьютора для фильтрации")
     from_: int = Field(0, description="Начальная позиция для пагинации", ge=0)
     size: int = Field(10, description="Размер страницы для пагинации", ge=1, le=100)
+
+
+class SearchError(BaseModel):
+    """Схема для ошибок поиска."""
+    
+    detail: str = Field(..., description="Описание ошибки")
+    error_type: str | None = Field(None, description="Тип ошибки")
+    raw_query: dict[str, Any] | None = Field(None, description="Исходный запрос к Elasticsearch")

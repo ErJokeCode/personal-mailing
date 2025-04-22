@@ -50,6 +50,14 @@ class ElasticsearchConfig(BaseModel):
     verify_certs: bool = False
 
 
+class MinioConfig(BaseModel):
+    endpoint: str = "minio:9000"
+    access_key: str = "minioadmin"
+    secret_key: str = "minioadmin"
+    secure: bool = False
+    bucket_name: str = "knowledge-base"
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=(
@@ -63,6 +71,7 @@ class Settings(BaseSettings):
     logging: LoggingConfig = LoggingConfig()
     db: DatabaseConfig
     es: ElasticsearchConfig
+    minio: MinioConfig = MinioConfig()
 
 
 settings = Settings()

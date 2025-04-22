@@ -2,15 +2,12 @@
     import BackButton from "/src/lib/components/BackButton.svelte";
     import {
         goto,
-        QueryString,
         type Route,
     } from "@mateothegreat/svelte5-router";
     import { GeneralError } from "/src/lib/errors";
     import {
-        AdminsApi,
         DocumentsApi,
         NotificationsApi,
-        StudentsApi,
     } from "/src/lib/server";
     import Get from "/src/lib/components/Get.svelte";
     import { A, Button, Heading, TabItem, Tabs } from "flowbite-svelte";

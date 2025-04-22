@@ -22,19 +22,19 @@
     import { signal } from "/src/lib/utils/signal";
     import Breadcrumbs from "/src/lib/components/Breadcrumbs.svelte";
 
-    let student_files;
-    let student_success = "";
-    let modeus_files;
-    let modeus_success = "";
-    let courses_files;
-    let courses_success = "";
+    let student_files = $state();
+    let student_success = $state("");
+    let modeus_files = $state();
+    let modeus_success = $state("");
+    let courses_files = $state();
+    let courses_success = $state("");
 
     let status = http.status();
-    let history = [];
+    let history = $state([]);
     let limit = -1;
 
-    let maxPage = 0;
-    let curPage = 0;
+    let maxPage = $state(0);
+    let curPage = $state(0);
     let amountPage = 10;
     let select;
 
@@ -58,7 +58,7 @@
         signal.off("FileUploaded", handleUploadDone);
     });
 
-    async function handleUploadDone(message) {
+    async function handleUploadDone() {
         status = status.start_load();
         history =
             (await http.get(
