@@ -78,6 +78,7 @@
     const update = async () => {
         let newId = document.getElementById('topic').value;
         if (question === knowledgeItem.question && answer === knowledgeItem.answer && newId === knowledgeItem.category_id) return;
+
         let body = {
             question: question,
             question_tags: [],
@@ -86,6 +87,7 @@
             tutor_id: Me.value.id,
             category_id: newId,
         };
+
         let response = await fetch(`${Base}/knowledge-items/${id}`, {
             method: 'PATCH',
             headers: {
@@ -95,17 +97,18 @@
             credentials: "include",
             body: JSON.stringify(body)
         });
+
         if (response.ok) {
             notifications.add({
                 type: "ok",
                 text: "Успешно изменено",
             });
+            getKnowledgeItem();
         } else {
             notifications.add({
                 type: "error",
                 text: response.statusText,
             })
-            getKnowledgeItem();
         }
     }
 
@@ -180,10 +183,6 @@
                     || chat.student.info.name.toLowerCase().includes(search.toLowerCase())
                     || chat.student.info.patronymic.toLowerCase().includes(search.toLowerCase())
         );
-    }
-
-    function toDate(rawDate) {
-        return new Date(rawDate).toLocaleString("ru");
     }
     
     function handleKeydown(event) {
@@ -298,11 +297,15 @@
                 </Heading>
                 <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
                     <b>Создано:</b>
-                    {toDate(knowledgeItem?.created_at)}
+                    {new Date(knowledgeItem?.created_at).toLocaleString("ru")}
                 </p>
                 <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
                     <b>Изменено:</b>
-                    {toDate(knowledgeItem?.updated_at)}
+                    {new Date(knowledgeItem?.updated_at).toLocaleString("ru")}
+                </p>
+                <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
+                    <b>Создал:</b>
+                    {knowledgeItem?.tutor_id}
                 </p>
             </Panel>
             <Panel class="mb-4 flex flex-column flex-1">
@@ -322,9 +325,6 @@
                         </A>
                     {/each}
                 </div> -->
-                <div class="mr-3 flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100 text-primary-600 dark:bg-primary-900 dark:text-primary-300">
-                    <FileLinesOutline size="lg" />
-                </div>
                 <A>bibabiba</A>
                 <A>bibabiba2</A>
                 <A>bibabiba3</A>
@@ -363,6 +363,12 @@
                                 onkeydown={handleKeydown}
                             />
                             <ul class="max-h-60 overflow-y-auto" role="listbox">
+                                {#if chats.length === 0}
+                                    <li
+                                        class="py-2 px-3">
+                                        Нет чатов
+                                    </li>
+                                {/if}
                                 {#each filteredChats() as chat, index}
                                     <li
                                         class="py-2 px-3 cursor-pointer flex justify-between hover:rounded {index === highlightedIndex ? 'bg-gray-200 dark:bg-gray-600' : 'hover:bg-gray-100 dark:hover:bg-gray-600'}"

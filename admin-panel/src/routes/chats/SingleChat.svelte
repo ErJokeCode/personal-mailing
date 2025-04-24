@@ -11,7 +11,8 @@
         Sidebar,
         SidebarWrapper,
         Tabs,
-        TabItem
+        TabItem,
+        Heading,
     } from "flowbite-svelte";
     import { createPaged } from "/src/lib/components/Paged.svelte";
     import { onDestroy, onMount } from "svelte";
@@ -26,7 +27,7 @@
     import ToastNotifications from "/src/lib/components/ToastNotifications.svelte";
     import { signal } from "/src/lib/utils/signal";
     import Breadcrumbs from "/src/lib/components/Breadcrumbs.svelte";
-    import { show } from "/src/stores/chats/Chats.svelte";
+    import { panel } from "/src/stores/chats/Chats.svelte";
 
     let props = $props();
     let studentId = props.route.params?.["studentId"] ?? "";
@@ -244,7 +245,7 @@
                         { name: "Чаты", href: "/chats" },
                         { name: `${chat.student?.info.surname} ${chat.student?.info.name[0]}. ${chat.student?.info.patronymic[0]}.` },
                     ]} />
-                <button on:click={() => show.value = !show.value}
+                <button on:click={() => panel.show = !panel.show}
                         class="absolute -right-2 -top-2 rounded p-1 hover:bg-gray-100 dark:hover:bg-gray-600
                             focus:outline-none cursor-pointer">
                     <RectangleListOutline size="xl" />
@@ -259,7 +260,7 @@
                     <Card
                         class={"max-w-[80%] w-fit min-w-40 py-2 px-3 sm:py-3 sm:px-4 break-all" +
                             (Me.value.email == message.admin?.email
-                                ? " bg-sky-100 dark:bg-sky-900" + (show.value || chatWidth < 1300 ? " ml-auto" : " ml-0")
+                                ? " bg-sky-100 dark:bg-sky-900" + (panel.show || chatWidth < 1300 ? " ml-auto" : " ml-0")
                                 : "")}>
                         <p class="sm:text-lg font-bold">
                             {message.admin?.email ?? chat.student.email}
@@ -334,32 +335,21 @@
                 {/each}
             </div>
         </div>
-        {#if modalImage}
-            <div
-                class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
-                on:click={closeImage}>
-                <img
-                    src={modalImage}
-                    class="w-auto h-auto max-w-[100vw] max-h-[100vh]"
-                    on:click|stopPropagation />
-            </div>
-        {/if}
+        
         <Sidebar
-                class={show.value ? "fixed md:relative" : "hidden"}
-                asideClass={"w-full md:w-md h-full flex-none md:border-s border-gray-200 dark:border-gray-600"
-                    + (show.value ? "" : " hidden")}>
+                class={panel.show ? "fixed md:relative" : "hidden"}
+                asideClass={"w-full md:w-[430px] h-full flex-none md:border-s border-gray-200 dark:border-gray-600"
+                    + (panel.show ? "" : " hidden")}>
             <SidebarWrapper class="bg-white h-full px-4 py-3 sm:px-6 sm:py-5">
-                <button on:click={() => show.value = false}
+                <button on:click={() => panel.show = false}
                         class="absolute right-2 top-1 sm:right-4 sm:top-3 rounded p-1 hover:bg-gray-100 dark:hover:bg-gray-600
                             focus:outline-none cursor-pointer md:hidden">
                     <CloseOutline size="xl" />
                 </button>
                 <Tabs tabStyle="underline">
                     <TabItem open title="Информация">
+                        <Heading tag="h5" class="mb-3">{chat.student?.info.surname} {chat.student?.info.name} {chat.student?.info.patronymic}</Heading>
                         <ul>
-                            <li><p><b>Фамилия:</b> {chat.student?.info.surname}</p></li>
-                            <li><p><b>Имя:</b> {chat.student?.info.name}</p></li>
-                            <li><p><b>Отчество:</b> {chat.student?.info.patronymic}</p></li>
                             <li><p><b>Почта:</b> {chat.student?.email}</p></li>
                             <li><p><b>Номер студенческого:</b> {chat.student?.info.personalNumber}</p></li>
                             <li><p><b>Дата рождения:</b> {chat.student?.info.dateOfBirth}</p></li>
@@ -408,5 +398,19 @@
                 </Tabs>
             </SidebarWrapper>
         </Sidebar>
+
+        {#if modalImage}
+            <div
+                class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+                on:click={closeImage}>
+                <img
+                    src={modalImage}
+                    class="w-auto h-auto max-w-[100vw] max-h-[100vh]"
+                    on:click|stopPropagation />
+                <div class="absolute top-0 right-0 cursor-pointer" on:click={closeImage}>
+                    <CloseOutline class="h-[2vw] w-auto" />
+                </div>
+            </div>
+        {/if}
     </div>
 {/if}

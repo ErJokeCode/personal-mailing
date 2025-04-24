@@ -37,25 +37,26 @@
     const add = async () => {
         if (selected === 'Нет категорий') {
             notifications.add({
-                        type: "error",
-                        text: "Добавьте категорию",
-                    });
+                type: "error",
+                text: "Добавьте категорию",
+            });
             return;
         }
         if (selected === 'Не выбрано') {
             notifications.add({
-                        type: "error",
-                        text: "Выберите категорию",
-                    });
+                type: "error",
+                text: "Выберите категорию",
+            });
             return;
         }
         if (question === '') {
             notifications.add({
-                        type: "error",
-                        text: "Заполните данные",
-                    });
+                type: "error",
+                text: "Заполните данные",
+            });
             return;
         }
+
         let body = {
             answer: answer,
             answer_tags: [],
@@ -64,26 +65,28 @@
             tutor_id: Me.value.id,
             category_id: document.getElementById('topic').value,
         };
-            let response = await fetch(`${Base}/knowledge-items/`, {
-                method: 'POST',
-                headers: {
-                    Accept: "application/json, */*",
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(body),
-                credentials: "include",
+
+        let response = await fetch(`${Base}/knowledge-items/`, {
+            method: 'POST',
+            headers: {
+                Accept: "application/json, */*",
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+            credentials: "include",
+        });
+
+        if (response.ok) {
+            notifications.add({
+                type: "ok",
+                text: "Вопрос успешно добавлен",
             });
-            if (response.ok) {
-                notifications.add({
-                            type: "ok",
-                            text: "Вопрос успешно добавлен",
-                        });
-            } else {
-                notifications.add({
-                    type: "error",
-                    text: response.statusText,
-                })
-            }
+        } else {
+            notifications.add({
+                type: "error",
+                text: response.statusText,
+            })
+        }
     }
     
     let selectedFiles: FileList | undefined = $state();

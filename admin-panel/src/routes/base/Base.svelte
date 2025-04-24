@@ -153,7 +153,7 @@
             body = {
                 query: searchTerm,
                 tutor_id: Me.value.id,
-                category_id: Number(document.getElementById('selected').value),
+                category_id: document.getElementById('selected').value,
                 size: 100,
             };
         }
@@ -167,7 +167,6 @@
             credentials: "include",
         });
         let json = await response?.json();
-        console.log(json)
         knowledgeItems = json;
     };
 

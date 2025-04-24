@@ -5,4 +5,4 @@ export const Chats = $state({
     search: "",
 });
 
-export let show = $state({value: false});
+export let panel = $state({show: false});

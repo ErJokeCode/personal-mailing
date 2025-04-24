@@ -82,5 +82,5 @@
         <ChevronRightOutline />
     </PaginationItem>
 
-    <span class="dark:text-white text-lg">Кол-во: {paged.totalCount}</span>
+    <span class="dark:text-white text-lg ml-1">Кол-во: {paged.totalCount}</span>
 </div>

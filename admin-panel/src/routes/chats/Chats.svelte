@@ -112,7 +112,7 @@
                                             {chat.student.info.surname} {chat.student.info.name[0]}. {chat.student.info.patronymic[0]}.
                                         </div>
                                     {/if}
-                                    <div class="font-normal text-gray-500 dark:text-gray-400">
+                                    <div class="font-normal text-sm text-gray-500 dark:text-gray-400">
                                         {new Date(chat.messages[0].createdAt).toLocaleTimeString("ru")}
                                     </div>
                                 </div>

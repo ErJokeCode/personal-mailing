@@ -57,7 +57,7 @@
             {#each chats as chat}
                 <Card
                     on:click={() => toChat(chat.student.id)}
-                    class="hover:bg-gray-100 dark:hover:bg-gray-600 hover:cursor-pointer">
+                    class="hover:bg-gray-100 dark:hover:bg-gray-600 hover:cursor-pointer p-4 sm:p-4">
                     <div><strong>{chat.student.email}:</strong></div>
                     <p>
                         "{chat.messages[0].content.length > 20
