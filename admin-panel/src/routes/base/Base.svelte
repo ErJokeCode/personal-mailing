@@ -23,36 +23,37 @@
     import Panel from "/src/lib/components/Panel.svelte";
     import Breadcrumbs from "/src/lib/components/Breadcrumbs.svelte";
     import { onMount } from "svelte";
-    import { Me } from "/src/stores/Me.svelte";
     import ToastNotifications from "/src/lib/components/ToastNotifications.svelte";
     import { Base } from "/src/lib/server";
 
     let notifications: ToastNotifications;
 
     let categories = $state([]);
-    let knowledgeItems = $state([]);
+    let questions = $state([]);
 
     let searchTerm = $state("");
     let searched = $state(false);
-    let selected= $state();
+    let selected = $state();
 
     let addOpen = $state(false);
     let newCategory = $state("");
+    let newDescription = $state("");
     let errAddCategory = $state("");
 
     let editOpen = $state(false);
     let changeCategory = $state("");
+    let changeDescription = $state("");
     let errChangeCategory = $state("");
 
     let deleteOpen = $state(false);
 
     onMount(async () => {
         await getCategories();
-        await getKnowledgeItems();
+        await getQuestions();
     });
 
     const getCategories = async () => {
-        let response = await fetch(`${Base}/categories/`, {
+        let response = await fetch(`${Base}/category/`, {
             method: 'GET',
             credentials: "include",
         });
@@ -60,13 +61,13 @@
         categories = json;
     };
 
-    const getKnowledgeItems = async () => {
-        let response = await fetch(`${Base}/knowledge-items/`, {
+    const getQuestions = async () => {
+        let response = await fetch(`${Base}/question/`, {
             method: 'GET',
             credentials: "include",
         });
         let json = await response?.json();
-        knowledgeItems = json;
+        questions = json;
     };
     
     const addCategory = async () => {
@@ -76,9 +77,9 @@
         }
         let body = {
             name: newCategory,
-            tutor_id: Me.value.id,
+            description: newDescription,
         };
-        let response = await fetch(`${Base}/categories/`, {
+        let response = await fetch(`${Base}/category/`, {
             method: 'POST',
             headers: {
                 Accept: "application/json, */*",
@@ -91,7 +92,8 @@
             errAddCategory = response.status + ' ' + response.statusText;
             return;
         }
-        newCategory = '';
+        newCategory = "";
+        newDescription = "",
         getCategories();
         addOpen = false;
     };
@@ -103,9 +105,9 @@
         }
         let body = {
             name: changeCategory,
-            tutor_id: Me.value.id,
+            description: changeDescription,
         };
-        let response = await fetch(`${Base}/categories/${id}`, {
+        let response = await fetch(`${Base}/category/${id}`, {
             method: 'PATCH',
             headers: {
                 Accept: "application/json, */*",
@@ -118,13 +120,14 @@
             errChangeCategory = response.status + ' ' + response.statusText;
             return;
         }
-        changeCategory = '';
+        changeCategory = "";
+        changeDescription = "",
         getCategories();
         editOpen = false;
     };
     
     const deleteCategory = async (id) => {
-        await fetch(`${Base}/categories/${id}`, {
+        await fetch(`${Base}/category/${id}`, {
             method: 'DELETE',
             credentials: "include",
         });
@@ -139,39 +142,29 @@
         searched = true;
         if (searchTerm === '') {
             searched = false;
-            getKnowledgeItems();
+            getQuestions();
             return;
         }
-        let body;
-        if (selected === 'Все категории') {
-            body = {
-                query: searchTerm,
-                tutor_id: Me.value.id,
-                size: 100,
-            };
-        } else {
-            body = {
-                query: searchTerm,
-                tutor_id: Me.value.id,
-                category_id: document.getElementById('selected').value,
-                size: 100,
-            };
+        let url = new URL(`${Base}/question/`);
+
+        url.searchParams.append("search", searchTerm);
+        if (selected !== "Все категории") {
+            url.searchParams.append("id_category", document.getElementById('selected').value );
         }
-        let response = await fetch(`${Base}/search/`, {
-            method: 'POST',
-            headers: {
-                Accept: "application/json, */*",
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify(body),
-            credentials: "include",
-        });
+        
+        let response = await fetch(url, { credentials: "include" });
         let json = await response?.json();
-        knowledgeItems = json;
+        questions = json;
     };
 
     function fullInfo(id) {
         goto(`/base-edit/${id}`);
+    }
+
+    function edit(category, description) {
+        editOpen = true;
+        changeCategory = category;
+        changeDescription = description;
     }
 </script>
 
@@ -204,14 +197,14 @@
     </div>
     
     <Label class="space-y-2 mb-2">Категория</Label>
-    {#if categories.length !== 0}
+    {#if categories.total_record !== 0}
         <select id="selected"
             bind:value={selected}
             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg mb-5
                 focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600
                 dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500">
             <option selected value='Все категории'>Все категории</option>
-            {#each categories as category}
+            {#each categories.content as category}
                 <option value={category.id}>{category.name}</option>
             {/each}
         </select>
@@ -222,10 +215,10 @@
     {#if searched}
         <Table hoverable>
             <TableBody>
-                {#each knowledgeItems.hits as knowledgeItem}
-                    <TableBodyRow on:click={() => fullInfo(knowledgeItem.id)}>
+                {#each questions.content as question}
+                    <TableBodyRow on:click={() => fullInfo(question.id)}>
                         <TableBodyCell
-                            >{knowledgeItem.question}</TableBodyCell>
+                            >{question.question}</TableBodyCell>
                     </TableBodyRow>
                 {/each}
             </TableBody>
@@ -235,12 +228,16 @@
             class="mb-5"
             multiple
             classActive="dark:bg-gray-600 dark:focus:ring-gray-700">
-            {#each categories as category}
+            {#each categories.content as category}
                 <AccordionItem
                     borderOpenClass="p-1 border-s border-e border-b border-gray-200 dark:border-gray-700">
                     <span slot="header">{category.name}</span>
+                    <div class="mx-3 mt-3">
+                        <b>Описание: </b>
+                        {category.description}
+                    </div>
                     <div class="mx-3 space-x-3">
-                        <Button class='my-3' on:click={() => editOpen = true}
+                        <Button class='my-3' on:click={() => edit(category.name, category.description)}
                             >Редактировать категорию</Button>
                         <Button class='mb-3' on:click={() => deleteOpen = true}
                             >Удалить категорию</Button>
@@ -256,6 +253,14 @@
                                 placeholder="Введите название"
                                 size="md" />
                             <Helper class="text-md" color="red">{errChangeCategory}</Helper>
+                        </Label>
+                        <Label class="flex flex-col space-y-2">
+                            <span>Описание</span>
+                            <Input
+                                bind:value={changeDescription}
+                                type="text"
+                                placeholder="Введите описание"
+                                size="md" />
                         </Label>
                         <svelte:fragment slot="footer">
                             <Button class='ml-auto'
@@ -283,11 +288,11 @@
                     </Modal>
                     <Table hoverable>
                         <TableBody>
-                            {#each knowledgeItems as knowledgeItem}
-                                {#if category.id === knowledgeItem.category_id}
-                                    <TableBodyRow on:click={() => fullInfo(knowledgeItem.id)}>
+                            {#each questions.content as question}
+                                {#if category.id === question.id_category}
+                                    <TableBodyRow on:click={() => fullInfo(question.id)}>
                                         <TableBodyCell
-                                            >{knowledgeItem.question}</TableBodyCell>
+                                            >{question.question}</TableBodyCell>
                                     </TableBodyRow>
                                 {/if}
                             {/each}
@@ -310,6 +315,14 @@
                     placeholder="Введите название"
                     size="md" />
                 <Helper class="text-md" color="red">{errAddCategory}</Helper>
+            </Label>
+            <Label class="flex flex-col space-y-2">
+                <span>Описание</span>
+                <Input
+                    bind:value={newDescription}
+                    type="text"
+                    placeholder="Введите описание"
+                    size="md" />
             </Label>
             <svelte:fragment slot="footer">
                 <Button class='ml-auto' on:click={() => addCategory()}>Добавить</Button>

@@ -11,7 +11,6 @@
     import Panel from "/src/lib/components/Panel.svelte";
     import Breadcrumbs from "/src/lib/components/Breadcrumbs.svelte";
     import { onMount } from "svelte";
-    import { Me } from "/src/stores/Me.svelte";
     import ToastNotifications from "/src/lib/components/ToastNotifications.svelte";
     import { Base } from "/src/lib/server";
 
@@ -22,23 +21,22 @@
     let selected = $state('Не выбрано');
 
     let question = $state('');
-    let answer = $state('');
 
     onMount(async () => {
-        let response = await fetch(`${Base}/categories/`, {
+        let response = await fetch(`${Base}/category/`, {
                 method: 'GET',
                 credentials: "include",
             });
         let json = await response?.json();
         categories = json;
-        if (categories.length === 0) selected = 'Нет категорий'
+        if (categories.total_record === 0) selected = 'Нет категорий'
     });
 
     const add = async () => {
         if (selected === 'Нет категорий') {
             notifications.add({
                 type: "error",
-                text: "Добавьте категорию",
+                text: "Сначала добавьте категорию",
             });
             return;
         }
@@ -58,15 +56,11 @@
         }
 
         let body = {
-            answer: answer,
-            answer_tags: [],
+            id_category: document.getElementById('topic').value,
             question: question,
-            question_tags: [],
-            tutor_id: Me.value.id,
-            category_id: document.getElementById('topic').value,
         };
 
-        let response = await fetch(`${Base}/knowledge-items/`, {
+        let response = await fetch(`${Base}/question/`, {
             method: 'POST',
             headers: {
                 Accept: "application/json, */*",
@@ -112,41 +106,27 @@
     <form>
         <Label class="space-y-2 mb-2">Категория</Label>
         <div class='flex space-x-3'>
-            <div class="w-1/2">
-                {#if categories.length !== 0}
-                    <select id="topic"
-                        bind:value={selected}
-                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
-                            focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600
-                            dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500">
-                        <option selected disabled value='Не выбрано'>Не выбрано</option>
-                        {#each categories as category}
-                            <option value={category.id}>{category.name}</option>
-                        {/each}
-                    </select>
-                {:else}
-                    <Select disabled placeholder='Нет категорий' />
-                {/if}
-            </div>
-            <div class="w-1/2">
-                <Fileupload clearable bind:files={selectedFiles} multiple />
-                <Helper class="mt-2">{fileNames}</Helper>
-            </div>
+            {#if categories.total_record !== 0}
+                <select id="topic"
+                    bind:value={selected}
+                    class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg
+                        focus:ring-orange-500 focus:border-orange-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600
+                        dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500">
+                    <option selected disabled value='Не выбрано'>Не выбрано</option>
+                    {#each categories.content as category}
+                        <option value={category.id}>{category.name}</option>
+                    {/each}
+                </select>
+            {:else}
+                <Select disabled placeholder='Нет категорий' />
+            {/if}
         </div>
     </form>
 
-    <div class="mb-5">
+    <div class="my-5">
         <Label class="mb-2">Вопрос</Label>
         <Textarea
             bind:value={question}
-            placeholder="Введите текст"
-            rows={4} />
-    </div>
-
-    <div class="mb-5">
-        <Label class="mb-2">Ответ (опционально)</Label>
-        <Textarea
-            bind:value={answer}
             placeholder="Введите текст"
             rows={4} />
     </div>

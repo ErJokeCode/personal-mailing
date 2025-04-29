@@ -10,12 +10,11 @@
         A,
     } from "flowbite-svelte";
     import { Label, Modal } from "flowbite-svelte";
-    import { ExclamationCircleOutline, FileLinesOutline } from "flowbite-svelte-icons";
+    import { CloseOutline, ExclamationCircleOutline } from "flowbite-svelte-icons";
     import Panel from "/src/lib/components/Panel.svelte";
     import http from "/src/lib/utils/http";
     import Breadcrumbs from "/src/lib/components/Breadcrumbs.svelte";
     import { onMount } from "svelte";
-    import { Me } from "/src/stores/Me.svelte";
     import ToastNotifications from "/src/lib/components/ToastNotifications.svelte";
     import { goto } from "@mateothegreat/svelte5-router";
     import ErrorAlert from "/src/lib/components/ErrorAlert.svelte";
@@ -33,15 +32,16 @@
 
     let categories = $state([]);
 
-    let knowledgeItem = $state();
+    let question = $state();
+    let answer = $state();
 
-    let question = $state("");
-    let answer = $state("");
+    let newQuestion = $state("");
+    let newAnswer = $state("");
 
     let deleteOpen = $state(false);
 
     onMount(async () => {
-        await getKnowledgeItem();
+        await getQuestion();
         await getCategories();
         await getChats();
     });
@@ -53,7 +53,7 @@
     }
 
     const getCategories = async () => {
-        let response = await fetch(`${Base}/categories/`, {
+        let response = await fetch(`${Base}/category/`, {
             method: 'GET',
             credentials: "include",
         });
@@ -61,8 +61,8 @@
         categories = json;
     }
 
-    const getKnowledgeItem = async () => {
-        let response = await fetch(`${Base}/knowledge-items/${id}`, {
+    const getQuestion = async () => {
+        let response = await fetch(`${Base}/question/${id}`, {
             method: 'GET',
             credentials: "include",
         });
@@ -70,25 +70,97 @@
         if (!response.ok) {
             errorMessage = json.detail;
         }
-        knowledgeItem = json;
-        question = knowledgeItem.question;
-        answer = knowledgeItem.answer;
+        question = json;
+        if (question.answers.length !== 0) {
+            answer = question.answers[0];
+            newAnswer = answer.answer;
+        }
+        newQuestion = question.question;
     }
 
-    const update = async () => {
+    const createAnswer = async () => {
+        let body = {
+            id_question: question.id,
+            answer: newAnswer,
+        };
+        let response = await fetch(`${Base}/answer/`, {
+            method: 'POST',
+            headers: {
+                Accept: "application/json, */*",
+                "Content-Type": "application/json",
+            },
+            credentials: "include",
+            body: JSON.stringify(body)
+        });
+        let json = await response.json();
+        answer = json;
+        newAnswer = answer.answer;
+    }
+
+    const changeAnswer = async (added=true) => {
+        if (question.answers.length === 0) {
+            createAnswer();
+        } else {
+            if (added && selectedFiles !== undefined) {
+                let data = new FormData();
+                for (let file of selectedFiles) {
+                    data.append("files", file);
+                }
+                await fetch(`${Base}/answer/${answer.id}/file`, {
+                    method: 'POST',
+                    body: data,
+                    credentials: "include",
+                });
+            }
+            if (newAnswer !== answer.answer) {
+                let body = {
+                    id_question: question.id,
+                    answer: newAnswer,
+                };
+                await fetch(`${Base}/answer/${answer.id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        Accept: "application/json, */*",
+                        "Content-Type": "application/json",
+                    },
+                    credentials: "include",
+                    body: JSON.stringify(body)
+                });
+            }
+            getQuestion();
+        }
+    }
+
+    const removeFile = async (id) => {
+        let response = await fetch(`${Base}/file/${id}`, {
+            method: 'DELETE',
+            credentials: "include",
+        });
+        if (response.ok) {
+            notifications.add({
+                type: "ok",
+                text: "Успешно удалено",
+            });
+            getQuestion();
+        } else {
+            notifications.add({
+                type: "error",
+                text: response.statusText,
+            })
+        }
+    }
+
+    const updateQuestion = async () => {
         let newId = document.getElementById('topic').value;
-        if (question === knowledgeItem.question && answer === knowledgeItem.answer && newId === knowledgeItem.category_id) return;
+        if (newQuestion === question.question && selectedFiles === undefined && newId === question.id_category && newAnswer === answer?.answer) return;
+        changeAnswer();
 
         let body = {
-            question: question,
-            question_tags: [],
-            answer: answer,
-            answer_tags: [],
-            tutor_id: Me.value.id,
-            category_id: newId,
+            id_category: newId,
+            question: newQuestion,
         };
 
-        let response = await fetch(`${Base}/knowledge-items/${id}`, {
+        let response = await fetch(`${Base}/question/${id}`, {
             method: 'PATCH',
             headers: {
                 Accept: "application/json, */*",
@@ -103,7 +175,7 @@
                 type: "ok",
                 text: "Успешно изменено",
             });
-            getKnowledgeItem();
+            getQuestion();
         } else {
             notifications.add({
                 type: "error",
@@ -112,8 +184,8 @@
         }
     }
 
-    const deleteItem = async () => {
-        await fetch(`${Base}/knowledge-items/${id}`, {
+    const deleteQuestion = async () => {
+        await fetch(`${Base}/question/${id}`, {
             method: 'DELETE',
             credentials: "include",
         });
@@ -126,17 +198,17 @@
             let data = new FormData();
 
             let body = JSON.stringify({
-                content: `${question}\n${answer}`,
+                content: `${newQuestion}\n${newAnswer}`,
                 studentId: selectedChat.student.id,
             });
 
             data.append("body", body);
 
-            // if (files !== null) {
-            //     for (let file of files) {
-            //         data.append("documents", file);
-            //     }
-            // }
+            if (answer?.files.length !== 0) {
+                for (let file of answer?.files) {
+                    data.append("documents", file);
+                }
+            }
 
             let res = await fetch(ChatsApi, {
                 method: "POST",
@@ -238,8 +310,8 @@
                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg mr-auto
                             focus:ring-orange-500 focus:border-orange-500 block w-1/2 p-2.5 dark:bg-gray-700 dark:border-gray-600
                             dark:placeholder-gray-400 dark:text-white dark:focus:ring-orange-500 dark:focus:border-orange-500">
-                        {#each categories as category}
-                            {#if category.id === knowledgeItem.category_id}
+                        {#each categories.content as category}
+                            {#if category.id === question.id_category}
                                 <option selected value={category.id}>{category.name}</option>
                             {:else}
                                 <option value={category.id}>{category.name}</option>
@@ -262,7 +334,7 @@
                         <Button
                             color="red"
                             class="me-2"
-                            on:click={() => deleteItem()}>Да, удалить</Button>
+                            on:click={() => deleteQuestion()}>Да, удалить</Button>
                         <Button color="alternative">Нет, не удалять</Button>
                     </div>
                 </Modal>
@@ -271,7 +343,7 @@
             <div class="mb-5">
                 <Label class="mb-2">Вопрос</Label>
                 <Textarea
-                    bind:value={question}
+                    bind:value={newQuestion}
                     placeholder="Введите текст"
                     rows={4} />
             </div>
@@ -279,16 +351,16 @@
             <div class="mb-5">
                 <Label class="mb-2">Ответ</Label>
                 <Textarea
-                    bind:value={answer}
+                    bind:value={newAnswer}
                     placeholder="Введите текст"
                     rows={4} />
             </div>
     
             <div class="flex justify-center">
-                <Button on:click={() => update()} size="lg" class="mb-1 justify-center">Сохранить</Button>
+                <Button on:click={() => updateQuestion()} size="lg" class="mb-1 justify-center">Сохранить</Button>
             </div>
         </Panel>
-        <div class="w-full md:w-5/12">
+        <div class="w-full md:w-5/12 flex flex-col">
             <Panel class="mb-4">
                 <Heading
                     tag="h2"
@@ -297,18 +369,10 @@
                 </Heading>
                 <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
                     <b>Создано:</b>
-                    {new Date(knowledgeItem?.created_at).toLocaleString("ru")}
-                </p>
-                <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
-                    <b>Изменено:</b>
-                    {new Date(knowledgeItem?.updated_at).toLocaleString("ru")}
-                </p>
-                <p class="text-l text-gray-500 dark:text-gray-100 mb-2">
-                    <b>Создал:</b>
-                    {knowledgeItem?.tutor_id}
+                    {new Date(question?.created_at).toLocaleString("ru")}
                 </p>
             </Panel>
-            <Panel class="mb-4 flex flex-column flex-1">
+            <Panel class="mb-4 flex flex-col flex-1">
                 <Heading
                     tag="h2"
                     class="text-xl font-semibold text-gray-900 dark:text-white sm:text-2xl mb-4">
@@ -318,16 +382,22 @@
                     <Fileupload clearable bind:files={selectedFiles} multiple />
                     <Helper class="mt-2">{fileNames}</Helper>
                 </div>
-                <!-- <div class="flex gap-1 flex-col items-baseline">
-                    {#each body.documents as document}
-                        <A href={`${DocumentsApi}/${document.blobId}`}>
-                            {document.name}
-                        </A>
+                <div class="flex gap-1 flex-col items-baseline">
+                    {#each answer?.files as file}
+                        <div class="flex space-x-2 items-center">
+                            <A href={`${Base}}/file/${file.id}/download/`}>
+                                {file.filename}
+                            </A>
+                            <Button
+                                on:click={() => removeFile(file.id)}
+                                outline
+                                color="red"
+                                size="xs"
+                                class="w-5 h-5">
+                                <CloseOutline />
+                            </Button>
+                        </div>
                     {/each}
-                </div> -->
-                <A>bibabiba</A>
-                <A>bibabiba2</A>
-                <A>bibabiba3</A>
             </Panel>
             <Panel>
                 <Label class="mb-2">Отправить ответ на вопрос студенту</Label>
